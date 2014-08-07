@@ -3,6 +3,9 @@ package com.stratio.specs;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.equalTo;
+
+import java.util.List;
 
 import com.stratio.specs.BaseGSpec;
 import com.stratio.specs.CommonG;
@@ -15,16 +18,19 @@ public class ThenGSpec extends BaseGSpec {
 		this.commonspec = spec;
 	}
 
-	@Then("^an exception '(.*?)' thrown$")
-	public void assertExceptionNotThrown(String exception) {
+	@Then("^an exception '(.*?)' thrown( with class '(.*?)')?")
+	public void assertExceptionNotThrown(String exception, String foo, String clazz) {
 		commonspec.getLogger().info("Verifying thrown exceptions existance");
 
 		if ("IS NOT".equals(exception)) {
 			assertThat("Captured exception list is not empty",
 					commonspec.getExceptions(), hasSize(0));
 		} else {
+			List<Exception> exceptions = commonspec.getExceptions(); 
+			assertThat("Unexpected last exception class",
+					exceptions.get(exceptions.size() - 1).getClass().getSimpleName(), equalTo(clazz));
 			assertThat("Captured exception list is empty",
-					commonspec.getExceptions(), not(hasSize(0)));
+					exceptions, not(hasSize(0)));
 			commonspec.getExceptions().clear();
 		}
 	}
