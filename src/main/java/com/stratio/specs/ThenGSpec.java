@@ -1,6 +1,7 @@
 package com.stratio.specs;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.cthul.matchers.CthulMatchers.*;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.equalTo;
@@ -18,9 +19,9 @@ public class ThenGSpec extends BaseGSpec {
 		this.commonspec = spec;
 	}
 
-	@Then("^an exception '(.*?)' thrown( with class '(.*?)')?")
+	@Then("^an exception '(.*?)' thrown( with class '(.*?)'( and message like '(.*?)')?)?")
 	public void assertExceptionNotThrown(String exception, String foo,
-			String clazz) {
+			String clazz, String bar, String exceptionMsg) {
 		commonspec.getLogger().info("Verifying thrown exceptions existance");
 
 		if ("IS NOT".equals(exception)) {
@@ -32,6 +33,11 @@ public class ThenGSpec extends BaseGSpec {
 				assertThat("Unexpected last exception class",
 						exceptions.get(exceptions.size() - 1).getClass()
 								.getSimpleName(), equalTo(clazz));
+				if (exceptionMsg != null) {
+					assertThat("Unexpected last exception message", exceptions
+							.get(exceptions.size() - 1).getMessage(),
+							containsPattern(exceptionMsg));
+				}
 			}
 			assertThat("Captured exception list is empty", exceptions,
 					not(hasSize(0)));
