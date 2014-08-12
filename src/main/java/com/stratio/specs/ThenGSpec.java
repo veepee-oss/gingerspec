@@ -19,18 +19,22 @@ public class ThenGSpec extends BaseGSpec {
 	}
 
 	@Then("^an exception '(.*?)' thrown( with class '(.*?)')?")
-	public void assertExceptionNotThrown(String exception, String foo, String clazz) {
+	public void assertExceptionNotThrown(String exception, String foo,
+			String clazz) {
 		commonspec.getLogger().info("Verifying thrown exceptions existance");
 
 		if ("IS NOT".equals(exception)) {
 			assertThat("Captured exception list is not empty",
 					commonspec.getExceptions(), hasSize(0));
 		} else {
-			List<Exception> exceptions = commonspec.getExceptions(); 
-			assertThat("Unexpected last exception class",
-					exceptions.get(exceptions.size() - 1).getClass().getSimpleName(), equalTo(clazz));
-			assertThat("Captured exception list is empty",
-					exceptions, not(hasSize(0)));
+			List<Exception> exceptions = commonspec.getExceptions();
+			if (clazz != null) {
+				assertThat("Unexpected last exception class",
+						exceptions.get(exceptions.size() - 1).getClass()
+								.getSimpleName(), equalTo(clazz));
+			}
+			assertThat("Captured exception list is empty", exceptions,
+					not(hasSize(0)));
 			commonspec.getExceptions().clear();
 		}
 	}
