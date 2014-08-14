@@ -1,0 +1,50 @@
+package com.stratio.tests.utils;
+
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.Socket;
+
+import org.jacoco.core.data.ExecutionDataWriter;
+import org.jacoco.core.runtime.RemoteControlReader;
+import org.jacoco.core.runtime.RemoteControlWriter;
+import org.testng.ITestContext;
+import org.testng.TestListenerAdapter;
+
+public class JaCoCoClient extends TestListenerAdapter {
+
+	private static final String DESTFILE = "target/executions/jacoco-client.exec";
+	private static final String ADDRESS = "localhost";
+	private static final int PORT = 6300;
+		
+	@Override
+	public void onFinish(ITestContext context) {
+
+		FileOutputStream localFile;
+		try {
+			localFile = new FileOutputStream(DESTFILE);		
+		final ExecutionDataWriter localWriter = new ExecutionDataWriter(
+				localFile);
+
+		// Open a socket to the coverage agent:
+		final Socket socket = new Socket(InetAddress.getByName(ADDRESS), PORT);
+		final RemoteControlWriter writer = new RemoteControlWriter(
+				socket.getOutputStream());
+		final RemoteControlReader reader = new RemoteControlReader(
+				socket.getInputStream());
+		reader.setSessionInfoVisitor(localWriter);
+		reader.setExecutionDataVisitor(localWriter);
+
+		// Send a dump command and read the response:
+		writer.visitDumpCommand(true, false);
+		reader.read();
+
+		socket.close();
+		localFile.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+}
