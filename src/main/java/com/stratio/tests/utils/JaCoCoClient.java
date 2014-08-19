@@ -48,8 +48,8 @@ public class JaCoCoClient extends TestListenerAdapter {
 			localFile.close();
 		} catch (IOException e) {
 			logger.warn(
-					"Exception on fetching remote coverage. is the remote JaCoCo agent set up?",
-					e);
+					"Exception on fetching remote coverage. is the remote JaCoCo agent set up?: {}",
+					e.getMessage());
 		}
 
 	}
