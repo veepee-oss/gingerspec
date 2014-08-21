@@ -3,6 +3,7 @@ package com.stratio.cucumber.testng;
 import gherkin.formatter.Formatter;
 import gherkin.formatter.Reporter;
 import gherkin.formatter.model.Background;
+import gherkin.formatter.model.DataTableRow;
 import gherkin.formatter.model.Examples;
 import gherkin.formatter.model.Feature;
 import gherkin.formatter.model.Match;
@@ -373,9 +374,21 @@ class CucumberReporter implements Formatter, Reporter {
 				}
 				sb.append(steps.get(i).getKeyword());
 				sb.append(steps.get(i).getName());
+				if (steps.get(i).getRows() != null) {
+					for (DataTableRow row : steps.get(i).getRows()) {
+						String strrow = "| ";
+						for (String cell : row.getCells()) {
+							strrow += cell + " | ";
+						}
+						sb.append("\n\t\t" + strrow);
+					}
+					do {
+						sb.append(".");
+					} while (sb.length() - length < 201); //98
+				}
 				do {
 					sb.append(".");
-				} while (sb.length() - length < 106);
+				} while (sb.length() - length < 130);
 				sb.append(resultStatus + resultStatusWarn);
 				sb.append("\n");
 			}
