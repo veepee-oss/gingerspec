@@ -3,10 +3,14 @@ package com.stratio.specs;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.cthul.matchers.CthulMatchers.*;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
 
 import java.util.List;
+
+import org.hamcrest.core.IsNull;
 
 import com.stratio.specs.BaseGSpec;
 import com.stratio.specs.CommonG;
@@ -24,11 +28,13 @@ public class ThenGSpec extends BaseGSpec {
 			String clazz, String bar, String exceptionMsg) {
 		commonspec.getLogger().info("Verifying thrown exceptions existance");
 
+		List<Exception> exceptions = commonspec.getExceptions();
 		if ("IS NOT".equals(exception)) {
 			assertThat("Captured exception list is not empty",
-					commonspec.getExceptions(), hasSize(0));
-		} else {
-			List<Exception> exceptions = commonspec.getExceptions();
+					exceptions, hasSize(0));
+		} else {			
+			assertThat("Captured exception list is empty",
+					commonspec.getExceptions(), hasSize(greaterThan((0))));
 			if (clazz != null) {
 				assertThat("Unexpected last exception class",
 						exceptions.get(exceptions.size() - 1).getClass()
