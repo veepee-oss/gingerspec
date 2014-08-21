@@ -67,5 +67,10 @@
 			<artifactId>org.jacoco.core</artifactId>
 			<version>0.7.1.201405082137</version>
 		</dependency>
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjweaver</artifactId>
+			<version>1.8.2</version>
+		</dependency>
 	</dependencies>
 </project>
