@@ -363,8 +363,7 @@ class CucumberReporter implements Formatter, Reporter {
 
 		private void addStepAndResultListing(StringBuilder sb) {
 
-			for (int i = 0; i < steps.size(); i++) {
-				int length = sb.length();
+			for (int i = 0; i < steps.size(); i++) {				
 				String resultStatus = "not executed";
 				String resultStatusWarn = "*";
 				if (i < results.size()) {
@@ -374,21 +373,21 @@ class CucumberReporter implements Formatter, Reporter {
 				}
 				sb.append(steps.get(i).getKeyword());
 				sb.append(steps.get(i).getName());
-				if (steps.get(i).getRows() != null) {
+				int len = 0;
+				len = steps.get(i).getKeyword().length() + steps.get(i).getName().length();
+				if (steps.get(i).getRows() != null) {					
 					for (DataTableRow row : steps.get(i).getRows()) {
 						String strrow = "| ";
 						for (String cell : row.getCells()) {
 							strrow += cell + " | ";
 						}
-						sb.append("\n\t\t" + strrow);
+						len = strrow.length() + 11;
+						sb.append("\n           " + strrow);
 					}
-					do {
-						sb.append(".");
-					} while (sb.length() - length < 201); //98
 				}
-				do {
+				for (int j = 0 ; j + len < 140; j++) {
 					sb.append(".");
-				} while (sb.length() - length < 130);
+				}
 				sb.append(resultStatus + resultStatusWarn);
 				sb.append("\n");
 			}
@@ -401,8 +400,7 @@ class CucumberReporter implements Formatter, Reporter {
 
 			if (message != null) {
 				Element messageElement = doc.createElement("message");
-				message = message.replace("\n", "\n<br>");
-				message = "\r\n<br>\r\n" + message;
+				message = "\r\n<pre>\r\n" + message + "\r\n</pre>\r\n";
 				messageElement.appendChild(doc.createCDATASection(message));
 				exceptionElement.appendChild(messageElement);
 			}
