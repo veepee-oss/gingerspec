@@ -1,19 +1,13 @@
 package com.stratio.specs;
 
+import static org.cthul.matchers.CthulMatchers.containsPattern;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.cthul.matchers.CthulMatchers.*;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.not;
 
 import java.util.List;
-
-import org.hamcrest.core.IsNull;
-
-import com.stratio.specs.BaseGSpec;
-import com.stratio.specs.CommonG;
 
 import cucumber.api.java.en.Then;
 
