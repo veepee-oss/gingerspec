@@ -59,9 +59,11 @@ class CucumberReporter implements Formatter, Reporter {
 	private Examples tmpExamples;
 	private List<Result> tmpHooks = new ArrayList<Result>();
 	private List<Step> tmpSteps = new ArrayList<Step>();
+	private List<Step> tmpStepsBG = new ArrayList<Step>();
 	private Integer iteration = 0;
 	private Integer position = 0;
 	private String callerClass;
+	private Background background;
 
 	public CucumberReporter(URL url, String cClass) throws IOException {
 		this.writer = new UTF8OutputStreamWriter(new URLOutputStream(url));
@@ -120,10 +122,13 @@ class CucumberReporter implements Formatter, Reporter {
 		testMethod = new TestMethod(scenario);
 		testMethod.feature = feat;
 		testMethod.hooks = tmpHooks;
+		tmpStepsBG.clear();
 		if (tmpExamples == null) {
 			testMethod.steps = tmpSteps;
+			testMethod.stepsbg = null;
 		} else {
 			testMethod.steps = new ArrayList<Step>();
+			testMethod.stepsbg = tmpStepsBG;
 		}
 		testMethod.examplesData = tmpExamples;
 		testMethod.start(root, iteration);
@@ -132,11 +137,20 @@ class CucumberReporter implements Formatter, Reporter {
 
 	@Override
 	public void background(Background background) {
+		this.background = background;
 	}
 
 	@Override
 	public void step(Step step) {
-		if (step.getClass().toString().contains("ExampleStep")) {
+		boolean bgstep = false;
+		if (background != null
+				&& (background.getLineRange().getLast() <= step.getLine())
+				&& (step.getLine() >= background.getLineRange().getFirst())) {
+			tmpStepsBG.add(step);
+			bgstep = true;
+		}
+
+		if (step.getClass().toString().contains("ExampleStep") && !bgstep) {
 			testMethod.steps.add(step);
 		} else {
 			tmpSteps.add(step);
@@ -153,6 +167,7 @@ class CucumberReporter implements Formatter, Reporter {
 		}
 		tmpHooks.clear();
 		tmpSteps.clear();
+		tmpStepsBG.clear();
 		testMethod = null;
 	}
 
@@ -272,6 +287,7 @@ class CucumberReporter implements Formatter, Reporter {
 		Examples examplesData;
 		static boolean treatSkippedAsFailure = false;
 		List<Step> steps;
+		List<Step> stepsbg;
 		final List<Result> results = new ArrayList<Result>();
 		List<Result> hooks;
 		Integer iteration = 1;
@@ -363,7 +379,15 @@ class CucumberReporter implements Formatter, Reporter {
 
 		private void addStepAndResultListing(StringBuilder sb) {
 
-			for (int i = 0; i < steps.size(); i++) {				
+			if (stepsbg != null) {
+				List<Step> mergedsteps = new ArrayList<Step>();
+				mergedsteps.addAll(stepsbg);
+				mergedsteps.addAll(steps);
+				steps.clear();
+				steps.addAll(mergedsteps);
+			}
+
+			for (int i = 0; i < steps.size(); i++) {
 				String resultStatus = "not executed";
 				String resultStatusWarn = "*";
 				if (i < results.size()) {
@@ -374,8 +398,9 @@ class CucumberReporter implements Formatter, Reporter {
 				sb.append(steps.get(i).getKeyword());
 				sb.append(steps.get(i).getName());
 				int len = 0;
-				len = steps.get(i).getKeyword().length() + steps.get(i).getName().length();
-				if (steps.get(i).getRows() != null) {					
+				len = steps.get(i).getKeyword().length()
+						+ steps.get(i).getName().length();
+				if (steps.get(i).getRows() != null) {
 					for (DataTableRow row : steps.get(i).getRows()) {
 						String strrow = "| ";
 						for (String cell : row.getCells()) {
@@ -385,7 +410,7 @@ class CucumberReporter implements Formatter, Reporter {
 						sb.append("\n           " + strrow);
 					}
 				}
-				for (int j = 0 ; j + len < 140; j++) {
+				for (int j = 0; j + len < 140; j++) {
 					sb.append(".");
 				}
 				sb.append(resultStatus + resultStatusWarn);
