@@ -28,7 +28,7 @@ public class ThenGSpec extends BaseGSpec {
 					exceptions, hasSize(0));
 		} else {			
 			assertThat("Captured exception list is empty",
-					commonspec.getExceptions(), hasSize(greaterThan((0))));
+					exceptions, hasSize(greaterThan((0))));
 			if (clazz != null) {
 				assertThat("Unexpected last exception class",
 						exceptions.get(exceptions.size() - 1).getClass()
