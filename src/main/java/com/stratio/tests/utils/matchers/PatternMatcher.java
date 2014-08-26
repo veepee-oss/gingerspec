@@ -1,4 +1,4 @@
-package com.stratio.tests.utils;
+package com.stratio.tests.utils.matchers;
 
 import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
