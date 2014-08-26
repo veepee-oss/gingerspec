@@ -2,12 +2,12 @@ package com.stratio.cucumber.converter;
 
 import cucumber.api.Transformer;
 
-public class StreamNameConverter extends Transformer<String> {
+public class NullableStringConverter extends Transformer<String> {
 
 	@Override
 	public String transform(String input) {
 
-		if (input.equals("//NULL//")) {
+		if ("//NULL//".equals(input)) {
 			return null;
 		} else if (input.startsWith("0x")) {
 
