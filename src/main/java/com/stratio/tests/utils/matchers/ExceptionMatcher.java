@@ -30,9 +30,19 @@ public class ExceptionMatcher extends TypeSafeMatcher<Exception> {
 	}
 
 	public void describeTo(Description description) {
+
+		String expectedMessage = String.valueOf(messagePattern);
+		if (expectedMessage.startsWith(".*?")) {
+			expectedMessage = expectedMessage.substring(3);
+		}
+		if (expectedMessage.endsWith(".*?")) {
+			expectedMessage = expectedMessage.substring(0,
+					expectedMessage.length() - 3);
+		}
+
 		description.appendText("an exception with class \"").appendText(clazz)
 				.appendText("\"").appendText(" and a message like  \"")
-				.appendText(String.valueOf(messagePattern)).appendText("\"");
+				.appendText(expectedMessage).appendText("\"");
 	}
 
 	@Override
