@@ -13,8 +13,9 @@ public class ExceptionMatcher extends TypeSafeMatcher<Exception> {
 	private final Pattern messagePattern;
 
 	@Factory
-	public static Matcher<Exception> hasClassAndMessage(String clazz, String regex) {
-		return hasClassAndMessage(clazz, Pattern.compile(regex));
+	public static Matcher<Exception> hasClassAndMessage(String clazz,
+			String regex) {
+		return hasClassAndMessage(clazz, Pattern.compile(".*?" + regex + ".*?"));
 	}
 
 	@Factory
@@ -29,9 +30,8 @@ public class ExceptionMatcher extends TypeSafeMatcher<Exception> {
 	}
 
 	public void describeTo(Description description) {
-		description.appendText("an exception with class \"")
-				.appendText(clazz).appendText("\"")
-				.appendText(" and a message like  \"")
+		description.appendText("an exception with class \"").appendText(clazz)
+				.appendText("\"").appendText(" and a message like  \"")
 				.appendText(String.valueOf(messagePattern)).appendText("\"");
 	}
 
