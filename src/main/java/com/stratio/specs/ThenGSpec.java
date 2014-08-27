@@ -5,13 +5,10 @@ import static com.stratio.tests.utils.matchers.ExceptionMatcher.hasClassAndMessa
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasSize;
 
 import java.util.List;
-
-import com.datastax.driver.core.ResultSet;
-import com.datastax.driver.core.Row;
 
 import cucumber.api.DataTable;
 import cucumber.api.java.en.Then;
