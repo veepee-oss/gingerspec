@@ -6,8 +6,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.hasItem;
 
 import java.util.List;
+
+import com.datastax.driver.core.ResultSet;
+import com.datastax.driver.core.Row;
 
 import cucumber.api.DataTable;
 import cucumber.api.java.en.Then;
@@ -48,23 +52,27 @@ public class ThenGSpec extends BaseGSpec {
 	
 	@Then("^a Casandra keyspace '(.*?)' exists$")
 	public void assertKeyspaceOnCassandraExists(String keyspace){
-		commonspec.getLogger().info("Verifying that the keyspace {} exists", keyspace);
-		boolean result = commonspec.getCassandraClient().existsKeyspace(keyspace, false);
-		if(result){
-			assertThat("The keyspace " + keyspace + "exists on cassandra", true, equalTo(result));
-		}else{
-			assertThat("The keyspace " + keyspace + "does not exist on cassandra.", false, equalTo(result));
-		}
+		commonspec.getLogger().info("Verifying if the keyspace {} exists", keyspace);
+		assertThat("The keyspace " + keyspace + "exists on cassandra", commonspec.getCassandraClient().getKeyspaces(), hasItem(keyspace));
 	}
 	
 	@Then("^a Casandra keyspace '(.*?)' contains a table '(.*?)'$")
 	public void assertTableExistsOnCassandraKeyspace(String keyspace, String tableName){
-		
+		commonspec.getLogger().info("Verifying if the table {} exists in the keyspace {}", tableName,keyspace);
+		assertThat("The table " + tableName + "exists on cassandra", commonspec.getCassandraClient().getTables(keyspace), hasItem(tableName));
 	}
 	
 	@Then("^a Casandra keyspace '(.*?)' contains a table '(.*?)' with '(.*?)' rows$")
 	public void assertRowNumberOfTableOnCassandraKeyspace(String keyspace, String tableName, Integer number_rows){
-		
+		commonspec.getLogger().info("Verifying if the keyspace {} exists", keyspace);
+		commonspec.getCassandraClient().useKeyspace(keyspace);
+		assertThat(
+				"The table " + tableName + "exists on cassandra",
+				commonspec
+						.getCassandraClient()
+						.executeQuery("SELECT COUNT(*) FROM " + tableName + ";")
+						.all().get(0).getInt(0), equalTo(number_rows));
+
 	}
 	
 	@Then("^a Casandra keyspace '(.*?)' contains a table '(.*?)' with values:$")
