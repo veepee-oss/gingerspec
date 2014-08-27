@@ -9,6 +9,7 @@ import static org.hamcrest.Matchers.hasSize;
 
 import java.util.List;
 
+import cucumber.api.DataTable;
 import cucumber.api.java.en.Then;
 
 public class ThenGSpec extends BaseGSpec {
@@ -44,4 +45,37 @@ public class ThenGSpec extends BaseGSpec {
 			commonspec.getExceptions().clear();
 		}
 	}
+	
+	@Then("^a Casandra keyspace '(.*?)' exists$")
+	public void assertKeyspaceOnCassandraExists(String keyspace){
+		commonspec.getLogger().info("Verifying that the keyspace {} exists", keyspace);
+		boolean result = commonspec.getCassandraClient().existsKeyspace(keyspace, false);
+		if(result){
+			assertThat("The keyspace " + keyspace + "exists on cassandra", true, equalTo(result));
+		}else{
+			assertThat("The keyspace " + keyspace + "does not exist on cassandra.", false, equalTo(result));
+		}
+	}
+	
+	@Then("^a Casandra keyspace '(.*?)' contains a table '(.*?)'$")
+	public void assertTableExistsOnCassandraKeyspace(String keyspace, String tableName){
+		
+	}
+	
+	@Then("^a Casandra keyspace '(.*?)' contains a table '(.*?)' with '(.*?)' rows$")
+	public void assertRowNumberOfTableOnCassandraKeyspace(String keyspace, String tableName, Integer number_rows){
+		
+	}
+	
+	@Then("^a Casandra keyspace '(.*?)' contains a table '(.*?)' with values:$")
+	public void assertValuesOfTable(String Keyspace, String tableName, DataTable data){
+		List<List<String>> a = data.raw();
+		for (List<String> z: a) {
+			
+		}
+	}
+	
+	
+	
+	
 }
