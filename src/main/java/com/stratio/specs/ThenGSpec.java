@@ -63,7 +63,7 @@ public class ThenGSpec extends BaseGSpec {
 	}
 	
 	@Then("^a Casandra keyspace '(.*?)' contains a table '(.*?)' with '(.*?)' rows$")
-	public void assertRowNumberOfTableOnCassandraKeyspace(String keyspace, String tableName, Integer number_rows){
+	public void assertRowNumberOfTableOnCassandraKeyspace(String keyspace, String tableName, String number_rows){
 		commonspec.getLogger().info("Verifying if the keyspace {} exists", keyspace);
 		commonspec.getCassandraClient().useKeyspace(keyspace);
 		assertThat(
@@ -71,10 +71,9 @@ public class ThenGSpec extends BaseGSpec {
 				commonspec
 						.getCassandraClient()
 						.executeQuery("SELECT COUNT(*) FROM " + tableName + ";")
-						.all().get(0).getInt(0), equalTo(number_rows));
-
+						.all().get(0).getLong(0), equalTo(new Long(number_rows)));
 	}
-	
+		
 	@Then("^a Casandra keyspace '(.*?)' contains a table '(.*?)' with values:$")
 	public void assertValuesOfTable(String Keyspace, String tableName, DataTable data){
 		List<List<String>> a = data.raw();
