@@ -64,7 +64,7 @@ public class CucumberRunner {
 		runtimeOptions.addFormatter(reporter);
 
 		Set<Class<? extends ICucumberFormatter>> implementers = new Reflections(
-				"com.stratio.tests.utils")
+				"com.stratio.test.utils")
 				.getSubTypesOf(ICucumberFormatter.class);
 
 		for (Class<? extends ICucumberFormatter> implementerClazz : implementers) {
