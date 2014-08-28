@@ -1,5 +1,7 @@
 package com.stratio.cucumber.aspects;
 
+import java.util.ArrayList;
+
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -9,7 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Aspect
-public class AssertToLoggerAspect {
+public class AssertAspect {
 
 	final Logger logger = LoggerFactory.getLogger(this.getClass()
 			.getCanonicalName());
@@ -27,7 +29,17 @@ public class AssertToLoggerAspect {
 			pjp.proceed();
 		} catch (AssertionError e) {
 			logger.error("Assertion failed: {}", reason);
+			if ((actual instanceof ArrayList)
+					&& (matcher.getClass().toString().endsWith("IsCollectionWithSize"))) {
+				Object el = ((ArrayList<?>) actual).get(((ArrayList<?>) actual)
+						.size() - 1);
+				if (el != null && (el instanceof Exception)) {
+					logger.error("Captured exception list last entry class: '{}' and message: '{}'",
+							((Exception) el).getClass().getSimpleName(), ((Exception) el).getMessage());
+				}
+			}
 			throw e;
 		}
 	}
+
 }

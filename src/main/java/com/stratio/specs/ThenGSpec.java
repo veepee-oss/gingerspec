@@ -2,11 +2,13 @@ package com.stratio.specs;
 
 
 import static com.stratio.tests.utils.matchers.ExceptionMatcher.hasClassAndMessage;
+import static com.stratio.tests.utils.matchers.ListLastElementExceptionMatcher.lastElementHasClassAndMessage;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.anyOf;
 
 import java.util.List;
 
@@ -27,7 +29,7 @@ public class ThenGSpec extends BaseGSpec {
 		List<Exception> exceptions = commonspec.getExceptions();
 		if ("IS NOT".equals(exception)) {
 			assertThat("Captured exception list is not empty", exceptions,
-					hasSize(0));
+					anyOf (hasSize(0), lastElementHasClassAndMessage("", "")));
 		} else {
 			assertThat("Captured exception list is empty", exceptions,
 					hasSize(greaterThan((0))));
