@@ -1,6 +1,7 @@
 package com.stratio.cucumber.aspects;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -30,16 +31,21 @@ public class AssertAspect {
 		} catch (AssertionError e) {
 			logger.error("Assertion failed: {}", reason);
 			if ((actual instanceof ArrayList)
-					&& (matcher.getClass().toString().endsWith("IsCollectionWithSize"))) {
-				Object el = ((ArrayList<?>) actual).get(((ArrayList<?>) actual)
-						.size() - 1);
-				if (el != null && (el instanceof Exception)) {
-					logger.error("Captured exception list last entry class: '{}' and message: '{}'",
-							((Exception) el).getClass().getSimpleName(), ((Exception) el).getMessage());
+					&& (matcher.getClass().toString()
+							.endsWith("IsCollectionWithSize"))) {
+
+				List<?> actualList = (ArrayList<?>) actual;
+				if (actualList.size() > 0) {
+					Object el = actualList.get(actualList.size() - 1);
+					if (el != null && (el instanceof Exception)) {
+						logger.error(
+								"Captured exception list last entry class: '{}' and message: '{}'",
+								((Exception) el).getClass().getSimpleName(),
+								((Exception) el).getMessage());
+					}
 				}
 			}
 			throw e;
 		}
 	}
-
 }
