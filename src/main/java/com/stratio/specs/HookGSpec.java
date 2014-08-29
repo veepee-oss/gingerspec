@@ -4,6 +4,7 @@ import cucumber.api.java.After;
 import cucumber.api.java.Before;
 
 public class HookGSpec extends BaseGSpec {
+	
 	public HookGSpec(CommonG spec) {
 		this.commonspec = spec;
 	}
@@ -25,6 +26,12 @@ public class HookGSpec extends BaseGSpec {
 		commonspec.getLogger().info("Setting up MongoDB client");
 	}
 
+	@Before(order = 10, value = "@elasticsearch")
+	public void elasticsearchSetup() {
+		commonspec.getLogger().info("Setting up elasticsearch client");
+		commonspec.getElasticSearchClient().create();
+	}
+
 	@After("@C*")
 	public void cassandraTeardown() {
 		commonspec.getLogger().info("Shutdown  C* client");
@@ -34,5 +41,11 @@ public class HookGSpec extends BaseGSpec {
 	@After("@MongoDB")
 	public void mongoTeardown() {
 		commonspec.getLogger().info("Shutdown MongoDB client");
+	}
+
+	@After("@elasticsearch")
+	public void elasticsearchTeardown() {
+		commonspec.getLogger().info("Shutdown elasticsearch client");
+		commonspec.getElasticSearchClient().close();
 	}
 }

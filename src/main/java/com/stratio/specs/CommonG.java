@@ -7,6 +7,8 @@ import org.slf4j.LoggerFactory;
 
 import com.stratio.tests.utils.CassandraUtil;
 import com.stratio.tests.utils.CassandraUtils;
+import com.stratio.tests.utils.ElasticSearchUtil;
+import com.stratio.tests.utils.ElasticSearchUtils;
 import com.stratio.tests.utils.ExceptionList;
 import com.stratio.tests.utils.ThreadProperty;
 
@@ -16,6 +18,7 @@ public class CommonG {
 			.get("class"));
 	private final ExceptionList exceptions = ExceptionList.getInstance();
 	private final CassandraUtil cassandraClient = CassandraUtil.getInstance();
+	private final ElasticSearchUtil elasticSearchClient = ElasticSearchUtil.getInstance();
 
 	public Logger getLogger() {
 		return this.logger;
@@ -27,5 +30,9 @@ public class CommonG {
 
 	public CassandraUtils getCassandraClient() {
 		return cassandraClient.getCassandraUtils();
+	}		
+	
+	public ElasticSearchUtils getElasticSearchClient() {
+		return elasticSearchClient.getElasticSearchUtils();
 	}		
 }
