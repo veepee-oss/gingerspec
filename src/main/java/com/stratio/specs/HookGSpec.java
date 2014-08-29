@@ -1,8 +1,5 @@
 package com.stratio.specs;
 
-import com.stratio.specs.BaseGSpec;
-import com.stratio.tests.utils.CassandraUtils;
-
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
 
@@ -20,7 +17,7 @@ public class HookGSpec extends BaseGSpec {
 	@Before(order = 10, value = "@C*")
 	public void cassandraSetup() {
 		commonspec.getLogger().info("Setting up C* client");
-		commonspec.setCassandraClient(new CassandraUtils());
+		commonspec.getCassandraClient().connect();
 	}
 
 	@Before(order = 10, value = "@MongoDB")
