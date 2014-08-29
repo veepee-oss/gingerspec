@@ -51,8 +51,8 @@ public class ElasticSearchUtils {
 		}
 	}
 
-	public String queryIndex(String indexName) {
-		HttpGet httpRequest = new HttpGet(this.url + indexName + "/_search");
+	public String queryIndex(String indexName, String query) {
+		HttpGet httpRequest = new HttpGet(this.url + indexName + "/_search?q=" + query);
 		try {
 			CloseableHttpResponse httpResponse = client.execute(httpRequest);
 			HttpEntity responseEntity = httpResponse.getEntity();
