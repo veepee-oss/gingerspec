@@ -17,13 +17,13 @@ public class HookGSpec extends BaseGSpec {
 		commonspec.getExceptions().clear();
 	}
 
-	@Before("@C*")
+	@Before(order = 10, value = "@C*")
 	public void cassandraSetup() {
 		commonspec.getLogger().info("Setting up C* client");
 		commonspec.setCassandraClient(new CassandraUtils());
 	}
 
-	@Before("@MongoDB")
+	@Before(order = 10, value = "@MongoDB")
 	public void mongoSetup() {
 		commonspec.getLogger().info("Setting up MongoDB client");
 	}
