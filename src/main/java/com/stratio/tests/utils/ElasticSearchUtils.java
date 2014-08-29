@@ -33,6 +33,15 @@ public class ElasticSearchUtils {
 
 	}
 
+	public void dropIndexes() {
+		HttpDelete httpRequest = new HttpDelete(this.url + "_all");
+		try {
+			this.client.execute(httpRequest);
+		} catch (IOException e) {
+			logger.error("Got exception when deleting ES indexes", e);
+		}
+	}
+
 	public void dropIndex(String indexName) {
 		HttpDelete httpRequest = new HttpDelete(this.url + indexName + "/");
 		try {
