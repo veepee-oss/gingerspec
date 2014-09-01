@@ -2,6 +2,7 @@ package com.stratio.specs;
 
 
 import static com.stratio.tests.utils.matchers.ExceptionMatcher.hasClassAndMessage;
+import static com.stratio.tests.utils.matchers.ColumnDefinitionsMatcher.containsColumn;
 import static com.stratio.tests.utils.matchers.ListLastElementExceptionMatcher.lastElementHasClassAndMessage;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -10,7 +11,18 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.anyOf;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
+
+import com.datastax.driver.core.ColumnDefinitions;
+import com.datastax.driver.core.DataType;
+import com.datastax.driver.core.ResultSet;
+import com.datastax.driver.core.Row;
 
 import cucumber.api.DataTable;
 import cucumber.api.java.en.Then;
@@ -74,11 +86,94 @@ public class ThenGSpec extends BaseGSpec {
 	}
 		
 	@Then("^a Casandra keyspace '(.*?)' contains a table '(.*?)' with values:$")
-	public void assertValuesOfTable(String Keyspace, String tableName, DataTable data){
-		List<List<String>> a = data.raw();
-		for (List<String> z: a) {
-			
+	public void assertValuesOfTable(String keyspace, String tableName, DataTable data) throws InterruptedException{
+		//Primero hacemos USE del Keyspace
+		commonspec.getLogger().info("Verifying if the keyspace {} exists", keyspace);
+		commonspec.getCassandraClient().useKeyspace(keyspace);
+		//Obtenemos los tipos y los nombres de las columnas del datatable y los devolvemos en un hashmap
+		HashMap<String,String> dataTableColumns = extractColumnNamesAndTypes(data.raw().get(0));
+		//Comprobamos que la tabla tenga las columnas
+		String query = "SELECT * FROM " + tableName + " LIMIT 1;";
+		ResultSet res_1 = commonspec.getCassandraClient().executeQuery(query);
+		equalsColumns(res_1.getColumnDefinitions(), dataTableColumns);
+		//Obtenemos la cadena de la parte del select con las columnas pertenecientes al dataTable
+		ArrayList<String> select_queries = giveQueriesList(data, tableName, columnNames(data.raw().get(0)));
+		//Pasamos a comprobar los datos de cassandra con las distintas queries
+		int index = 1;
+		for(String exec_query : select_queries){
+			res_1 = commonspec.getCassandraClient().executeQuery(exec_query);
+			List<Row> res_as_list = res_1.all();
+			assertThat("The query " + exec_query + " not return any result on Cassandra", res_as_list.size(), greaterThan(0));
+			assertThat("The resultSet is not as expected", res_as_list.get(0).toString().substring(3), equalTo(data.raw().get(index).toString()));
+			index++;
 		}
+	}
+	
+	@SuppressWarnings("rawtypes")
+	public void equalsColumns(ColumnDefinitions res_cols, HashMap<String,String> expected_cols){
+		Iterator it = expected_cols.entrySet().iterator();
+		while (it.hasNext()) {
+			Map.Entry e = (Map.Entry)it.next();
+			assertThat("The table not contains the column.",res_cols.toString(),containsColumn(e.getKey().toString()));
+			DataType type = res_cols.getType(e.getKey().toString());
+			assertThat("The column type is not equals.",type.getName().toString(),equalTo(e.getValue().toString()));
+		}
+	}
+	
+	public void checkhatcolumnNameExists(String resultSetColumns, String columnName) {
+		String [] aux = resultSetColumns.split("\\p{Punct}");
+		ArrayList<String> test = new ArrayList<String>(Arrays.asList(aux));
+		assertThat("The column "+ columnName +" does not exists.",test,hasItem(columnName));
+	}
+	
+	public ArrayList<String> giveQueriesList(DataTable data, String tableName, String col_names){
+		ArrayList<String> queryList = new ArrayList<String>();
+		for(int i = 1; i < data.raw().size(); i++){
+			String query = "SELECT " + col_names + " FROM " + tableName;
+			List<String> row = data.raw().get(i);
+			query += conditionWhere(row, col_names.split(",")) + ";";
+			queryList.add(query);
+		}
+		return queryList;
+	}
+	
+	public String conditionWhere(List<String> values, String[] columnNames){
+		
+		String condition = " WHERE ";
+		Pattern number_pat = Pattern.compile("^\\d+(\\.*\\d*)?");
+		Pattern boolean_pat = Pattern.compile("true|false");
+		for(int i = 0; i < values.size()-1; i++){
+			if(number_pat.matcher(values.get(i)).matches() || boolean_pat.matcher(values.get(i)).matches()){
+				condition += columnNames[i] + " = " + values.get(i) + " AND ";
+			}else{
+				condition += columnNames[i] + " = '" + values.get(i) + "' AND ";
+			}
+		}
+		if(number_pat.matcher( values.get(values.size()-1)).matches() || boolean_pat.matcher( values.get(values.size()-1)).matches()){
+			condition += columnNames[columnNames.length-1] + " = " + values.get(values.size()-1);
+		}else{
+			condition += columnNames[columnNames.length-1] + " = '" + values.get(values.size()-1) + "'";
+		}
+		return condition;
+	}
+	
+	public String columnNames(List<String> FirstRow){
+		String column_names_for_query = "";
+		for(String s : FirstRow){
+			String[] aux = s.split("-");
+			column_names_for_query += aux[0] + ",";
+		}
+		column_names_for_query = column_names_for_query.substring(0, column_names_for_query.length()-1);
+		return column_names_for_query;
+	}
+	
+	public HashMap<String,String> extractColumnNamesAndTypes(List<String> FirstRow){
+		HashMap<String,String> columns = new HashMap<String,String>();
+		for(String s : FirstRow){
+			String[] aux = s.split("-");
+			columns.put(aux[0], aux[1]);
+		}
+		return columns;
 	}
 	
 	

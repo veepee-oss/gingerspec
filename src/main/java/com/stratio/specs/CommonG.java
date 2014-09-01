@@ -28,8 +28,8 @@ public class CommonG {
 		return exceptions.getExceptions();
 	}
 
-	public CassandraUtils getCassandraClient() {
-		return cassandraClient.getCassandraUtils();
+	public CassandraUtils getCassandraClient(){
+			return cassandraClient.getCassandraUtils();
 	}		
 	
 	public ElasticSearchUtils getElasticSearchClient() {

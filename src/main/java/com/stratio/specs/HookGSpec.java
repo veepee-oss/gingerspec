@@ -16,7 +16,7 @@ public class HookGSpec extends BaseGSpec {
 	}
 
 	@Before(order = 10, value = "@C*")
-	public void cassandraSetup() {
+	public void cassandraSetup() throws Exception {
 		commonspec.getLogger().info("Setting up C* client");
 		commonspec.getCassandraClient().connect();
 	}
