@@ -15,8 +15,7 @@ import org.testng.TestListenerAdapter;
 
 public class JaCoCoClient extends TestListenerAdapter {
 
-	private static final String DESTFILE = "target/executions/jacoco-client.exec";
-	private static final String ADDRESS = "localhost";
+	private static final String DESTFILE = "target/executions/jacoco-client.exec";	
 	private static final int PORT = 6300;
 
 	private final Logger logger = LoggerFactory.getLogger(JaCoCoClient.class);
@@ -31,6 +30,7 @@ public class JaCoCoClient extends TestListenerAdapter {
 					localFile);
 
 			// Open a socket to the coverage agent:
+			String ADDRESS = System.getProperty("JACOCO_SERVER", "localhost");
 			final Socket socket = new Socket(InetAddress.getByName(ADDRESS),
 					PORT);
 			final RemoteControlWriter writer = new RemoteControlWriter(
