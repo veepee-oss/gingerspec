@@ -25,15 +25,17 @@ public class ElasticSearchUtils {
 		String host = System.getProperty("ELASTICSEARCH_HOST", "127.0.0.1");
 		String port = System.getProperty("ELASTICSEARCH_PORT", "9200");
 		this.url = "http://" + host + ":" + port + "/";
+		logger.info("Elasticsearch backend at {}", this.url);
 	}
 
 	public void create() {
-		logger.info("Creating elasticsearch client");
+		logger.debug("Creating elasticsearch client");
 		this.client = HttpClientBuilder.create().build();
 
 	}
 
 	public void dropIndexes() {
+		logger.debug("Dropping every elasticsearch index at {}", this.url);
 		HttpDelete httpRequest = new HttpDelete(this.url + "_all");
 		try {
 			this.client.execute(httpRequest);
@@ -43,6 +45,7 @@ public class ElasticSearchUtils {
 	}
 
 	public void dropIndex(String indexName) {
+		logger.debug("Dropping index {} at elasticsearch at {}", indexName, this.url);
 		HttpDelete httpRequest = new HttpDelete(this.url + indexName + "/");
 		try {
 			this.client.execute(httpRequest);
@@ -52,6 +55,7 @@ public class ElasticSearchUtils {
 	}
 
 	public String queryIndex(String indexName, String type, String query) {
+		logger.debug("Querying index {} in type {}, at elasticsearch at {}", indexName, type, this.url);
 		HttpGet httpRequest = new HttpGet(this.url + indexName + "/" + type + "/_search?q=" + query);
 		try {
 			CloseableHttpResponse httpResponse = client.execute(httpRequest);
