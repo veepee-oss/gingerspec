@@ -1,5 +1,6 @@
 package com.stratio.specs;
 
+import static com.stratio.tests.utils.matchers.RecordSetMatcher.containedInRecordSet;
 import static com.stratio.tests.utils.matchers.ExceptionMatcher.hasClassAndMessage;
 import static com.stratio.tests.utils.matchers.ColumnDefinitionsMatcher.containsColumn;
 import static com.stratio.tests.utils.matchers.ListLastElementExceptionMatcher.lastElementHasClassAndMessage;
@@ -21,6 +22,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.aerospike.client.query.RecordSet;
 import com.datastax.driver.core.ColumnDefinitions;
 import com.datastax.driver.core.DataType;
 import com.datastax.driver.core.ResultSet;
@@ -241,4 +243,12 @@ public class ThenGSpec extends BaseGSpec {
 		assertThat("Event not found at elastic search index",
 				cleanResponseList, hasItem(data));
 	}
+	
+	@Then("^checking if a Aerospike namespace '(.*?)' with table '(.*?)' and data exists:$")
+	public void assertValuesOfTableAeroSpike(String nameSpace, String tableName, DataTable data){
+		commonspec.getLogger().info("Verifying if the nameSpace {} exists and tableName {} exists on Aerospike",nameSpace ,tableName);
+		RecordSet rs = commonspec.getAerospikeClient().readTable(nameSpace, tableName);
+		assertThat("The table does not contains the data required.", rs, containedInRecordSet(data));
+	}
+	
 }

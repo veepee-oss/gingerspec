@@ -88,5 +88,10 @@
 			<artifactId>httpclient</artifactId>
 			<version>4.3.5</version>
 		</dependency>
+			<dependency>
+		    <groupId>com.aerospike</groupId>
+		    <artifactId>aerospike-client</artifactId>
+		    <version>[3.0.0,)</version>
+		</dependency>
 	</dependencies>
 </project>

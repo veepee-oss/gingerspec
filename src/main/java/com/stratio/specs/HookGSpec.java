@@ -48,4 +48,16 @@ public class HookGSpec extends BaseGSpec {
 		commonspec.getLogger().info("Shutdown elasticsearch client");
 		commonspec.getElasticSearchClient().close();
 	}
+	
+	@Before(order = 10, value = "@Aerospike")
+	public void aerospikeSetup() {
+		commonspec.getLogger().info("Setting up Aerospike client");
+		commonspec.getAerospikeClient().connect();
+	}
+
+	@After("@Aerospike")
+	public void aerospikeTeardown() {
+		commonspec.getLogger().info("Shutdown Aerospike client");
+		commonspec.getAerospikeClient().disconnect();
+	}
 }

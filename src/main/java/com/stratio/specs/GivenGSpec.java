@@ -1,5 +1,6 @@
 package com.stratio.specs;
 
+import cucumber.api.DataTable;
 import cucumber.api.java.en.Given;
 
 public class GivenGSpec extends BaseGSpec {
@@ -31,4 +32,26 @@ public class GivenGSpec extends BaseGSpec {
 		commonspec.getLogger().info("Dropping an es index: {}", index);
 		commonspec.getElasticSearchClient().dropIndex(index);
 	}
+	
+	@Given("a Cassandra script with name '(.*?)' and default keyspace '(.*?)'$")
+	public void InsertDataOnCassandraFromFile(String filename, String keyspace) {
+		commonspec.getLogger().info("Inserting data on cassandra from file");
+		commonspec.getCassandraClient().loadTestData(keyspace, "/scripts/" + filename);
+	}
+	
+	@Given("^I drop an Cassandra keyspace '(.*?)'$")
+	public void DropCassandraKeyspace(String keyspace) {
+		commonspec.getLogger().info("Dropping a Cassandra Keyspace");
+		commonspec.getCassandraClient().dropKeyspace(keyspace);
+	}
+	
+	@Given("^a Aerospike namespace '(.*?)' with table '(.*?)':$")
+	public void CreateAeroSpikeTable(String nameSpace, String tableName, DataTable tab) {
+		commonspec.getLogger().info("Creating a table on AeroSpike");
+		if(commonspec.getAerospikeClient().isConnected()){
+			commonspec.getLogger().info("Creating a table on AeroSpike");
+		}
+		commonspec.getAerospikeClient().insertFromDataTable(nameSpace, tableName, tab);
+	}	
+	
 }
