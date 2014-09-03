@@ -221,7 +221,7 @@ public class ThenGSpec extends BaseGSpec {
 			String response = commonspec.getElasticSearchClient().queryIndex(
 					indexName, type, query);
 
-			Pattern pat = Pattern.compile(".*?source..\\{(.*?)\\}.*?");
+			Pattern pat = Pattern.compile(".*?source.*?\\{(.*?)\\}.*?");
 			Matcher m = pat.matcher(response);
 			while (m.find()) {
 				responseList.add(m.group(1).replaceAll("\"", ""));
