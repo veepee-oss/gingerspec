@@ -34,6 +34,26 @@ public class ElasticSearchUtils {
 
 	}
 
+	public void emptyIndexes() {
+		logger.debug("Emptying every entry at every elasticsearch index at {}", this.url);
+		HttpDelete httpRequest = new HttpDelete(this.url + "_all/*/");		
+		try {			
+			this.client.execute(httpRequest);
+		} catch (IOException e) {
+			logger.error("Got exception when deleting ES indexes", e);
+		}
+	}
+	
+	public void emptyIndex(String indexName) {
+		logger.debug("Emptying elasticsearch index {} at {}", indexName, this.url);
+		HttpDelete httpRequest = new HttpDelete(this.url + indexName + "/*/");		
+		try {			
+			this.client.execute(httpRequest);
+		} catch (IOException e) {
+			logger.error("Got exception when deleting ES indexes", e);
+		}
+	}
+	
 	public void dropIndexes() {
 		logger.debug("Dropping every elasticsearch index at {}", this.url);
 		HttpDelete httpRequest = new HttpDelete(this.url + "_all");
