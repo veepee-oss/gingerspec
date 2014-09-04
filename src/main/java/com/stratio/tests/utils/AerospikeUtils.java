@@ -75,7 +75,7 @@ public class AerospikeUtils {
 						LOGGER.error("It is possible that you forget to create the namespace.");
 						LOGGER.error("Go to \"etc/aerospike/aerospike.conf\" and create a the namespace.");
 					}else{
-						LOGGER.error("ERROR : " + e.getMessage());
+						LOGGER.error("ERROR : ", e);
 					}
 			}
 		}

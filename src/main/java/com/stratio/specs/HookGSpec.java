@@ -29,9 +29,15 @@ public class HookGSpec extends BaseGSpec {
 	@Before(order = 10, value = "@elasticsearch")
 	public void elasticsearchSetup() {
 		commonspec.getLogger().info("Setting up elasticsearch client");
-		commonspec.getElasticSearchClient().create();
+		commonspec.getElasticSearchClient().connect();
 	}
 
+	@Before(order = 10, value = "@Aerospike")
+	public void aerospikeSetup() {
+		commonspec.getLogger().info("Setting up Aerospike client");
+		commonspec.getAerospikeClient().connect();
+	}
+	
 	@After("@C*")
 	public void cassandraTeardown() {
 		commonspec.getLogger().info("Shutdown  C* client");
@@ -46,13 +52,7 @@ public class HookGSpec extends BaseGSpec {
 	@After("@elasticsearch")
 	public void elasticsearchTeardown() {
 		commonspec.getLogger().info("Shutdown elasticsearch client");
-		commonspec.getElasticSearchClient().close();
-	}
-	
-	@Before(order = 10, value = "@Aerospike")
-	public void aerospikeSetup() {
-		commonspec.getLogger().info("Setting up Aerospike client");
-		commonspec.getAerospikeClient().connect();
+		commonspec.getElasticSearchClient().disconnect();
 	}
 
 	@After("@Aerospike")

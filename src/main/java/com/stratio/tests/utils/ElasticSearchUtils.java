@@ -28,7 +28,7 @@ public class ElasticSearchUtils {
 		logger.info("Elasticsearch backend at {}", this.url);
 	}
 
-	public void create() {
+	public void connect() {
 		logger.debug("Creating elasticsearch client");
 		this.client = HttpClientBuilder.create().build();
 
@@ -87,7 +87,7 @@ public class ElasticSearchUtils {
 		return "ERR";
 	}
 
-	public void close() {
+	public void disconnect() {
 		try {
 			this.client.close();
 		} catch (IOException e) {
