@@ -98,12 +98,17 @@ public class MongoDBUtils {
 		getMongoDBCollection(collection_name).drop();
 	}
 	
-	public void dropAllDataMongoDBCollection(String collection_name){
+	public void dropAllDataMongoDBCollection(String dataBase, String collection_name){
+		connectToMongoDBDataBase(dataBase);
 		DBCollection db = getMongoDBCollection(collection_name);
-		List<DBObject> objects_list = db.getIndexInfo();
-		for(int i = 0; i < objects_list.size(); i++){
-			db.remove(objects_list.get(i));
-		}
+		DBCursor objects_list = db.find();
+		try {
+			   while(objects_list.hasNext()) {
+			      db.remove(objects_list.next());
+			   }
+			} finally {
+				objects_list.close();
+			}
 	}
 	
 	public void insertIntoMongoDBCollection(String dataBase, String collection, DataTable table){

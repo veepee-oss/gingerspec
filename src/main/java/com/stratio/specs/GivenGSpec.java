@@ -71,6 +71,11 @@ public class GivenGSpec extends BaseGSpec {
 		commonspec.getLogger().info("Inserting data in a database on MongoDB");
 		commonspec.getMongoDBClient().insertIntoMongoDBCollection(dataBase, tab_name, table);
 	}
-	
+	@Given("^I drop all elements of database '(.*?)' and table '(.*?)'")
+	public void truncateTableInMongo(String database, String table){
+		commonspec.getLogger().info("Truncating a table in MongoDB");
+		commonspec.getMongoDBClient().dropAllDataMongoDBCollection(database, table);
+	}
+			
 	
 }
