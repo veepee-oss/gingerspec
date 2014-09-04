@@ -3,12 +3,8 @@ package com.stratio.tests.utils;
 import java.net.UnknownHostException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +16,7 @@ import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 
 import cucumber.api.DataTable;
-import cucumber.deps.com.thoughtworks.xstream.mapper.Mapper.Null;
+
 
 public class MongoDBUtils {
 
@@ -29,19 +25,27 @@ public class MongoDBUtils {
 
 	private final String host;
 	private final int port;
-	private MongoClient mongoClient;
-	private DB dataBase;
+	private static MongoClient mongoClient;
+	private static DB dataBase;
 
 	public MongoDBUtils() {
-		this.host = System.getProperty("MONGODB_HOST", "127.0.0.1");
+		this.host = "127.0.0.1"; //System.getProperty("MONGODB_HOST", "17.0.0.1");
 		this.port = 27017;
-		LOGGER.debug("Initializing MongoDB.");
+		//LOGGER.debug("Initializing MongoDB.");
 	}
 
-	public void connectToMongoDB() throws UnknownHostException {
-		mongoClient = new MongoClient(this.host, this.port);
+	public void connectToMongoDB() {
+		try {
+			mongoClient = new MongoClient(this.host, this.port);
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
+	public void disconnect() {
+		mongoClient.close();
+	}
 	public void connectToMongoDBDataBase(String db) {
 		dataBase = mongoClient.getDB(db);
 	}
@@ -105,7 +109,7 @@ public class MongoDBUtils {
 	public void insertIntoMongoDBCollection(String dataBase, String collection, DataTable table){
 		//Primero pasamos la fila del datatable a un hashmap de ColumnName-Type
 		 ArrayList<String[]> col_rel = coltoArrayList(table);
-		 DB db = mongoClient.getDB(dataBase);
+		this.dataBase = mongoClient.getDB(dataBase);
 		 //Vamos insertando fila a fila
 		 for(int i = 1; i < table.raw().size(); i++){
 			 //Obtenemos la fila correspondiente
@@ -116,13 +120,13 @@ public class MongoDBUtils {
 				 Object data = castSTringTo(col_name_type[1], row.get(x));
 				 doc.put(col_name_type[0], data);
 			 }
-			 db.getCollection(collection).insert(doc);
+			 this.dataBase.getCollection(collection).insert(doc);
 		 }
-		
 	}
 	
-	public void readFromMongoDBCollection(String dataBase, String collection,
+	public ArrayList<DBObject> readFromMongoDBCollection(String dataBase, String collection,
 			DataTable table) {
+		ArrayList<DBObject> res = new ArrayList<DBObject>();
 		ArrayList<String[]> col_rel = coltoArrayList(table);
 		DB db = mongoClient.getDB(dataBase);
 		DBCollection aux = db.getCollection(collection);
@@ -138,12 +142,13 @@ public class MongoDBUtils {
 			DBCursor cursor = aux.find(doc);
 			try {
 				while (cursor.hasNext()) {
-					System.out.println(cursor.next());
+					res.add(cursor.next());
 				}
 			} finally {
 				cursor.close();
 			}
 		}
+		return res;
 
 	}
 	

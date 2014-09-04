@@ -12,6 +12,8 @@ import com.stratio.tests.utils.CassandraUtils;
 import com.stratio.tests.utils.ElasticSearchUtil;
 import com.stratio.tests.utils.ElasticSearchUtils;
 import com.stratio.tests.utils.ExceptionList;
+import com.stratio.tests.utils.MongoDBUtil;
+import com.stratio.tests.utils.MongoDBUtils;
 import com.stratio.tests.utils.ThreadProperty;
 
 public class CommonG {
@@ -22,7 +24,7 @@ public class CommonG {
 	private final CassandraUtil cassandraClient = CassandraUtil.getInstance();
 	private final ElasticSearchUtil elasticSearchClient = ElasticSearchUtil.getInstance();
 	private final AerospikeUtil aerospikeClient = AerospikeUtil.getInstance();
-	
+	private final MongoDBUtil mongoDBClient = MongoDBUtil.getInstance();
 	public Logger getLogger() {
 		return this.logger;
 	}
@@ -41,5 +43,9 @@ public class CommonG {
 	
 	public AerospikeUtils getAerospikeClient() {
 		return aerospikeClient.getAeroSpikeUtils();
+	}
+	
+	public MongoDBUtils getMongoDBClient() {
+		return mongoDBClient.getMongoDBUtils();
 	}
 }

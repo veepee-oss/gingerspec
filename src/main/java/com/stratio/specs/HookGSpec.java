@@ -24,6 +24,7 @@ public class HookGSpec extends BaseGSpec {
 	@Before(order = 10, value = "@MongoDB")
 	public void mongoSetup() {
 		commonspec.getLogger().info("Setting up MongoDB client");
+		commonspec.getMongoDBClient().connectToMongoDB();
 	}
 
 	@Before(order = 10, value = "@elasticsearch")
@@ -47,6 +48,7 @@ public class HookGSpec extends BaseGSpec {
 	@After("@MongoDB")
 	public void mongoTeardown() {
 		commonspec.getLogger().info("Shutdown MongoDB client");
+		commonspec.getMongoDBClient().disconnect();
 	}
 
 	@After("@elasticsearch")

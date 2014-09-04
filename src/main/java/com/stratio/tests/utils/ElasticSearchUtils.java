@@ -25,7 +25,7 @@ public class ElasticSearchUtils {
 		String host = System.getProperty("ELASTICSEARCH_HOST", "127.0.0.1");
 		String port = System.getProperty("ELASTICSEARCH_PORT", "9200");
 		this.url = "http://" + host + ":" + port + "/";
-		logger.info("Elasticsearch backend at {}", this.url);
+		//logger.info("Elasticsearch backend at {}", this.url);
 	}
 
 	public void connect() {

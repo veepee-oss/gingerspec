@@ -53,5 +53,24 @@ public class GivenGSpec extends BaseGSpec {
 		}
 		commonspec.getAerospikeClient().insertFromDataTable(nameSpace, tableName, tab);
 	}	
+	@Given("^I create a dataBase '(.*?)'$")
+	public void createMongoDBDataBase(String databaseName){
+		commonspec.getLogger().info("Creating a database on MongoDB");
+		commonspec.getMongoDBClient().connectToMongoDBDataBase(databaseName);
+		
+	}
+	
+	@Given("^I drop a dataBase '(.*?)'$")
+	public void dropMongoDBDataBase(String databaseName){
+		commonspec.getLogger().info("Creating a database on MongoDB");
+		commonspec.getMongoDBClient().dropMongoDBDataBase(databaseName);
+	}
+	
+	@Given("^I insert in dataBase '(.*?)' and table '(.*?)':$")
+	public void insertOnMongoTable(String dataBase, String tab_name, DataTable table){
+		commonspec.getLogger().info("Inserting data in a database on MongoDB");
+		commonspec.getMongoDBClient().insertIntoMongoDBCollection(dataBase, tab_name, table);
+	}
+	
 	
 }

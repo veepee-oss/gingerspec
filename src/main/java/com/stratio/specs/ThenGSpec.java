@@ -1,9 +1,11 @@
 package com.stratio.specs;
 
+import com.mongodb.DBObject;
 import static com.stratio.tests.utils.matchers.RecordSetMatcher.containedInRecordSet;
 import static com.stratio.tests.utils.matchers.ExceptionMatcher.hasClassAndMessage;
 import static com.stratio.tests.utils.matchers.ColumnDefinitionsMatcher.containsColumn;
 import static com.stratio.tests.utils.matchers.ListLastElementExceptionMatcher.lastElementHasClassAndMessage;
+import static com.stratio.tests.utils.matchers.DBObjectsMatcher.containedInMongoDBResult;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
@@ -249,6 +251,14 @@ public class ThenGSpec extends BaseGSpec {
 		commonspec.getLogger().info("Verifying if the nameSpace {} exists and tableName {} exists on Aerospike",nameSpace ,tableName);
 		RecordSet rs = commonspec.getAerospikeClient().readTable(nameSpace, tableName);
 		assertThat("The table does not contains the data required.", rs, containedInRecordSet(data));
+	}
+	
+	@Then("^a Mongo dataBase '(.*?)' contains a table '(.*?)' with values:")
+	public void assertValuesOfTableMongo (String dataBase, String tableName, DataTable data){
+		commonspec.getLogger().info("Verifying if the dataBase {} exists and tableName {} exists on Aerospike",dataBase ,tableName);
+		ArrayList<DBObject> result = commonspec.getMongoDBClient().readFromMongoDBCollection(dataBase, tableName, data);
+		assertThat("The table does not contains the data required.", result, containedInMongoDBResult(data));
+		
 	}
 	
 }
