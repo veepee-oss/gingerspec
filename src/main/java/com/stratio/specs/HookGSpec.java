@@ -39,27 +39,32 @@ public class HookGSpec extends BaseGSpec {
 		commonspec.getAerospikeClient().connect();
 	}
 
-	@After("@C*")
+	@After(order = 20, value = "@C*")
 	public void cassandraTeardown() {
 		commonspec.getLogger().info("Shutdown  C* client");
 		commonspec.getCassandraClient().disconnect();
 	}
 
-	@After("@MongoDB")
+	@After(order = 20, value = "@MongoDB")
 	public void mongoTeardown() {
 		commonspec.getLogger().info("Shutdown MongoDB client");
 		commonspec.getMongoDBClient().disconnect();
 	}
 
-	@After("@elasticsearch")
+	@After(order = 20, value = "@elasticsearch")
 	public void elasticsearchTeardown() {
 		commonspec.getLogger().info("Shutdown elasticsearch client");
 		commonspec.getElasticSearchClient().disconnect();
 	}
 
-	@After("@Aerospike")
+	@After(order = 20, value = "@Aerospike")
 	public void aerospikeTeardown() {
 		commonspec.getLogger().info("Shutdown Aerospike client");
 		commonspec.getAerospikeClient().disconnect();
+	}
+
+	@After(order = 0)
+	public void teardown() {
+		commonspec.getLogger().info("Ended running hooks\n");
 	}
 }
