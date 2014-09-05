@@ -18,7 +18,8 @@ public class IgnoreTagAspect {
 	}
 
 	@Around(value = "addIgnoreTagPointcut()")
-	public String[] aroundAddIgnoreTagPointcut(ProceedingJoinPoint pjp) throws Throwable {
+	public String[] aroundAddIgnoreTagPointcut(ProceedingJoinPoint pjp)
+			throws Throwable {
 		logger.debug("Executing pointcut around CucumberOptions tag array");
 		String[] response = new String[1];
 		response[0] = "~@ignore";

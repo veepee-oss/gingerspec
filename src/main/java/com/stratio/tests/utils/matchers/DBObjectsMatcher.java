@@ -4,7 +4,6 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
-
 import org.hamcrest.Description;
 import org.hamcrest.Factory;
 import org.hamcrest.TypeSafeMatcher;
@@ -38,7 +37,7 @@ public class DBObjectsMatcher extends TypeSafeMatcher<ArrayList<DBObject>> {
 	@Override
 	protected boolean matchesSafely(ArrayList<DBObject> item) {
 		ArrayList<String[]> col_rel = coltoArrayList(table);
-		if(item.size() != table.raw().size()-1){
+		if (item.size() != table.raw().size() - 1) {
 			return false;
 		}
 		for (int i = 1; i < table.raw().size(); i++) {

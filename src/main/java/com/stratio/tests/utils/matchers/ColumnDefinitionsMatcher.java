@@ -5,13 +5,11 @@ import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 import org.hamcrest.Factory;
 
-public class ColumnDefinitionsMatcher extends
-TypeSafeMatcher<String> {
+public class ColumnDefinitionsMatcher extends TypeSafeMatcher<String> {
 
-	
 	private final String columnName;
 
-	//Constructor
+	// Constructor
 	public ColumnDefinitionsMatcher(String columnName) {
 		this.columnName = columnName;
 	}
@@ -20,23 +18,22 @@ TypeSafeMatcher<String> {
 	public static Matcher<String> containsColumn(String columnName) {
 		return new ColumnDefinitionsMatcher(columnName);
 	}
-	
 
 	@Override
 	protected boolean matchesSafely(String item) {
-		String [] aux = item.split("\\p{Punct}");
-		for(int i = 0; i < aux.length; i++){
+		String[] aux = item.split("\\p{Punct}");
+		for (int i = 0; i < aux.length; i++) {
 			aux[i] = aux[i].trim();
-			if(aux[i].toString().equals(this.columnName.toString())){
+			if (aux[i].toString().equals(this.columnName.toString())) {
 				return true;
 			}
 		}
 		return false;
 	}
-	
-	
+
 	@Override
 	public void describeTo(Description description) {
-		description.appendText("The column " + this.columnName + " does not exists on the table.");
+		description.appendText("The column " + this.columnName
+				+ " does not exists on the table.");
 	}
 }

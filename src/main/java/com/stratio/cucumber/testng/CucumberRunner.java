@@ -70,7 +70,8 @@ public class CucumberRunner {
 		for (Class<? extends ICucumberFormatter> implementerClazz : implementers) {
 			Constructor ctor = implementerClazz.getConstructor();
 			ctor.setAccessible(true);
-			runtimeOptions.addFormatter((ICucumberFormatter) ctor.newInstance());
+			runtimeOptions
+					.addFormatter((ICucumberFormatter) ctor.newInstance());
 		}
 
 		ClassFinder classFinder = new ResourceLoaderClassFinder(resourceLoader,

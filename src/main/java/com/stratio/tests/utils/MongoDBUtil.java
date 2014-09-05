@@ -15,5 +15,5 @@ public class MongoDBUtil {
 	public MongoDBUtils getMongoDBUtils() {
 		return cUtils;
 	}
-	
+
 }

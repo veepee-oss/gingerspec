@@ -217,7 +217,7 @@ public class ThenGSpec extends BaseGSpec {
 		return columns;
 	}
 
-	@Then("^the '(.*?)' index has a type '(.*?)' with content \\(key and value\\): '(.*?)'$")	
+	@Then("^the '(.*?)' index has a type '(.*?)' with content \\(key and value\\): '(.*?)'$")
 	public void assertIndexHasContent(String indexName, String type, String data) {
 		commonspec.getLogger().info("Verifying elasticseach content existance");
 
@@ -247,30 +247,45 @@ public class ThenGSpec extends BaseGSpec {
 		assertThat("Event not found at elastic search index",
 				cleanResponseList, hasItem(data));
 	}
-	
+
 	@Then("^checking if a Aerospike namespace '(.*?)' with table '(.*?)' and data exists:$")
-	public void assertValuesOfTableAeroSpike(String nameSpace, String tableName, DataTable data){
-		commonspec.getLogger().info("Verifying if the nameSpace {} exists and tableName {} exists on Aerospike",nameSpace ,tableName);
-		RecordSet rs = commonspec.getAerospikeClient().readTable(nameSpace, tableName);
-		assertThat("The table does not contains the data required.", rs, containedInRecordSet(data));
+	public void assertValuesOfTableAeroSpike(String nameSpace,
+			String tableName, DataTable data) {
+		commonspec
+				.getLogger()
+				.info("Verifying if the nameSpace {} exists and tableName {} exists on Aerospike",
+						nameSpace, tableName);
+		RecordSet rs = commonspec.getAerospikeClient().readTable(nameSpace,
+				tableName);
+		assertThat("The table does not contains the data required.", rs,
+				containedInRecordSet(data));
 	}
-	
+
 	@Then("^a Mongo dataBase '(.*?)' contains a table '(.*?)' with values:")
-	public void assertValuesOfTableMongo (String dataBase, String tableName, DataTable data){
-		commonspec.getLogger().info("Verifying if the dataBase {} exists and tableName {} exists on MongoDB",dataBase ,tableName);
+	public void assertValuesOfTableMongo(String dataBase, String tableName,
+			DataTable data) {
+		commonspec
+				.getLogger()
+				.info("Verifying if the dataBase {} exists and tableName {} exists on MongoDB",
+						dataBase, tableName);
 		commonspec.getMongoDBClient().connectToMongoDBDataBase(dataBase);
-		ArrayList<DBObject> result = commonspec.getMongoDBClient().readFromMongoDBCollection(tableName, data);
-		assertThat("The table does not contains the data required.", result, containedInMongoDBResult(data));
-		
+		ArrayList<DBObject> result = commonspec.getMongoDBClient()
+				.readFromMongoDBCollection(tableName, data);
+		assertThat("The table does not contains the data required.", result,
+				containedInMongoDBResult(data));
+
 	}
-	
+
 	@Then("^a Mongo dataBase '(.*?)' doesnt contains a table '(.*?)'$")
-	public void aMongoDataBaseContainsaTable(String database, String tableName){
-		commonspec.getLogger().info("Verifying if the dataBase {} contains the table {}",database ,tableName);
+	public void aMongoDataBaseContainsaTable(String database, String tableName) {
+		commonspec.getLogger().info(
+				"Verifying if the dataBase {} contains the table {}", database,
+				tableName);
 		commonspec.getMongoDBClient().connectToMongoDBDataBase(database);
-		Set<String> collectionsNames = commonspec.getMongoDBClient().getMongoDBCollections();
-		assertThat("The Mongo dataBase contains the table", collectionsNames, not(hasItem(tableName)));
+		Set<String> collectionsNames = commonspec.getMongoDBClient()
+				.getMongoDBCollections();
+		assertThat("The Mongo dataBase contains the table", collectionsNames,
+				not(hasItem(tableName)));
 	}
-	
-	
+
 }

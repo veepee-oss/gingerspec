@@ -12,7 +12,7 @@ public class NullableStringConverter extends Transformer<String> {
 		} else if (input.startsWith("0x")) {
 
 			int cInt = Integer.parseInt(input.substring(2), 16);
-			char[] cArr = Character.toChars(cInt);			
+			char[] cArr = Character.toChars(cInt);
 			return String.valueOf(cArr);
 		} else {
 			return input;

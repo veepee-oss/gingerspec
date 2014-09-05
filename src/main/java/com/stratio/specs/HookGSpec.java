@@ -4,7 +4,7 @@ import cucumber.api.java.After;
 import cucumber.api.java.Before;
 
 public class HookGSpec extends BaseGSpec {
-	
+
 	public HookGSpec(CommonG spec) {
 		this.commonspec = spec;
 	}
@@ -38,7 +38,7 @@ public class HookGSpec extends BaseGSpec {
 		commonspec.getLogger().info("Setting up Aerospike client");
 		commonspec.getAerospikeClient().connect();
 	}
-	
+
 	@After("@C*")
 	public void cassandraTeardown() {
 		commonspec.getLogger().info("Shutdown  C* client");
