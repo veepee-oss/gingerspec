@@ -54,7 +54,7 @@ public class MongoDBUtils {
 		List<String> dataBaseList = mongoClient.getDatabaseNames();
 		return dataBaseList.contains(dataBaseName);
 	}
-
+	
 	public boolean exitsCollections(String col_name) {
 		if (dataBase.collectionExists(col_name)) {
 			return true;

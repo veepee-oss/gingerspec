@@ -1,6 +1,7 @@
 package com.stratio.specs;
 
 import com.mongodb.DBObject;
+
 import static com.stratio.tests.utils.matchers.RecordSetMatcher.containedInRecordSet;
 import static com.stratio.tests.utils.matchers.ExceptionMatcher.hasClassAndMessage;
 import static com.stratio.tests.utils.matchers.ColumnDefinitionsMatcher.containsColumn;
@@ -12,7 +13,7 @@ import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.anyOf;
-
+import static org.hamcrest.Matchers.not;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -21,6 +22,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -260,5 +262,14 @@ public class ThenGSpec extends BaseGSpec {
 		assertThat("The table does not contains the data required.", result, containedInMongoDBResult(data));
 		
 	}
+	
+	@Then("^a Mongo dataBase '(.*?)' doesnt contains a table '(.*?)'$")
+	public void aMongoDataBaseContainsaTable(String database, String tableName){
+		commonspec.getLogger().info("Verifying if the dataBase {} contains the table {}",database ,tableName);
+		commonspec.getMongoDBClient().connectToMongoDBDataBase(database);
+		Set<String> collectionsNames = commonspec.getMongoDBClient().getMongoDBCollections();
+		assertThat("The Mongo dataBase contains the table", collectionsNames, not(hasItem(tableName)));
+	}
+	
 	
 }
