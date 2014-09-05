@@ -65,6 +65,6 @@ public class HookGSpec extends BaseGSpec {
 
 	@After(order = 0)
 	public void teardown() {
-		commonspec.getLogger().info("Ended running hooks\n");
+		commonspec.getLogger().info("Ended running hooks");
 	}
 }
