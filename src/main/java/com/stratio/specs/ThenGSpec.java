@@ -258,7 +258,8 @@ public class ThenGSpec extends BaseGSpec {
 	@Then("^a Mongo dataBase '(.*?)' contains a table '(.*?)' with values:")
 	public void assertValuesOfTableMongo (String dataBase, String tableName, DataTable data){
 		commonspec.getLogger().info("Verifying if the dataBase {} exists and tableName {} exists on MongoDB",dataBase ,tableName);
-		ArrayList<DBObject> result = commonspec.getMongoDBClient().readFromMongoDBCollection(dataBase, tableName, data);
+		commonspec.getMongoDBClient().connectToMongoDBDataBase(dataBase);
+		ArrayList<DBObject> result = commonspec.getMongoDBClient().readFromMongoDBCollection(tableName, data);
 		assertThat("The table does not contains the data required.", result, containedInMongoDBResult(data));
 		
 	}

@@ -2,6 +2,7 @@ package com.stratio.specs;
 
 import cucumber.api.DataTable;
 import cucumber.api.java.en.Given;
+import cucumber.api.java.en.When;
 
 public class GivenGSpec extends BaseGSpec {
 
@@ -14,68 +15,76 @@ public class GivenGSpec extends BaseGSpec {
 		commonspec.getLogger().info("Emptying es indexes");
 		commonspec.getElasticSearchClient().emptyIndexes();
 	}
-	
+
 	@Given("^I empty an elasticsearch index named '(.*?)'$")
 	public void emptyElasticsearchIndex(String index) {
 		commonspec.getLogger().info("Emptying an es index: {}", index);
 		commonspec.getElasticSearchClient().emptyIndex(index);
 	}
-	
+
 	@Given("^I drop every existing elasticsearch index$")
 	public void dropElasticsearchIndexes() {
 		commonspec.getLogger().info("Dropping es indexes");
 		commonspec.getElasticSearchClient().dropIndexes();
 	}
-	
+
 	@Given("^I drop an elasticsearch index named '(.*?)'$")
 	public void dropElasticsearchIndex(String index) {
 		commonspec.getLogger().info("Dropping an es index: {}", index);
 		commonspec.getElasticSearchClient().dropIndex(index);
 	}
-	
-	@Given("a Cassandra script with name '(.*?)' and default keyspace '(.*?)'$")
+
+	@Given("a C* script with name '(.*?)' and default keyspace '(.*?)'$")
 	public void InsertDataOnCassandraFromFile(String filename, String keyspace) {
 		commonspec.getLogger().info("Inserting data on cassandra from file");
-		commonspec.getCassandraClient().loadTestData(keyspace, "/scripts/" + filename);
+		commonspec.getCassandraClient().loadTestData(keyspace,
+				"/scripts/" + filename);
 	}
-	
-	@Given("^I drop an Cassandra keyspace '(.*?)'$")
+
+	@Given("^I drop an C* keyspace '(.*?)'$")
 	public void DropCassandraKeyspace(String keyspace) {
-		commonspec.getLogger().info("Dropping a Cassandra Keyspace");
+		commonspec.getLogger().info("Dropping a C* keyspace", keyspace);
 		commonspec.getCassandraClient().dropKeyspace(keyspace);
 	}
-	
-	@Given("^a Aerospike namespace '(.*?)' with table '(.*?)':$")
-	public void CreateAeroSpikeTable(String nameSpace, String tableName, DataTable tab) {
+
+	@Given("^I create an AeroSpike namespace '(.*?)' with table '(.*?)':$")
+	public void CreateAeroSpikeTable(String nameSpace, String tableName,
+			DataTable tab) {
 		commonspec.getLogger().info("Creating a table on AeroSpike");
-		if(commonspec.getAerospikeClient().isConnected()){
+		if (commonspec.getAerospikeClient().isConnected()) {
 			commonspec.getLogger().info("Creating a table on AeroSpike");
 		}
-		commonspec.getAerospikeClient().insertFromDataTable(nameSpace, tableName, tab);
-	}	
-	@Given("^I create a dataBase '(.*?)'$")
-	public void createMongoDBDataBase(String databaseName){
+		commonspec.getAerospikeClient().insertFromDataTable(nameSpace,
+				tableName, tab);
+	}
+
+	@Given("^I create a MongoDB dataBase '(.*?)'$")
+	public void createMongoDBDataBase(String databaseName) {
 		commonspec.getLogger().info("Creating a database on MongoDB");
 		commonspec.getMongoDBClient().connectToMongoDBDataBase(databaseName);
-		
+
 	}
-	
-	@Given("^I drop a dataBase '(.*?)'$")
-	public void dropMongoDBDataBase(String databaseName){
+
+	@Given("^I drop a MongoDB database '(.*?)'$")
+	public void dropMongoDBDataBase(String databaseName) {
 		commonspec.getLogger().info("Creating a database on MongoDB");
 		commonspec.getMongoDBClient().dropMongoDBDataBase(databaseName);
 	}
-	
-	@Given("^I insert in dataBase '(.*?)' and table '(.*?)':$")
-	public void insertOnMongoTable(String dataBase, String tab_name, DataTable table){
+
+	@Given("^I insert into a MongoDB database '(.*?)' and table '(.*?)' this values:$")
+	public void insertOnMongoTable(String dataBase, String tab_name,
+			DataTable table) {
 		commonspec.getLogger().info("Inserting data in a database on MongoDB");
-		commonspec.getMongoDBClient().insertIntoMongoDBCollection(dataBase, tab_name, table);
+		commonspec.getMongoDBClient().connectToMongoDBDataBase(dataBase);
+		commonspec.getMongoDBClient().insertIntoMongoDBCollection(tab_name,
+				table);
 	}
-	@Given("^I drop all elements of database '(.*?)' and table '(.*?)'")
-	public void truncateTableInMongo(String database, String table){
+
+	@Given("^I drop every document at a MongoDB database '(.*?)' and table '(.*?)'")
+	public void truncateTableInMongo(String database, String table) {
 		commonspec.getLogger().info("Truncating a table in MongoDB");
-		commonspec.getMongoDBClient().dropAllDataMongoDBCollection(database, table);
+		commonspec.getMongoDBClient().connectToMongoDBDataBase(database);
+		commonspec.getMongoDBClient().dropAllDataMongoDBCollection(table);
 	}
-			
-	
+
 }

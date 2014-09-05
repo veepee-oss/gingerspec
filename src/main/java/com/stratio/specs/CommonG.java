@@ -22,9 +22,11 @@ public class CommonG {
 			.get("class"));
 	private final ExceptionList exceptions = ExceptionList.getInstance();
 	private final CassandraUtil cassandraClient = CassandraUtil.getInstance();
-	private final ElasticSearchUtil elasticSearchClient = ElasticSearchUtil.getInstance();
+	private final ElasticSearchUtil elasticSearchClient = ElasticSearchUtil
+			.getInstance();
 	private final AerospikeUtil aerospikeClient = AerospikeUtil.getInstance();
 	private final MongoDBUtil mongoDBClient = MongoDBUtil.getInstance();
+
 	public Logger getLogger() {
 		return this.logger;
 	}
@@ -33,18 +35,18 @@ public class CommonG {
 		return exceptions.getExceptions();
 	}
 
-	public CassandraUtils getCassandraClient(){
-			return cassandraClient.getCassandraUtils();
-	}		
-	
+	public CassandraUtils getCassandraClient() {
+		return cassandraClient.getCassandraUtils();
+	}
+
 	public ElasticSearchUtils getElasticSearchClient() {
 		return elasticSearchClient.getElasticSearchUtils();
 	}
-	
+
 	public AerospikeUtils getAerospikeClient() {
 		return aerospikeClient.getAeroSpikeUtils();
 	}
-	
+
 	public MongoDBUtils getMongoDBClient() {
 		return mongoDBClient.getMongoDBUtils();
 	}

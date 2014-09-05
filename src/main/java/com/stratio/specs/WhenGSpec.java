@@ -16,11 +16,4 @@ public class WhenGSpec extends BaseGSpec {
 		commonspec.getLogger().info("Idling a while");
 		Thread.sleep(seconds * 1000);
 	}
-	
-	@When("^I drop the keyspace '(.*?)'$")
-	public void idleWait(String keyspace) throws InterruptedException {
-		commonspec.getLogger().info("Dropping keyspace {}", keyspace);
-		commonspec.getCassandraClient().dropKeyspace(keyspace);
-		
-	}
 }
