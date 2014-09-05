@@ -1,8 +1,7 @@
 package com.stratio.tests.utils;
 
-import java.util.ArrayList;
+
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,9 +11,7 @@ import com.aerospike.client.AerospikeException;
 import com.aerospike.client.Bin;
 import com.aerospike.client.Host;
 import com.aerospike.client.Key;
-import com.aerospike.client.Record;
 import com.aerospike.client.policy.ClientPolicy;
-import com.aerospike.client.policy.Policy;
 import com.aerospike.client.policy.WritePolicy;
 import com.aerospike.client.query.RecordSet;
 import com.aerospike.client.query.Statement;
@@ -28,7 +25,6 @@ public class AerospikeUtils {
 	private final String host;
 	private final Integer port;
 	private AerospikeClient client;
-	private Policy policy = null;
 	public AerospikeUtils() {
 		this.host = "127.0.0.1";
 		this.port =  3000;

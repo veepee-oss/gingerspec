@@ -5,8 +5,8 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
@@ -20,13 +20,13 @@ import cucumber.api.DataTable;
 
 public class MongoDBUtils {
 
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(MongoDBUtils.class);
+//	private static final Logger LOGGER = LoggerFactory
+//			.getLogger(MongoDBUtils.class);
 
 	private final String host;
 	private final int port;
 	private static MongoClient mongoClient;
-	private static DB dataBase;
+	private DB dataBase;
 
 	public MongoDBUtils() {
 		this.host = "127.0.0.1"; //System.getProperty("MONGODB_HOST", "17.0.0.1");

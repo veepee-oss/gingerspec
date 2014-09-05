@@ -5,12 +5,11 @@ import java.util.List;
 
 import org.hamcrest.Description;
 import org.hamcrest.Factory;
-import org.hamcrest.Matcher;
-import org.hamcrest.SelfDescribing;
 import org.hamcrest.TypeSafeMatcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.aerospike.client.AerospikeException;
-import com.aerospike.client.Key;
 import com.aerospike.client.Record;
 import com.aerospike.client.query.RecordSet;
 
@@ -18,7 +17,9 @@ import cucumber.api.DataTable;
 
 public class RecordSetMatcher extends TypeSafeMatcher<RecordSet> {
 	private final DataTable table;
-
+	
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(RecordSetMatcher.class);
 	// Constructor
 	public RecordSetMatcher(DataTable table) {
 		this.table = table;
@@ -75,7 +76,7 @@ public class RecordSetMatcher extends TypeSafeMatcher<RecordSet> {
 					records_as_list.add(record_as_list);
 				}
 			} catch (AerospikeException e) {
-				System.out.println(e.getMessage());
+				LOGGER.error("ERROR :" + e);
 
 			}
 		} finally {
