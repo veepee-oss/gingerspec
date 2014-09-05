@@ -26,18 +26,17 @@ public class AerospikeUtils {
 	private AerospikeClient client;
 
 	public AerospikeUtils() {
-		this.host = "127.0.0.1";
-		this.port = 3000;
+		this.host = System.getProperty("AEROSPIKE_HOST", "127.0.0.1");
+		this.port = Integer.parseInt(System.getProperty("AEROSPIKE_PORT", "3000"));
 	}
 
 	public void connect() {
 		Host[] hosts = new Host[] { new Host(this.host, this.port) };
 		try {
 			client = new AerospikeClient(new ClientPolicy(), hosts);
-			LOGGER.info("Connection to Aerospike");
+			LOGGER.debug("Initializing Aerospike client");
 		} catch (AerospikeException e) {
-
-			LOGGER.error("Imposible to connect");
+			LOGGER.error("Unable to connect to Aerospike", e);
 		}
 	}
 

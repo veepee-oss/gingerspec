@@ -5,8 +5,8 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
@@ -19,8 +19,8 @@ import cucumber.api.DataTable;
 
 public class MongoDBUtils {
 
-	// private static final Logger LOGGER = LoggerFactory
-	// .getLogger(MongoDBUtils.class);
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(MongoDBUtils.class);
 
 	private final String host;
 	private final int port;
@@ -28,18 +28,16 @@ public class MongoDBUtils {
 	private DB dataBase;
 
 	public MongoDBUtils() {
-		this.host = "127.0.0.1"; // System.getProperty("MONGODB_HOST",
-									// "17.0.0.1");
-		this.port = 27017;
-		// LOGGER.debug("Initializing MongoDB.");
+		this.host = System.getProperty("MONGO_HOST", "127.0.0.1");
+		this.port = Integer.parseInt(System.getProperty("MONGO_PORT", "27017"));
+		LOGGER.debug("Initializing MongoDB client");
 	}
 
 	public void connectToMongoDB() {
 		try {
 			mongoClient = new MongoClient(this.host, this.port);
 		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.error("Unable to connect to MongoDB", e);
 		}
 	}
 
