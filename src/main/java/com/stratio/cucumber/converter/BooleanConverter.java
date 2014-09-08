@@ -4,14 +4,9 @@ import cucumber.api.Transformer;
 
 public class BooleanConverter extends Transformer<Boolean> {
 
-	@Override
-	public Boolean transform(String input) {
+    @Override
+    public Boolean transform(String input) {
+        return "".equals(input);
 
-		if (input.equals("")) {
-			return true;
-		} else {
-			return false;
-		}
-
-	}
+    }
 }

@@ -15,42 +15,42 @@ import org.testng.TestListenerAdapter;
 
 public class JaCoCoClient extends TestListenerAdapter {
 
-	private static final String DESTFILE = "target/executions/jacoco-client.exec";
-	private static final int PORT = 6300;
+    private static final String DESTFILE = "target/executions/jacoco-client.exec";
+    private static final int PORT = 6300;
 
-	private final Logger logger = LoggerFactory.getLogger(JaCoCoClient.class);
+    private final Logger logger = LoggerFactory.getLogger(JaCoCoClient.class);
 
-	@Override
-	public void onFinish(ITestContext context) {
+    @Override
+    public void onFinish(ITestContext context) {
 
-		FileOutputStream localFile;
-		try {
-			localFile = new FileOutputStream(DESTFILE);
-			final ExecutionDataWriter localWriter = new ExecutionDataWriter(
-					localFile);
+        FileOutputStream localFile;
+        try {
+            localFile = new FileOutputStream(DESTFILE);
+            final ExecutionDataWriter localWriter = new ExecutionDataWriter(
+                    localFile);
 
-			// Open a socket to the coverage agent:
-			String ADDRESS = System.getProperty("JACOCO_SERVER", "localhost");
-			final Socket socket = new Socket(InetAddress.getByName(ADDRESS),
-					PORT);
-			final RemoteControlWriter writer = new RemoteControlWriter(
-					socket.getOutputStream());
-			final RemoteControlReader reader = new RemoteControlReader(
-					socket.getInputStream());
-			reader.setSessionInfoVisitor(localWriter);
-			reader.setExecutionDataVisitor(localWriter);
+            // Open a socket to the coverage agent:
+            String ADDRESS = System.getProperty("JACOCO_SERVER", "localhost");
+            final Socket socket = new Socket(InetAddress.getByName(ADDRESS),
+                    PORT);
+            final RemoteControlWriter writer = new RemoteControlWriter(
+                    socket.getOutputStream());
+            final RemoteControlReader reader = new RemoteControlReader(
+                    socket.getInputStream());
+            reader.setSessionInfoVisitor(localWriter);
+            reader.setExecutionDataVisitor(localWriter);
 
-			// Send a dump command and read the response:
-			writer.visitDumpCommand(true, false);
-			reader.read();
+            // Send a dump command and read the response:
+            writer.visitDumpCommand(true, false);
+            reader.read();
 
-			socket.close();
-			localFile.close();
-		} catch (IOException e) {
-			logger.warn(
-					"Exception on fetching remote coverage. is the remote JaCoCo agent set up?: {}",
-					e.getMessage());
-		}
+            socket.close();
+            localFile.close();
+        } catch (IOException e) {
+            logger.warn(
+                    "Exception on fetching remote coverage. is the remote JaCoCo agent set up?: {}",
+                    e.getMessage());
+        }
 
-	}
+    }
 }

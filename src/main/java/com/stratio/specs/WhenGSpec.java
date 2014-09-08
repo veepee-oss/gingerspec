@@ -7,13 +7,13 @@ import cucumber.api.java.en.When;
 
 public class WhenGSpec extends BaseGSpec {
 
-	public WhenGSpec(CommonG spec) {
-		this.commonspec = spec;
-	}
+    public WhenGSpec(CommonG spec) {
+        this.commonspec = spec;
+    }
 
-	@When("^I wait '(.*?)' seconds?$")
-	public void idleWait(Integer seconds) throws InterruptedException {
-		commonspec.getLogger().info("Idling a while");
-		Thread.sleep(seconds * 1000);
-	}
+    @When("^I wait '(.*?)' seconds?$")
+    public void idleWait(Integer seconds) throws InterruptedException {
+        commonspec.getLogger().info("Idling a while");
+        Thread.sleep(seconds * 1000);
+    }
 }

@@ -12,34 +12,34 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
 
-abstract public class BaseGTest {
+public abstract class BaseGTest {
 
-	final Logger logger = LoggerFactory.getLogger(this.getClass()
-			.getCanonicalName());
+    final Logger logger = LoggerFactory.getLogger(this.getClass()
+            .getCanonicalName());
 
-	@BeforeSuite(alwaysRun = true)
-	public void beforeGSuite(ITestContext context) {
-	}
+    @BeforeSuite(alwaysRun = true)
+    public void beforeGSuite(ITestContext context) {
+    }
 
-	@AfterSuite(alwaysRun = true)
-	public void afterGSuite(ITestContext context) {
-		logger.info("Done executing this test-run.");
-	}
+    @AfterSuite(alwaysRun = true)
+    public void afterGSuite(ITestContext context) {
+        logger.info("Done executing this test-run.");
+    }
 
-	@BeforeClass(alwaysRun = true)
-	public void beforeGClass(ITestContext context) {
-		ThreadProperty.set("class", this.getClass().getCanonicalName());
-	}
+    @BeforeClass(alwaysRun = true)
+    public void beforeGClass(ITestContext context) {
+        ThreadProperty.set("class", this.getClass().getCanonicalName());
+    }
 
-	@BeforeMethod(alwaysRun = true)
-	public void beforeGMethod(Method method) {
-	}
+    @BeforeMethod(alwaysRun = true)
+    public void beforeGMethod(Method method) {
+    }
 
-	@AfterMethod(alwaysRun = true)
-	public void afterGMethod(Method method) {
-	}
+    @AfterMethod(alwaysRun = true)
+    public void afterGMethod(Method method) {
+    }
 
-	@AfterClass()
-	public void afterGClass() {
-	}
+    @AfterClass()
+    public void afterGClass() {
+    }
 }

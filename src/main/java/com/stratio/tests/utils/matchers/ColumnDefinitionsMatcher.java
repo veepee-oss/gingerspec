@@ -7,33 +7,33 @@ import org.hamcrest.Factory;
 
 public class ColumnDefinitionsMatcher extends TypeSafeMatcher<String> {
 
-	private final String columnName;
+    private final String columnName;
 
-	// Constructor
-	public ColumnDefinitionsMatcher(String columnName) {
-		this.columnName = columnName;
-	}
+    // Constructor
+    public ColumnDefinitionsMatcher(String columnName) {
+        this.columnName = columnName;
+    }
 
-	@Factory
-	public static Matcher<String> containsColumn(String columnName) {
-		return new ColumnDefinitionsMatcher(columnName);
-	}
+    @Factory
+    public static Matcher<String> containsColumn(String columnName) {
+        return new ColumnDefinitionsMatcher(columnName);
+    }
 
-	@Override
-	protected boolean matchesSafely(String item) {
-		String[] aux = item.split("\\p{Punct}");
-		for (int i = 0; i < aux.length; i++) {
-			aux[i] = aux[i].trim();
-			if (aux[i].toString().equals(this.columnName.toString())) {
-				return true;
-			}
-		}
-		return false;
-	}
+    @Override
+    protected boolean matchesSafely(String item) {
+        String[] aux = item.split("\\p{Punct}");
+        for (int i = 0; i < aux.length; i++) {
+            aux[i] = aux[i].trim();
+            if (aux[i].equals(this.columnName)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-	@Override
-	public void describeTo(Description description) {
-		description.appendText("The column " + this.columnName
-				+ " does not exists on the table.");
-	}
+    @Override
+    public void describeTo(Description description) {
+        description.appendText("The column " + this.columnName
+                + " does not exists on the table.");
+    }
 }

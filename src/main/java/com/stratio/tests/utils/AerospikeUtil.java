@@ -1,17 +1,17 @@
 package com.stratio.tests.utils;
 
 public class AerospikeUtil {
-	private static AerospikeUtil instance = new AerospikeUtil();
-	private final AerospikeUtils cUtils = new AerospikeUtils();
+    private static AerospikeUtil instance = new AerospikeUtil();
+    private final AerospikeUtils cUtils = new AerospikeUtils();
 
-	private AerospikeUtil() {
-	}
+    private AerospikeUtil() {
+    }
 
-	public static AerospikeUtil getInstance() {
-		return instance;
-	}
+    public static AerospikeUtil getInstance() {
+        return instance;
+    }
 
-	public AerospikeUtils getAeroSpikeUtils() {
-		return cUtils;
-	}
+    public AerospikeUtils getAeroSpikeUtils() {
+        return cUtils;
+    }
 }

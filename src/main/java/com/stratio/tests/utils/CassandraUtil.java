@@ -2,17 +2,17 @@ package com.stratio.tests.utils;
 
 public class CassandraUtil {
 
-	private static CassandraUtil instance = new CassandraUtil();
-	private final CassandraUtils cUtils = new CassandraUtils();
+    private static CassandraUtil instance = new CassandraUtil();
+    private final CassandraUtils cUtils = new CassandraUtils();
 
-	private CassandraUtil() {
-	}
+    private CassandraUtil() {
+    }
 
-	public static CassandraUtil getInstance() {
-		return instance;
-	}
+    public static CassandraUtil getInstance() {
+        return instance;
+    }
 
-	public CassandraUtils getCassandraUtils() {
-		return cUtils;
-	}
+    public CassandraUtils getCassandraUtils() {
+        return cUtils;
+    }
 }

@@ -5,17 +5,17 @@ import java.util.List;
 
 public class ExceptionList {
 
-	private static ExceptionList instance = new ExceptionList();
-	private final List<Exception> exceptions = new ArrayList<Exception>();
+    private static ExceptionList instance = new ExceptionList();
+    private final List<Exception> exceptions = new ArrayList<Exception>();
 
-	private ExceptionList() {
-	}
+    private ExceptionList() {
+    }
 
-	public static ExceptionList getInstance() {
-		return instance;
-	}
+    public static ExceptionList getInstance() {
+        return instance;
+    }
 
-	public List<Exception> getExceptions() {
-		return exceptions;
-	}
+    public List<Exception> getExceptions() {
+        return exceptions;
+    }
 }
