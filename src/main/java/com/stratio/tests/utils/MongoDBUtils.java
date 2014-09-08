@@ -105,7 +105,7 @@ public class MongoDBUtils {
 
     public void insertIntoMongoDBCollection(String collection, DataTable table) {
         // Primero pasamos la fila del datatable a un hashmap de ColumnName-Type
-        ArrayList<String[]> colRel = coltoArrayList(table);
+        List<String[]> colRel = coltoArrayList(table);
         // Vamos insertando fila a fila
         for (int i = 1; i < table.raw().size(); i++) {
             // Obtenemos la fila correspondiente
@@ -122,8 +122,8 @@ public class MongoDBUtils {
 
     public List<DBObject> readFromMongoDBCollection(String collection,
             DataTable table) {
-        ArrayList<DBObject> res = new ArrayList<DBObject>();
-        ArrayList<String[]> colRel = coltoArrayList(table);
+        List<DBObject> res = new ArrayList<DBObject>();
+        List<String[]> colRel = coltoArrayList(table);
         DBCollection aux = this.dataBase.getCollection(collection);
         for (int i = 1; i < table.raw().size(); i++) {
             // Obtenemos la fila correspondiente
