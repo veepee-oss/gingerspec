@@ -37,9 +37,7 @@ public class DBObjectsMatcher extends TypeSafeMatcher<ArrayList<DBObject>> {
 	@Override
 	protected boolean matchesSafely(ArrayList<DBObject> item) {
 		ArrayList<String[]> col_rel = coltoArrayList(table);
-		if (item.size() != table.raw().size() - 1) {
-			return false;
-		}
+
 		for (int i = 1; i < table.raw().size(); i++) {
 			// Obtenemos la fila correspondiente
 			BasicDBObject doc = new BasicDBObject();

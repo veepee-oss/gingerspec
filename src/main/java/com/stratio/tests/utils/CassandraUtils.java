@@ -25,13 +25,9 @@ public class CassandraUtils {
 			.getLogger(CassandraUtils.class);
 
 	private Cluster cluster;
-
 	private final String host;
-
 	private Metadata metadata;
-
-	private static Session session;
-
+	private Session session;
 	private QueryUtils queryUtils;
 
 	public CassandraUtils() {
@@ -40,22 +36,22 @@ public class CassandraUtils {
 
 	public void connect() {
 		buildCluster();
-		queryUtils = new QueryUtils();
-		metadata = cluster.getMetadata();
+		this.queryUtils = new QueryUtils();
+		this.metadata = this.cluster.getMetadata();
 		LOGGER.debug("Connected to cluster (" + host + "): "
 				+ metadata.getClusterName() + "\n");
-		session = cluster.connect();
+		this.session = this.cluster.connect();
 	}
 
 	public ResultSet executeQuery(String query) {
 
-		return session.execute(query);
+		return this.session.execute(query);
 	}
 
 	public void executeQueriesList(List<String> queriesList) {
 
 		for (String query : queriesList) {
-			session.execute(query);
+			this.session.execute(query);
 		}
 	}
 
@@ -63,34 +59,35 @@ public class CassandraUtils {
 		metadata = cluster.getMetadata();
 		LOGGER.debug("Connected to cluster (" + host + "): "
 				+ metadata.getClusterName() + "\n");
-		session = cluster.connect();
+		this.session = this.cluster.connect();
 	}
 
 	public void disconnect() {
-		session.close();
+		this.session.close();
+		this.cluster.close();
 	}
 
 	public Metadata getMetadata() {
-		metadata = cluster.getMetadata();
-		return metadata;
+		this.metadata = cluster.getMetadata();
+		return this.metadata;
 	}
 
 	public void buildCluster() {
-		this.cluster = Cluster.builder().addContactPoint(host).build();
+		this.cluster = Cluster.builder().addContactPoint(this.host).build();
 		this.cluster.getConfiguration().getQueryOptions()
 				.setConsistencyLevel(ConsistencyLevel.ONE);
 
 	}
 
 	public Session getSession() {
-		return session;
+		return this.session;
 	}
 
 	public void createKeyspace(String keyspace) {
 		Hashtable<String, String> replicationSimpleOneExtra = new Hashtable<String, String>();
 		replicationSimpleOneExtra.put("'class'", "'SimpleStrategy'");
 		replicationSimpleOneExtra.put("'replication_factor'", "1");
-		String query = queryUtils
+		String query = this.queryUtils
 				.createKeyspaceQuery(true, keyspace, queryUtils
 						.createKeyspaceReplication(replicationSimpleOneExtra),
 						"");
@@ -99,8 +96,8 @@ public class CassandraUtils {
 	}
 
 	public boolean existsKeyspace(String keyspace, boolean showLog) {
-		metadata = cluster.getMetadata();
-		if (metadata.getKeyspaces().isEmpty())
+		this.metadata = cluster.getMetadata();
+		if (this.metadata.getKeyspaces().isEmpty())
 			return false;
 		for (KeyspaceMetadata k : metadata.getKeyspaces()) {
 			if (showLog)
@@ -114,33 +111,33 @@ public class CassandraUtils {
 
 	public ArrayList<String> getKeyspaces() {
 		ArrayList<String> result = new ArrayList<String>();
-		metadata = cluster.getMetadata();
+		this.metadata = this.cluster.getMetadata();
 		if (metadata.getKeyspaces().isEmpty())
 			return result;
-		for (KeyspaceMetadata k : metadata.getKeyspaces()) {
+		for (KeyspaceMetadata k : this.metadata.getKeyspaces()) {
 			result.add(k.getName());
 		}
 		return result;
 	}
 
 	public void dropKeyspace(String keyspace) {
-		executeQuery(queryUtils.dropKeyspaceQuery(false, keyspace));
+		executeQuery(this.queryUtils.dropKeyspaceQuery(false, keyspace));
 	}
 
 	public void dropKeyspace(boolean ifExists, String keyspace) {
-		executeQuery(queryUtils.dropKeyspaceQuery(ifExists, keyspace));
+		executeQuery(this.queryUtils.dropKeyspaceQuery(ifExists, keyspace));
 	}
 
 	public void useKeyspace(String keyspace) {
-		executeQuery(queryUtils.useQuery(keyspace));
+		executeQuery(this.queryUtils.useQuery(keyspace));
 	}
 
 	public boolean existsTable(String keyspace, String table, boolean showLog) {
-		metadata = cluster.getMetadata();
+		this.metadata = this.cluster.getMetadata();
 
-		if (metadata.getKeyspace(keyspace).getTables().isEmpty())
+		if (this.metadata.getKeyspace(keyspace).getTables().isEmpty())
 			return false;
-		for (TableMetadata t : metadata.getKeyspace(keyspace).getTables()) {
+		for (TableMetadata t : this.metadata.getKeyspace(keyspace).getTables()) {
 			if (showLog) {
 				if (t.getName() != null)
 					LOGGER.debug(t.getName());
@@ -154,13 +151,13 @@ public class CassandraUtils {
 
 	public ArrayList<String> getTables(String keyspace) {
 		ArrayList<String> result = new ArrayList<String>();
-		metadata = cluster.getMetadata();
+		this.metadata = this.cluster.getMetadata();
 		if (!existsKeyspace(keyspace, false)) {
 			return result;
 		}
-		if (metadata.getKeyspace(keyspace).getTables().isEmpty())
+		if (this.metadata.getKeyspace(keyspace).getTables().isEmpty())
 			return result;
-		for (TableMetadata t : metadata.getKeyspace(keyspace).getTables()) {
+		for (TableMetadata t : this.metadata.getKeyspace(keyspace).getTables()) {
 			result.add(t.getName());
 		}
 		return result;
@@ -168,8 +165,7 @@ public class CassandraUtils {
 
 	public void dropTable(String keyspace, String table) {
 		// se elimina la table
-		executeQuery(queryUtils.dropTableQuery(false, table));
-
+		executeQuery(this.queryUtils.dropTableQuery(false, table));
 	}
 
 	/**
