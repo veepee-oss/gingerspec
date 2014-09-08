@@ -55,7 +55,6 @@ class CucumberReporter implements Formatter, Reporter {
     private Element clazz;
     private Element root;
     private TestMethod testMethod;
-    private Feature feat;
     private Examples tmpExamples;
     private List<Result> tmpHooks = new ArrayList<Result>();
     private List<Step> tmpSteps = new ArrayList<Step>();
@@ -95,7 +94,6 @@ class CucumberReporter implements Formatter, Reporter {
 
     @Override
     public void feature(Feature feature) {
-        feat = feature;
         clazz = document.createElement("class");
         clazz.setAttribute("name", callerClass);
         test.appendChild(clazz);

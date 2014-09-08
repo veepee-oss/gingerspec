@@ -55,8 +55,9 @@ public class AerospikeUtils {
         WritePolicy writePolicy = new WritePolicy();
         writePolicy.timeout = 50;
         List<List<String>> table_as_list = table.raw();
-        int iKey = table_as_list.size();// (Se resta uno porque la primera fila
-                                        // indica los columnNames)
+     // (Se resta uno porque la primera fila indica los columnNames)
+        int iKey = table_as_list.size();
+        
         for (int i = 1; i < iKey; i++) {
             try {
                 Key key = new Key(NameSpace, tableName, "MyKey" + i);

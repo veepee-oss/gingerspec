@@ -138,8 +138,7 @@ public class CassandraUtils {
         if (this.metadata.getKeyspace(keyspace).getTables().isEmpty())
             return false;
         for (TableMetadata t : this.metadata.getKeyspace(keyspace).getTables()) {
-            if (showLog) {
-                if (t.getName() != null)
+            if (showLog && (t.getName() != null)) {
                     LOGGER.debug(t.getName());
             }
             if (t.getName().equals(table)) {
