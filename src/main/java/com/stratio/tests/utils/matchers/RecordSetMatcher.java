@@ -39,17 +39,17 @@ public class RecordSetMatcher extends TypeSafeMatcher<RecordSet> {
 
     @Override
     protected boolean matchesSafely(RecordSet item) {
-        List<List<String>> table_as_list = table.raw();
-        List<String> columnNames = table_as_list.get(0);
-        List<List<String>> records_as_table = recordToList(columnNames, item);
+        List<List<String>> tableAsList = table.raw();
+        List<String> columnNames = tableAsList.get(0);
+        List<List<String>> recordsAsTable = recordToList(columnNames, item);
         // Primero comprobamos las longitudes(han de ser las mismas)
-        if (records_as_table.size() != table_as_list.size()) {
+        if (recordsAsTable.size() != tableAsList.size()) {
             return false;
         }
         // Pasamos a comprobar el contenido del recordset por filas
-        for (int i = 1; i < table_as_list.size(); i++) {
-            if (records_as_table.contains(table_as_list.get(i))) {
-                records_as_table.remove(table_as_list.get(i));
+        for (int i = 1; i < tableAsList.size(); i++) {
+            if (recordsAsTable.contains(tableAsList.get(i))) {
+                recordsAsTable.remove(tableAsList.get(i));
             } else {
                 return false;
             }
@@ -59,23 +59,22 @@ public class RecordSetMatcher extends TypeSafeMatcher<RecordSet> {
 
     private List<List<String>> recordToList(List<String> columnNames,
             RecordSet item) {
-        List<List<String>> records_as_list = new ArrayList<List<String>>();
-        records_as_list.add(columnNames);
+        List<List<String>> recordsAsList = new ArrayList<List<String>>();
+        recordsAsList.add(columnNames);
         try {
             try {
                 while (item.next()) {
                     Record record = item.getRecord();
-                    List<String> record_as_list = new ArrayList<String>();
+                    List<String> recordAsList = new ArrayList<String>();
                     for (int i = 0; i < columnNames.size(); i++) {
                         Object aux = record.getValue(columnNames.get(i));
                         if (aux != null) {
-                            record_as_list.add(aux.toString());
+                            recordAsList.add(aux.toString());
                         } else {
-                            record_as_list.add("ERROR");
+                            recordAsList.add("ERROR");
                         }
-
                     }
-                    records_as_list.add(record_as_list);
+                    recordsAsList.add(recordAsList);
                 }
             } catch (AerospikeException e) {
                 LOGGER.error("ERROR :" + e);
@@ -84,7 +83,7 @@ public class RecordSetMatcher extends TypeSafeMatcher<RecordSet> {
         } finally {
             item.close();
         }
-        return records_as_list;
+        return recordsAsList;
     }
 
 }

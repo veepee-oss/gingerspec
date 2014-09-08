@@ -1,6 +1,6 @@
 package com.stratio.tests.utils;
 
-public class ElasticSearchUtil {
+public final class ElasticSearchUtil {
 
     private static ElasticSearchUtil instance = new ElasticSearchUtil();
     private final ElasticSearchUtils esUtils = new ElasticSearchUtils();

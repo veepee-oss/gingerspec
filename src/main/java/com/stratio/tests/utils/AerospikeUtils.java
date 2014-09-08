@@ -49,20 +49,20 @@ public class AerospikeUtils {
         client.close();
     }
 
-    public void insertFromDataTable(String NameSpace, String tableName,
+    public void insertFromDataTable(String nameSpace, String tableName,
             DataTable table) {
         // Primero comprobamos el numero de filas del datable
         WritePolicy writePolicy = new WritePolicy();
         writePolicy.timeout = 50;
-        List<List<String>> table_as_list = table.raw();
+        List<List<String>> tableAsList = table.raw();
      // (Se resta uno porque la primera fila indica los columnNames)
-        int iKey = table_as_list.size();
+        int iKey = tableAsList.size();
         
         for (int i = 1; i < iKey; i++) {
             try {
-                Key key = new Key(NameSpace, tableName, "MyKey" + i);
-                Bin[] bins = createBins(table_as_list.get(0),
-                        table_as_list.get(i));
+                Key key = new Key(nameSpace, tableName, "MyKey" + i);
+                Bin[] bins = createBins(tableAsList.get(0),
+                        tableAsList.get(i));
                 client.add(writePolicy, key, bins[0]);
                 client.add(writePolicy, key, bins[1]);
             } catch (AerospikeException e) {
@@ -86,9 +86,9 @@ public class AerospikeUtils {
         return bins;
     }
 
-    public RecordSet readTable(String NameSpace, String table) {
+    public RecordSet readTable(String nameSpace, String table) {
         Statement stmt = new Statement();
-        stmt.setNamespace(NameSpace);
+        stmt.setNamespace(nameSpace);
         stmt.setSetName(table);
         RecordSet rs = null;
         try {

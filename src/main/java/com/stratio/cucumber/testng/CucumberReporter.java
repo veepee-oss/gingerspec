@@ -275,7 +275,7 @@ class CucumberReporter implements Formatter, Reporter {
         return String.valueOf(totalDuration);
     }
 
-    private static class TestMethod {
+    private static final class TestMethod {
 
         Scenario scenario = null;
         Examples examplesData;

@@ -1,6 +1,6 @@
 package com.stratio.tests.utils;
 
-public class CassandraUtil {
+public final class CassandraUtil {
 
     private static CassandraUtil instance = new CassandraUtil();
     private final CassandraUtils cUtils = new CassandraUtils();

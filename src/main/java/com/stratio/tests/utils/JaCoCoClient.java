@@ -30,8 +30,8 @@ public class JaCoCoClient extends TestListenerAdapter {
                     localFile);
 
             // Open a socket to the coverage agent:
-            String ADDRESS = System.getProperty("JACOCO_SERVER", "localhost");
-            final Socket socket = new Socket(InetAddress.getByName(ADDRESS),
+            String address = System.getProperty("JACOCO_SERVER", "localhost");
+            final Socket socket = new Socket(InetAddress.getByName(address),
                     PORT);
             final RemoteControlWriter writer = new RemoteControlWriter(
                     socket.getOutputStream());

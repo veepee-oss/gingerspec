@@ -1,6 +1,6 @@
 package com.stratio.tests.utils;
 
-public class MongoDBUtil {
+public final class MongoDBUtil {
 
     private static MongoDBUtil instance = new MongoDBUtil();
     private final MongoDBUtils cUtils = new MongoDBUtils();

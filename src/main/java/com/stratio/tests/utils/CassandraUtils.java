@@ -7,6 +7,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,7 +85,7 @@ public class CassandraUtils {
     }
 
     public void createKeyspace(String keyspace) {
-        Hashtable<String, String> replicationSimpleOneExtra = new Hashtable<String, String>();
+        Map<String, String> replicationSimpleOneExtra = new Hashtable<String, String>();
         replicationSimpleOneExtra.put("'class'", "'SimpleStrategy'");
         replicationSimpleOneExtra.put("'replication_factor'", "1");
         String query = this.queryUtils
@@ -97,11 +98,13 @@ public class CassandraUtils {
 
     public boolean existsKeyspace(String keyspace, boolean showLog) {
         this.metadata = cluster.getMetadata();
-        if (this.metadata.getKeyspaces().isEmpty())
+        if (this.metadata.getKeyspaces().isEmpty()) {
             return false;
+        }
         for (KeyspaceMetadata k : metadata.getKeyspaces()) {
-            if (showLog)
+            if (showLog) {
                 LOGGER.debug(k.getName());
+            }
             if (k.getName().equals(keyspace)) {
                 return true;
             }
@@ -109,11 +112,12 @@ public class CassandraUtils {
         return false;
     }
 
-    public ArrayList<String> getKeyspaces() {
+    public List<String> getKeyspaces() {
         ArrayList<String> result = new ArrayList<String>();
         this.metadata = this.cluster.getMetadata();
-        if (metadata.getKeyspaces().isEmpty())
+        if (metadata.getKeyspaces().isEmpty()) {
             return result;
+        }
         for (KeyspaceMetadata k : this.metadata.getKeyspaces()) {
             result.add(k.getName());
         }
@@ -135,11 +139,12 @@ public class CassandraUtils {
     public boolean existsTable(String keyspace, String table, boolean showLog) {
         this.metadata = this.cluster.getMetadata();
 
-        if (this.metadata.getKeyspace(keyspace).getTables().isEmpty())
+        if (this.metadata.getKeyspace(keyspace).getTables().isEmpty()) {
             return false;
+        }
         for (TableMetadata t : this.metadata.getKeyspace(keyspace).getTables()) {
             if (showLog && (t.getName() != null)) {
-                    LOGGER.debug(t.getName());
+                LOGGER.debug(t.getName());
             }
             if (t.getName().equals(table)) {
                 return true;
@@ -148,14 +153,15 @@ public class CassandraUtils {
         return false;
     }
 
-    public ArrayList<String> getTables(String keyspace) {
+    public List<String> getTables(String keyspace) {
         ArrayList<String> result = new ArrayList<String>();
         this.metadata = this.cluster.getMetadata();
         if (!existsKeyspace(keyspace, false)) {
             return result;
         }
-        if (this.metadata.getKeyspace(keyspace).getTables().isEmpty())
+        if (this.metadata.getKeyspace(keyspace).getTables().isEmpty()) {
             return result;
+        }
         for (TableMetadata t : this.metadata.getKeyspace(keyspace).getTables()) {
             result.add(t.getName());
         }
@@ -178,9 +184,9 @@ public class CassandraUtils {
      *            The path of the CQL script.
      */
     public void loadTestData(String keyspace, String path) {
-        KeyspaceMetadata metadata = session.getCluster().getMetadata()
+        KeyspaceMetadata md = session.getCluster().getMetadata()
                 .getKeyspace(keyspace);
-        if (metadata == null) {
+        if (md == null) {
             LOGGER.info("Creating keyspace " + keyspace + " using " + path);
             List<String> scriptLines = loadScript(path);
             LOGGER.info("Executing " + scriptLines.size() + " lines");

@@ -34,20 +34,20 @@ public class GivenGSpec extends BaseGSpec {
     }
 
     @Given("a C* script with name '(.*?)' and default keyspace '(.*?)'$")
-    public void InsertDataOnCassandraFromFile(String filename, String keyspace) {
+    public void insertDataOnCassandraFromFile(String filename, String keyspace) {
         commonspec.getLogger().info("Inserting data on cassandra from file");
         commonspec.getCassandraClient().loadTestData(keyspace,
                 "/scripts/" + filename);
     }
 
     @Given("^I drop an C* keyspace '(.*?)'$")
-    public void DropCassandraKeyspace(String keyspace) {
+    public void dropCassandraKeyspace(String keyspace) {
         commonspec.getLogger().info("Dropping a C* keyspace", keyspace);
         commonspec.getCassandraClient().dropKeyspace(keyspace);
     }
 
     @Given("^I create an AeroSpike namespace '(.*?)' with table '(.*?)':$")
-    public void CreateAeroSpikeTable(String nameSpace, String tableName,
+    public void createAeroSpikeTable(String nameSpace, String tableName,
             DataTable tab) {
         commonspec.getLogger().info("Creating a table on AeroSpike");
         if (commonspec.getAerospikeClient().isConnected()) {
@@ -71,11 +71,11 @@ public class GivenGSpec extends BaseGSpec {
     }
 
     @Given("^I insert into a MongoDB database '(.*?)' and table '(.*?)' this values:$")
-    public void insertOnMongoTable(String dataBase, String tab_name,
+    public void insertOnMongoTable(String dataBase, String tabName,
             DataTable table) {
         commonspec.getLogger().info("Inserting data in a database on MongoDB");
         commonspec.getMongoDBClient().connectToMongoDBDataBase(dataBase);
-        commonspec.getMongoDBClient().insertIntoMongoDBCollection(tab_name,
+        commonspec.getMongoDBClient().insertIntoMongoDBCollection(tabName,
                 table);
     }
 

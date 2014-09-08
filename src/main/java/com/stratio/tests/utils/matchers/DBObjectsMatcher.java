@@ -36,16 +36,16 @@ public class DBObjectsMatcher extends TypeSafeMatcher<ArrayList<DBObject>> {
 
     @Override
     protected boolean matchesSafely(ArrayList<DBObject> item) {
-        ArrayList<String[]> col_rel = coltoArrayList(table);
+        List<String[]> colRel = coltoArrayList(table);
 
         for (int i = 1; i < table.raw().size(); i++) {
             // Obtenemos la fila correspondiente
             BasicDBObject doc = new BasicDBObject();
             List<String> row = table.raw().get(i);
             for (int x = 0; x < row.size(); x++) {
-                String[] col_name_type = col_rel.get(x);
-                Object data = castSTringTo(col_name_type[1], row.get(x));
-                doc.put(col_name_type[0], data);
+                String[] colNameType = colRel.get(x);
+                Object data = castSTringTo(colNameType[1], row.get(x));
+                doc.put(colNameType[0], data);
             }
             if (!isContained(item, doc)) {
                 return false;
@@ -54,7 +54,7 @@ public class DBObjectsMatcher extends TypeSafeMatcher<ArrayList<DBObject>> {
         return true;
     }
 
-    private boolean isContained(ArrayList<DBObject> item, BasicDBObject doc) {
+    private boolean isContained(List<DBObject> item, BasicDBObject doc) {
         boolean res = false;
         for (int i = 0; i < item.size() && !res; i++) {
             DBObject aux = item.get(i);
@@ -75,13 +75,13 @@ public class DBObjectsMatcher extends TypeSafeMatcher<ArrayList<DBObject>> {
         return res;
     }
 
-    private ArrayList<String[]> coltoArrayList(DataTable table) {
-        ArrayList<String[]> res = new ArrayList<String[]>();
+    private List<String[]> coltoArrayList(DataTable table) {
+        List<String[]> res = new ArrayList<String[]>();
         // Primero se obiente la primera fila del datatable
         List<String> firstRow = table.raw().get(0);
         for (int i = 0; i < firstRow.size(); i++) {
-            String[] col_type_array = firstRow.get(i).split("-");
-            res.add(col_type_array);
+            String[] colTypeArray = firstRow.get(i).split("-");
+            res.add(colTypeArray);
         }
         return res;
     }

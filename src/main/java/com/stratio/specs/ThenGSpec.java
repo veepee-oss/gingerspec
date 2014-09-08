@@ -14,6 +14,7 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.not;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -91,7 +92,7 @@ public class ThenGSpec extends BaseGSpec {
 
     @Then("^a Casandra keyspace '(.*?)' contains a table '(.*?)' with '(.*?)' rows$")
     public void assertRowNumberOfTableOnCassandraKeyspace(String keyspace,
-            String tableName, String number_rows) {
+            String tableName, String numberRows) {
         commonspec.getLogger().info("Verifying if the keyspace {} exists",
                 keyspace);
         commonspec.getCassandraClient().useKeyspace(keyspace);
@@ -101,7 +102,7 @@ public class ThenGSpec extends BaseGSpec {
                         .getCassandraClient()
                         .executeQuery("SELECT COUNT(*) FROM " + tableName + ";")
                         .all().get(0).getLong(0),
-                equalTo(new Long(number_rows)));
+                equalTo(new Long(numberRows)));
     }
 
     @Then("^a Casandra keyspace '(.*?)' contains a table '(.*?)' with values:$")
@@ -113,25 +114,25 @@ public class ThenGSpec extends BaseGSpec {
         commonspec.getCassandraClient().useKeyspace(keyspace);
         // Obtenemos los tipos y los nombres de las columnas del datatable y los
         // devolvemos en un hashmap
-        HashMap<String, String> dataTableColumns = extractColumnNamesAndTypes(data
+        Map<String, String> dataTableColumns = extractColumnNamesAndTypes(data
                 .raw().get(0));
         // Comprobamos que la tabla tenga las columnas
         String query = "SELECT * FROM " + tableName + " LIMIT 1;";
-        ResultSet res_1 = commonspec.getCassandraClient().executeQuery(query);
-        equalsColumns(res_1.getColumnDefinitions(), dataTableColumns);
+        ResultSet res = commonspec.getCassandraClient().executeQuery(query);
+        equalsColumns(res.getColumnDefinitions(), dataTableColumns);
         // Obtenemos la cadena de la parte del select con las columnas
         // pertenecientes al dataTable
-        ArrayList<String> select_queries = giveQueriesList(data, tableName,
+        List<String> selectQueries = giveQueriesList(data, tableName,
                 columnNames(data.raw().get(0)));
         // Pasamos a comprobar los datos de cassandra con las distintas queries
         int index = 1;
-        for (String exec_query : select_queries) {
-            res_1 = commonspec.getCassandraClient().executeQuery(exec_query);
-            List<Row> res_as_list = res_1.all();
-            assertThat("The query " + exec_query
+        for (String execQuery : selectQueries) {
+            res = commonspec.getCassandraClient().executeQuery(execQuery);
+            List<Row> resAsList = res.all();
+            assertThat("The query " + execQuery
                     + " not return any result on Cassandra",
-                    res_as_list.size(), greaterThan(0));
-            assertThat("The resultSet is not as expected", res_as_list.get(0)
+                    resAsList.size(), greaterThan(0));
+            assertThat("The resultSet is not as expected", resAsList.get(0)
                     .toString().substring(3), equalTo(data.raw().get(index)
                     .toString()));
             index++;
@@ -139,14 +140,14 @@ public class ThenGSpec extends BaseGSpec {
     }
 
     @SuppressWarnings("rawtypes")
-    public void equalsColumns(ColumnDefinitions res_cols,
-            HashMap<String, String> expected_cols) {
-        Iterator it = expected_cols.entrySet().iterator();
+    public void equalsColumns(ColumnDefinitions resCols,
+            Map<String, String> dataTableColumns) {
+        Iterator it = dataTableColumns.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry e = (Map.Entry) it.next();
             assertThat("The table not contains the column.",
-                    res_cols.toString(), containsColumn(e.getKey().toString()));
-            DataType type = res_cols.getType(e.getKey().toString());
+                    resCols.toString(), containsColumn(e.getKey().toString()));
+            DataType type = resCols.getType(e.getKey().toString());
             assertThat("The column type is not equals.", type.getName()
                     .toString(), equalTo(e.getValue().toString()));
         }
@@ -160,13 +161,13 @@ public class ThenGSpec extends BaseGSpec {
                 hasItem(columnName));
     }
 
-    public ArrayList<String> giveQueriesList(DataTable data, String tableName,
-            String col_names) {
-        ArrayList<String> queryList = new ArrayList<String>();
+    public List<String> giveQueriesList(DataTable data, String tableName,
+            String colNames) {
+        List<String> queryList = new ArrayList<String>();
         for (int i = 1; i < data.raw().size(); i++) {
-            String query = "SELECT " + col_names + " FROM " + tableName;
+            String query = "SELECT " + colNames + " FROM " + tableName;
             List<String> row = data.raw().get(i);
-            query += conditionWhere(row, col_names.split(",")) + ";";
+            query += conditionWhere(row, colNames.split(",")) + ";";
             queryList.add(query);
         }
         return queryList;
@@ -175,18 +176,18 @@ public class ThenGSpec extends BaseGSpec {
     public String conditionWhere(List<String> values, String[] columnNames) {
 
         String condition = " WHERE ";
-        Pattern number_pat = Pattern.compile("^\\d+(\\.*\\d*)?");
-        Pattern boolean_pat = Pattern.compile("true|false");
+        Pattern numberPat = Pattern.compile("^\\d+(\\.*\\d*)?");
+        Pattern booleanPat = Pattern.compile("true|false");
         for (int i = 0; i < values.size() - 1; i++) {
-            if (number_pat.matcher(values.get(i)).matches()
-                    || boolean_pat.matcher(values.get(i)).matches()) {
+            if (numberPat.matcher(values.get(i)).matches()
+                    || booleanPat.matcher(values.get(i)).matches()) {
                 condition += columnNames[i] + " = " + values.get(i) + " AND ";
             } else {
                 condition += columnNames[i] + " = '" + values.get(i) + "' AND ";
             }
         }
-        if (number_pat.matcher(values.get(values.size() - 1)).matches()
-                || boolean_pat.matcher(values.get(values.size() - 1)).matches()) {
+        if (numberPat.matcher(values.get(values.size() - 1)).matches()
+                || booleanPat.matcher(values.get(values.size() - 1)).matches()) {
             condition += columnNames[columnNames.length - 1] + " = "
                     + values.get(values.size() - 1);
         } else {
@@ -196,21 +197,21 @@ public class ThenGSpec extends BaseGSpec {
         return condition;
     }
 
-    public String columnNames(List<String> FirstRow) {
-        String column_names_for_query = "";
-        for (String s : FirstRow) {
+    public String columnNames(List<String> firstRow) {
+        String columnNamesForQuery = "";
+        for (String s : firstRow) {
             String[] aux = s.split("-");
-            column_names_for_query += aux[0] + ",";
+            columnNamesForQuery += aux[0] + ",";
         }
-        column_names_for_query = column_names_for_query.substring(0,
-                column_names_for_query.length() - 1);
-        return column_names_for_query;
+        columnNamesForQuery = columnNamesForQuery.substring(0,
+                columnNamesForQuery.length() - 1);
+        return columnNamesForQuery;
     }
 
-    public HashMap<String, String> extractColumnNamesAndTypes(
-            List<String> FirstRow) {
+    public Map<String, String> extractColumnNamesAndTypes(
+            List<String> firstRow) {
         HashMap<String, String> columns = new HashMap<String, String>();
-        for (String s : FirstRow) {
+        for (String s : firstRow) {
             String[] aux = s.split("-");
             columns.put(aux[0], aux[1]);
         }
@@ -269,7 +270,7 @@ public class ThenGSpec extends BaseGSpec {
                 .info("Verifying if the dataBase {} exists and tableName {} exists on MongoDB",
                         dataBase, tableName);
         commonspec.getMongoDBClient().connectToMongoDBDataBase(dataBase);
-        ArrayList<DBObject> result = commonspec.getMongoDBClient()
+        ArrayList<DBObject> result = (ArrayList<DBObject>) commonspec.getMongoDBClient()
                 .readFromMongoDBCollection(tableName, data);
         assertThat("The table does not contains the data required.", result,
                 containedInMongoDBResult(data));

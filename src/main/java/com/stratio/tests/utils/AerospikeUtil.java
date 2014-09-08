@@ -1,6 +1,6 @@
 package com.stratio.tests.utils;
 
-public class AerospikeUtil {
+public final class AerospikeUtil {
     private static AerospikeUtil instance = new AerospikeUtil();
     private final AerospikeUtils cUtils = new AerospikeUtils();
 

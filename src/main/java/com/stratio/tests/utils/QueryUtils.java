@@ -1,6 +1,6 @@
 package com.stratio.tests.utils;
 
-import java.util.Hashtable;
+import java.util.Map;
 
 public class QueryUtils {
 
@@ -8,8 +8,7 @@ public class QueryUtils {
         return "USE " + keyspace + ";";
     }
 
-    public String createKeyspaceReplication(
-            Hashtable<String, String> replication) {
+    public String createKeyspaceReplication(Map<String, String> replication) {
         String result = "";
         if (!replication.isEmpty()) {
             // No uso String buffer porque como maximo seran siempre 2
@@ -22,22 +21,22 @@ public class QueryUtils {
     }
 
     public String createKeyspaceQuery(Boolean ifNotExists, String keyspaceName,
-            String replication, String durable_writes) {
+            String replication, String durableWrites) {
         String result = "CREATE KEYSPACE ";
         if (ifNotExists) {
             result = result + "IF NOT EXISTS ";
         }
         result = result + keyspaceName;
-        if (replication != "" || durable_writes != "") {
+        if (!"".equals(replication) || !"".equals(durableWrites)) {
             result += " WITH ";
-            if (replication != "") {
+            if (!"".equals(replication)) {
                 result += "REPLICATION = {" + replication + "}";
             }
-            if (durable_writes != "") {
-                if (replication != "") {
+            if (!"".equals(durableWrites)) {
+                if (!"".equals(replication)) {
                     result += " AND ";
                 }
-                result += "durable_writes = " + durable_writes;
+                result += "durable_writes = " + durableWrites;
             }
         }
         result = result + ";";
@@ -46,17 +45,19 @@ public class QueryUtils {
 
     public String dropKeyspaceQuery(Boolean ifExists, String keyspace) {
         String query = "DROP KEYSPACE ";
-        if (ifExists)
+        if (ifExists) {
             query += "IF EXISTS ";
-        query += keyspace;
-        return query += ";";
+        }
+        query = query + keyspace + ";";
+        return query;
     }
 
     public String dropTableQuery(Boolean ifExists, String table) {
         String query = "DROP TABLE ";
-        if (ifExists)
+        if (ifExists) {
             query += "IF EXISTS ";
-        query += table;
-        return query += ";";
+        }
+        query = query + table + ";";
+        return query;
     }
 }

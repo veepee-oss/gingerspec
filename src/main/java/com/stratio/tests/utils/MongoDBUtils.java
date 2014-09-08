@@ -54,85 +54,85 @@ public class MongoDBUtils {
         return dataBaseList.contains(dataBaseName);
     }
 
-    public boolean exitsCollections(String col_name) {
-        return dataBase.collectionExists(col_name);
+    public boolean exitsCollections(String colName) {
+        return dataBase.collectionExists(colName);
     }
 
     public Set<String> getMongoDBCollections() {
         return dataBase.getCollectionNames();
     }
 
-    public DBCollection getMongoDBCollection(String collection_name) {
-        return dataBase.getCollection(collection_name);
+    public DBCollection getMongoDBCollection(String collectionName) {
+        return dataBase.getCollection(collectionName);
     }
 
-    public void createMongoDBCollection(String colection_name, DataTable options) {
+    public void createMongoDBCollection(String colectionName, DataTable options) {
         BasicDBObject aux = new BasicDBObject();
         // Recorremos las options para castearlas y añadirlas a la collection
-        List<List<String>> rows_op = options.raw();
-        for (int i = 0; i < rows_op.size(); i++) {
-            List<String> row_op = rows_op.get(i);
-            if (row_op.get(0).equals("size") || row_op.get(0).equals("max")) {
-                int intproperty = Integer.parseInt(row_op.get(1));
-                aux.append(row_op.get(0), intproperty);
+        List<List<String>> rowsOp = options.raw();
+        for (int i = 0; i < rowsOp.size(); i++) {
+            List<String> rowOp = rowsOp.get(i);
+            if (rowOp.get(0).equals("size") || rowOp.get(0).equals("max")) {
+                int intproperty = Integer.parseInt(rowOp.get(1));
+                aux.append(rowOp.get(0), intproperty);
             } else {
-                Boolean bool_property = Boolean.parseBoolean(row_op.get(1));
-                aux.append(row_op.get(0), bool_property);
+                Boolean boolProperty = Boolean.parseBoolean(rowOp.get(1));
+                aux.append(rowOp.get(0), boolProperty);
             }
         }
-        dataBase.createCollection(colection_name, aux);
+        dataBase.createCollection(colectionName, aux);
     }
 
     public void dropMongoDBDataBase(String dataBaseName) {
         mongoClient.dropDatabase(dataBaseName);
     }
 
-    public void dropMongoDBCollection(String collection_name) {
-        getMongoDBCollection(collection_name).drop();
+    public void dropMongoDBCollection(String collectionName) {
+        getMongoDBCollection(collectionName).drop();
     }
 
-    public void dropAllDataMongoDBCollection(String collection_name) {
-        DBCollection db = getMongoDBCollection(collection_name);
-        DBCursor objects_list = db.find();
+    public void dropAllDataMongoDBCollection(String collectionName) {
+        DBCollection db = getMongoDBCollection(collectionName);
+        DBCursor objectsList = db.find();
         try {
-            while (objects_list.hasNext()) {
-                db.remove(objects_list.next());
+            while (objectsList.hasNext()) {
+                db.remove(objectsList.next());
             }
         } finally {
-            objects_list.close();
+            objectsList.close();
         }
     }
 
     public void insertIntoMongoDBCollection(String collection, DataTable table) {
         // Primero pasamos la fila del datatable a un hashmap de ColumnName-Type
-        ArrayList<String[]> col_rel = coltoArrayList(table);
+        ArrayList<String[]> colRel = coltoArrayList(table);
         // Vamos insertando fila a fila
         for (int i = 1; i < table.raw().size(); i++) {
             // Obtenemos la fila correspondiente
             BasicDBObject doc = new BasicDBObject();
             List<String> row = table.raw().get(i);
             for (int x = 0; x < row.size(); x++) {
-                String[] col_name_type = col_rel.get(x);
-                Object data = castSTringTo(col_name_type[1], row.get(x));
-                doc.put(col_name_type[0], data);
+                String[] colNameType = colRel.get(x);
+                Object data = castSTringTo(colNameType[1], row.get(x));
+                doc.put(colNameType[0], data);
             }
             this.dataBase.getCollection(collection).insert(doc);
         }
     }
 
-    public ArrayList<DBObject> readFromMongoDBCollection(String collection,
+    public List<DBObject> readFromMongoDBCollection(String collection,
             DataTable table) {
         ArrayList<DBObject> res = new ArrayList<DBObject>();
-        ArrayList<String[]> col_rel = coltoArrayList(table);
+        ArrayList<String[]> colRel = coltoArrayList(table);
         DBCollection aux = this.dataBase.getCollection(collection);
         for (int i = 1; i < table.raw().size(); i++) {
             // Obtenemos la fila correspondiente
             BasicDBObject doc = new BasicDBObject();
             List<String> row = table.raw().get(i);
             for (int x = 0; x < row.size(); x++) {
-                String[] col_name_type = col_rel.get(x);
-                Object data = castSTringTo(col_name_type[1], row.get(x));
-                doc.put(col_name_type[0], data);
+                String[] colNameType = colRel.get(x);
+                Object data = castSTringTo(colNameType[1], row.get(x));
+                doc.put(colNameType[0], data);
             }
             DBCursor cursor = aux.find(doc);
             try {
@@ -147,13 +147,13 @@ public class MongoDBUtils {
 
     }
 
-    private ArrayList<String[]> coltoArrayList(DataTable table) {
-        ArrayList<String[]> res = new ArrayList<String[]>();
+    private List<String[]> coltoArrayList(DataTable table) {
+        List<String[]> res = new ArrayList<String[]>();
         // Primero se obiente la primera fila del datatable
         List<String> firstRow = table.raw().get(0);
         for (int i = 0; i < firstRow.size(); i++) {
-            String[] col_type_array = firstRow.get(i).split("-");
-            res.add(col_type_array);
+            String[] colTypeArray = firstRow.get(i).split("-");
+            res.add(colTypeArray);
         }
         return res;
     }
