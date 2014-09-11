@@ -83,9 +83,5 @@ public class CucumberRunner {
 
     public void runCukes() throws IOException {
         runtime.run();
-
-        if (!runtime.getErrors().isEmpty()) {
-            throw new CucumberException(runtime.getErrors().get(0));
-        }
     }
 }
