@@ -6,7 +6,7 @@ import org.hamcrest.Matcher;
 
 import com.stratio.tests.utils.HttpResponse;
 
-public class RequestMatcher {
+public class HTTPRequestMatcher {
 
     @Factory
     public static Matcher<HttpResponse> hasStatus(
