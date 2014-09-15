@@ -11,6 +11,7 @@ import gherkin.formatter.model.Result;
 import gherkin.formatter.model.Scenario;
 import gherkin.formatter.model.ScenarioOutline;
 import gherkin.formatter.model.Step;
+import gherkin.formatter.model.Tag;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -156,7 +157,14 @@ class CucumberReporter implements Formatter, Reporter {
 
     @Override
     public void endOfScenarioLifeCycle(Scenario scenario) {
-        testMethod.finish(document, root, position);
+        Boolean ignored = false;
+        for (Tag tag : scenario.getTags()) {
+            if ("@ignore".equals(tag.getName())) {
+                ignored = true;
+            }
+        }
+
+        testMethod.finish(document, root, position, ignored);
         position++;
         if ((tmpExamples != null)
                 && (iteration >= tmpExamples.getRows().size())) {
@@ -309,7 +317,8 @@ class CucumberReporter implements Formatter, Reporter {
             element.setAttribute("started-at", DATE_FORMAT.format(new Date()));
         }
 
-        public void finish(Document doc, Element element, Integer position) {
+        public void finish(Document doc, Element element, Integer position,
+                Boolean ignored) {
 
             element.setAttribute("duration-ms", calculateTotalDurationString());
             element.setAttribute("finished-at", DATE_FORMAT.format(new Date()));
@@ -318,43 +327,47 @@ class CucumberReporter implements Formatter, Reporter {
             addStepAndResultListing(stringBuilder);
             Result skipped = null;
             Result failed = null;
-
-            for (Result result : results) {
-                if ("failed".equals(result.getStatus())) {
-                    failed = result;
-                } else if ("undefined".equals(result.getStatus())
-                        || "pending".equals(result.getStatus())) {
-                    skipped = result;
-                }
-            }
-            for (Result result : hooks) {
-                if (failed == null && "failed".equals(result.getStatus())) {
-                    failed = result;
-                }
-            }
-            if (failed != null) {
-                element.setAttribute("status", "FAIL");
-                StringWriter stringWriter = new StringWriter();
-                failed.getError()
-                        .printStackTrace(new PrintWriter(stringWriter));
-                Element exception = createException(doc, failed.getError()
-                        .getClass().getName(), stringBuilder.toString(),
-                        stringWriter.toString());
-                element.appendChild(exception);
-
-            } else if (skipped != null) {
-                if (treatSkippedAsFailure) {
-                    element.setAttribute("status", "FAIL");
-                    Element exception = createException(doc,
-                            "The scenario has pending or undefined step(s)",
-                            stringBuilder.toString(),
-                            "The scenario has pending or undefined step(s)");
-                    element.appendChild(exception);
-                } else {
-                    element.setAttribute("status", "SKIP");
-                }
+            if (ignored) {
+                element.setAttribute("status", "SKIP");
             } else {
-                element.setAttribute("status", "PASS");
+                for (Result result : results) {
+                    if ("failed".equals(result.getStatus())) {
+                        failed = result;
+                    } else if ("undefined".equals(result.getStatus())
+                            || "pending".equals(result.getStatus())) {
+                        skipped = result;
+                    }
+                }
+                for (Result result : hooks) {
+                    if (failed == null && "failed".equals(result.getStatus())) {
+                        failed = result;
+                    }
+                }
+                if (failed != null) {
+                    element.setAttribute("status", "FAIL");
+                    StringWriter stringWriter = new StringWriter();
+                    failed.getError().printStackTrace(
+                            new PrintWriter(stringWriter));
+                    Element exception = createException(doc, failed.getError()
+                            .getClass().getName(), stringBuilder.toString(),
+                            stringWriter.toString());
+                    element.appendChild(exception);
+
+                } else if (skipped != null) {
+                    if (treatSkippedAsFailure) {
+                        element.setAttribute("status", "FAIL");
+                        Element exception = createException(
+                                doc,
+                                "The scenario has pending or undefined step(s)",
+                                stringBuilder.toString(),
+                                "The scenario has pending or undefined step(s)");
+                        element.appendChild(exception);
+                    } else {
+                        element.setAttribute("status", "SKIP");
+                    }
+                } else {
+                    element.setAttribute("status", "PASS");
+                }
             }
         }
 
