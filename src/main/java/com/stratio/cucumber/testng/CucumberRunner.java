@@ -12,7 +12,6 @@ import org.reflections.Reflections;
 
 import cucumber.api.CucumberOptions;
 import cucumber.runtime.ClassFinder;
-import cucumber.runtime.CucumberException;
 import cucumber.runtime.RuntimeOptions;
 import cucumber.runtime.RuntimeOptionsFactory;
 import cucumber.runtime.Utils;

@@ -309,10 +309,10 @@ class CucumberReporter implements Formatter, Reporter {
                         examplesData.getRows().get(iteration).getCells()
                                 .toString());
 
-                element.setAttribute("name", scenario.getName()
-                        + " "
-                        + examplesData.getRows().get(iteration).getCells()
-                                .toString());
+                String data = examplesData.getRows().get(iteration).getCells()
+                        .toString();
+                data = data.replaceAll("\"", "¨");
+                element.setAttribute("name", scenario.getName() + " " + data);
             }
             element.setAttribute("started-at", DATE_FORMAT.format(new Date()));
         }
