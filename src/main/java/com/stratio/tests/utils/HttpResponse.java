@@ -1,7 +1,7 @@
 package com.stratio.tests.utils;
 
 public class HttpResponse {
-    private Integer statusCode;
+    private int statusCode;
     private String response;
 
     public HttpResponse (Integer statusCode, String response) {
@@ -9,11 +9,11 @@ public class HttpResponse {
         this.response = response;
     }
     
-    public Integer getStatusCode() {
+    public int getStatusCode() {
         return statusCode;
     }
 
-    public void setStatusCode(Integer status) {
+    public void setStatusCode(int status) {
         this.statusCode = status;
     }
 
