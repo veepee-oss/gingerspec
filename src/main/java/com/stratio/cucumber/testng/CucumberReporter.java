@@ -329,6 +329,10 @@ class CucumberReporter implements Formatter, Reporter {
             Result failed = null;
             if (ignored) {
                 element.setAttribute("status", "SKIP");
+                StringWriter stringWriter = new StringWriter();
+                Element exception = createException(doc,
+                        "SkippedDueTagException", "This scenario was skipped due the use of the @ignore tag", " ");
+                element.appendChild(exception);
             } else {
                 for (Result result : results) {
                     if ("failed".equals(result.getStatus())) {
@@ -367,6 +371,11 @@ class CucumberReporter implements Formatter, Reporter {
                     }
                 } else {
                     element.setAttribute("status", "PASS");
+
+                    StringWriter stringWriter = new StringWriter();
+                    Element exception = createException(doc,
+                            "NonRealException", stringBuilder.toString(), " ");
+                    element.appendChild(exception);
                 }
             }
         }
@@ -443,7 +452,7 @@ class CucumberReporter implements Formatter, Reporter {
             Element stacktraceElement = doc.createElement("full-stacktrace");
             stacktraceElement.appendChild(doc.createCDATASection(stacktrace));
             exceptionElement.appendChild(stacktraceElement);
-
+            
             return exceptionElement;
         }
     }
