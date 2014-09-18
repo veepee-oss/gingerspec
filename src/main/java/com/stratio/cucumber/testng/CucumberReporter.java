@@ -322,7 +322,6 @@ class CucumberReporter implements Formatter, Reporter {
             Result failed = null;
             if (ignored) {
                 element.setAttribute("status", "SKIP");
-                StringWriter stringWriter = new StringWriter();
                 Element exception = createException(doc,
                         "SkippedDueTagException", "This scenario was skipped due the use of the @ignore tag", " ");
                 element.appendChild(exception);

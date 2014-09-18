@@ -1,8 +1,5 @@
 package com.stratio.assertions;
 
-import java.lang.reflect.Method;
-import java.util.List;
-
 import org.assertj.core.api.AbstractAssert;
 
 import com.stratio.tests.utils.HttpResponse;
