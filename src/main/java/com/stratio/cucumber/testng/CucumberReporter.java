@@ -38,8 +38,6 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.stratio.tests.utils.ThreadProperty;
-
 import cucumber.runtime.CucumberException;
 import cucumber.runtime.io.URLOutputStream;
 import cucumber.runtime.io.UTF8OutputStreamWriter;
@@ -301,14 +299,9 @@ class CucumberReporter implements Formatter, Reporter {
         private void start(Element element, Integer iteration) {
             this.iteration = iteration;
             if ((examplesData == null)
-                    || (this.iteration >= examplesData.getRows().size())) {
-                ThreadProperty.set("dataSet", "");
+                    || (this.iteration >= examplesData.getRows().size())) {                
                 element.setAttribute("name", scenario.getName());
-            } else {
-                ThreadProperty.set("dataSet",
-                        examplesData.getRows().get(iteration).getCells()
-                                .toString());
-
+            } else {                
                 String data = examplesData.getRows().get(iteration).getCells()
                         .toString();
                 data = data.replaceAll("\"", "¨");
