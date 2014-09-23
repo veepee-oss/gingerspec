@@ -36,8 +36,7 @@ public class GivenGSpec extends BaseGSpec {
     @Given("a C* script with name '(.*?)' and default keyspace '(.*?)'$")
     public void insertDataOnCassandraFromFile(String filename, String keyspace) {
         commonspec.getLogger().info("Inserting data on cassandra from file");
-        commonspec.getCassandraClient().loadTestData(keyspace,
-                "/scripts/" + filename);
+        commonspec.getCassandraClient().loadTestData(keyspace, "/scripts/" + filename);
     }
 
     @Given("^I drop an C* keyspace '(.*?)'$")
@@ -47,14 +46,12 @@ public class GivenGSpec extends BaseGSpec {
     }
 
     @Given("^I create an AeroSpike namespace '(.*?)' with table '(.*?)':$")
-    public void createAeroSpikeTable(String nameSpace, String tableName,
-            DataTable tab) {
+    public void createAeroSpikeTable(String nameSpace, String tableName, DataTable tab) {
         commonspec.getLogger().info("Creating a table on AeroSpike");
         if (commonspec.getAerospikeClient().isConnected()) {
             commonspec.getLogger().info("Creating a table on AeroSpike");
         }
-        commonspec.getAerospikeClient().insertFromDataTable(nameSpace,
-                tableName, tab);
+        commonspec.getAerospikeClient().insertFromDataTable(nameSpace, tableName, tab);
     }
 
     @Given("^I create a MongoDB dataBase '(.*?)'$")
@@ -71,12 +68,10 @@ public class GivenGSpec extends BaseGSpec {
     }
 
     @Given("^I insert into a MongoDB database '(.*?)' and table '(.*?)' this values:$")
-    public void insertOnMongoTable(String dataBase, String tabName,
-            DataTable table) {
+    public void insertOnMongoTable(String dataBase, String tabName, DataTable table) {
         commonspec.getLogger().info("Inserting data in a database on MongoDB");
         commonspec.getMongoDBClient().connectToMongoDBDataBase(dataBase);
-        commonspec.getMongoDBClient().insertIntoMongoDBCollection(tabName,
-                table);
+        commonspec.getMongoDBClient().insertIntoMongoDBCollection(tabName, table);
     }
 
     @Given("^I drop every document at a MongoDB database '(.*?)' and table '(.*?)'")

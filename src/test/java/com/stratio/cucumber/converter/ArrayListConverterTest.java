@@ -16,7 +16,8 @@ public class ArrayListConverterTest {
         assertThat("Single string input converter", converter.transform("foo"), hasSize(1));
         assertThat("Single string input converter", converter.transform("foo"), hasItem("foo"));
         assertThat("Complex string input converter", converter.transform("foo,bar"), hasSize(2));
-        assertThat("Single string input converter", converter.transform("foo , bar"), allOf(hasItem("foo "), hasItem(" bar")));
+        assertThat("Single string input converter", converter.transform("foo , bar"),
+                allOf(hasItem("foo "), hasItem(" bar")));
     }
 
 }

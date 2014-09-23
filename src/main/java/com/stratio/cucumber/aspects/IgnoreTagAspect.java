@@ -21,27 +21,23 @@ import cucumber.runtime.model.CucumberScenario;
 @Aspect
 public class IgnoreTagAspect {
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass()
-            .getCanonicalName());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
 
     @Pointcut("execution (* cucumber.runtime.model.CucumberScenario.run(..)) && "
             + "args (formatter, reporter, runtime)")
-    protected void addIgnoreTagPointcutScenario(Formatter formatter,
-            Reporter reporter, Runtime runtime) {
+    protected void addIgnoreTagPointcutScenario(Formatter formatter, Reporter reporter, Runtime runtime) {
     }
 
     @Around(value = "addIgnoreTagPointcutScenario(formatter, reporter, runtime)")
-    public void aroundAddIgnoreTagPointcut(ProceedingJoinPoint pjp,
-            Formatter formatter, Reporter reporter, Runtime runtime)
-            throws Throwable {
+    public void aroundAddIgnoreTagPointcut(ProceedingJoinPoint pjp, Formatter formatter, Reporter reporter,
+            Runtime runtime) throws Throwable {
         logger.debug("Executing pointcut CucumberScenario run method");
 
         CucumberScenario scen = (CucumberScenario) pjp.getThis();
         Scenario scenario = (Scenario) scen.getGherkinModel();
 
         Class<?> sc = scen.getClass();
-        Method tt = sc.getSuperclass()
-                .getDeclaredMethod("tagsAndInheritedTags");
+        Method tt = sc.getSuperclass().getDeclaredMethod("tagsAndInheritedTags");
         tt.setAccessible(true);
         Set<Tag> tags = (Set<Tag>) tt.invoke(scen);
 
@@ -53,7 +49,7 @@ public class IgnoreTagAspect {
         }
 
         if (ignore) {
-            runtime.buildBackendWorlds(reporter, tags, scenario.getName());            
+            runtime.buildBackendWorlds(reporter, tags, scenario.getName());
             formatter.startOfScenarioLifeCycle(scenario);
             formatter.endOfScenarioLifeCycle(scenario);
             runtime.disposeBackendWorlds();

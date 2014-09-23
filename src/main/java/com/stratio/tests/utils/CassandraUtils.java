@@ -22,8 +22,7 @@ import com.datastax.driver.core.TableMetadata;
 
 public class CassandraUtils {
 
-    private static final Logger LOGGER = LoggerFactory
-            .getLogger(CassandraUtils.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CassandraUtils.class);
 
     private Cluster cluster;
     private final String host;
@@ -39,8 +38,7 @@ public class CassandraUtils {
         buildCluster();
         this.queryUtils = new QueryUtils();
         this.metadata = this.cluster.getMetadata();
-        LOGGER.debug("Connected to cluster (" + host + "): "
-                + metadata.getClusterName() + "\n");
+        LOGGER.debug("Connected to cluster (" + host + "): " + metadata.getClusterName() + "\n");
         this.session = this.cluster.connect();
     }
 
@@ -58,8 +56,7 @@ public class CassandraUtils {
 
     public void reconnect() {
         metadata = cluster.getMetadata();
-        LOGGER.debug("Connected to cluster (" + host + "): "
-                + metadata.getClusterName() + "\n");
+        LOGGER.debug("Connected to cluster (" + host + "): " + metadata.getClusterName() + "\n");
         this.session = this.cluster.connect();
     }
 
@@ -75,8 +72,7 @@ public class CassandraUtils {
 
     public void buildCluster() {
         this.cluster = Cluster.builder().addContactPoint(this.host).build();
-        this.cluster.getConfiguration().getQueryOptions()
-                .setConsistencyLevel(ConsistencyLevel.ONE);
+        this.cluster.getConfiguration().getQueryOptions().setConsistencyLevel(ConsistencyLevel.ONE);
 
     }
 
@@ -88,10 +84,8 @@ public class CassandraUtils {
         Map<String, String> replicationSimpleOneExtra = new Hashtable<String, String>();
         replicationSimpleOneExtra.put("'class'", "'SimpleStrategy'");
         replicationSimpleOneExtra.put("'replication_factor'", "1");
-        String query = this.queryUtils
-                .createKeyspaceQuery(true, keyspace, queryUtils
-                        .createKeyspaceReplication(replicationSimpleOneExtra),
-                        "");
+        String query = this.queryUtils.createKeyspaceQuery(true, keyspace,
+                queryUtils.createKeyspaceReplication(replicationSimpleOneExtra), "");
         LOGGER.debug(query);
         executeQuery(query);
     }
@@ -174,9 +168,8 @@ public class CassandraUtils {
     }
 
     /**
-     * Load a {@code keyspace} in Cassandra using the CQL sentences in the
-     * script path. The script is executed if the keyspace does not exists in
-     * Cassandra.
+     * Load a {@code keyspace} in Cassandra using the CQL sentences in the script path. The script is executed if the
+     * keyspace does not exists in Cassandra.
      * 
      * @param keyspace
      *            The name of the keyspace.
@@ -184,8 +177,7 @@ public class CassandraUtils {
      *            The path of the CQL script.
      */
     public void loadTestData(String keyspace, String path) {
-        KeyspaceMetadata md = session.getCluster().getMetadata()
-                .getKeyspace(keyspace);
+        KeyspaceMetadata md = session.getCluster().getMetadata().getKeyspace(keyspace);
         if (md == null) {
             LOGGER.info("Creating keyspace " + keyspace + " using " + path);
             List<String> scriptLines = loadScript(path);
@@ -193,8 +185,7 @@ public class CassandraUtils {
             for (String cql : scriptLines) {
                 ResultSet result = session.execute(cql);
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Executing: " + cql + " -> "
-                            + result.toString());
+                    LOGGER.debug("Executing: " + cql + " -> " + result.toString());
                 }
             }
         }
@@ -202,8 +193,7 @@ public class CassandraUtils {
     }
 
     /**
-     * Load the lines of a CQL script containing one statement per line into a
-     * list. l
+     * Load the lines of a CQL script containing one statement per line into a list. l
      * 
      * @param path
      *            The path of the CQL script.
@@ -214,8 +204,7 @@ public class CassandraUtils {
         URL url = CassandraUtils.class.getResource(path);
         LOGGER.debug(url.toString());
         LOGGER.info("Loading script from: " + url);
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(
-                url.openStream()))) {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream()))) {
             String line;
             while ((line = br.readLine()) != null) {
                 if (line.length() > 0 && !line.startsWith("#")) {

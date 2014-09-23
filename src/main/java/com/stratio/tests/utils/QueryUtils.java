@@ -20,8 +20,7 @@ public class QueryUtils {
         return result;
     }
 
-    public String createKeyspaceQuery(Boolean ifNotExists, String keyspaceName,
-            String replication, String durableWrites) {
+    public String createKeyspaceQuery(Boolean ifNotExists, String keyspaceName, String replication, String durableWrites) {
         String result = "CREATE KEYSPACE ";
         if (ifNotExists) {
             result = result + "IF NOT EXISTS ";

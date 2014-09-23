@@ -14,8 +14,7 @@ import org.testng.annotations.BeforeSuite;
 
 public abstract class BaseGTest {
 
-    final Logger logger = LoggerFactory.getLogger(this.getClass()
-            .getCanonicalName());
+    final Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
 
     @BeforeSuite(alwaysRun = true)
     public void beforeGSuite(ITestContext context) {

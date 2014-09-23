@@ -13,14 +13,12 @@ public class ExceptionMatcher extends TypeSafeMatcher<Exception> {
     private final Pattern messagePattern;
 
     @Factory
-    public static Matcher<Exception> hasClassAndMessage(String clazz,
-            String regex) {
+    public static Matcher<Exception> hasClassAndMessage(String clazz, String regex) {
         return hasClassAndMessage(clazz, Pattern.compile(".*?" + regex + ".*?"));
     }
 
     @Factory
-    public static Matcher<Exception> hasClassAndMessage(String clazz,
-            Pattern messagePattern) {
+    public static Matcher<Exception> hasClassAndMessage(String clazz, Pattern messagePattern) {
         return new ExceptionMatcher(clazz, messagePattern);
     }
 
@@ -36,18 +34,15 @@ public class ExceptionMatcher extends TypeSafeMatcher<Exception> {
             expectedMessage = expectedMessage.substring(3);
         }
         if (expectedMessage.endsWith(".*?")) {
-            expectedMessage = expectedMessage.substring(0,
-                    expectedMessage.length() - 3);
+            expectedMessage = expectedMessage.substring(0, expectedMessage.length() - 3);
         }
 
-        description.appendText("an exception with class \"").appendText(clazz)
-                .appendText("\"").appendText(" and a message like  \"")
-                .appendText(expectedMessage).appendText("\"");
+        description.appendText("an exception with class \"").appendText(clazz).appendText("\"")
+                .appendText(" and a message like  \"").appendText(expectedMessage).appendText("\"");
     }
 
     @Override
     protected boolean matchesSafely(Exception item) {
-        return item.getClass().getSimpleName().equals(clazz)
-                && messagePattern.matcher(item.getMessage()).matches();
+        return item.getClass().getSimpleName().equals(clazz) && messagePattern.matcher(item.getMessage()).matches();
     }
 }

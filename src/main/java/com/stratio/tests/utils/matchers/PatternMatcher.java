@@ -11,14 +11,12 @@ import java.util.regex.Pattern;
  */
 
 /**
- * Tests if the argument is a {@link CharSequence} that matches a regular
- * expression.
+ * Tests if the argument is a {@link CharSequence} that matches a regular expression.
  */
 public class PatternMatcher extends TypeSafeMatcher<CharSequence> {
 
     /**
-     * Creates a matcher that matches if the examined {@link CharSequence}
-     * matches the specified regular expression.
+     * Creates a matcher that matches if the examined {@link CharSequence} matches the specified regular expression.
      * <p/>
      * For example:
      * 
@@ -27,8 +25,7 @@ public class PatternMatcher extends TypeSafeMatcher<CharSequence> {
      * </pre>
      *
      * @param regex
-     *            the regular expression that the returned matcher will use to
-     *            match any examined {@link CharSequence}
+     *            the regular expression that the returned matcher will use to match any examined {@link CharSequence}
      */
     @Factory
     public static Matcher<CharSequence> pattern(String regex) {
@@ -36,8 +33,7 @@ public class PatternMatcher extends TypeSafeMatcher<CharSequence> {
     }
 
     /**
-     * Creates a matcher that matches if the examined {@link CharSequence}
-     * matches the specified {@link Pattern}.
+     * Creates a matcher that matches if the examined {@link CharSequence} matches the specified {@link Pattern}.
      * <p/>
      * For example:
      * 
@@ -46,8 +42,7 @@ public class PatternMatcher extends TypeSafeMatcher<CharSequence> {
      * </pre>
      *
      * @param pattern
-     *            the pattern that the returned matcher will use to match any
-     *            examined {@link CharSequence}
+     *            the pattern that the returned matcher will use to match any examined {@link CharSequence}
      */
     @Factory
     public static Matcher<CharSequence> pattern(Pattern pattern) {
@@ -66,15 +61,12 @@ public class PatternMatcher extends TypeSafeMatcher<CharSequence> {
     }
 
     @Override
-    public void describeMismatchSafely(CharSequence item,
-            org.hamcrest.Description mismatchDescription) {
-        mismatchDescription.appendText("was \"")
-                .appendText(String.valueOf(item)).appendText("\"");
+    public void describeMismatchSafely(CharSequence item, org.hamcrest.Description mismatchDescription) {
+        mismatchDescription.appendText("was \"").appendText(String.valueOf(item)).appendText("\"");
     }
 
     @Override
     public void describeTo(org.hamcrest.Description description) {
-        description.appendText("a string with pattern \"")
-                .appendText(String.valueOf(pattern)).appendText("\"");
+        description.appendText("a string with pattern \"").appendText(String.valueOf(pattern)).appendText("\"");
     }
 }

@@ -26,17 +26,13 @@ public class JaCoCoClient extends TestListenerAdapter {
         FileOutputStream localFile;
         try {
             localFile = new FileOutputStream(DESTFILE);
-            final ExecutionDataWriter localWriter = new ExecutionDataWriter(
-                    localFile);
+            final ExecutionDataWriter localWriter = new ExecutionDataWriter(localFile);
 
             // Open a socket to the coverage agent:
             String address = System.getProperty("JACOCO_SERVER", "localhost");
-            final Socket socket = new Socket(InetAddress.getByName(address),
-                    PORT);
-            final RemoteControlWriter writer = new RemoteControlWriter(
-                    socket.getOutputStream());
-            final RemoteControlReader reader = new RemoteControlReader(
-                    socket.getInputStream());
+            final Socket socket = new Socket(InetAddress.getByName(address), PORT);
+            final RemoteControlWriter writer = new RemoteControlWriter(socket.getOutputStream());
+            final RemoteControlReader reader = new RemoteControlReader(socket.getInputStream());
             reader.setSessionInfoVisitor(localWriter);
             reader.setExecutionDataVisitor(localWriter);
 
@@ -47,9 +43,7 @@ public class JaCoCoClient extends TestListenerAdapter {
             socket.close();
             localFile.close();
         } catch (IOException e) {
-            logger.warn(
-                    "Exception on fetching remote coverage. is the remote JaCoCo agent set up?: {}",
-                    e.getMessage());
+            logger.warn("Exception on fetching remote coverage. is the remote JaCoCo agent set up?: {}", e.getMessage());
         }
 
     }

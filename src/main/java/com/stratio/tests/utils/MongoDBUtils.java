@@ -19,8 +19,7 @@ import cucumber.api.DataTable;
 
 public class MongoDBUtils {
 
-    private static final Logger LOGGER = LoggerFactory
-            .getLogger(MongoDBUtils.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MongoDBUtils.class);
 
     private final String host;
     private final int port;
@@ -120,8 +119,7 @@ public class MongoDBUtils {
         }
     }
 
-    public List<DBObject> readFromMongoDBCollection(String collection,
-            DataTable table) {
+    public List<DBObject> readFromMongoDBCollection(String collection, DataTable table) {
         List<DBObject> res = new ArrayList<DBObject>();
         List<String[]> colRel = coltoArrayList(table);
         DBCollection aux = this.dataBase.getCollection(collection);

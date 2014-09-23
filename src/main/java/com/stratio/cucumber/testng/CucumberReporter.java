@@ -44,8 +44,7 @@ import cucumber.runtime.io.UTF8OutputStreamWriter;
 
 class CucumberReporter implements Formatter, Reporter {
 
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat(
-            "yyyy-MM-dd'T'HH:mm:ss'Z'");
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
     private final Writer writer;
     private final Document document;
     private final Element results;
@@ -67,8 +66,7 @@ class CucumberReporter implements Formatter, Reporter {
         this.writer = new UTF8OutputStreamWriter(new URLOutputStream(url));
         TestMethod.treatSkippedAsFailure = false;
         try {
-            document = DocumentBuilderFactory.newInstance()
-                    .newDocumentBuilder().newDocument();
+            document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
             results = document.createElement("testng-results");
             suite = document.createElement("suite");
             test = document.createElement("test");
@@ -77,14 +75,12 @@ class CucumberReporter implements Formatter, Reporter {
             results.appendChild(suite);
             document.appendChild(results);
         } catch (ParserConfigurationException e) {
-            throw new CucumberException("Error initializing DocumentBuilder.",
-                    e);
+            throw new CucumberException("Error initializing DocumentBuilder.", e);
         }
     }
 
     @Override
-    public void syntaxError(String state, String event,
-            List<String> legalEvents, String uri, Integer line) {
+    public void syntaxError(String state, String event, List<String> legalEvents, String uri, Integer line) {
     }
 
     @Override
@@ -139,8 +135,7 @@ class CucumberReporter implements Formatter, Reporter {
     @Override
     public void step(Step step) {
         boolean bgstep = false;
-        if (background != null
-                && (background.getLineRange().getLast() <= step.getLine())
+        if (background != null && (background.getLineRange().getLast() <= step.getLine())
                 && (step.getLine() >= background.getLineRange().getFirst())) {
             tmpStepsBG.add(step);
             bgstep = true;
@@ -164,8 +159,7 @@ class CucumberReporter implements Formatter, Reporter {
 
         testMethod.finish(document, root, position, ignored);
         position++;
-        if ((tmpExamples != null)
-                && (iteration >= tmpExamples.getRows().size())) {
+        if ((tmpExamples != null) && (iteration >= tmpExamples.getRows().size())) {
             tmpExamples = null;
         }
         tmpHooks.clear();
@@ -181,27 +175,16 @@ class CucumberReporter implements Formatter, Reporter {
     @Override
     public void done() {
         try {
-            results.setAttribute("total",
-                    String.valueOf(getElementsCountByAttribute(suite, "status",
-                            ".*")));
-            results.setAttribute("passed", String
-                    .valueOf(getElementsCountByAttribute(suite, "status",
-                            "PASS")));
-            results.setAttribute("failed", String
-                    .valueOf(getElementsCountByAttribute(suite, "status",
-                            "FAIL")));
-            results.setAttribute("skipped", String
-                    .valueOf(getElementsCountByAttribute(suite, "status",
-                            "SKIP")));
+            results.setAttribute("total", String.valueOf(getElementsCountByAttribute(suite, "status", ".*")));
+            results.setAttribute("passed", String.valueOf(getElementsCountByAttribute(suite, "status", "PASS")));
+            results.setAttribute("failed", String.valueOf(getElementsCountByAttribute(suite, "status", "FAIL")));
+            results.setAttribute("skipped", String.valueOf(getElementsCountByAttribute(suite, "status", "SKIP")));
             suite.setAttribute("name", CucumberReporter.class.getName());
-            suite.setAttribute("duration-ms",
-                    getTotalDuration(suite.getElementsByTagName("test-method")));
+            suite.setAttribute("duration-ms", getTotalDuration(suite.getElementsByTagName("test-method")));
             test.setAttribute("name", CucumberReporter.class.getName());
-            test.setAttribute("duration-ms",
-                    getTotalDuration(suite.getElementsByTagName("test-method")));
+            test.setAttribute("duration-ms", getTotalDuration(suite.getElementsByTagName("test-method")));
 
-            Transformer transformer = TransformerFactory.newInstance()
-                    .newTransformer();
+            Transformer transformer = TransformerFactory.newInstance().newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
             StreamResult streamResult = new StreamResult(writer);
             DOMSource domSource = new DOMSource(document);
@@ -243,20 +226,17 @@ class CucumberReporter implements Formatter, Reporter {
         testMethod.hooks.add(result);
     }
 
-    private int getElementsCountByAttribute(Node node, String attributeName,
-            String attributeValue) {
+    private int getElementsCountByAttribute(Node node, String attributeName, String attributeValue) {
         int count = 0;
 
         for (int i = 0; i < node.getChildNodes().getLength(); i++) {
-            count += getElementsCountByAttribute(node.getChildNodes().item(i),
-                    attributeName, attributeValue);
+            count += getElementsCountByAttribute(node.getChildNodes().item(i), attributeName, attributeValue);
         }
 
         NamedNodeMap attributes = node.getAttributes();
         if (attributes != null) {
             Node namedItem = attributes.getNamedItem(attributeName);
-            if (namedItem != null
-                    && namedItem.getNodeValue().matches(attributeValue)) {
+            if (namedItem != null && namedItem.getNodeValue().matches(attributeValue)) {
                 count++;
             }
         }
@@ -268,8 +248,7 @@ class CucumberReporter implements Formatter, Reporter {
         for (int i = 0; i < testCaseNodes.getLength(); i++) {
             try {
                 String duration = "0";
-                Node durationms = testCaseNodes.item(i).getAttributes()
-                        .getNamedItem("duration-ms");
+                Node durationms = testCaseNodes.item(i).getAttributes().getNamedItem("duration-ms");
                 if (durationms != null) {
                     duration = durationms.getNodeValue();
                 }
@@ -298,20 +277,17 @@ class CucumberReporter implements Formatter, Reporter {
 
         private void start(Element element, Integer iteration) {
             this.iteration = iteration;
-            if ((examplesData == null)
-                    || (this.iteration >= examplesData.getRows().size())) {                
+            if ((examplesData == null) || (this.iteration >= examplesData.getRows().size())) {
                 element.setAttribute("name", scenario.getName());
-            } else {                
-                String data = examplesData.getRows().get(iteration).getCells()
-                        .toString();
+            } else {
+                String data = examplesData.getRows().get(iteration).getCells().toString();
                 data = data.replaceAll("\"", "¨");
                 element.setAttribute("name", scenario.getName() + " " + data);
             }
             element.setAttribute("started-at", DATE_FORMAT.format(new Date()));
         }
 
-        public void finish(Document doc, Element element, Integer position,
-                Boolean ignored) {
+        public void finish(Document doc, Element element, Integer position, Boolean ignored) {
 
             element.setAttribute("duration-ms", calculateTotalDurationString());
             element.setAttribute("finished-at", DATE_FORMAT.format(new Date()));
@@ -322,15 +298,14 @@ class CucumberReporter implements Formatter, Reporter {
             Result failed = null;
             if (ignored) {
                 element.setAttribute("status", "SKIP");
-                Element exception = createException(doc,
-                        "SkippedDueTagException", "This scenario was skipped due the use of the @ignore tag", " ");
+                Element exception = createException(doc, "SkippedDueTagException",
+                        "This scenario was skipped due the use of the @ignore tag", " ");
                 element.appendChild(exception);
             } else {
                 for (Result result : results) {
                     if ("failed".equals(result.getStatus())) {
                         failed = result;
-                    } else if ("undefined".equals(result.getStatus())
-                            || "pending".equals(result.getStatus())) {
+                    } else if ("undefined".equals(result.getStatus()) || "pending".equals(result.getStatus())) {
                         skipped = result;
                     }
                 }
@@ -342,21 +317,16 @@ class CucumberReporter implements Formatter, Reporter {
                 if (failed != null) {
                     element.setAttribute("status", "FAIL");
                     StringWriter stringWriter = new StringWriter();
-                    failed.getError().printStackTrace(
-                            new PrintWriter(stringWriter));
-                    Element exception = createException(doc, failed.getError()
-                            .getClass().getName(), stringBuilder.toString(),
-                            stringWriter.toString());
+                    failed.getError().printStackTrace(new PrintWriter(stringWriter));
+                    Element exception = createException(doc, failed.getError().getClass().getName(),
+                            stringBuilder.toString(), stringWriter.toString());
                     element.appendChild(exception);
 
                 } else if (skipped != null) {
                     if (treatSkippedAsFailure) {
                         element.setAttribute("status", "FAIL");
-                        Element exception = createException(
-                                doc,
-                                "The scenario has pending or undefined step(s)",
-                                stringBuilder.toString(),
-                                "The scenario has pending or undefined step(s)");
+                        Element exception = createException(doc, "The scenario has pending or undefined step(s)",
+                                stringBuilder.toString(), "The scenario has pending or undefined step(s)");
                         element.appendChild(exception);
                     } else {
                         element.setAttribute("status", "SKIP");
@@ -365,8 +335,7 @@ class CucumberReporter implements Formatter, Reporter {
                     element.setAttribute("status", "PASS");
 
                     StringWriter stringWriter = new StringWriter();
-                    Element exception = createException(doc,
-                            "NonRealException", stringBuilder.toString(), " ");
+                    Element exception = createException(doc, "NonRealException", stringBuilder.toString(), " ");
                     element.appendChild(exception);
                 }
             }
@@ -375,12 +344,10 @@ class CucumberReporter implements Formatter, Reporter {
         private String calculateTotalDurationString() {
             long totalDurationNanos = 0;
             for (Result r : results) {
-                totalDurationNanos += r.getDuration() == null ? 0 : r
-                        .getDuration();
+                totalDurationNanos += r.getDuration() == null ? 0 : r.getDuration();
             }
             for (Result r : hooks) {
-                totalDurationNanos += r.getDuration() == null ? 0 : r
-                        .getDuration();
+                totalDurationNanos += r.getDuration() == null ? 0 : r.getDuration();
             }
             return String.valueOf(totalDurationNanos / 1000000);
         }
@@ -400,14 +367,13 @@ class CucumberReporter implements Formatter, Reporter {
                 String resultStatusWarn = "*";
                 if (i < results.size()) {
                     resultStatus = results.get(i).getStatus();
-                    resultStatusWarn = ((results.get(i).getError() != null) && (results
-                            .get(i).getStatus().equals("passed"))) ? "(W)" : "";
+                    resultStatusWarn = ((results.get(i).getError() != null) && (results.get(i).getStatus()
+                            .equals("passed"))) ? "(W)" : "";
                 }
                 sb.append(steps.get(i).getKeyword());
                 sb.append(steps.get(i).getName());
                 int len = 0;
-                len = steps.get(i).getKeyword().length()
-                        + steps.get(i).getName().length();
+                len = steps.get(i).getKeyword().length() + steps.get(i).getName().length();
                 if (steps.get(i).getRows() != null) {
                     for (DataTableRow row : steps.get(i).getRows()) {
                         String strrow = "| ";
@@ -428,23 +394,20 @@ class CucumberReporter implements Formatter, Reporter {
             }
         }
 
-        private Element createException(Document doc, String clazz,
-                String message, String stacktrace) {
+        private Element createException(Document doc, String clazz, String message, String stacktrace) {
             Element exceptionElement = doc.createElement("exception");
             exceptionElement.setAttribute("class", clazz);
 
             if (message != null) {
                 Element messageElement = doc.createElement("message");
-                messageElement.appendChild(doc
-                        .createCDATASection("\r\n<pre>\r\n" + message
-                                + "\r\n</pre>\r\n"));
+                messageElement.appendChild(doc.createCDATASection("\r\n<pre>\r\n" + message + "\r\n</pre>\r\n"));
                 exceptionElement.appendChild(messageElement);
             }
 
             Element stacktraceElement = doc.createElement("full-stacktrace");
             stacktraceElement.appendChild(doc.createCDATASection(stacktrace));
             exceptionElement.appendChild(stacktraceElement);
-            
+
             return exceptionElement;
         }
     }

@@ -23,33 +23,28 @@ public class CucumberRunner {
 
     private final cucumber.runtime.Runtime runtime;
 
-    public CucumberRunner(Class<?> clazz, String... feature)
-            throws IOException, ClassNotFoundException, InstantiationException,
-            IllegalAccessException, NoSuchMethodException,
-            InvocationTargetException {
+    public CucumberRunner(Class<?> clazz, String... feature) throws IOException, ClassNotFoundException,
+            InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         ClassLoader classLoader = clazz.getClassLoader();
         ResourceLoader resourceLoader = new MultiLoader(classLoader);
 
-        RuntimeOptionsFactory runtimeOptionsFactory = new RuntimeOptionsFactory(
-                clazz, new Class[] { CucumberOptions.class });
+        RuntimeOptionsFactory runtimeOptionsFactory = new RuntimeOptionsFactory(clazz,
+                new Class[] { CucumberOptions.class });
         RuntimeOptions runtimeOptions = runtimeOptionsFactory.create();
 
         new File("target/executions/").mkdirs();
         CucumberReporter reporter;
         if ((feature.length == 0)) {
-            reporter = new CucumberReporter(Utils.toURL("target/executions/"
-                    + clazz.getCanonicalName() + ".xml"),
+            reporter = new CucumberReporter(Utils.toURL("target/executions/" + clazz.getCanonicalName() + ".xml"),
                     clazz.getCanonicalName());
 
         } else {
             List<String> features = new ArrayList<String>();
-            String fPath = "src/test/resources/features/" + feature[0]
-                    + ".feature";
+            String fPath = "src/test/resources/features/" + feature[0] + ".feature";
             features.add(fPath);
             runtimeOptions.getFeaturePaths().addAll(features);
-            reporter = new CucumberReporter(Utils.toURL("target/executions/"
-                    + clazz.getCanonicalName() + "$" + feature[0] + ".xml"),
-                    clazz.getCanonicalName());
+            reporter = new CucumberReporter(Utils.toURL("target/executions/" + clazz.getCanonicalName() + "$"
+                    + feature[0] + ".xml"), clazz.getCanonicalName());
         }
 
         List<String> uniqueGlue = new ArrayList<String>();
@@ -63,21 +58,17 @@ public class CucumberRunner {
 
         runtimeOptions.addFormatter(reporter);
 
-        Set<Class<? extends ICucumberFormatter>> implementers = new Reflections(
-                "com.stratio.tests.utils")
+        Set<Class<? extends ICucumberFormatter>> implementers = new Reflections("com.stratio.tests.utils")
                 .getSubTypesOf(ICucumberFormatter.class);
 
         for (Class<? extends ICucumberFormatter> implementerClazz : implementers) {
             Constructor<?> ctor = implementerClazz.getConstructor();
             ctor.setAccessible(true);
-            runtimeOptions
-                    .addFormatter((ICucumberFormatter) ctor.newInstance());
+            runtimeOptions.addFormatter((ICucumberFormatter) ctor.newInstance());
         }
 
-        ClassFinder classFinder = new ResourceLoaderClassFinder(resourceLoader,
-                classLoader);
-        runtime = new cucumber.runtime.Runtime(resourceLoader, classFinder,
-                classLoader, runtimeOptions);
+        ClassFinder classFinder = new ResourceLoaderClassFinder(resourceLoader, classLoader);
+        runtime = new cucumber.runtime.Runtime(resourceLoader, classFinder, classLoader, runtimeOptions);
     }
 
     public void runCukes() throws IOException {

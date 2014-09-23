@@ -18,8 +18,7 @@ import cucumber.api.DataTable;
 public class RecordSetMatcher extends TypeSafeMatcher<RecordSet> {
     private final DataTable table;
 
-    private static final Logger LOGGER = LoggerFactory
-            .getLogger(RecordSetMatcher.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RecordSetMatcher.class);
 
     // Constructor
     public RecordSetMatcher(DataTable table) {
@@ -33,8 +32,7 @@ public class RecordSetMatcher extends TypeSafeMatcher<RecordSet> {
 
     @Override
     public void describeTo(Description description) {
-        description
-                .appendText("The data of the table is not contained in the RecordSet");
+        description.appendText("The data of the table is not contained in the RecordSet");
     }
 
     @Override
@@ -57,8 +55,7 @@ public class RecordSetMatcher extends TypeSafeMatcher<RecordSet> {
         return true;
     }
 
-    private List<List<String>> recordToList(List<String> columnNames,
-            RecordSet item) {
+    private List<List<String>> recordToList(List<String> columnNames, RecordSet item) {
         List<List<String>> recordsAsList = new ArrayList<List<String>>();
         recordsAsList.add(columnNames);
         try {

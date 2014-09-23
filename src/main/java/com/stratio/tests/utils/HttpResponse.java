@@ -4,11 +4,11 @@ public class HttpResponse {
     private int statusCode;
     private String response;
 
-    public HttpResponse (Integer statusCode, String response) {
+    public HttpResponse(Integer statusCode, String response) {
         this.statusCode = statusCode;
         this.response = response;
     }
-    
+
     public int getStatusCode() {
         return statusCode;
     }

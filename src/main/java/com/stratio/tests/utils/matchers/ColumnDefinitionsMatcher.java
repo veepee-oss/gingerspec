@@ -33,7 +33,6 @@ public class ColumnDefinitionsMatcher extends TypeSafeMatcher<String> {
 
     @Override
     public void describeTo(Description description) {
-        description.appendText("The column " + this.columnName
-                + " does not exists on the table.");
+        description.appendText("The column " + this.columnName + " does not exists on the table.");
     }
 }

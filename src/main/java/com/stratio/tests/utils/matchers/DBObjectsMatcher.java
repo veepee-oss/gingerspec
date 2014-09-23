@@ -29,8 +29,7 @@ public class DBObjectsMatcher extends TypeSafeMatcher<ArrayList<DBObject>> {
 
     @Override
     public void describeTo(Description description) {
-        description
-                .appendText("The result obtained is not equals from expected in DataTable");
+        description.appendText("The result obtained is not equals from expected in DataTable");
 
     }
 

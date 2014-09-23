@@ -15,8 +15,7 @@ import org.slf4j.LoggerFactory;
 
 public class ElasticSearchUtils {
 
-    private final Logger logger = LoggerFactory
-            .getLogger(ElasticSearchUtils.class);
+    private final Logger logger = LoggerFactory.getLogger(ElasticSearchUtils.class);
     private String url;
     private CloseableHttpClient client;
 
@@ -34,8 +33,7 @@ public class ElasticSearchUtils {
     }
 
     public void emptyIndexes() {
-        logger.debug("Emptying every entry at every elasticsearch index at {}",
-                this.url);
+        logger.debug("Emptying every entry at every elasticsearch index at {}", this.url);
         HttpDelete httpRequest = new HttpDelete(this.url + "_all/*/");
         try {
             this.client.execute(httpRequest);
@@ -45,8 +43,7 @@ public class ElasticSearchUtils {
     }
 
     public void emptyIndex(String indexName) {
-        logger.debug("Emptying elasticsearch index {} at {}", indexName,
-                this.url);
+        logger.debug("Emptying elasticsearch index {} at {}", indexName, this.url);
         HttpDelete httpRequest = new HttpDelete(this.url + indexName + "/*/");
         try {
             this.client.execute(httpRequest);
@@ -66,8 +63,7 @@ public class ElasticSearchUtils {
     }
 
     public void dropIndex(String indexName) {
-        logger.debug("Dropping index {} at elasticsearch at {}", indexName,
-                this.url);
+        logger.debug("Dropping index {} at elasticsearch at {}", indexName, this.url);
         HttpDelete httpRequest = new HttpDelete(this.url + indexName + "/");
         try {
             this.client.execute(httpRequest);
@@ -77,10 +73,8 @@ public class ElasticSearchUtils {
     }
 
     public String queryIndex(String indexName, String type, String query) {
-        logger.debug("Querying index {} in type {}, at elasticsearch at {}",
-                indexName, type, this.url);
-        HttpGet httpRequest = new HttpGet(this.url + indexName + "/" + type
-                + "/_search?q=" + query);
+        logger.debug("Querying index {} in type {}, at elasticsearch at {}", indexName, type, this.url);
+        HttpGet httpRequest = new HttpGet(this.url + indexName + "/" + type + "/_search?q=" + query);
         try {
             CloseableHttpResponse httpResponse = client.execute(httpRequest);
             HttpEntity responseEntity = httpResponse.getEntity();

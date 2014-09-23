@@ -19,16 +19,14 @@ import cucumber.api.DataTable;
 
 public class AerospikeUtils {
 
-    private static final Logger LOGGER = LoggerFactory
-            .getLogger(AerospikeUtils.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AerospikeUtils.class);
     private final String host;
     private final Integer port;
     private AerospikeClient client;
 
     public AerospikeUtils() {
         this.host = System.getProperty("AEROSPIKE_HOST", "127.0.0.1");
-        this.port = Integer.parseInt(System.getProperty("AEROSPIKE_PORT",
-                "3000"));
+        this.port = Integer.parseInt(System.getProperty("AEROSPIKE_PORT", "3000"));
     }
 
     public void connect() {
@@ -49,20 +47,18 @@ public class AerospikeUtils {
         client.close();
     }
 
-    public void insertFromDataTable(String nameSpace, String tableName,
-            DataTable table) {
+    public void insertFromDataTable(String nameSpace, String tableName, DataTable table) {
         // Primero comprobamos el numero de filas del datable
         WritePolicy writePolicy = new WritePolicy();
         writePolicy.timeout = 50;
         List<List<String>> tableAsList = table.raw();
-     // (Se resta uno porque la primera fila indica los columnNames)
+        // (Se resta uno porque la primera fila indica los columnNames)
         int iKey = tableAsList.size();
-        
+
         for (int i = 1; i < iKey; i++) {
             try {
                 Key key = new Key(nameSpace, tableName, "MyKey" + i);
-                Bin[] bins = createBins(tableAsList.get(0),
-                        tableAsList.get(i));
+                Bin[] bins = createBins(tableAsList.get(0), tableAsList.get(i));
                 client.add(writePolicy, key, bins[0]);
                 client.add(writePolicy, key, bins[1]);
             } catch (AerospikeException e) {
@@ -80,8 +76,7 @@ public class AerospikeUtils {
     private Bin[] createBins(List<String> columnNames, List<String> row) {
         Bin[] bins = new Bin[columnNames.size()];
         for (int i = 0; i < columnNames.size(); i++) {
-            bins[i] = new Bin(columnNames.get(i).toString(), row.get(i)
-                    .toString());
+            bins[i] = new Bin(columnNames.get(i).toString(), row.get(i).toString());
         }
         return bins;
     }

@@ -18,12 +18,10 @@ import com.stratio.tests.utils.ThreadProperty;
 
 public class CommonG {
 
-    private final Logger logger = LoggerFactory.getLogger(ThreadProperty
-            .get("class"));
+    private final Logger logger = LoggerFactory.getLogger(ThreadProperty.get("class"));
     private final ExceptionList exceptions = ExceptionList.getInstance();
     private final CassandraUtil cassandraClient = CassandraUtil.getInstance();
-    private final ElasticSearchUtil elasticSearchClient = ElasticSearchUtil
-            .getInstance();
+    private final ElasticSearchUtil elasticSearchClient = ElasticSearchUtil.getInstance();
     private final AerospikeUtil aerospikeClient = AerospikeUtil.getInstance();
     private final MongoDBUtil mongoDBClient = MongoDBUtil.getInstance();
 
