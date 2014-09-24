@@ -12,17 +12,16 @@ public class AssertJAspect {
 
     final Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
 
-    @Pointcut("execution(void org.assertj.core.api.Assert+.*(..))")
-    protected void logAssertJFailurePointcut() { // Object actual) {
+    @Pointcut("execution(* org.assertj.core.internal.Failures.failure(..))")
+    protected void logAssertJFailurePointcut() {
     }
 
     @Around("logAssertJFailurePointcut()")
-    public void aroundLogAssertJFailurePointcut(ProceedingJoinPoint pjp) throws Throwable {
-        try {
-            pjp.proceed();
-        } catch (AssertionError e) {
-            logger.error("Assertion failed: {}", e.getMessage());
-            throw e;
-        }
+    public AssertionError aroundLogAssertJFailurePointcut(ProceedingJoinPoint pjp) throws Throwable {
+
+        AssertionError ae = (AssertionError) pjp.proceed();
+        logger.error("Assertion failed: {}", ae.getMessage());
+        return ae;
+
     }
 }
