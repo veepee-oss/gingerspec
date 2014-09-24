@@ -23,7 +23,6 @@ public class ElasticSearchUtils {
         String host = System.getProperty("ELASTICSEARCH_HOST", "127.0.0.1");
         String port = System.getProperty("ELASTICSEARCH_PORT", "9200");
         this.url = "http://" + host + ":" + port + "/";
-        logger.debug("Elasticsearch backend at {}", this.url);
     }
 
     public void connect() {
@@ -36,7 +35,8 @@ public class ElasticSearchUtils {
         logger.debug("Emptying every entry at every elasticsearch index at {}", this.url);
         HttpDelete httpRequest = new HttpDelete(this.url + "_all/*/");
         try {
-            this.client.execute(httpRequest);
+            CloseableHttpResponse response = this.client.execute(httpRequest);
+            response.close();
         } catch (IOException e) {
             logger.error("Got exception when deleting ES indexes", e);
         }
@@ -46,7 +46,8 @@ public class ElasticSearchUtils {
         logger.debug("Emptying elasticsearch index {} at {}", indexName, this.url);
         HttpDelete httpRequest = new HttpDelete(this.url + indexName + "/*/");
         try {
-            this.client.execute(httpRequest);
+            CloseableHttpResponse response = this.client.execute(httpRequest);
+            response.close();
         } catch (IOException e) {
             logger.error("Got exception when deleting ES indexes", e);
         }
@@ -56,7 +57,8 @@ public class ElasticSearchUtils {
         logger.debug("Dropping every elasticsearch index at {}", this.url);
         HttpDelete httpRequest = new HttpDelete(this.url + "_all");
         try {
-            this.client.execute(httpRequest);
+            CloseableHttpResponse response = this.client.execute(httpRequest);
+            response.close();
         } catch (IOException e) {
             logger.error("Got exception when deleting ES indexes", e);
         }
@@ -66,7 +68,8 @@ public class ElasticSearchUtils {
         logger.debug("Dropping index {} at elasticsearch at {}", indexName, this.url);
         HttpDelete httpRequest = new HttpDelete(this.url + indexName + "/");
         try {
-            this.client.execute(httpRequest);
+            CloseableHttpResponse response = this.client.execute(httpRequest);
+            response.close();
         } catch (IOException e) {
             logger.error("Got exception when deleting the ES index", e);
         }
@@ -76,9 +79,11 @@ public class ElasticSearchUtils {
         logger.debug("Querying index {} in type {}, at elasticsearch at {}", indexName, type, this.url);
         HttpGet httpRequest = new HttpGet(this.url + indexName + "/" + type + "/_search?q=" + query);
         try {
-            CloseableHttpResponse httpResponse = client.execute(httpRequest);
+            CloseableHttpResponse httpResponse = this.client.execute(httpRequest);
             HttpEntity responseEntity = httpResponse.getEntity();
-            return EntityUtils.toString(responseEntity);
+            String response = EntityUtils.toString(responseEntity);
+            httpResponse.close();
+            return response;
         } catch (ParseException | IOException e) {
             logger.error("Got exception when querying the ES index", e);
         }

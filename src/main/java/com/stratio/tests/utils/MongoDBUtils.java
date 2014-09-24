@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,11 +30,11 @@ public class MongoDBUtils {
     public MongoDBUtils() {
         this.host = System.getProperty("MONGO_HOST", "127.0.0.1");
         this.port = Integer.parseInt(System.getProperty("MONGO_PORT", "27017"));
-        LOGGER.debug("Initializing MongoDB client");
     }
 
     public void connectToMongoDB() {
         try {
+            LOGGER.debug("Initializing MongoDB client");
             mongoClient = new MongoClient(this.host, this.port);
         } catch (UnknownHostException e) {
             LOGGER.error("Unable to connect to MongoDB", e);
