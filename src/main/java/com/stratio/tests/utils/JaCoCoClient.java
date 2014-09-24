@@ -37,7 +37,7 @@ public class JaCoCoClient extends TestListenerAdapter {
             reader.setExecutionDataVisitor(localWriter);
 
             // Send a dump command and read the response:
-            writer.visitDumpCommand(true, false);
+            writer.visitDumpCommand(true, true);
             reader.read();
 
             socket.close();
