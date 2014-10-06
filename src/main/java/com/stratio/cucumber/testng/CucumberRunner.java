@@ -53,6 +53,7 @@ public class CucumberRunner {
         uniqueGlue.add("classpath:com/stratio/streaming/specs");
         uniqueGlue.add("classpath:com/stratio/ingestion/specs");
         uniqueGlue.add("classpath:com/stratio/datavis/specs");
+        uniqueGlue.add("classpath:com/stratio/connectors/specs");
         runtimeOptions.getGlue().clear();
         runtimeOptions.getGlue().addAll(uniqueGlue);
 
