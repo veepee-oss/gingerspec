@@ -1,18 +1,16 @@
 package com.stratio.specs;
 
-import com.mongodb.DBObject;
-
-import static com.stratio.tests.utils.matchers.RecordSetMatcher.containedInRecordSet;
-import static com.stratio.tests.utils.matchers.ExceptionMatcher.hasClassAndMessage;
 import static com.stratio.tests.utils.matchers.ColumnDefinitionsMatcher.containsColumn;
-import static com.stratio.tests.utils.matchers.ListLastElementExceptionMatcher.lastElementHasClassAndMessage;
 import static com.stratio.tests.utils.matchers.DBObjectsMatcher.containedInMongoDBResult;
+import static com.stratio.tests.utils.matchers.ExceptionMatcher.hasClassAndMessage;
+import static com.stratio.tests.utils.matchers.ListLastElementExceptionMatcher.lastElementHasClassAndMessage;
+import static com.stratio.tests.utils.matchers.RecordSetMatcher.containedInRecordSet;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.not;
 
 import java.util.ArrayList;
@@ -27,13 +25,19 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+
 import com.aerospike.client.query.RecordSet;
 import com.datastax.driver.core.ColumnDefinitions;
 import com.datastax.driver.core.DataType;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
+import com.mongodb.DBObject;
+import com.stratio.cucumber.converter.ArrayListConverter;
 
 import cucumber.api.DataTable;
+import cucumber.api.Transform;
 import cucumber.api.java.en.Then;
 
 public class ThenGSpec extends BaseGSpec {
@@ -242,4 +246,25 @@ public class ThenGSpec extends BaseGSpec {
         assertThat("The Mongo dataBase contains the table", collectionsNames, not(hasItem(tableName)));
     }
 
+    @Then("^a text '(.*?)' exists$")
+    public void assertTextInSource(String text) {
+        commonspec.getLogger().info("Verifying if our current page contains the text {}", text);
+        com.stratio.assertions.Assertions.assertThat(commonspec.getDriver()).as("Expected text not found at page")
+                .contains(text);
+    }
+
+    @Then("^no error is thrown$")
+    public void assertNoError() {
+    }
+
+    @Then("^an element '(.*?)' has '(.*?)' as content$")
+    public void assertTextInElement(String target, @Transform(ArrayListConverter.class) ArrayList<String> texts) {
+        commonspec.getLogger().info("Verifying text content of elements {}", texts);
+
+        WebElement elem = commonspec.getDriver().findElement(By.id(target));
+
+        String[] expectedTexts = texts.toArray(new String[texts.size()]);
+        com.stratio.assertions.Assertions.assertThat(elem).as("Element doesnt contains expected text")
+                .contains(expectedTexts);
+    }
 }

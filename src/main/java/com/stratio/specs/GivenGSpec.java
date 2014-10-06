@@ -81,4 +81,18 @@ public class GivenGSpec extends BaseGSpec {
         commonspec.getMongoDBClient().dropAllDataMongoDBCollection(table);
     }
 
+    @Given("^I browse to '(.*?)'$")
+    public void seleniumBrowse(String url) {
+        if (url.endsWith("_HOME")) {
+            String SUT_PORT = url.replace("_HOME", "_PORT");
+            url = System.getProperty(url, "") + ":" + System.getProperty(SUT_PORT, "")
+                    + System.getProperty("WEB_PATH", "");
+        }
+        org.assertj.core.api.Assertions.assertThat(url).isNotEmpty();
+        if (!url.startsWith("http://")) {
+            url = "http://" + url;
+        }
+        commonspec.getLogger().info("Browsing to {} with {}", url, commonspec.getBrowserName());
+        commonspec.getDriver().get(url);
+    }
 }

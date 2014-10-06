@@ -2,6 +2,7 @@ package com.stratio.specs;
 
 import java.util.List;
 
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,6 +26,9 @@ public class CommonG {
     private final AerospikeUtil aerospikeClient = AerospikeUtil.getInstance();
     private final MongoDBUtil mongoDBClient = MongoDBUtil.getInstance();
 
+    private RemoteWebDriver driver = null;
+    private String browserName = null;
+
     public Logger getLogger() {
         return this.logger;
     }
@@ -47,5 +51,21 @@ public class CommonG {
 
     public MongoDBUtils getMongoDBClient() {
         return mongoDBClient.getMongoDBUtils();
+    }
+
+    public RemoteWebDriver getDriver() {
+        return driver;
+    }
+
+    public void setDriver(RemoteWebDriver driver) {
+        this.driver = driver;
+    }
+
+    public String getBrowserName() {
+        return browserName;
+    }
+
+    public void setBrowserName(String browserName) {
+        this.browserName = browserName;
     }
 }

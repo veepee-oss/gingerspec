@@ -1,18 +1,5 @@
 package com.stratio.cucumber.testng;
 
-import gherkin.formatter.Formatter;
-import gherkin.formatter.Reporter;
-import gherkin.formatter.model.Background;
-import gherkin.formatter.model.DataTableRow;
-import gherkin.formatter.model.Examples;
-import gherkin.formatter.model.Feature;
-import gherkin.formatter.model.Match;
-import gherkin.formatter.model.Result;
-import gherkin.formatter.model.Scenario;
-import gherkin.formatter.model.ScenarioOutline;
-import gherkin.formatter.model.Step;
-import gherkin.formatter.model.Tag;
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -38,9 +25,23 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.stratio.tests.utils.ThreadProperty;
+
 import cucumber.runtime.CucumberException;
 import cucumber.runtime.io.URLOutputStream;
 import cucumber.runtime.io.UTF8OutputStreamWriter;
+import gherkin.formatter.Formatter;
+import gherkin.formatter.Reporter;
+import gherkin.formatter.model.Background;
+import gherkin.formatter.model.DataTableRow;
+import gherkin.formatter.model.Examples;
+import gherkin.formatter.model.Feature;
+import gherkin.formatter.model.Match;
+import gherkin.formatter.model.Result;
+import gherkin.formatter.model.Scenario;
+import gherkin.formatter.model.ScenarioOutline;
+import gherkin.formatter.model.Step;
+import gherkin.formatter.model.Tag;
 
 class CucumberReporter implements Formatter, Reporter {
 
@@ -279,10 +280,12 @@ class CucumberReporter implements Formatter, Reporter {
             this.iteration = iteration;
             if ((examplesData == null) || (this.iteration >= examplesData.getRows().size())) {
                 element.setAttribute("name", scenario.getName());
+                ThreadProperty.set("dataSet", "");
             } else {
                 String data = examplesData.getRows().get(iteration).getCells().toString();
                 data = data.replaceAll("\"", "¨");
                 element.setAttribute("name", scenario.getName() + " " + data);
+                ThreadProperty.set("dataSet", data);
             }
             element.setAttribute("started-at", DATE_FORMAT.format(new Date()));
         }
