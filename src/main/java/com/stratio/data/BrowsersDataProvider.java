@@ -13,12 +13,16 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.ITestContext;
 import org.testng.annotations.DataProvider;
 
 import com.google.common.collect.Lists;
 
 public class BrowsersDataProvider {
+
+    private static final Logger logger = LoggerFactory.getLogger(BrowsersDataProvider.class);
 
     @DataProvider(parallel = true)
     public static Iterator<String[]> availableBrowsers(ITestContext context, Constructor<?> testConstructor)
@@ -38,12 +42,18 @@ public class BrowsersDataProvider {
         return lData.iterator();
     }
 
-    private static ArrayList<String> gridBrowsers() throws IOException {
+    private static ArrayList<String> gridBrowsers() {
         ArrayList<String> response = new ArrayList<String>();
 
         String grid = System.getProperty("SELENIUM.GRID", "127.0.0.1:4444");
         grid = "http://" + grid + "/grid/console";
-        Document doc = Jsoup.connect(grid).timeout(20000).get();
+        Document doc;
+        try {
+            doc = Jsoup.connect(grid).timeout(20000).get();
+        } catch (IOException e) {
+            logger.error("Exception on connecting to Selenium grid: {}", e.getMessage());
+            return response;
+        }
 
         Elements slaves = (Elements) doc.select("div.proxy");
 
