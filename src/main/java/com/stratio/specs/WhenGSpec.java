@@ -1,7 +1,7 @@
 package com.stratio.specs;
 
 import static com.stratio.assertions.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThat;
+import static com.stratio.assertions.SeleniumExtractor.linkText;
 
 import java.util.List;
 
@@ -27,9 +27,8 @@ public class WhenGSpec extends BaseGSpec {
         commonspec.getLogger().info("Clicking on {}", target);
         WebElement z = commonspec.getDriver().findElement(By.id(zone));
         List<WebElement> anchors = z.findElements(By.linkText(target));
-        assertThat(anchors).as("Unexpected WebElements count found").hasSize(1);
-        assertThat(z).as("No WebElements found").hasLinkText(target);
 
+        assertThat(anchors).as("No WebElements found").extracting(linkText()).contains(target).hasSize(1);
         anchors.get(0).click();
     }
 

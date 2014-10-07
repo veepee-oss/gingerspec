@@ -29,6 +29,7 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.internal.Locatable;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
+import org.openqa.selenium.remote.ScreenshotException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,9 +54,12 @@ public class SeleniumAspect {
             retVal = pjp.proceed();
             return retVal;
         } catch (Throwable ex) {
-            WebDriver driver = null;
-            if (ex instanceof WebDriverException) {
+            WebDriver driver = null;           
+            if (ex instanceof WebDriverException) {                
                 logger.info("Got a selenium exception");
+                if (!(pjp.getThis() instanceof WebDriver)) {
+                    throw ex;    
+                }
                 driver = (WebDriver) pjp.getThis();
             } else if ((pjp.getTarget() instanceof SeleniumAssert) && (ex instanceof AssertionError)) {
                 logger.info("Got a SeleniumAssert response");
@@ -71,9 +75,13 @@ public class SeleniumAspect {
                     driver = ((RemoteWebElement) actual.get(as)).getWrappedDriver();
                 }
             }
-            captureEvidence(driver, "framehtmlSource");
-            captureEvidence(driver, "htmlSource");
-            captureEvidence(driver, "screenCapture");
+            if (driver != null) {
+                captureEvidence(driver, "framehtmlSource");
+                captureEvidence(driver, "htmlSource");
+                captureEvidence(driver, "screenCapture");
+            } else {
+                logger.info("Got no Selenium driver to capture a screen");
+            }
             throw ex;
         }
     }

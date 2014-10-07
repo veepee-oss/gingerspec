@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.internal.Strings;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -41,16 +40,5 @@ public class SeleniumAssert extends AbstractAssert<SeleniumAssert, Object> {
             Strings.instance().assertContains(info, ((WebElement) actual).getText(), values);
         }
         return this;
-    }
-
-    public SeleniumAssert hasLinkText(String target) {
-        if (actual instanceof WebDriver) {
-            org.assertj.core.api.Assertions.assertThat(((WebDriver) actual).findElements(By.linkText(target)))
-                    .extracting("name").contains(target);
-        } else if (actual instanceof WebElement) {
-            org.assertj.core.api.Assertions.assertThat(((WebElement) actual).findElements(By.linkText(target)))
-                    .extracting("name").contains(target);
-        }
-        return this;
-    }
+    }   
 }
