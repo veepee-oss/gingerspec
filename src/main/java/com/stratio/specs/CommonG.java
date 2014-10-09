@@ -20,11 +20,6 @@ import com.stratio.tests.utils.ThreadProperty;
 public class CommonG {
 
     private final Logger logger = LoggerFactory.getLogger(ThreadProperty.get("class"));
-    private final ExceptionList exceptions = ExceptionList.getInstance();
-    private final CassandraUtil cassandraClient = CassandraUtil.getInstance();
-    private final ElasticSearchUtil elasticSearchClient = ElasticSearchUtil.getInstance();
-    private final AerospikeUtil aerospikeClient = AerospikeUtil.getInstance();
-    private final MongoDBUtil mongoDBClient = MongoDBUtil.getInstance();
 
     private RemoteWebDriver driver = null;
     private String browserName = null;
@@ -34,23 +29,23 @@ public class CommonG {
     }
 
     public List<Exception> getExceptions() {
-        return exceptions.getExceptions();
+        return ExceptionList.INSTANCE.getExceptions();
     }
 
     public CassandraUtils getCassandraClient() {
-        return cassandraClient.getCassandraUtils();
+        return CassandraUtil.INSTANCE.getCassandraUtils();
     }
 
     public ElasticSearchUtils getElasticSearchClient() {
-        return elasticSearchClient.getElasticSearchUtils();
+        return ElasticSearchUtil.INSTANCE.getElasticSearchUtils();
     }
 
     public AerospikeUtils getAerospikeClient() {
-        return aerospikeClient.getAeroSpikeUtils();
+        return AerospikeUtil.INSTANCE.getAeroSpikeUtils();
     }
 
     public MongoDBUtils getMongoDBClient() {
-        return mongoDBClient.getMongoDBUtils();
+        return MongoDBUtil.INSTANCE.getMongoDBUtils();
     }
 
     public RemoteWebDriver getDriver() {

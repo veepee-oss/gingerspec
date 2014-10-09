@@ -1,18 +1,12 @@
 package com.stratio.tests.utils;
 
-public final class ElasticSearchUtil {
+public enum ElasticSearchUtil {
+    INSTANCE;
 
-    private static ElasticSearchUtil instance = new ElasticSearchUtil();
-    private final ElasticSearchUtils esUtils = new ElasticSearchUtils();
-
-    private ElasticSearchUtil() {
-    }
-
-    public static ElasticSearchUtil getInstance() {
-        return instance;
-    }
+    private final ElasticSearchUtils cUtils = new ElasticSearchUtils();
 
     public ElasticSearchUtils getElasticSearchUtils() {
-        return esUtils;
+        return cUtils;
     }
+
 }

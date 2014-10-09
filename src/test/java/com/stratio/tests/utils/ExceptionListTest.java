@@ -9,7 +9,7 @@ public class ExceptionListTest {
 
     @Test
     public void test() {
-        assertThat("Non empty Exception list on boot", ExceptionList.getInstance().getExceptions(), hasSize(0));
+        assertThat("Non empty Exception list on boot", ExceptionList.INSTANCE.getExceptions(), hasSize(0));
     }
 
 }
