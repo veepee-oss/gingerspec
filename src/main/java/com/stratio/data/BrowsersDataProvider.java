@@ -45,7 +45,7 @@ public class BrowsersDataProvider {
     private static ArrayList<String> gridBrowsers() {
         ArrayList<String> response = new ArrayList<String>();
 
-        String grid = System.getProperty("SELENIUM.GRID", "127.0.0.1:4444");
+        String grid = System.getProperty("SELENIUM_GRID", "127.0.0.1:4444");
         grid = "http://" + grid + "/grid/console";
         Document doc;
         try {
