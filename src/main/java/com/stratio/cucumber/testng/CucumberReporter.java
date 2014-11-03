@@ -158,8 +158,8 @@ class CucumberReporter implements Formatter, Reporter {
             }
         }
 
-        testMethod.finish(document, root, position, ignored);
-        position++;
+        testMethod.finish(document, root, this.position, ignored);
+        this.position++;
         if ((tmpExamples != null) && (iteration >= tmpExamples.getRows().size())) {
             tmpExamples = null;
         }

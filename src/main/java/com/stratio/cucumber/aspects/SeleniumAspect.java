@@ -9,6 +9,7 @@ import java.io.PrintWriter;
 import java.io.Writer;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 
@@ -29,7 +30,6 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.internal.Locatable;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
-import org.openqa.selenium.remote.ScreenshotException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +40,7 @@ import com.stratio.tests.utils.ThreadProperty;
 @Aspect
 public class SeleniumAspect {
 
-    final Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
 
     @Pointcut("call(* com.stratio.assertions.SeleniumAssert.*(..))" + " || call(* org.openqa.selenium.*.click(..))"
             + " || call(* org.openqa.selenium.*.findElement(..))")
@@ -54,11 +54,11 @@ public class SeleniumAspect {
             retVal = pjp.proceed();
             return retVal;
         } catch (Throwable ex) {
-            WebDriver driver = null;           
-            if (ex instanceof WebDriverException) {                
+            WebDriver driver = null;
+            if (ex instanceof WebDriverException) {
                 logger.info("Got a selenium exception");
                 if (!(pjp.getThis() instanceof WebDriver)) {
-                    throw ex;    
+                    throw ex;
                 }
                 driver = (WebDriver) pjp.getThis();
             } else if ((pjp.getTarget() instanceof SeleniumAssert) && (ex instanceof AssertionError)) {
@@ -91,7 +91,7 @@ public class SeleniumAspect {
         return body.getSize().getHeight();
     }
 
-    private File adjustLastCapture(Integer newTrailingImageHeight, ArrayList<File> capture) throws IOException {
+    private File adjustLastCapture(Integer newTrailingImageHeight, List<File> capture) throws IOException {
         // cuts last image just in case it dupes information
         Integer finalHeight = 0;
         Integer finalWidth = 0;
@@ -202,12 +202,13 @@ public class SeleniumAspect {
                 String source = ((RemoteWebDriver) driver).getPageSource();
 
                 File fout = new File(outputFile);
-                fout.getParentFile().mkdirs();
+                boolean dirs = fout.getParentFile().mkdirs();
                 FileOutputStream fos = new FileOutputStream(fout, true);
 
                 Writer out = new OutputStreamWriter(fos, "UTF8");
                 PrintWriter writer = new PrintWriter(out, false);
                 writer.append(source);
+                writer.close();
                 out.close();
             }
 
@@ -228,7 +229,7 @@ public class SeleniumAspect {
             try {
                 FileUtils.copyFile(file, new File(outputFile));
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error("Exception on copying browser screen capture", e);
             }
         }
 

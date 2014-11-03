@@ -64,14 +64,14 @@ public class HookGSpec extends BaseGSpec {
         commonspec.getLogger().info("Setting up selenium for {}", browser);
 
         DesiredCapabilities capabilities = null;
-        if (browser.toLowerCase().equals("chrome")) {
+        if (browser.equalsIgnoreCase("chrome")) {
             ChromeOptions chromeOptions = new ChromeOptions();
             chromeOptions.addArguments("test-type");
             capabilities = DesiredCapabilities.chrome();
             capabilities.setCapability(ChromeOptions.CAPABILITY, chromeOptions);
-        } else if (browser.toLowerCase().equals("firefox")) {
+        } else if (browser.equalsIgnoreCase("firefox")) {
             capabilities = DesiredCapabilities.firefox();
-        } else if (browser.toLowerCase().equals("phantomjs")) {
+        } else if (browser.equalsIgnoreCase("phantomjs")) {
             capabilities = DesiredCapabilities.phantomjs();
         } else {
             commonspec.getLogger().error("Unknown browser: " + browser);
