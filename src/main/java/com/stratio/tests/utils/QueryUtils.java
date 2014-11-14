@@ -2,24 +2,49 @@ package com.stratio.tests.utils;
 
 import java.util.Map;
 
+/**
+ * Build queries for cassandra.
+ * 
+ * @author Javier Delgado
+ * @author Hugo Dominguez
+ * 
+ */
 public class QueryUtils {
-
+    /**
+     * Use Keyspace Query
+     * 
+     * @param keyspace
+     * @return
+     */
     public String useQuery(String keyspace) {
         return "USE " + keyspace + ";";
     }
 
+    /**
+     * Create the replication part of a query.
+     * 
+     * @param replication
+     * @return
+     */
     public String createKeyspaceReplication(Map<String, String> replication) {
-        String result = "";
+        StringBuilder result = new StringBuilder();
         if (!replication.isEmpty()) {
-            // No uso String buffer porque como maximo seran siempre 2
-            for (String s : replication.keySet()) {
-                result += s + ": " + replication.get(s) + ", ";
+            for (Map.Entry<String, String> entry : replication.entrySet()) {
+                result.append(entry.getKey()).append(": ").append(entry.getValue()).append(", ");
             }
-            result = result.substring(0, result.length() - 2);
         }
-        return result;
+        return result.toString().substring(0, result.length() - 2);
     }
 
+    /**
+     * Create Keyspace builder query.
+     * 
+     * @param ifNotExists
+     * @param keyspaceName
+     * @param replication
+     * @param durableWrites
+     * @return
+     */
     public String createKeyspaceQuery(Boolean ifNotExists, String keyspaceName, String replication, String durableWrites) {
         String result = "CREATE KEYSPACE ";
         if (ifNotExists) {
@@ -42,6 +67,13 @@ public class QueryUtils {
         return result;
     }
 
+    /**
+     * Drop keyspace builder query.
+     * 
+     * @param ifExists
+     * @param keyspace
+     * @return
+     */
     public String dropKeyspaceQuery(Boolean ifExists, String keyspace) {
         String query = "DROP KEYSPACE ";
         if (ifExists) {
@@ -51,6 +83,13 @@ public class QueryUtils {
         return query;
     }
 
+    /**
+     * Drop table builder query.
+     * 
+     * @param ifExists
+     * @param table
+     * @return
+     */
     public String dropTableQuery(Boolean ifExists, String table) {
         String query = "DROP TABLE ";
         if (ifExists) {

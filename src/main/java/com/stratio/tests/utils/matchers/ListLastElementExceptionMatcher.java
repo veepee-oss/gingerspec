@@ -9,7 +9,7 @@ import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 
 public class ListLastElementExceptionMatcher extends TypeSafeMatcher<List<Exception>> {
-
+    public static final int VALUE = 3;
     private final String clazz;
     private final Pattern messagePattern;
 
@@ -32,10 +32,10 @@ public class ListLastElementExceptionMatcher extends TypeSafeMatcher<List<Except
 
         String expectedMessage = String.valueOf(messagePattern);
         if (expectedMessage.startsWith(".*?")) {
-            expectedMessage = expectedMessage.substring(3);
+            expectedMessage = expectedMessage.substring(VALUE);
         }
         if (expectedMessage.endsWith(".*?")) {
-            expectedMessage = expectedMessage.substring(0, expectedMessage.length() - 3);
+            expectedMessage = expectedMessage.substring(0, expectedMessage.length() - VALUE);
         }
 
         description.appendText("an exception with class \"").appendText(clazz).appendText("\"")

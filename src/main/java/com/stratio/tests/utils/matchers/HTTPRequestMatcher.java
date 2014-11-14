@@ -6,8 +6,11 @@ import org.hamcrest.Matcher;
 
 import com.stratio.tests.utils.HttpResponse;
 
-public class HTTPRequestMatcher {
+public final class HTTPRequestMatcher {
 
+    private HTTPRequestMatcher(){
+     }
+    
     @Factory
     public static Matcher<HttpResponse> hasStatus(final Matcher<Integer> statusMatcher) {
         return new FeatureMatcher<HttpResponse, Integer>(statusMatcher, "Requests with code", "code") {

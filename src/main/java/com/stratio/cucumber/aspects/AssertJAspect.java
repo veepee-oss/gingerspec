@@ -6,16 +6,25 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+/**
+ * @author Javier Delgado
+ * @author Hugo Dominguez
+ *
+ */
 @Aspect
 public class AssertJAspect {
 
-    final Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
 
     @Pointcut("execution(* org.assertj.core.internal.Failures.failure(..))")
     protected void logAssertJFailurePointcut() {
     }
-
+/**
+ * 
+ * @param pjp
+ * @return
+ * @throws Throwable
+ */
     @Around("logAssertJFailurePointcut()")
     public AssertionError aroundLogAssertJFailurePointcut(ProceedingJoinPoint pjp) throws Throwable {
 

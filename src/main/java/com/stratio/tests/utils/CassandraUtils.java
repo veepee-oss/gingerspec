@@ -20,6 +20,12 @@ import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.core.TableMetadata;
 
+/**
+ * Generic utilities for operations over Cassandra.
+ * 
+ * @author Hugo Dominguez
+ * @author Javier Delgado
+ */
 public class CassandraUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CassandraUtils.class);
@@ -30,10 +36,16 @@ public class CassandraUtils {
     private Session session;
     private QueryUtils queryUtils;
 
+    /**
+     * Generic contructor of CassandraUtils.
+     */
     public CassandraUtils() {
         this.host = System.getProperty("CASSANDRA_HOST", "127.0.0.1");
     }
 
+    /**
+     * Connect to Cassandra host.
+     */
     public void connect() {
         buildCluster();
         this.queryUtils = new QueryUtils();
@@ -42,11 +54,22 @@ public class CassandraUtils {
         this.session = this.cluster.connect();
     }
 
+    /**
+     * Execute a query over Cassandra.
+     * 
+     * @param query
+     * @return ResultSet
+     */
     public ResultSet executeQuery(String query) {
 
         return this.session.execute(query);
     }
 
+    /**
+     * Execute a list of queries over Cassandra.
+     * 
+     * @param queriesList
+     */
     public void executeQueriesList(List<String> queriesList) {
 
         for (String query : queriesList) {
@@ -54,32 +77,56 @@ public class CassandraUtils {
         }
     }
 
+    /**
+     * Reconnect to Cassandra host.
+     */
     public void reconnect() {
         metadata = cluster.getMetadata();
         LOGGER.debug("Connected to cluster (" + host + "): " + metadata.getClusterName() + "\n");
         this.session = this.cluster.connect();
     }
 
+    /**
+     * Disconnect of Cassandra host.
+     */
     public void disconnect() {
         this.session.close();
         this.cluster.close();
     }
 
+    /**
+     * Get the metadata of the Cassandra Cluster.
+     * 
+     * @return Metadata
+     */
     public Metadata getMetadata() {
         this.metadata = cluster.getMetadata();
         return this.metadata;
     }
 
+    /**
+     * Build a Cassandra cluster.
+     */
     public void buildCluster() {
         this.cluster = Cluster.builder().addContactPoint(this.host).build();
         this.cluster.getConfiguration().getQueryOptions().setConsistencyLevel(ConsistencyLevel.ONE);
 
     }
 
+    /**
+     * Get the cassandra session.
+     * 
+     * @return Session
+     */
     public Session getSession() {
         return this.session;
     }
 
+    /**
+     * Create a keyspace in Cassandra.
+     * 
+     * @param keyspace
+     */
     public void createKeyspace(String keyspace) {
         Map<String, String> replicationSimpleOneExtra = new Hashtable<String, String>();
         replicationSimpleOneExtra.put("'class'", "'SimpleStrategy'");
@@ -90,6 +137,13 @@ public class CassandraUtils {
         executeQuery(query);
     }
 
+    /**
+     * Checks if a keyspace exists in Cassandra.
+     * 
+     * @param keyspace
+     * @param showLog
+     * @return boolean
+     */
     public boolean existsKeyspace(String keyspace, boolean showLog) {
         this.metadata = cluster.getMetadata();
         if (this.metadata.getKeyspaces().isEmpty()) {
@@ -106,6 +160,11 @@ public class CassandraUtils {
         return false;
     }
 
+    /**
+     * Get a list of the existing keyspaces in Cassandra.
+     * 
+     * @return
+     */
     public List<String> getKeyspaces() {
         ArrayList<String> result = new ArrayList<String>();
         this.metadata = this.cluster.getMetadata();
@@ -118,18 +177,42 @@ public class CassandraUtils {
         return result;
     }
 
+    /**
+     * Drop a keyspace in Cassandra.
+     * 
+     * @param keyspace
+     */
     public void dropKeyspace(String keyspace) {
         executeQuery(this.queryUtils.dropKeyspaceQuery(false, keyspace));
     }
 
+    /**
+     * Drop a keyspace in Cassandra.
+     * 
+     * @param ifExists
+     * @param keyspace
+     */
     public void dropKeyspace(boolean ifExists, String keyspace) {
         executeQuery(this.queryUtils.dropKeyspaceQuery(ifExists, keyspace));
     }
 
+    /**
+     * Use a keyspace in Cassandra.
+     * 
+     * @param keyspace
+     */
     public void useKeyspace(String keyspace) {
         executeQuery(this.queryUtils.useQuery(keyspace));
     }
 
+    /**
+     * Checks if a keyspace contains an especific table.
+     * 
+     * @param keyspace
+     * @param table
+     * @param showLog
+     * @return
+     */
     public boolean existsTable(String keyspace, String table, boolean showLog) {
         this.metadata = this.cluster.getMetadata();
 
@@ -147,6 +230,12 @@ public class CassandraUtils {
         return false;
     }
 
+    /**
+     * Get tables of a keyspace.
+     * 
+     * @param keyspace
+     * @return
+     */
     public List<String> getTables(String keyspace) {
         ArrayList<String> result = new ArrayList<String>();
         this.metadata = this.cluster.getMetadata();
@@ -162,6 +251,12 @@ public class CassandraUtils {
         return result;
     }
 
+    /**
+     * Drop a table of a keyspace.
+     * 
+     * @param keyspace
+     * @param table
+     */
     public void dropTable(String keyspace, String table) {
         // se elimina la table
         executeQuery(this.queryUtils.dropTableQuery(false, table));

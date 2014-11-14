@@ -16,43 +16,71 @@ import com.thoughtworks.selenium.SeleniumException;
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
 
+/**
+ * @author Javier Delgado
+ * @author Hugo Dominguez
+ */
 public class HookGSpec extends BaseGSpec {
 
+    public static final int ORDER_10 = 10;
+    public static final int ORDER_20 = 20;
+    public static final int PAGE_LOAD_TIMEOUT = 120;
+    public static final int IMPLICITLY_WAIT = 10;
+    public static final int SCRIPT_TIMEOUT = 30;
+
+    /**
+     * Default constructor.
+     * @param spec
+     */
     public HookGSpec(CommonG spec) {
         this.commonspec = spec;
     }
 
+    /**
+     * Clean the exception list.
+     */
     @Before(order = 0)
     public void globalSetup() {
         commonspec.getLogger().info("Clearing exception list");
         commonspec.getExceptions().clear();
     }
-
-    @Before(order = 10, value = "@C*")
+    /**
+     * Connect to Cassandra.
+     */
+    @Before(order = ORDER_10, value = "@C*")
     public void cassandraSetup() {
         commonspec.getLogger().info("Setting up C* client");
         commonspec.getCassandraClient().connect();
     }
-
-    @Before(order = 10, value = "@MongoDB")
+    /**
+     * Connect to MongoDB.
+     */
+    @Before(order = ORDER_10, value = "@MongoDB")
     public void mongoSetup() {
         commonspec.getLogger().info("Setting up MongoDB client");
         commonspec.getMongoDBClient().connectToMongoDB();
     }
-
-    @Before(order = 10, value = "@elasticsearch")
+/**
+ * Connect to ElasticSearch.
+ */
+    @Before(order = ORDER_10, value = "@elasticsearch")
     public void elasticsearchSetup() {
         commonspec.getLogger().info("Setting up elasticsearch client");
         commonspec.getElasticSearchClient().connect();
     }
-
-    @Before(order = 10, value = "@Aerospike")
+/**
+ * Connect to Aerospike.
+ */
+    @Before(order = ORDER_10, value = "@Aerospike")
     public void aerospikeSetup() {
         commonspec.getLogger().info("Setting up Aerospike client");
         commonspec.getAerospikeClient().connect();
     }
-
-    @Before(order = 10, value = "@web")
+/**
+ * Connect to selenium.
+ * @throws MalformedURLException
+ */
+    @Before(order = ORDER_10, value = "@web")
     public void seleniumSetup() throws MalformedURLException {
         String b = ThreadProperty.get("browser");
         if ("".equals(b)) {
@@ -83,16 +111,18 @@ public class HookGSpec extends BaseGSpec {
         String grid = System.getProperty("SELENIUM.GRID", "127.0.0.1:4444");
         grid = "http://" + grid + "/wd/hub";
         commonspec.setDriver(new RemoteWebDriver(new URL(grid), capabilities));
-        commonspec.getDriver().manage().timeouts().pageLoadTimeout(120, TimeUnit.SECONDS);
-        commonspec.getDriver().manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-        commonspec.getDriver().manage().timeouts().setScriptTimeout(30, TimeUnit.SECONDS);
+        commonspec.getDriver().manage().timeouts().pageLoadTimeout(PAGE_LOAD_TIMEOUT, TimeUnit.SECONDS);
+        commonspec.getDriver().manage().timeouts().implicitlyWait(IMPLICITLY_WAIT, TimeUnit.SECONDS);
+        commonspec.getDriver().manage().timeouts().setScriptTimeout(SCRIPT_TIMEOUT, TimeUnit.SECONDS);
 
         commonspec.getDriver().manage().deleteAllCookies();
         commonspec.getDriver().manage().window().maximize();
 
     }
-
-    @After(order = 20, value = "@web")
+    /**
+     * Close selenium web driver.
+     */
+    @After(order = ORDER_20, value = "@web")
     public void seleniumTeardown() {
         if (commonspec.getDriver() != null) {
             commonspec.getLogger().info("Shutdown Selenium client");
@@ -100,31 +130,41 @@ public class HookGSpec extends BaseGSpec {
             commonspec.getDriver().quit();
         }
     }
-
-    @After(order = 20, value = "@C*")
+/**
+ * Close cassandra connection.
+ */
+    @After(order = ORDER_20, value = "@C*")
     public void cassandraTeardown() {
         commonspec.getLogger().info("Shutdown  C* client");
         commonspec.getCassandraClient().disconnect();
     }
-
-    @After(order = 20, value = "@MongoDB")
+/**
+ * Close MongoDB Connection.
+ */
+    @After(order = ORDER_20, value = "@MongoDB")
     public void mongoTeardown() {
         commonspec.getLogger().info("Shutdown MongoDB client");
         commonspec.getMongoDBClient().disconnect();
     }
-
-    @After(order = 20, value = "@elasticsearch")
+/**
+ * Close ElasticSearch connection.
+ */
+    @After(order = ORDER_20, value = "@elasticsearch")
     public void elasticsearchTeardown() {
         commonspec.getLogger().info("Shutdown elasticsearch client");
         commonspec.getElasticSearchClient().disconnect();
     }
-
-    @After(order = 20, value = "@Aerospike")
+/**
+ * Close aerospike connection.
+ */
+    @After(order = ORDER_20, value = "@Aerospike")
     public void aerospikeTeardown() {
         commonspec.getLogger().info("Shutdown Aerospike client");
         commonspec.getAerospikeClient().disconnect();
     }
-
+/**
+ * Close logger.
+ */
     @After(order = 0)
     public void teardown() {
         commonspec.getLogger().info("Ended running hooks");

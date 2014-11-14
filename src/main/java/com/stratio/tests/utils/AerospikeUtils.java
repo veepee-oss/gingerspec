@@ -16,19 +16,27 @@ import com.aerospike.client.query.RecordSet;
 import com.aerospike.client.query.Statement;
 
 import cucumber.api.DataTable;
-
+/**
+ * @author Javier Delgado
+ * @author Hugo Dominguez
+ *
+ */
 public class AerospikeUtils {
-
+    private static final int DEFAULT_TIMEOUT = 50;
     private static final Logger LOGGER = LoggerFactory.getLogger(AerospikeUtils.class);
     private final String host;
     private final Integer port;
     private AerospikeClient client;
-
+/**
+ * Constructor Aerospike utils.
+ */
     public AerospikeUtils() {
         this.host = System.getProperty("AEROSPIKE_HOST", "127.0.0.1");
         this.port = Integer.parseInt(System.getProperty("AEROSPIKE_PORT", "3000"));
     }
-
+/**
+ * Connect to aerospike host.
+ */
     public void connect() {
         Host[] hosts = new Host[] { new Host(this.host, this.port) };
         try {
@@ -38,19 +46,29 @@ public class AerospikeUtils {
             LOGGER.error("Unable to connect to Aerospike", e);
         }
     }
-
+/**
+ * Check if it has connection with the aerospike server.
+ * @return
+ */
     public boolean isConnected() {
         return client.isConnected();
     }
-
+/**
+ * Disconnect of the Aerospike Server.
+ */
     public void disconnect() {
         client.close();
     }
-
+/**
+ * Insert data in Aerospike table..
+ * @param nameSpace
+ * @param tableName
+ * @param table
+ */
     public void insertFromDataTable(String nameSpace, String tableName, DataTable table) {
         // Primero comprobamos el numero de filas del datable
         WritePolicy writePolicy = new WritePolicy();
-        writePolicy.timeout = 50;
+        writePolicy.timeout = DEFAULT_TIMEOUT;
         List<List<String>> tableAsList = table.raw();
         // (Se resta uno porque la primera fila indica los columnNames)
         int iKey = tableAsList.size();
@@ -80,7 +98,12 @@ public class AerospikeUtils {
         }
         return bins;
     }
-
+/**
+ * Read a table from aerospike.
+ * @param nameSpace
+ * @param table
+ * @return
+ */
     public RecordSet readTable(String nameSpace, String table) {
         Statement stmt = new Statement();
         stmt.setNamespace(nameSpace);
@@ -91,6 +114,7 @@ public class AerospikeUtils {
         } catch (AerospikeException e) {
             LOGGER.error("ERROR : " + e.getMessage());
         }
+        stmt = null;
         return rs;
     }
 

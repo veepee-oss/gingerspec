@@ -11,33 +11,53 @@ import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
-
+/**
+ * @author Hugo Dominguez
+ *@author Javier Delgado
+ */
 public abstract class BaseGTest {
 
-    final Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
-
+    private final Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
+    /**
+     * Method executed before a suite.
+     * @param context
+     */
     @BeforeSuite(alwaysRun = true)
     public void beforeGSuite(ITestContext context) {
     }
-
+    /**
+     * Method executed before a suite.
+     * @param context
+     */
     @AfterSuite(alwaysRun = true)
     public void afterGSuite(ITestContext context) {
         logger.info("Done executing this test-run.");
     }
-
+    /**
+     * Method executed before a test class.
+     * @param context
+     */
     @BeforeClass(alwaysRun = true)
     public void beforeGClass(ITestContext context) {
         ThreadProperty.set("class", this.getClass().getCanonicalName());
     }
-
+    /**
+     * Method executed after a test method.
+     * @param method
+     */
     @BeforeMethod(alwaysRun = true)
     public void beforeGMethod(Method method) {
     }
-
+    /**
+     * Method executed before method.
+     * @param method
+     */
     @AfterMethod(alwaysRun = true)
     public void afterGMethod(Method method) {
     }
-
+    /**
+     * Method executed before a class.
+     */
     @AfterClass()
     public void afterGClass() {
     }

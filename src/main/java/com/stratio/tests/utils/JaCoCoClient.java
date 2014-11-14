@@ -12,7 +12,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.ITestContext;
 import org.testng.TestListenerAdapter;
-
+/**
+ * Jacoco client for Server coverages.
+ * @author Hugo dominguez
+ * @author Javier Delgado
+ *
+ */
 public class JaCoCoClient extends TestListenerAdapter {
 
     private static final String DESTFILE = "target/executions/jacoco-client.exec";

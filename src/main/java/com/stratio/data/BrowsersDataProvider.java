@@ -19,11 +19,26 @@ import org.testng.ITestContext;
 import org.testng.annotations.DataProvider;
 
 import com.google.common.collect.Lists;
-
-public class BrowsersDataProvider {
-
+/**
+ * @author Javier Delgado
+ * @author Hugo Dominguez
+ *
+ */
+public final class BrowsersDataProvider {
+    public static final int DEFAULT_TIMEOUT = 20000;
+    public static final int DEFAULT_GROUP = 3;
+    public static final int DEFAULT_LESS_LENGTH = 4;
     private static final Logger logger = LoggerFactory.getLogger(BrowsersDataProvider.class);
 
+    private BrowsersDataProvider(){
+        }
+    /**
+     * 
+     * @param context
+     * @param testConstructor
+     * @return
+     * @throws Exception
+     */
     @DataProvider(parallel = true)
     public static Iterator<String[]> availableBrowsers(ITestContext context, Constructor<?> testConstructor)
             throws Exception {
@@ -49,7 +64,7 @@ public class BrowsersDataProvider {
         grid = "http://" + grid + "/grid/console";
         Document doc;
         try {
-            doc = Jsoup.connect(grid).timeout(20000).get();
+            doc = Jsoup.connect(grid).timeout(DEFAULT_TIMEOUT).get();
         } catch (IOException e) {
             logger.error("Exception on connecting to Selenium grid: {}", e.getMessage());
             return response;
@@ -68,7 +83,7 @@ public class BrowsersDataProvider {
                         Pattern pat = Pattern.compile("browserName=(.*?),.*?(version=(.*?))?}");
                         Matcher m = pat.matcher(browserDetails.attr("title"));
                         while (m.find()) {
-                            response.add(m.group(1) + "_" + m.group(3));
+                            response.add(m.group(1) + "_" + m.group(DEFAULT_GROUP));
                         }
                     } else {
                         String version = busyBrowserList.get(iBusy).parent().text();
@@ -77,7 +92,7 @@ public class BrowsersDataProvider {
                         version = version.replace(browser, "");
                         String browserSrc = busyBrowserList.get(iBusy).select("img").attr("src");
                         if (!browserSrc.equals("")) {
-                            browser = browserSrc.substring(browserSrc.lastIndexOf("/") + 1, browserSrc.length() - 4);
+                            browser = browserSrc.substring(browserSrc.lastIndexOf('/') + 1, browserSrc.length() - DEFAULT_LESS_LENGTH);
                         }
                         response.add(browser + "_" + version);
                         iBusy++;

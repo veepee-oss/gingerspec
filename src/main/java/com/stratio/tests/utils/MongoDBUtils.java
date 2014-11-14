@@ -18,20 +18,30 @@ import com.mongodb.MongoClient;
 
 import cucumber.api.DataTable;
 
+/**
+ * Generic operations over MongoDB Driver.
+ * @author Hugo Dominguez
+ * @autor Javier Delgado
+ *
+ */
 public class MongoDBUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MongoDBUtils.class);
 
     private final String host;
     private final int port;
-    private static MongoClient mongoClient;
+    private MongoClient mongoClient;
     private DB dataBase;
-
+/**
+ * Generic constructor.
+ */
     public MongoDBUtils() {
         this.host = System.getProperty("MONGO_HOST", "127.0.0.1");
         this.port = Integer.parseInt(System.getProperty("MONGO_PORT", "27017"));
     }
-
+/**
+ * Connect to MongoDB Host.
+ */
     public void connectToMongoDB() {
         try {
             LOGGER.debug("Initializing MongoDB client");
@@ -40,32 +50,56 @@ public class MongoDBUtils {
             LOGGER.error("Unable to connect to MongoDB", e);
         }
     }
-
+/**
+ * Disconnect of MongoDB host.
+ */
     public void disconnect() {
         mongoClient.close();
     }
-
+/**
+ * Connect to DataBase of MongoDB(If it not exists, it will be created).
+ * @param db
+ */
     public void connectToMongoDBDataBase(String db) {
         dataBase = mongoClient.getDB(db);
     }
-
+/**
+ * Checks if a database exists in MongoDB.
+ * @param dataBaseName
+ * @return
+ */
     public boolean exitsMongoDbDataBase(String dataBaseName) {
         List<String> dataBaseList = mongoClient.getDatabaseNames();
         return dataBaseList.contains(dataBaseName);
     }
-
+/**
+ * Checks if a collection exists in a MongoDB dataBase.
+ * @param colName
+ * @return
+ */
     public boolean exitsCollections(String colName) {
         return dataBase.collectionExists(colName);
     }
-
+/**
+ * Get a list of collections of a database.
+ * @return List of collections of a database.
+ */
     public Set<String> getMongoDBCollections() {
         return dataBase.getCollectionNames();
     }
-
+/**
+ * Get a MongoDB collection.
+ * @param collectionName
+ * @return DBCollection
+ */
     public DBCollection getMongoDBCollection(String collectionName) {
         return dataBase.getCollection(collectionName);
     }
-
+/**
+ * Create a MongoDB collection.
+ * @param colectionName
+ * @param options
+ */
     public void createMongoDBCollection(String colectionName, DataTable options) {
         BasicDBObject aux = new BasicDBObject();
         // Recorremos las options para castearlas y añadirlas a la collection
@@ -82,15 +116,24 @@ public class MongoDBUtils {
         }
         dataBase.createCollection(colectionName, aux);
     }
-
+/**
+ * Drop a MongoDB DataBase.
+ * @param dataBaseName
+ */
     public void dropMongoDBDataBase(String dataBaseName) {
         mongoClient.dropDatabase(dataBaseName);
     }
-
+/**
+ * Drop a MongoDBCollection.
+ * @param collectionName
+ */
     public void dropMongoDBCollection(String collectionName) {
         getMongoDBCollection(collectionName).drop();
     }
-
+/**
+ * Drop all the data associated to a MongoDB Collection.
+ * @param collectionName
+ */
     public void dropAllDataMongoDBCollection(String collectionName) {
         DBCollection db = getMongoDBCollection(collectionName);
         DBCursor objectsList = db.find();
@@ -102,7 +145,11 @@ public class MongoDBUtils {
             objectsList.close();
         }
     }
-
+/**
+ * Insert data in a MongoDB Collection.
+ * @param collection
+ * @param table
+ */
     public void insertIntoMongoDBCollection(String collection, DataTable table) {
         // Primero pasamos la fila del datatable a un hashmap de ColumnName-Type
         List<String[]> colRel = coltoArrayList(table);
@@ -119,7 +166,12 @@ public class MongoDBUtils {
             this.dataBase.getCollection(collection).insert(doc);
         }
     }
-
+/**
+ * Read data from a MongoDB collection.
+ * @param collection
+ * @param table
+ * @return List<DBObjects>
+ */
     public List<DBObject> readFromMongoDBCollection(String collection, DataTable table) {
         List<DBObject> res = new ArrayList<DBObject>();
         List<String[]> colRel = coltoArrayList(table);

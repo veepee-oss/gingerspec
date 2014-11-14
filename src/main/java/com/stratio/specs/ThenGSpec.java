@@ -40,12 +40,36 @@ import cucumber.api.DataTable;
 import cucumber.api.Transform;
 import cucumber.api.java.en.Then;
 
+/**
+ * @author Hugo Dominguez
+ * @author Javier Delgado
+ * 
+ *         Then generic Specs that could be used in tests projects.
+ */
+
 public class ThenGSpec extends BaseGSpec {
 
+    public static final int VALUE_SUBSTRING = 3;
+
+    /**
+     * Class constructor.
+     * 
+     * @param spec
+     */
     public ThenGSpec(CommonG spec) {
         this.commonspec = spec;
     }
 
+    /**
+     * Checks if an exception has been thrown.
+     * 
+     * @param exception
+     *            : "IS NOT" | "IS"
+     * @param foo
+     * @param clazz
+     * @param bar
+     * @param exceptionMsg
+     */
     @Then("^an exception '(.*?)' thrown( with class '(.*?)'( and message like '(.*?)')?)?")
     public void assertExceptionNotThrown(String exception, String foo, String clazz, String bar, String exceptionMsg)
             throws ClassNotFoundException {
@@ -71,6 +95,11 @@ public class ThenGSpec extends BaseGSpec {
         }
     }
 
+    /**
+     * Checks if a keyspaces exists in Cassandra.
+     * 
+     * @param keyspace
+     */
     @Then("^a Casandra keyspace '(.*?)' exists$")
     public void assertKeyspaceOnCassandraExists(String keyspace) {
         commonspec.getLogger().info("Verifying if the keyspace {} exists", keyspace);
@@ -78,6 +107,12 @@ public class ThenGSpec extends BaseGSpec {
                 hasItem(keyspace));
     }
 
+    /**
+     * Checks if a cassandra keyspace contains a table.
+     * 
+     * @param keyspace
+     * @param tableName
+     */
     @Then("^a Casandra keyspace '(.*?)' contains a table '(.*?)'$")
     public void assertTableExistsOnCassandraKeyspace(String keyspace, String tableName) {
         commonspec.getLogger().info("Verifying if the table {} exists in the keyspace {}", tableName, keyspace);
@@ -85,15 +120,31 @@ public class ThenGSpec extends BaseGSpec {
                 .getTables(keyspace), hasItem(tableName));
     }
 
+    /**
+     * Checks the number of rows in a cassandra table.
+     * 
+     * @param keyspace
+     * @param tableName
+     * @param numberRows
+     */
     @Then("^a Casandra keyspace '(.*?)' contains a table '(.*?)' with '(.*?)' rows$")
     public void assertRowNumberOfTableOnCassandraKeyspace(String keyspace, String tableName, String numberRows) {
+        Long numberRowsLong = Long.parseLong(numberRows);
         commonspec.getLogger().info("Verifying if the keyspace {} exists", keyspace);
         commonspec.getCassandraClient().useKeyspace(keyspace);
         assertThat("The table " + tableName + "exists on cassandra",
                 commonspec.getCassandraClient().executeQuery("SELECT COUNT(*) FROM " + tableName + ";").all().get(0)
-                        .getLong(0), equalTo(new Long(numberRows)));
+                        .getLong(0), equalTo(numberRowsLong));
     }
 
+    /**
+     * Checks if a cassandra table contains the values of a DataTable.
+     * 
+     * @param keyspace
+     * @param tableName
+     * @param data
+     * @throws InterruptedException
+     */
     @Then("^a Casandra keyspace '(.*?)' contains a table '(.*?)' with values:$")
     public void assertValuesOfTable(String keyspace, String tableName, DataTable data) throws InterruptedException {
         // Primero hacemos USE del Keyspace
@@ -116,14 +167,14 @@ public class ThenGSpec extends BaseGSpec {
             List<Row> resAsList = res.all();
             assertThat("The query " + execQuery + " not return any result on Cassandra", resAsList.size(),
                     greaterThan(0));
-            assertThat("The resultSet is not as expected", resAsList.get(0).toString().substring(3), equalTo(data.raw()
-                    .get(index).toString()));
+            assertThat("The resultSet is not as expected", resAsList.get(0).toString().substring(VALUE_SUBSTRING),
+                    equalTo(data.raw().get(index).toString()));
             index++;
         }
     }
 
     @SuppressWarnings("rawtypes")
-    public void equalsColumns(ColumnDefinitions resCols, Map<String, String> dataTableColumns) {
+    private void equalsColumns(ColumnDefinitions resCols, Map<String, String> dataTableColumns) {
         Iterator it = dataTableColumns.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry e = (Map.Entry) it.next();
@@ -133,13 +184,13 @@ public class ThenGSpec extends BaseGSpec {
         }
     }
 
-    public void checkhatcolumnNameExists(String resultSetColumns, String columnName) {
+    private void checkhatcolumnNameExists(String resultSetColumns, String columnName) {
         String[] aux = resultSetColumns.split("\\p{Punct}");
         ArrayList<String> test = new ArrayList<String>(Arrays.asList(aux));
         assertThat("The column " + columnName + " does not exists.", test, hasItem(columnName));
     }
 
-    public List<String> giveQueriesList(DataTable data, String tableName, String colNames) {
+    private List<String> giveQueriesList(DataTable data, String tableName, String colNames) {
         List<String> queryList = new ArrayList<String>();
         for (int i = 1; i < data.raw().size(); i++) {
             String query = "SELECT " + colNames + " FROM " + tableName;
@@ -150,38 +201,39 @@ public class ThenGSpec extends BaseGSpec {
         return queryList;
     }
 
-    public String conditionWhere(List<String> values, String[] columnNames) {
-
-        String condition = " WHERE ";
+    private String conditionWhere(List<String> values, String[] columnNames) {
+        StringBuilder condition = new StringBuilder();
+        condition.append(" WHERE ");
         Pattern numberPat = Pattern.compile("^\\d+(\\.*\\d*)?");
         Pattern booleanPat = Pattern.compile("true|false");
         for (int i = 0; i < values.size() - 1; i++) {
+            condition.append(columnNames[i]).append(" =");
             if (numberPat.matcher(values.get(i)).matches() || booleanPat.matcher(values.get(i)).matches()) {
-                condition += columnNames[i] + " = " + values.get(i) + " AND ";
+                condition.append(" ").append(values.get(i)).append(" AND ");
             } else {
-                condition += columnNames[i] + " = '" + values.get(i) + "' AND ";
+                condition.append(" '").append(values.get(i)).append("' AND ");
             }
         }
+        condition.append(columnNames[columnNames.length - 1]).append(" =");
         if (numberPat.matcher(values.get(values.size() - 1)).matches()
                 || booleanPat.matcher(values.get(values.size() - 1)).matches()) {
-            condition += columnNames[columnNames.length - 1] + " = " + values.get(values.size() - 1);
+            condition.append(" ").append(values.get(values.size() - 1));
         } else {
-            condition += columnNames[columnNames.length - 1] + " = '" + values.get(values.size() - 1) + "'";
+            condition.append(" '").append(values.get(values.size() - 1)).append("'");
         }
-        return condition;
+        return condition.toString();
     }
 
-    public String columnNames(List<String> firstRow) {
-        String columnNamesForQuery = "";
+    private String columnNames(List<String> firstRow) {
+        StringBuilder columnNamesForQuery = new StringBuilder();
         for (String s : firstRow) {
             String[] aux = s.split("-");
-            columnNamesForQuery += aux[0] + ",";
+            columnNamesForQuery.append(aux[0]).append(",");
         }
-        columnNamesForQuery = columnNamesForQuery.substring(0, columnNamesForQuery.length() - 1);
-        return columnNamesForQuery;
+        return columnNamesForQuery.toString().substring(0, columnNamesForQuery.length() - 1);
     }
 
-    public Map<String, String> extractColumnNamesAndTypes(List<String> firstRow) {
+    private Map<String, String> extractColumnNamesAndTypes(List<String> firstRow) {
         HashMap<String, String> columns = new HashMap<String, String>();
         for (String s : firstRow) {
             String[] aux = s.split("-");
@@ -190,6 +242,13 @@ public class ThenGSpec extends BaseGSpec {
         return columns;
     }
 
+    /**
+     * Checks if the index has a specific content.
+     * 
+     * @param indexName
+     * @param type
+     * @param data
+     */
     @Then("^the '(.*?)' index has a type '(.*?)' with content \\(key and value\\): '(.*?)'$")
     public void assertIndexHasContent(String indexName, String type, String data) {
         commonspec.getLogger().info("Verifying elasticseach content existance");
@@ -219,6 +278,13 @@ public class ThenGSpec extends BaseGSpec {
         assertThat("Event not found at elastic search index", cleanResponseList, hasItem(data));
     }
 
+    /**
+     * Checks the values of a Aerospike table.
+     * 
+     * @param nameSpace
+     * @param tableName
+     * @param data
+     */
     @Then("^checking if a Aerospike namespace '(.*?)' with table '(.*?)' and data exists:$")
     public void assertValuesOfTableAeroSpike(String nameSpace, String tableName, DataTable data) {
         commonspec.getLogger().info("Verifying if the nameSpace {} exists and tableName {} exists on Aerospike",
@@ -227,6 +293,13 @@ public class ThenGSpec extends BaseGSpec {
         assertThat("The table does not contains the data required.", rs, containedInRecordSet(data));
     }
 
+    /**
+     * Checks the values of a MongoDB table.
+     * 
+     * @param dataBase
+     * @param tableName
+     * @param data
+     */
     @Then("^a Mongo dataBase '(.*?)' contains a table '(.*?)' with values:")
     public void assertValuesOfTableMongo(String dataBase, String tableName, DataTable data) {
         commonspec.getLogger().info("Verifying if the dataBase {} exists and tableName {} exists on MongoDB", dataBase,
@@ -238,6 +311,12 @@ public class ThenGSpec extends BaseGSpec {
 
     }
 
+    /**
+     * Checks if a MongoDB database contains a table.
+     * 
+     * @param database
+     * @param tableName
+     */
     @Then("^a Mongo dataBase '(.*?)' doesnt contains a table '(.*?)'$")
     public void aMongoDataBaseContainsaTable(String database, String tableName) {
         commonspec.getLogger().info("Verifying if the dataBase {} contains the table {}", database, tableName);
@@ -246,6 +325,11 @@ public class ThenGSpec extends BaseGSpec {
         assertThat("The Mongo dataBase contains the table", collectionsNames, not(hasItem(tableName)));
     }
 
+    /**
+     * Check if a text exists in a source.
+     * 
+     * @param text
+     */
     @Then("^a text '(.*?)' exists$")
     public void assertTextInSource(String text) {
         commonspec.getLogger().info("Verifying if our current page contains the text {}", text);
@@ -253,10 +337,19 @@ public class ThenGSpec extends BaseGSpec {
                 .contains(text);
     }
 
+    /**
+     * Checks if it is not thrown an error.
+     */
     @Then("^no error is thrown$")
     public void assertNoError() {
     }
 
+    /**
+     * Checks if an element has an expecific text.
+     * 
+     * @param target
+     * @param texts
+     */
     @Then("^an element '(.*?)' has '(.*?)' as content$")
     public void assertTextInElement(String target, @Transform(ArrayListConverter.class) ArrayList<String> texts) {
         commonspec.getLogger().info("Verifying text content of elements {}", texts);

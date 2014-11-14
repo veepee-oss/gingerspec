@@ -37,8 +37,16 @@ import com.stratio.assertions.SeleniumAssert;
 import com.stratio.tests.utils.HashUtils;
 import com.stratio.tests.utils.ThreadProperty;
 
+/**
+ * @author Javier Delgado
+ * @author Hugo Dominguez
+ * 
+ */
 @Aspect
 public class SeleniumAspect {
+
+    private static final long DEFAULT_CURRENT_TIME = 1000L;
+    private static final int DEFAULT_SLEEP_TIME = 1500;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
 
@@ -47,6 +55,12 @@ public class SeleniumAspect {
     protected void exceptionCallPointcut() {
     }
 
+    /**
+     * 
+     * @param pjp
+     * @return
+     * @throws Throwable
+     */
     @Around(value = "exceptionCallPointcut()")
     public Object aroundExceptionCalls(ProceedingJoinPoint pjp) throws Throwable {
         Object retVal = null;
@@ -127,11 +141,11 @@ public class SeleniumAspect {
             y += tmpImg.getHeight();
         }
 
-        long ts = System.currentTimeMillis() / 1000L;
+        long ts = System.currentTimeMillis() / DEFAULT_CURRENT_TIME;
 
         File temp;
 
-        temp = File.createTempFile("chromecap" + String.valueOf(ts), ".png");
+        temp = File.createTempFile("chromecap" + Long.toString(ts), ".png");
         temp.deleteOnExit();
         ImageIO.write(img, "png", temp);
 
@@ -151,7 +165,7 @@ public class SeleniumAspect {
         Integer newTrailingImageHeight = 0;
 
         while (!atBottom) {
-            Thread.sleep(1500);
+            Thread.sleep(DEFAULT_SLEEP_TIME);
             capture.add(((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE));
 
             ((JavascriptExecutor) driver).executeScript("if(window.screen)" + " {window.scrollBy(0," + windowSize
@@ -203,6 +217,7 @@ public class SeleniumAspect {
 
                 File fout = new File(outputFile);
                 boolean dirs = fout.getParentFile().mkdirs();
+
                 FileOutputStream fos = new FileOutputStream(fout, true);
 
                 Writer out = new OutputStreamWriter(fos, "UTF8");

@@ -4,16 +4,38 @@ import org.assertj.core.api.AbstractAssert;
 
 import com.stratio.tests.utils.HttpResponse;
 
+/**
+ * @author Javier Delgado
+ * @author Hugo Dominguez
+ * 
+ */
 public class HttpResponseAssert extends AbstractAssert<HttpResponseAssert, HttpResponse> {
 
+    /**
+     * Generic constructor.
+     * 
+     * @param actual
+     */
     public HttpResponseAssert(HttpResponse actual) {
         super(actual, HttpResponseAssert.class);
     }
 
+    /**
+     * Checks the actual "http" response.
+     * 
+     * @param actual
+     * @return HttpResponseAssert
+     */
     public static HttpResponseAssert assertThat(HttpResponse actual) {
         return new HttpResponseAssert(actual);
     }
 
+    /**
+     * Checks if a HttpResponse has an specific status.
+     * 
+     * @param status
+     * @return HttpResponseAssert
+     */
     public HttpResponseAssert hasStatusCode(Integer status) {
         if (actual.getStatusCode() != status) {
             failWithMessage("Expected response status code to be <%s> but was <%s>", status, actual.getStatusCode());
@@ -21,6 +43,12 @@ public class HttpResponseAssert extends AbstractAssert<HttpResponseAssert, HttpR
         return this;
     }
 
+    /**
+     * Checks if a HttpResponse has not an specific status.
+     * 
+     * @param status
+     * @return
+     */
     public HttpResponseAssert doesNotHaveStatusCode(Integer status) {
         if (actual.getStatusCode() == status) {
             failWithMessage("Expected response status code not to be <%s> but was <%s>", status, actual.getStatusCode());
@@ -28,6 +56,12 @@ public class HttpResponseAssert extends AbstractAssert<HttpResponseAssert, HttpR
         return this;
     }
 
+    /**
+     * Checks if a HttpResponse has a specific message.
+     * 
+     * @param message
+     * @return HttpResponseAssert
+     */
     public HttpResponseAssert hasMessage(String message) {
 
         if (!actual.getResponse().contains(message)) {
@@ -36,6 +70,12 @@ public class HttpResponseAssert extends AbstractAssert<HttpResponseAssert, HttpR
         return this;
     }
 
+    /**
+     * Checks if a HttpResponse has not a specific message.
+     * 
+     * @param message
+     * @return HttpResponseAssert
+     */
     public HttpResponseAssert doesNotHaveMessage(String message) {
 
         if (actual.getResponse().contains(message)) {
@@ -44,6 +84,13 @@ public class HttpResponseAssert extends AbstractAssert<HttpResponseAssert, HttpR
         return this;
     }
 
+    /**
+     * Checks if a HttpResponse has a specific message and has a specific status.
+     * 
+     * @param status
+     * @param message
+     * @return HttpResponseAssert
+     */
     public HttpResponseAssert hasStatusCodeAndMessage(Integer status, String message) {
 
         String msg = "";
@@ -65,6 +112,13 @@ public class HttpResponseAssert extends AbstractAssert<HttpResponseAssert, HttpR
         return this;
     }
 
+    /**
+     * Checks if a HttpResponse has not a specific message and has not a specific status.
+     * 
+     * @param status
+     * @param message
+     * @return HttpResponseAssert
+     */
     public HttpResponseAssert doesNotHaveStatusCodeNorMessage(Integer status, String message) {
 
         String msg = "";

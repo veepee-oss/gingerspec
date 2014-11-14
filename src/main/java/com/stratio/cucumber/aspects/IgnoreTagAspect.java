@@ -17,7 +17,11 @@ import org.slf4j.LoggerFactory;
 
 import cucumber.runtime.Runtime;
 import cucumber.runtime.model.CucumberScenario;
-
+/**
+ * @author Javier Delgado
+ * @author Hugo Dominguez
+ *
+ */
 @Aspect
 public class IgnoreTagAspect {
 
@@ -27,7 +31,14 @@ public class IgnoreTagAspect {
             + "args (formatter, reporter, runtime)")
     protected void addIgnoreTagPointcutScenario(Formatter formatter, Reporter reporter, Runtime runtime) {
     }
-
+/**
+ * 
+ * @param pjp
+ * @param formatter
+ * @param reporter
+ * @param runtime
+ * @throws Throwable
+ */
     @Around(value = "addIgnoreTagPointcutScenario(formatter, reporter, runtime)")
     public void aroundAddIgnoreTagPointcut(ProceedingJoinPoint pjp, Formatter formatter, Reporter reporter,
             Runtime runtime) throws Throwable {

@@ -1,6 +1,19 @@
 package com.stratio.tests.utils;
 
-public class HashUtils {
+/**
+ * @author Javier Delgado
+ * @author Hugo Dominguez
+ * 
+ */
+public final class HashUtils {
+
+    private HashUtils() {
+    }
+/**
+ * doHash
+ * @param str
+ * @return
+ */
     public static String doHash(String str) {
 
         Integer hash = 7;

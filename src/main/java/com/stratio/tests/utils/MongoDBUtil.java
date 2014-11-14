@@ -1,5 +1,10 @@
 package com.stratio.tests.utils;
-
+/**
+ * Singelton class of MongoDBUtils.
+ * @author Hugo Dominguez
+ * @author Javier Delgado
+ *
+ */
 public enum MongoDBUtil {
     INSTANCE;
 

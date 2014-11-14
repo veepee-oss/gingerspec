@@ -23,6 +23,7 @@ public class CucumberRunner {
 
     private final cucumber.runtime.Runtime runtime;
 
+    @SuppressWarnings("unused")
     public CucumberRunner(Class<?> clazz, String... feature) throws IOException, ClassNotFoundException,
             InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         ClassLoader classLoader = clazz.getClassLoader();
@@ -32,7 +33,7 @@ public class CucumberRunner {
                 new Class[] { CucumberOptions.class });
         RuntimeOptions runtimeOptions = runtimeOptionsFactory.create();
 
-        new File("target/executions/").mkdirs();
+        boolean aux = new File("target/executions/").mkdirs();
         CucumberReporter reporter;
         if ((feature.length == 0)) {
             reporter = new CucumberReporter(Utils.toURL("target/executions/" + clazz.getCanonicalName() + ".xml"),
@@ -49,7 +50,7 @@ public class CucumberRunner {
 
         List<String> uniqueGlue = new ArrayList<String>();
         uniqueGlue.add("classpath:com/stratio/specs");
-        uniqueGlue.add("classpath:com/stratio/meta/specs");
+        uniqueGlue.add("classpath:com/stratio/crossdata/specs");
         uniqueGlue.add("classpath:com/stratio/streaming/specs");
         uniqueGlue.add("classpath:com/stratio/ingestion/specs");
         uniqueGlue.add("classpath:com/stratio/datavis/specs");
