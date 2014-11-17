@@ -344,7 +344,7 @@ public class ThenGSpec extends BaseGSpec {
      * @param texts
      */
     @Then("^an element '(.*?)' has '(.*?)' as content$")
-    public void assertTextInElement(String target, @Transform(ArrayListConverter.class) ArrayList<String> texts) {
+    public void assertTextInElement(String target, @Transform(ArrayListConverter.class) List<String> texts) {
         commonspec.getLogger().info("Verifying text content of elements {}", texts);
 
         WebElement elem = commonspec.getDriver().findElement(By.id(target));

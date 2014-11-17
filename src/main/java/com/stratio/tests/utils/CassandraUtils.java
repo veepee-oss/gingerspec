@@ -299,7 +299,7 @@ public class CassandraUtils {
         URL url = CassandraUtils.class.getResource(path);
         LOGGER.debug(url.toString());
         LOGGER.info("Loading script from: " + url);
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream()))) {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream(), "UTF8"))) {
             String line;
             while ((line = br.readLine()) != null) {
                 if (line.length() > 0 && !line.startsWith("#")) {

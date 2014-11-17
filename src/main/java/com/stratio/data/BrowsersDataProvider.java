@@ -43,7 +43,7 @@ public final class BrowsersDataProvider {
     public static Iterator<String[]> availableBrowsers(ITestContext context, Constructor<?> testConstructor)
             throws Exception {
 
-        ArrayList<String> browsers = gridBrowsers();
+        List<String> browsers = gridBrowsers();
         List<String[]> lData = Lists.newArrayList();
 
         for (String s : browsers) {
@@ -57,7 +57,7 @@ public final class BrowsersDataProvider {
         return lData.iterator();
     }
 
-    private static ArrayList<String> gridBrowsers() {
+    private static List<String> gridBrowsers() {
         ArrayList<String> response = new ArrayList<String>();
 
         String grid = System.getProperty("SELENIUM_GRID", "127.0.0.1:4444");

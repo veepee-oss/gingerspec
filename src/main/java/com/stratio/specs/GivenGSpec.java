@@ -157,18 +157,15 @@ public class GivenGSpec extends BaseGSpec {
      */
     @Given("^I browse to '(.*?)'$")
     public void seleniumBrowse(String url) {
-        String urlAux = "";
+        org.assertj.core.api.Assertions.assertThat(url).isNotEmpty();
+        commonspec.getLogger().info("Browsing to {} with {}", url, commonspec.getBrowserName());
         if (url.endsWith("_HOME")) {
             String sutPort = url.replace("_HOME", "_PORT");
-            urlAux = System.getProperty(url, "") + ":" + System.getProperty(sutPort, "")
-                    + System.getProperty("WEB_PATH", "");
-            url = urlAux;
-        }
-        org.assertj.core.api.Assertions.assertThat(url).isNotEmpty();
-        if (!url.startsWith("http://")) {
-            url = "http://" + urlAux;
-        }
-        commonspec.getLogger().info("Browsing to {} with {}", url, commonspec.getBrowserName());
-        commonspec.getDriver().get(url);
+            commonspec.getDriver().get(System.getProperty(url, "") + ":" + System.getProperty(sutPort, "")
+                    + System.getProperty("WEB_PATH", ""));
+        }        
+        else {
+            commonspec.getDriver().get(url);
+        }       
     }
 }
