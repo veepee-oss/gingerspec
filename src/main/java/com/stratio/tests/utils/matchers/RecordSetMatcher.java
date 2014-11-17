@@ -14,22 +14,33 @@ import com.aerospike.client.Record;
 import com.aerospike.client.query.RecordSet;
 
 import cucumber.api.DataTable;
-
+/**
+ * @author Javier Delgado
+ * @author Hugo Dominguez
+ *
+ */
 public class RecordSetMatcher extends TypeSafeMatcher<RecordSet> {
     private final DataTable table;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RecordSetMatcher.class);
 
-    // Constructor
+    /**
+     * Default constructor.
+     * @param table
+     */
     public RecordSetMatcher(DataTable table) {
         this.table = table;
     }
-
+    /**
+     * Checks if a dataTable is contained in a recordSet.
+     * @param table
+     * @return
+     */
     @Factory
     public static RecordSetMatcher containedInRecordSet(DataTable table) {
         return new RecordSetMatcher(table);
     }
-
+    
     @Override
     public void describeTo(Description description) {
         description.appendText("The data of the table is not contained in the RecordSet");

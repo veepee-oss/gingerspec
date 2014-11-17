@@ -8,16 +8,35 @@ import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 
+/**
+ * @author Javier Delgado
+ * @author Hugo Dominguez
+ * 
+ */
 public class ListLastElementExceptionMatcher extends TypeSafeMatcher<List<Exception>> {
     public static final int VALUE = 3;
     private final String clazz;
     private final Pattern messagePattern;
 
+    /**
+     * Checks if the last element has the class and the message.
+     * 
+     * @param clazz
+     * @param regex
+     * @return
+     */
     @Factory
     public static Matcher<List<Exception>> lastElementHasClassAndMessage(String clazz, String regex) {
         return lastElementHasClassAndMessage(clazz, Pattern.compile(".*?" + regex + ".*?"));
     }
 
+    /**
+     * Checks if the last element has the class and the message.
+     * 
+     * @param clazz
+     * @param messagePattern
+     * @return
+     */
     @Factory
     public static Matcher<List<Exception>> lastElementHasClassAndMessage(String clazz, Pattern messagePattern) {
         return new ListLastElementExceptionMatcher(clazz, messagePattern);
@@ -27,7 +46,10 @@ public class ListLastElementExceptionMatcher extends TypeSafeMatcher<List<Except
         this.clazz = clazz;
         this.messagePattern = messagePattern;
     }
-
+/**
+ * Message showed in the case that a test fails.
+ * @param Description
+ */
     public void describeTo(Description description) {
 
         String expectedMessage = String.valueOf(messagePattern);

@@ -19,10 +19,27 @@ import cucumber.runtime.io.MultiLoader;
 import cucumber.runtime.io.ResourceLoader;
 import cucumber.runtime.io.ResourceLoaderClassFinder;
 
+/**
+ * @author Javier Delgado
+ * @author Hugo Dominguez
+ * 
+ */
 public class CucumberRunner {
 
     private final cucumber.runtime.Runtime runtime;
 
+    /**
+     * Default constructor for cucumber Runner.
+     * 
+     * @param clazz
+     * @param feature
+     * @throws IOException
+     * @throws ClassNotFoundException
+     * @throws InstantiationException
+     * @throws IllegalAccessException
+     * @throws NoSuchMethodException
+     * @throws InvocationTargetException
+     */
     @SuppressWarnings("unused")
     public CucumberRunner(Class<?> clazz, String... feature) throws IOException, ClassNotFoundException,
             InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
@@ -74,6 +91,11 @@ public class CucumberRunner {
         runtime = new cucumber.runtime.Runtime(resourceLoader, classFinder, classLoader, runtimeOptions);
     }
 
+    /**
+     * Run the testclases(Features).
+     * 
+     * @throws IOException
+     */
     public void runCukes() throws IOException {
         runtime.run();
     }
