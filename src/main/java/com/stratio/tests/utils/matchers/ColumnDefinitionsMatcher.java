@@ -4,16 +4,28 @@ import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 import org.hamcrest.Factory;
-
+/**
+ * @author Javier Delgado
+ * @author Hugo Dominguez
+ *
+ */
 public class ColumnDefinitionsMatcher extends TypeSafeMatcher<String> {
 
     private final String columnName;
 
-    // Constructor
+    /**
+     * Constructor.
+     * @param columnName
+     */
     public ColumnDefinitionsMatcher(String columnName) {
         this.columnName = columnName;
     }
-
+    
+    /**
+     * Matcher contains column.
+     * @param columnName
+     * @return Matcher<String>
+     */
     @Factory
     public static Matcher<String> containsColumn(String columnName) {
         return new ColumnDefinitionsMatcher(columnName);

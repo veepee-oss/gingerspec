@@ -54,6 +54,7 @@ public class ExceptionMatcher extends TypeSafeMatcher<Exception> {
 
     /**
      * Matcher message.
+     * @param description
      */
     public void describeTo(Description description) {
 

@@ -6,11 +6,22 @@ import org.hamcrest.Matcher;
 
 import com.stratio.tests.utils.HttpResponse;
 
+/**
+ * @author Javier Delgado
+ * @author Hugo Dominguez
+ * 
+ */
 public final class HTTPRequestMatcher {
-
-    private HTTPRequestMatcher(){
-     }
-    
+    /**
+     * Default constructor.
+     */
+    private HTTPRequestMatcher() {
+    }
+    /**
+     * Matcher for http request.
+     * @param statusMatcher
+     * @return Matcher<HttpResponse>
+     */
     @Factory
     public static Matcher<HttpResponse> hasStatus(final Matcher<Integer> statusMatcher) {
         return new FeatureMatcher<HttpResponse, Integer>(statusMatcher, "Requests with code", "code") {
@@ -20,7 +31,11 @@ public final class HTTPRequestMatcher {
             }
         };
     }
-
+    /**
+     * Checks if a httpResponse has a message. 
+     * @param messageMatcher
+     * @return
+     */
     @Factory
     public static Matcher<HttpResponse> hasMessage(final Matcher<String> messageMatcher) {
 

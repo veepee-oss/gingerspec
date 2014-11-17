@@ -12,16 +12,28 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 
 import cucumber.api.DataTable;
-
+/**
+ * @author Javier Delgado
+ * @author Hugo Dominguez
+ *
+ */
 public class DBObjectsMatcher extends TypeSafeMatcher<ArrayList<DBObject>> {
 
     private final DataTable table;
 
-    // Constructor
+    /**
+     * Constructor.
+     * @param table
+     */
     public DBObjectsMatcher(DataTable table) {
         this.table = table;
     }
 
+    /**
+     * Matcher function for DBObjects.
+     * @param table
+     * @return
+     */
     @Factory
     public static DBObjectsMatcher containedInMongoDBResult(DataTable table) {
         return new DBObjectsMatcher(table);

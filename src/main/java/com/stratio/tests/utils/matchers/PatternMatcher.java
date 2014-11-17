@@ -23,9 +23,10 @@ public class PatternMatcher extends TypeSafeMatcher<CharSequence> {
      * <pre>
      * assertThat(&quot;myStringOfNote&quot;, pattern(&quot;[0-9]+&quot;))
      * </pre>
-     *
+     * 
      * @param regex
      *            the regular expression that the returned matcher will use to match any examined {@link CharSequence}
+     * @return Matcher<CharSequence>
      */
     @Factory
     public static Matcher<CharSequence> pattern(String regex) {
@@ -40,9 +41,10 @@ public class PatternMatcher extends TypeSafeMatcher<CharSequence> {
      * <pre>
      * assertThat(&quot;myStringOfNote&quot;, Pattern.compile(&quot;[0-9]+&quot;))
      * </pre>
-     *
+     * 
      * @param pattern
      *            the pattern that the returned matcher will use to match any examined {@link CharSequence}
+     * @return Matcher<CharSequence>
      */
     @Factory
     public static Matcher<CharSequence> pattern(Pattern pattern) {
@@ -51,6 +53,11 @@ public class PatternMatcher extends TypeSafeMatcher<CharSequence> {
 
     private final Pattern pattern;
 
+    /**
+     * Constructor.
+     * 
+     * @param pattern
+     */
     public PatternMatcher(Pattern pattern) {
         this.pattern = pattern;
     }
