@@ -14,7 +14,6 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -182,12 +181,6 @@ public class ThenGSpec extends BaseGSpec {
             DataType type = resCols.getType(e.getKey().toString());
             assertThat("The column type is not equals.", type.getName().toString(), equalTo(e.getValue().toString()));
         }
-    }
-
-    private void checkhatcolumnNameExists(String resultSetColumns, String columnName) {
-        String[] aux = resultSetColumns.split("\\p{Punct}");
-        ArrayList<String> test = new ArrayList<String>(Arrays.asList(aux));
-        assertThat("The column " + columnName + " does not exists.", test, hasItem(columnName));
     }
 
     private List<String> giveQueriesList(DataTable data, String tableName, String colNames) {

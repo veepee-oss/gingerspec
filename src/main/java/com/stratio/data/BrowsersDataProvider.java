@@ -28,7 +28,7 @@ public final class BrowsersDataProvider {
     public static final int DEFAULT_TIMEOUT = 20000;
     public static final int DEFAULT_GROUP = 3;
     public static final int DEFAULT_LESS_LENGTH = 4;
-    private static final Logger logger = LoggerFactory.getLogger(BrowsersDataProvider.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BrowsersDataProvider.class);
 
     private BrowsersDataProvider(){
         }
@@ -66,7 +66,7 @@ public final class BrowsersDataProvider {
         try {
             doc = Jsoup.connect(grid).timeout(DEFAULT_TIMEOUT).get();
         } catch (IOException e) {
-            logger.error("Exception on connecting to Selenium grid: {}", e.getMessage());
+            LOGGER.error("Exception on connecting to Selenium grid: {}", e.getMessage());
             return response;
         }
 
