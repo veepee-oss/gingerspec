@@ -103,7 +103,7 @@ public class ElasticSearchUtils {
     }
 
     /**
-     * Build an elasticSearch query(format: http)
+     * Build an elasticSearch query(format: http).
      * 
      * @param indexName
      * @param type

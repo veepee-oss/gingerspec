@@ -13,7 +13,7 @@ import cucumber.api.java.en.Given;
 public class GivenGSpec extends BaseGSpec {
 
     /**
-     * Generic constructor
+     * Generic constructor.
      * 
      * @param spec
      */

@@ -53,7 +53,7 @@ public class ExceptionMatcher extends TypeSafeMatcher<Exception> {
     }
 
     /**
-     * Matcher message
+     * Matcher message.
      */
     public void describeTo(Description description) {
 

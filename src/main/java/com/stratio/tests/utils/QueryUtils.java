@@ -11,7 +11,7 @@ import java.util.Map;
  */
 public class QueryUtils {
     /**
-     * Use Keyspace Query
+     * Use Keyspace Query.
      * 
      * @param keyspace
      * @return

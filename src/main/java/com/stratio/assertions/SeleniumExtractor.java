@@ -14,7 +14,7 @@ public final class SeleniumExtractor implements Extractor<WebElement, String> {
     }
 
     /**
-     * Get selenium extractor
+     * Get selenium extractor.
      * 
      * @return
      */

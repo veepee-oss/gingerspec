@@ -10,7 +10,7 @@ public final class HashUtils {
     private HashUtils() {
     }
 /**
- * doHash
+ * doHash.
  * @param str
  * @return
  */

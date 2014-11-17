@@ -67,7 +67,7 @@ class CucumberReporter implements Formatter, Reporter {
     private static final String STATUS = "status";
 
     /**
-     * Constructor of cucumberReporter
+     * Constructor of cucumberReporter.
      * 
      * @param url
      * @param cClass
@@ -301,7 +301,7 @@ class CucumberReporter implements Formatter, Reporter {
         }
 
         /**
-         * Finish
+         * Finish.
          * 
          * @param doc
          * @param element
