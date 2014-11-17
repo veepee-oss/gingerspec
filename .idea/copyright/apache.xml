@@ -1,9 +1,0 @@
-<component name="CopyrightManager">
-  <copyright>
-    <option name="notice" value="Stratio Meta&#10;  &#10;  Copyright (c) &amp;#36;today.year, Stratio, All rights reserved.&#10;  &#10;  This library is free software; you can redistribute it and/or modify it under the terms of the&#10;  GNU Lesser General Public License as published by the Free Software Foundation; either version&#10;  3.0 of the License, or (at your option) any later version.&#10;  &#10;  This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without&#10;  even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU&#10;  Lesser General Public License for more details.&#10;  &#10;  You should have received a copy of the GNU Lesser General Public License along with this library." />
-    <option name="keyword" value="Copyright" />
-    <option name="allowReplaceKeyword" value="" />
-    <option name="myName" value="apache" />
-    <option name="myLocal" value="true" />
-  </copyright>
-</component>
