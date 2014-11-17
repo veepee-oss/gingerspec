@@ -46,10 +46,12 @@ public class ListLastElementExceptionMatcher extends TypeSafeMatcher<List<Except
         this.clazz = clazz;
         this.messagePattern = messagePattern;
     }
-/**
- * Message showed in the case that a test fails.
- * @param Description
- */
+
+    /**
+     * Message showed in the case that a test fails.
+     * 
+     * @param Description
+     */
     public void describeTo(Description description) {
 
         String expectedMessage = String.valueOf(messagePattern);
