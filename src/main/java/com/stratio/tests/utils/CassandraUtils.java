@@ -87,7 +87,7 @@ public class CassandraUtils {
     }
 
     /**
-     * Disconnect of Cassandra host.
+     * Disconnect from Cassandra host.
      */
     public void disconnect() {
         this.session.close();

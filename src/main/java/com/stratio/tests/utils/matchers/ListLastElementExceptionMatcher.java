@@ -19,7 +19,7 @@ public class ListLastElementExceptionMatcher extends TypeSafeMatcher<List<Except
     private final Pattern messagePattern;
 
     /**
-     * Checks if the last element has the class and the message.
+     * Checks if the last element has the class and the message(Regular expression).
      * 
      * @param clazz
      * @param regex
@@ -31,7 +31,7 @@ public class ListLastElementExceptionMatcher extends TypeSafeMatcher<List<Except
     }
 
     /**
-     * Checks if the last element has the class and the message.
+     * Checks if the last element has the class and the message(Pattern).
      * 
      * @param clazz
      * @param messagePattern
@@ -48,7 +48,7 @@ public class ListLastElementExceptionMatcher extends TypeSafeMatcher<List<Except
     }
 
     /**
-     * Message showed in the case that a test fails.
+     * Message showed in the case that a matcher fails.
      * 
      * @param Description
      */

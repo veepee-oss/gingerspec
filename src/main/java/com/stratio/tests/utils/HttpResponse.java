@@ -9,7 +9,7 @@ public class HttpResponse {
     private int statusCode;
     private String response;
 /**
- * 
+ * Constructor of an HttpResponse.
  * @param statusCode
  * @param response
  */

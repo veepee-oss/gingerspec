@@ -26,7 +26,7 @@ public abstract class BaseGTest {
     public void beforeGSuite(ITestContext context) {
     }
     /**
-     * Method executed before a suite.
+     * Method executed after a suite.
      * @param context
      */
     @AfterSuite(alwaysRun = true)

@@ -18,7 +18,7 @@ public class ExceptionMatcher extends TypeSafeMatcher<Exception> {
     private final Pattern messagePattern;
 
     /**
-     * HasClassAnMessage ExceptionMatcher.
+     * Checks if an exception is throw by an expecific class and the message achieve to the regular expresion.
      * 
      * @param clazz
      * @param regex
@@ -30,7 +30,7 @@ public class ExceptionMatcher extends TypeSafeMatcher<Exception> {
     }
 
     /**
-     * HasClassAnMessage ExceptionMatcher.
+     * Checks if an exception is throw by an expecific class and the message is similar to messagePattern.
      * 
      * @param clazz
      * @param messagePattern
@@ -53,7 +53,7 @@ public class ExceptionMatcher extends TypeSafeMatcher<Exception> {
     }
 
     /**
-     * Matcher message.
+     * This message is show when the matcher fails.
      * @param description
      */
     public void describeTo(Description description) {

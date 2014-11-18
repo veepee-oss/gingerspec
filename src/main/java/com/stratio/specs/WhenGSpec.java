@@ -35,7 +35,7 @@ public class WhenGSpec extends BaseGSpec {
         Thread.sleep(seconds * DEFAULT_TIMEOUT);
     }
 /**
- * Action click.
+ * Action click in selenlium.
  * @param zone
  * @param target
  */

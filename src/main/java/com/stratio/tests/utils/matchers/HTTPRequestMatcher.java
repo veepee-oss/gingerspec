@@ -18,7 +18,7 @@ public final class HTTPRequestMatcher {
     private HTTPRequestMatcher() {
     }
     /**
-     * Matcher for http request.
+     * Checks if a httpResponse has an specific status.
      * @param statusMatcher
      * @return Matcher<HttpResponse>
      */
@@ -32,7 +32,7 @@ public final class HTTPRequestMatcher {
         };
     }
     /**
-     * Checks if a httpResponse has a message. 
+     * Checks if a httpResponse has a specific message. 
      * @param messageMatcher
      * @return
      */

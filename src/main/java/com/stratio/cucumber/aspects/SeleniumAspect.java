@@ -56,7 +56,7 @@ public class SeleniumAspect {
     }
 
     /**
-     * 
+     * If an exception has thrown by selenium, this methods save a screen capture.
      * @param pjp
      * @return
      * @throws Throwable

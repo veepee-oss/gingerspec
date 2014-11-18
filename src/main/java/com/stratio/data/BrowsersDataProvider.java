@@ -33,7 +33,7 @@ public final class BrowsersDataProvider {
     private BrowsersDataProvider(){
         }
     /**
-     * 
+     * Get the  browsers available in a selenium grid.
      * @param context
      * @param testConstructor
      * @return

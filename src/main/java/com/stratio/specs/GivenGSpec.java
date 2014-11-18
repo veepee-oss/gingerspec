@@ -22,7 +22,7 @@ public class GivenGSpec extends BaseGSpec {
     }
 
     /**
-     * Empty all the indexed of ElasticSearch.
+     * Empty all the indexes of ElasticSearch.
      */
     @Given("^I empty every existing elasticsearch index$")
     public void emptyElasticsearchIndexes() {
@@ -74,7 +74,7 @@ public class GivenGSpec extends BaseGSpec {
     }
 
     /**
-     * To drop a Cassandra Keyspace.
+     * Drop a Cassandra Keyspace.
      * 
      * @param keyspace
      */
@@ -85,7 +85,7 @@ public class GivenGSpec extends BaseGSpec {
     }
 
     /**
-     * Create a AeroSpike namespace, a table and the data of the table.
+     * Create a AeroSpike namespace, table and the data of the table.
      * 
      * @param nameSpace
      * @param tableName
