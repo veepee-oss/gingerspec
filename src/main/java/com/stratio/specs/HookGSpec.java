@@ -10,6 +10,7 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
+import com.stratio.exceptions.DBException;
 import com.stratio.tests.utils.ThreadProperty;
 import com.thoughtworks.selenium.SeleniumException;
 
@@ -136,7 +137,11 @@ public class HookGSpec extends BaseGSpec {
     @After(order = ORDER_20, value = "@C*")
     public void cassandraTeardown() {
         commonspec.getLogger().info("Shutdown  C* client");
-        commonspec.getCassandraClient().disconnect();
+        try {
+            commonspec.getCassandraClient().disconnect();
+        } catch (DBException e) {
+            fail(e.toString());
+        }
     }
 /**
  * Close MongoDB Connection.

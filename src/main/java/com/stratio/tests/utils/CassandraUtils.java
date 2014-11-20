@@ -19,6 +19,7 @@ import com.datastax.driver.core.Metadata;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.core.TableMetadata;
+import com.stratio.exceptions.DBException;
 
 /**
  * Generic utilities for operations over Cassandra.
@@ -88,20 +89,32 @@ public class CassandraUtils {
 
     /**
      * Disconnect from Cassandra host.
+     * @throws DBException 
      */
-    public void disconnect() {
-        this.session.close();
-        this.cluster.close();
+    public void disconnect() throws DBException {
+        if (this.session == null) {
+            throw new DBException ("The C* is null");
+        } 
+        if(this.cluster.isClosed()){
+            throw new DBException ("The cluster has been closed");
+        }
+            this.session.close();
+            this.cluster.close();
     }
 
     /**
      * Get the metadata of the Cassandra Cluster.
      * 
      * @return Metadata
+     * @throws Exception 
      */
-    public Metadata getMetadata() {
-        this.metadata = cluster.getMetadata();
-        return this.metadata;
+    public Metadata getMetadata() throws DBException {
+        if (!this.cluster.isClosed()) {
+            this.metadata = cluster.getMetadata();
+            return this.metadata;
+        } else {
+           throw new DBException ("The cluster has been closed");
+        }
     }
 
     /**
