@@ -13,6 +13,8 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.stratio.exceptions.DBException;
+
 /**
  * @author Javier Delgado
  * @author Hugo Dominguez
@@ -127,12 +129,13 @@ public class ElasticSearchUtils {
 
     /**
      * Disconnect from elasticSearch.
+     * @throws DBException 
      */
-    public void disconnect() {
+    public void disconnect() throws DBException {
         try {
             this.client.close();
         } catch (IOException e) {
-            logger.error("Got exception when closing the ES client", e);
+            throw new DBException(e.toString());
         }
     }
 }

@@ -14,6 +14,7 @@ import com.aerospike.client.policy.ClientPolicy;
 import com.aerospike.client.policy.WritePolicy;
 import com.aerospike.client.query.RecordSet;
 import com.aerospike.client.query.Statement;
+import com.stratio.exceptions.DBException;
 
 import cucumber.api.DataTable;
 
@@ -61,9 +62,15 @@ public class AerospikeUtils {
 
     /**
      * Disconnect from Aerospike Server.
+     * @throws DBException 
      */
-    public void disconnect() {
-        client.close();
+    public void disconnect() throws DBException {
+        if (client.isConnected()) {
+            client.close();
+        } else {
+            throw new DBException("Impossible to disconnect from Aerospike server because there is not a previously connection");
+        }
+
     }
 
     /**

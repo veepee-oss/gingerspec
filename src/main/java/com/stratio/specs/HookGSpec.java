@@ -31,6 +31,7 @@ public class HookGSpec extends BaseGSpec {
 
     /**
      * Default constructor.
+     * 
      * @param spec
      */
     public HookGSpec(CommonG spec) {
@@ -45,6 +46,7 @@ public class HookGSpec extends BaseGSpec {
         commonspec.getLogger().info("Clearing exception list");
         commonspec.getExceptions().clear();
     }
+
     /**
      * Connect to Cassandra.
      */
@@ -53,34 +55,43 @@ public class HookGSpec extends BaseGSpec {
         commonspec.getLogger().info("Setting up C* client");
         commonspec.getCassandraClient().connect();
     }
+
     /**
      * Connect to MongoDB.
      */
     @Before(order = ORDER_10, value = "@MongoDB")
     public void mongoSetup() {
         commonspec.getLogger().info("Setting up MongoDB client");
-        commonspec.getMongoDBClient().connectToMongoDB();
+        try {
+            commonspec.getMongoDBClient().connect();
+        } catch (DBException e) {
+            fail(e.toString());
+        }
     }
-/**
- * Connect to ElasticSearch.
- */
+
+    /**
+     * Connect to ElasticSearch.
+     */
     @Before(order = ORDER_10, value = "@elasticsearch")
     public void elasticsearchSetup() {
         commonspec.getLogger().info("Setting up elasticsearch client");
         commonspec.getElasticSearchClient().connect();
     }
-/**
- * Connect to Aerospike.
- */
+
+    /**
+     * Connect to Aerospike.
+     */
     @Before(order = ORDER_10, value = "@Aerospike")
     public void aerospikeSetup() {
         commonspec.getLogger().info("Setting up Aerospike client");
         commonspec.getAerospikeClient().connect();
     }
-/**
- * Connect to selenium.
- * @throws MalformedURLException
- */
+
+    /**
+     * Connect to selenium.
+     * 
+     * @throws MalformedURLException
+     */
     @Before(order = ORDER_10, value = "@web")
     public void seleniumSetup() throws MalformedURLException {
         String b = ThreadProperty.get("browser");
@@ -120,6 +131,7 @@ public class HookGSpec extends BaseGSpec {
         commonspec.getDriver().manage().window().maximize();
 
     }
+
     /**
      * Close selenium web driver.
      */
@@ -131,9 +143,10 @@ public class HookGSpec extends BaseGSpec {
             commonspec.getDriver().quit();
         }
     }
-/**
- * Close cassandra connection.
- */
+
+    /**
+     * Close cassandra connection.
+     */
     @After(order = ORDER_20, value = "@C*")
     public void cassandraTeardown() {
         commonspec.getLogger().info("Shutdown  C* client");
@@ -143,33 +156,45 @@ public class HookGSpec extends BaseGSpec {
             fail(e.toString());
         }
     }
-/**
- * Close MongoDB Connection.
- */
+
+    /**
+     * Close MongoDB Connection.
+     */
     @After(order = ORDER_20, value = "@MongoDB")
     public void mongoTeardown() {
         commonspec.getLogger().info("Shutdown MongoDB client");
         commonspec.getMongoDBClient().disconnect();
     }
-/**
- * Close ElasticSearch connection.
- */
+
+    /**
+     * Close ElasticSearch connection.
+     */
     @After(order = ORDER_20, value = "@elasticsearch")
     public void elasticsearchTeardown() {
         commonspec.getLogger().info("Shutdown elasticsearch client");
-        commonspec.getElasticSearchClient().disconnect();
+        try {
+            commonspec.getElasticSearchClient().disconnect();
+        } catch (DBException e) {
+            fail(e.toString());
+        }
     }
-/**
- * Close aerospike connection.
- */
+
+    /**
+     * Close aerospike connection.
+     */
     @After(order = ORDER_20, value = "@Aerospike")
     public void aerospikeTeardown() {
         commonspec.getLogger().info("Shutdown Aerospike client");
-        commonspec.getAerospikeClient().disconnect();
+        try {
+            commonspec.getAerospikeClient().disconnect();
+        } catch (DBException e) {
+            fail(e.toString());
+        }
     }
-/**
- * Close logger.
- */
+
+    /**
+     * Close logger.
+     */
     @After(order = 0)
     public void teardown() {
         commonspec.getLogger().info("Ended running hooks");

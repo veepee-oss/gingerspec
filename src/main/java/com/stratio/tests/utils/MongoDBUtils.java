@@ -15,6 +15,7 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
+import com.stratio.exceptions.DBException;
 
 import cucumber.api.DataTable;
 
@@ -44,13 +45,15 @@ public class MongoDBUtils {
 
     /**
      * Connect to MongoDB Host.
+     * @throws DBException 
      */
-    public void connectToMongoDB() {
+    public void connect() throws DBException {
         try {
             LOGGER.debug("Initializing MongoDB client");
             mongoClient = new MongoClient(this.host, this.port);
         } catch (UnknownHostException e) {
-            LOGGER.error("Unable to connect to MongoDB", e);
+            throw new DBException(e.toString());
+            
         }
     }
 
@@ -58,7 +61,7 @@ public class MongoDBUtils {
      * Disconnect of MongoDB host.
      */
     public void disconnect() {
-        mongoClient.close();
+         mongoClient.close();
     }
 
     /**
