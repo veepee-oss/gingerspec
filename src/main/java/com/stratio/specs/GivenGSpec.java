@@ -1,5 +1,7 @@
 package com.stratio.specs;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import cucumber.api.DataTable;
 import cucumber.api.java.en.Given;
 
@@ -157,15 +159,24 @@ public class GivenGSpec extends BaseGSpec {
      */
     @Given("^I browse to '(.*?)'$")
     public void seleniumBrowse(String url) {
-        org.assertj.core.api.Assertions.assertThat(url).isNotEmpty();
-        commonspec.getLogger().info("Browsing to {} with {}", url, commonspec.getBrowserName());
-        if (url.endsWith("_HOME")) {
-            String sutPort = url.replace("_HOME", "_PORT");
-            commonspec.getDriver().get(System.getProperty(url, "") + ":" + System.getProperty(sutPort, "")
-                    + System.getProperty("WEB_PATH", ""));
-        }        
-        else {
-            commonspec.getDriver().get(url);
-        }       
+        assertThat(url).isNotEmpty();
+        String newUrl = commonspec.replacePlaceholders(url);
+        commonspec.getLogger().info("Browsing to {} with {}", newUrl, commonspec.getBrowserName());
+
+        if (url.endsWith("_HOST}")) {
+            String sutPort = commonspec.replacePlaceholders(url.replace("HOST", "PORT"));
+            commonspec.getDriver().get("http://" + newUrl + ":" + sutPort + System.getProperty("WEB_PATH", ""));
+        } else {
+            commonspec.getDriver().get("http://" + newUrl);
+        }
+    }
+
+    /**
+     * Maximizes current browser window. Mind the current resolution could break a test.
+     * 
+     */
+    @Given("^I maximize the browser$")
+    public void seleniumMaximize(String url) {
+        commonspec.getDriver().manage().window().maximize();
     }
 }

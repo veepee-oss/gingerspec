@@ -1,11 +1,12 @@
 package com.stratio.specs;
 
+import static com.stratio.assertions.Assertions.assertThat;
 import static com.stratio.tests.utils.matchers.ColumnDefinitionsMatcher.containsColumn;
 import static com.stratio.tests.utils.matchers.DBObjectsMatcher.containedInMongoDBResult;
 import static com.stratio.tests.utils.matchers.ExceptionMatcher.hasClassAndMessage;
 import static com.stratio.tests.utils.matchers.ListLastElementExceptionMatcher.lastElementHasClassAndMessage;
 import static com.stratio.tests.utils.matchers.RecordSetMatcher.containedInRecordSet;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
@@ -24,7 +25,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 import com.aerospike.client.query.RecordSet;
@@ -76,18 +76,20 @@ public class ThenGSpec extends BaseGSpec {
 
         List<Exception> exceptions = commonspec.getExceptions();
         if ("IS NOT".equals(exception)) {
-            assertThat("Captured exception list is not empty", exceptions,
+            org.hamcrest.MatcherAssert.assertThat("Captured exception list is not empty", exceptions,
                     anyOf(hasSize(0), lastElementHasClassAndMessage("", "")));
         } else {
-            assertThat("Captured exception list is empty", exceptions, hasSize(greaterThan((0))));
+            org.hamcrest.MatcherAssert.assertThat("Captured exception list is empty", exceptions,
+                    hasSize(greaterThan((0))));
             Exception ex = exceptions.get(exceptions.size() - 1);
             if ((clazz != null) && (exceptionMsg != null)) {
 
-                assertThat("Unexpected last exception class or message", ex, hasClassAndMessage(clazz, exceptionMsg));
+                org.hamcrest.MatcherAssert.assertThat("Unexpected last exception class or message", ex,
+                        hasClassAndMessage(clazz, exceptionMsg));
 
             } else if (clazz != null) {
-                assertThat("Unexpected last exception class", exceptions.get(exceptions.size() - 1).getClass()
-                        .getSimpleName(), equalTo(clazz));
+                org.hamcrest.MatcherAssert.assertThat("Unexpected last exception class",
+                        exceptions.get(exceptions.size() - 1).getClass().getSimpleName(), equalTo(clazz));
             }
 
             commonspec.getExceptions().clear();
@@ -102,8 +104,8 @@ public class ThenGSpec extends BaseGSpec {
     @Then("^a Casandra keyspace '(.*?)' exists$")
     public void assertKeyspaceOnCassandraExists(String keyspace) {
         commonspec.getLogger().info("Verifying if the keyspace {} exists", keyspace);
-        assertThat("The keyspace " + keyspace + "exists on cassandra", commonspec.getCassandraClient().getKeyspaces(),
-                hasItem(keyspace));
+        org.hamcrest.MatcherAssert.assertThat("The keyspace " + keyspace + "exists on cassandra", commonspec
+                .getCassandraClient().getKeyspaces(), hasItem(keyspace));
     }
 
     /**
@@ -115,8 +117,8 @@ public class ThenGSpec extends BaseGSpec {
     @Then("^a Casandra keyspace '(.*?)' contains a table '(.*?)'$")
     public void assertTableExistsOnCassandraKeyspace(String keyspace, String tableName) {
         commonspec.getLogger().info("Verifying if the table {} exists in the keyspace {}", tableName, keyspace);
-        assertThat("The table " + tableName + "exists on cassandra", commonspec.getCassandraClient()
-                .getTables(keyspace), hasItem(tableName));
+        org.hamcrest.MatcherAssert.assertThat("The table " + tableName + "exists on cassandra", commonspec
+                .getCassandraClient().getTables(keyspace), hasItem(tableName));
     }
 
     /**
@@ -131,9 +133,9 @@ public class ThenGSpec extends BaseGSpec {
         Long numberRowsLong = Long.parseLong(numberRows);
         commonspec.getLogger().info("Verifying if the keyspace {} exists", keyspace);
         commonspec.getCassandraClient().useKeyspace(keyspace);
-        assertThat("The table " + tableName + "exists on cassandra",
-                commonspec.getCassandraClient().executeQuery("SELECT COUNT(*) FROM " + tableName + ";").all().get(0)
-                        .getLong(0), equalTo(numberRowsLong));
+        org.hamcrest.MatcherAssert.assertThat("The table " + tableName + "exists on cassandra", commonspec
+                .getCassandraClient().executeQuery("SELECT COUNT(*) FROM " + tableName + ";").all().get(0).getLong(0),
+                equalTo(numberRowsLong));
     }
 
     /**
@@ -164,10 +166,10 @@ public class ThenGSpec extends BaseGSpec {
         for (String execQuery : selectQueries) {
             res = commonspec.getCassandraClient().executeQuery(execQuery);
             List<Row> resAsList = res.all();
-            assertThat("The query " + execQuery + " not return any result on Cassandra", resAsList.size(),
-                    greaterThan(0));
-            assertThat("The resultSet is not as expected", resAsList.get(0).toString().substring(VALUE_SUBSTRING),
-                    equalTo(data.raw().get(index).toString()));
+            org.hamcrest.MatcherAssert.assertThat("The query " + execQuery + " not return any result on Cassandra",
+                    resAsList.size(), greaterThan(0));
+            org.hamcrest.MatcherAssert.assertThat("The resultSet is not as expected", resAsList.get(0).toString()
+                    .substring(VALUE_SUBSTRING), equalTo(data.raw().get(index).toString()));
             index++;
         }
     }
@@ -177,9 +179,11 @@ public class ThenGSpec extends BaseGSpec {
         Iterator it = dataTableColumns.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry e = (Map.Entry) it.next();
-            assertThat("The table not contains the column.", resCols.toString(), containsColumn(e.getKey().toString()));
+            org.hamcrest.MatcherAssert.assertThat("The table not contains the column.", resCols.toString(),
+                    containsColumn(e.getKey().toString()));
             DataType type = resCols.getType(e.getKey().toString());
-            assertThat("The column type is not equals.", type.getName().toString(), equalTo(e.getValue().toString()));
+            org.hamcrest.MatcherAssert.assertThat("The column type is not equals.", type.getName().toString(),
+                    equalTo(e.getValue().toString()));
         }
     }
 
@@ -268,7 +272,8 @@ public class ThenGSpec extends BaseGSpec {
             cleanResponseList.add(el.replaceAll(",@timestamp.*", ""));
         }
 
-        assertThat("Event not found at elastic search index", cleanResponseList, hasItem(data));
+        org.hamcrest.MatcherAssert.assertThat("Event not found at elastic search index", cleanResponseList,
+                hasItem(data));
     }
 
     /**
@@ -283,7 +288,8 @@ public class ThenGSpec extends BaseGSpec {
         commonspec.getLogger().info("Verifying if the nameSpace {} exists and tableName {} exists on Aerospike",
                 nameSpace, tableName);
         RecordSet rs = commonspec.getAerospikeClient().readTable(nameSpace, tableName);
-        assertThat("The table does not contains the data required.", rs, containedInRecordSet(data));
+        org.hamcrest.MatcherAssert.assertThat("The table does not contains the data required.", rs,
+                containedInRecordSet(data));
     }
 
     /**
@@ -300,7 +306,8 @@ public class ThenGSpec extends BaseGSpec {
         commonspec.getMongoDBClient().connectToMongoDBDataBase(dataBase);
         ArrayList<DBObject> result = (ArrayList<DBObject>) commonspec.getMongoDBClient().readFromMongoDBCollection(
                 tableName, data);
-        assertThat("The table does not contains the data required.", result, containedInMongoDBResult(data));
+        org.hamcrest.MatcherAssert.assertThat("The table does not contains the data required.", result,
+                containedInMongoDBResult(data));
 
     }
 
@@ -315,30 +322,23 @@ public class ThenGSpec extends BaseGSpec {
         commonspec.getLogger().info("Verifying if the dataBase {} contains the table {}", database, tableName);
         commonspec.getMongoDBClient().connectToMongoDBDataBase(database);
         Set<String> collectionsNames = commonspec.getMongoDBClient().getMongoDBCollections();
-        assertThat("The Mongo dataBase contains the table", collectionsNames, not(hasItem(tableName)));
+        org.hamcrest.MatcherAssert.assertThat("The Mongo dataBase contains the table", collectionsNames,
+                not(hasItem(tableName)));
     }
 
     /**
-     * Check if a text exists in a source.
+     * Checks if a text exists in the source of an already loaded URL.
      * 
      * @param text
      */
     @Then("^a text '(.*?)' exists$")
     public void assertTextInSource(String text) {
         commonspec.getLogger().info("Verifying if our current page contains the text {}", text);
-        com.stratio.assertions.Assertions.assertThat(commonspec.getDriver()).as("Expected text not found at page")
-                .contains(text);
+        assertThat(commonspec.getDriver()).as("Expected text not found at page").contains(text);
     }
 
     /**
-     * Checks if it is not thrown an error.
-     */
-    @Then("^no error is thrown$")
-    public void assertNoError() {
-    }
-
-    /**
-     * Checks if an element has an expecific text.
+     * Checks if the first element found has an expecific text.
      * 
      * @param target
      * @param texts
@@ -347,10 +347,50 @@ public class ThenGSpec extends BaseGSpec {
     public void assertTextInElement(String target, @Transform(ArrayListConverter.class) List<String> texts) {
         commonspec.getLogger().info("Verifying text content of elements {}", texts);
 
-        WebElement elem = commonspec.getDriver().findElement(By.id(target));
+        List<WebElement> wel = commonspec.locateElement(target);
 
+        assertThat(wel).isNotEmpty();
         String[] expectedTexts = texts.toArray(new String[texts.size()]);
-        com.stratio.assertions.Assertions.assertThat(elem).as("Element doesnt contains expected text")
-                .contains(expectedTexts);
+        assertThat(wel.get(0)).as("Element doesnt contains expected text").contains(expectedTexts);
+    }
+
+    /**
+     * Queries a web each {@code poll} minutes, for a maximum of {@code totalTime} minutes, until at least an element
+     * with attribute like data-ng-{@code attrib} with a value {@code element} exists.
+     * 
+     * @param totalTime
+     * @param poll
+     * @param attrib
+     * @param element
+     */
+    @Then("^waiting during '(.*?)' minutes and polling every '(.*?)', an element '(.*?)' exists$")
+    public void pollElementAngular(Integer totalTime, Integer poll, String element) throws InterruptedException {
+        commonspec.getLogger().info("Waiting for element to be available: {} minutes", totalTime);
+        List<WebElement> wel = commonspec.locateElement(element);
+        int i = totalTime;
+
+        while ((i >= 0) && (wel.size() == 0)) {
+            i = i - poll;
+            Thread.sleep(poll * 1000 * 60);
+            commonspec.getLogger().info("Waited {}", totalTime - i);
+            wel = commonspec.locateElement(element);
+        }
+
+        assertThat(wel).as("No element with with " + element + " attribute found").isNotEmpty();
+    }
+
+    /**
+     * Verifies that the first webelement found identified as {@code element} has {@code text} as text
+     * 
+     * @param element
+     * @param text
+     */
+    @Then("^an element '(.*?)' does has a text '(.*?)'$")
+    public void textOnElementPresent(String element, String text) {
+        commonspec.getLogger().info("Verifying text unexistance");
+
+        List<WebElement> wel = commonspec.locateElement(element);
+        assertThat(wel).isNotEmpty();
+        assertThat(wel.get(0)).contains(text);
     }
 }

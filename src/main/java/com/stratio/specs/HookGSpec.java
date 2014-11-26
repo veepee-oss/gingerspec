@@ -6,6 +6,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -120,7 +121,7 @@ public class HookGSpec extends BaseGSpec {
 
         capabilities.setVersion(version);
 
-        String grid = System.getProperty("SELENIUM.GRID", "127.0.0.1:4444");
+        String grid = System.getProperty("SELENIUM_GRID", "127.0.0.1:4444");
         grid = "http://" + grid + "/wd/hub";
         commonspec.setDriver(new RemoteWebDriver(new URL(grid), capabilities));
         commonspec.getDriver().manage().timeouts().pageLoadTimeout(PAGE_LOAD_TIMEOUT, TimeUnit.SECONDS);
@@ -128,7 +129,8 @@ public class HookGSpec extends BaseGSpec {
         commonspec.getDriver().manage().timeouts().setScriptTimeout(SCRIPT_TIMEOUT, TimeUnit.SECONDS);
 
         commonspec.getDriver().manage().deleteAllCookies();
-        commonspec.getDriver().manage().window().maximize();
+        commonspec.getDriver().manage().window().setSize(new Dimension(1440, 900));
+        // commonspec.getDriver().manage().window().maximize();
 
     }
 
@@ -138,9 +140,9 @@ public class HookGSpec extends BaseGSpec {
     @After(order = ORDER_20, value = "@web")
     public void seleniumTeardown() {
         if (commonspec.getDriver() != null) {
-            commonspec.getLogger().info("Shutdown Selenium client");
-            commonspec.getDriver().close();
-            commonspec.getDriver().quit();
+            // commonspec.getLogger().info("Shutdown Selenium client");
+            // commonspec.getDriver().close();
+            // commonspec.getDriver().quit();
         }
     }
 

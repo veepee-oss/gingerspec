@@ -19,6 +19,7 @@ import org.testng.ITestContext;
 import org.testng.annotations.DataProvider;
 
 import com.google.common.collect.Lists;
+
 /**
  * @author Javier Delgado
  * @author Hugo Dominguez
@@ -26,14 +27,15 @@ import com.google.common.collect.Lists;
  */
 public final class BrowsersDataProvider {
     public static final int DEFAULT_TIMEOUT = 20000;
-    public static final int DEFAULT_GROUP = 3;
     public static final int DEFAULT_LESS_LENGTH = 4;
     private static final Logger LOGGER = LoggerFactory.getLogger(BrowsersDataProvider.class);
 
-    private BrowsersDataProvider(){
-        }
+    private BrowsersDataProvider() {
+    }
+
     /**
-     * Get the  browsers available in a selenium grid.
+     * Get the browsers available in a selenium grid.
+     * 
      * @param context
      * @param testConstructor
      * @return
@@ -83,7 +85,7 @@ public final class BrowsersDataProvider {
                         Pattern pat = Pattern.compile("browserName=(.*?),.*?(version=(.*?))?}");
                         Matcher m = pat.matcher(browserDetails.attr("title"));
                         while (m.find()) {
-                            response.add(m.group(1) + "_" + m.group(DEFAULT_GROUP));
+                            response.add(m.group(1) + "_" + m.group(3));
                         }
                     } else {
                         String version = busyBrowserList.get(iBusy).parent().text();
@@ -92,7 +94,8 @@ public final class BrowsersDataProvider {
                         version = version.replace(browser, "");
                         String browserSrc = busyBrowserList.get(iBusy).select("img").attr("src");
                         if (!browserSrc.equals("")) {
-                            browser = browserSrc.substring(browserSrc.lastIndexOf('/') + 1, browserSrc.length() - DEFAULT_LESS_LENGTH);
+                            browser = browserSrc.substring(browserSrc.lastIndexOf('/') + 1, browserSrc.length()
+                                    - DEFAULT_LESS_LENGTH);
                         }
                         response.add(browser + "_" + version);
                         iBusy++;
