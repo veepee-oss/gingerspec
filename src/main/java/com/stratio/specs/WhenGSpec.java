@@ -6,6 +6,7 @@ import static org.assertj.core.api.Fail.fail;
 import java.util.List;
 
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.Select;
 
 import cucumber.api.java.en.When;
@@ -100,4 +101,21 @@ public class WhenGSpec extends BaseGSpec {
         sel.selectByVisibleText(opt);
     }
 
+    /**
+     * Searchs for two webelements dragging the first one to the second
+     * 
+     * @param source
+     * @param destination
+     */
+    @When("^I drag '(.*?)' and drop it to '(.*?)'$")
+    public void dragElement(String source, String destination) {
+        commonspec.getLogger().info("Dragging element");
+        
+        Actions builder = new Actions(commonspec.getDriver());
+
+        List<WebElement> sourceElement = commonspec.locateElement(source);
+        List<WebElement> destinationElement = commonspec.locateElement(destination);
+
+        builder.dragAndDrop(sourceElement.get(0), destinationElement.get(0)).perform();
+    }
 }

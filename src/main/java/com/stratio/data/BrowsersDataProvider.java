@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -46,6 +47,31 @@ public final class BrowsersDataProvider {
             throws Exception {
 
         List<String> browsers = gridBrowsers();
+        List<String[]> lData = Lists.newArrayList();
+
+        for (String s : browsers) {
+            lData.add(new String[] { s });
+        }
+
+        if (lData.size() == 0) {
+            lData.add(new String[] { "" });
+        }
+
+        return lData.iterator();
+    }
+
+    @DataProvider(parallel = true)
+    public static Iterator<String[]> availableUniqueBrowsers(ITestContext context, Constructor<?> testConstructor)
+            throws Exception {
+
+        List<String> browsers = gridBrowsers();
+
+        HashSet<String> hs = new HashSet<String>();
+        hs.addAll(browsers);
+        browsers.clear();
+
+        browsers.addAll(hs);
+
         List<String[]> lData = Lists.newArrayList();
 
         for (String s : browsers) {
