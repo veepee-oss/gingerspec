@@ -140,9 +140,9 @@ public class HookGSpec extends BaseGSpec {
     @After(order = ORDER_20, value = "@web")
     public void seleniumTeardown() {
         if (commonspec.getDriver() != null) {
-            // commonspec.getLogger().info("Shutdown Selenium client");
-            // commonspec.getDriver().close();
-            // commonspec.getDriver().quit();
+            commonspec.getLogger().info("Shutdown Selenium client");
+            commonspec.getDriver().close();
+            commonspec.getDriver().quit();
         }
     }
 
