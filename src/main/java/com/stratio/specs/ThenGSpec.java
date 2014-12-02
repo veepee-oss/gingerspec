@@ -393,4 +393,19 @@ public class ThenGSpec extends BaseGSpec {
         assertThat(wel).isNotEmpty();
         assertThat(wel.get(0)).contains(text);
     }
+
+    /**
+     * Checks if the first element found has an expecific text.
+     * 
+     * @param target
+     * @param texts
+     */
+    @Then("^an element '(.*?)' exists")
+    public void assertElementExists(String element) {
+        commonspec.getLogger().info("Verifying elements { existance}", element);
+
+        List<WebElement> wel = commonspec.locateElement(element);
+
+        assertThat(wel).as("Element " + element + " not found").isNotEmpty();
+    }
 }
