@@ -195,13 +195,13 @@ public class CommonG {
 
             newVal = System.getProperty(sysProp, "");
             if ("toLower".equals(modifier)) {
-                newVal = newVal.toLowerCase();
+                return element.substring(0, element.indexOf("${")) + newVal.toLowerCase();
             } else if ("toUpper".equals(modifier)) {
-                newVal = newVal.toUpperCase();
+                return element.substring(0, element.indexOf("${")) + newVal.toUpperCase();
+            } else {
+                return element.substring(0, element.indexOf("${")) + newVal;
             }
-        } else {
-            newVal = element;
         }
-        return newVal;
+        return element;
     }
 }

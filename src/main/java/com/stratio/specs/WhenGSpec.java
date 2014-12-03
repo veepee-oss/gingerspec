@@ -51,8 +51,8 @@ public class WhenGSpec extends BaseGSpec {
     @When("^I click on '(.*?)'")
     public void searchAndClick(String element) {
         String elem = commonspec.replacePlaceholders(element);
-        commonspec.getLogger().info("Clicking at {}", element);
-        List<WebElement> wel = commonspec.locateElement(element);
+        commonspec.getLogger().info("Clicking at {}", elem);
+        List<WebElement> wel = commonspec.locateElement(elem);
 
         if (wel.size() != 0) {
             wel.get(0).click();
@@ -110,7 +110,7 @@ public class WhenGSpec extends BaseGSpec {
     @When("^I drag '(.*?)' and drop it to '(.*?)'$")
     public void dragElement(String source, String destination) {
         commonspec.getLogger().info("Dragging element");
-        
+
         Actions builder = new Actions(commonspec.getDriver());
 
         List<WebElement> sourceElement = commonspec.locateElement(source);
