@@ -408,4 +408,17 @@ public class ThenGSpec extends BaseGSpec {
 
         assertThat(wel).as("Element " + element + " not found").isNotEmpty();
     }
+
+    /**
+     * Takes an snapshot of the current page
+     * 
+     * @param target
+     * @param texts
+     * @throws Exception
+     */
+    @Then("^I take a snapshot$")
+    public void takeSnapshot() throws Exception {
+
+        commonspec.captureEvidence(commonspec.getDriver(), "screenCapture");
+    }
 }
