@@ -19,7 +19,7 @@
 		<reflections.version>0.9.9-RC1</reflections.version>
 		<org.jacoco.core.version>0.7.1.201405082137</org.jacoco.core.version>
 		<aspectjweaver.version>1.8.2</aspectjweaver.version>		
-		<cassandra-driver-core.version>2.0.4</cassandra-driver-core.version>
+		<cassandra-driver-core.version>2.1.1</cassandra-driver-core.version>
 		<guava.version>15.0</guava.version>
 		<lz4.version>1.2.0</lz4.version>
 		<httpclient.version>4.3.5</httpclient.version>
@@ -111,10 +111,16 @@
 			<version>${aspectjweaver.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.datastax.cassandra</groupId>
-			<artifactId>cassandra-driver-core</artifactId>
-			<version>${cassandra-driver-core.version}</version>
-		</dependency>
+            <groupId>com.datastax.cassandra</groupId>
+            <artifactId>cassandra-driver-core</artifactId>
+            <version>${cassandra-driver-core.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>netty</artifactId>
+                    <groupId>io.netty</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>        
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
