@@ -185,7 +185,8 @@ public class GivenGSpec extends BaseGSpec {
             throws InterruptedException {
         assertThat(url).isNotEmpty();
         String newUrl = commonspec.replacePlaceholders(url);
-        commonspec.getLogger().info("Browsing to {} with {}", newUrl, commonspec.getBrowserName());
+        commonspec.getLogger()
+                .info("Browsing to {} with {}, during {}", newUrl, commonspec.getBrowserName(), totalTime);
 
         commonspec.getDriver().get("http://" + newUrl);
         List<WebElement> wel = commonspec.locateElement(element);
