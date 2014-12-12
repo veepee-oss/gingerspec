@@ -2,6 +2,10 @@ package com.stratio.specs;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
+
+import org.openqa.selenium.WebElement;
+
 import cucumber.api.DataTable;
 import cucumber.api.java.en.Given;
 
@@ -153,7 +157,7 @@ public class GivenGSpec extends BaseGSpec {
     }
 
     /**
-     * Select the selenium browser.
+     * Browse to {@code url} using the current browser.
      * 
      * @param url
      */
@@ -163,11 +167,36 @@ public class GivenGSpec extends BaseGSpec {
         String newUrl = commonspec.replacePlaceholders(url);
         commonspec.getLogger().info("Browsing to {} with {}", newUrl, commonspec.getBrowserName());
 
-        if (url.endsWith("_HOST}")) {
-            String sutPort = commonspec.replacePlaceholders(url.replace("HOST", "PORT"));
-            commonspec.getDriver().get("http://" + newUrl + ":" + sutPort + System.getProperty("WEB_PATH", ""));
-        } else {
+        commonspec.getDriver().get("http://" + newUrl);
+    }
+
+    /**
+     * Browse to {@code url} using the current browser, retrying it's load each {@code poll} until an {@code element} is
+     * found, for a maximum of {@code totalTime}.
+     * 
+     * @param url
+     * @param totalTime
+     * @param poll
+     * @param element
+     * @throws InterruptedException
+     */
+    @Given("^I browse to '(.*?), during '(.*?)' minutes and polling every '(.*?)', an element '(.*?)' exists'$")
+    public void seleniumBrowseRepeatedly(String url, Integer totalTime, Integer poll, String element)
+            throws InterruptedException {
+        assertThat(url).isNotEmpty();
+        String newUrl = commonspec.replacePlaceholders(url);
+        commonspec.getLogger().info("Browsing to {} with {}", newUrl, commonspec.getBrowserName());
+
+        commonspec.getDriver().get("http://" + newUrl);
+        List<WebElement> wel = commonspec.locateElement(element);
+        int i = totalTime;
+
+        while ((i >= 0) && (wel.size() == 0)) {
+            i = i - poll;
+            Thread.sleep(poll * 1000 * 60);
+            commonspec.getLogger().info("Waited {}", totalTime - i);
             commonspec.getDriver().get("http://" + newUrl);
+            wel = commonspec.locateElement(element);
         }
     }
 

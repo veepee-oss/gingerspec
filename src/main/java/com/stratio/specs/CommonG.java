@@ -198,33 +198,35 @@ public class CommonG {
     }
 
     /**
-     * Replaces a placeholded element, starting with $$ with the corresponding java property
+     * Replaces every placeholded element, enclosed in ${} with the corresponding java property
      * 
      * @param element
      */
     public String replacePlaceholders(String element) {
-        String newVal = "";
-        if (element.contains("${")) {
-            String placeholder = element.substring(element.indexOf("${"), element.indexOf("}"));
+        String newVal = element;
+        while (newVal.contains("${")) {
+            String placeholder = newVal.substring(newVal.indexOf("${"), newVal.indexOf("}") + 1);
             String modifier = "";
             String sysProp = "";
             if (placeholder.contains(".")) {
                 sysProp = placeholder.substring(2, placeholder.indexOf("."));
-                modifier = placeholder.substring(placeholder.indexOf(".") + 1, placeholder.length());
+                modifier = placeholder.substring(placeholder.indexOf(".") + 1, placeholder.length() - 1);
             } else {
-                sysProp = placeholder.substring(2, placeholder.length());
+                sysProp = placeholder.substring(2, placeholder.length() - 1);
             }
 
-            newVal = System.getProperty(sysProp, "");
+            String prop = "";
             if ("toLower".equals(modifier)) {
-                return element.substring(0, element.indexOf("${")) + newVal.toLowerCase();
+                prop = System.getProperty(sysProp, "").toLowerCase();
             } else if ("toUpper".equals(modifier)) {
-                return element.substring(0, element.indexOf("${")) + newVal.toUpperCase();
+                prop = System.getProperty(sysProp, "").toUpperCase();
             } else {
-                return element.substring(0, element.indexOf("${")) + newVal;
+                prop = System.getProperty(sysProp, "");
             }
+            newVal = newVal.replace(placeholder, prop);
         }
-        return element;
+
+        return newVal;
     }
 
     public String captureEvidence(WebDriver driver, String type) throws Exception {

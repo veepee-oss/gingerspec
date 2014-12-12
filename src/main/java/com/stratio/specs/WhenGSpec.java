@@ -70,8 +70,8 @@ public class WhenGSpec extends BaseGSpec {
      */
     @When("^I type '(.*?)' at '(.*?)'")
     public void searchAndType(String text, String element) {
-        commonspec.getLogger().info("Typing {} on {}", text, element);
         String newText = commonspec.replacePlaceholders(text);
+        commonspec.getLogger().info("Typing {} on {}", newText, element);
         List<WebElement> wel = commonspec.locateElement(element);
 
         assertThat(wel).as("No element found with locator " + element).isNotEmpty();
