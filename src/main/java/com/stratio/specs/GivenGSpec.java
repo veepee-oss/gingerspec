@@ -180,7 +180,7 @@ public class GivenGSpec extends BaseGSpec {
      * @param element
      * @throws InterruptedException
      */
-    @Given("^I browse to '(.*?)', during '(.*?)' minutes and polling every '(.*?)', an element '(.*?)' exists'$")
+    @Given("^I browse to '(.*?)', during '(.*?)' minutes and polling every '(.*?)', an element '(.*?)' exists$")
     public void seleniumBrowseRepeatedly(String url, Integer totalTime, Integer poll, String element)
             throws InterruptedException {
         assertThat(url).isNotEmpty();
