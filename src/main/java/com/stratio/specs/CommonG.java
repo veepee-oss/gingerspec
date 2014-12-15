@@ -149,6 +149,7 @@ public class CommonG {
      * matching an {@code locator} value
      * 
      * @param element
+     * @throws Exception
      */
     public List<WebElement> locateElement(String element) {
 
@@ -160,6 +161,12 @@ public class CommonG {
             String[] attrib = element.split(":");
             wel = this.locateCssSelector(attrib[0], attrib[1]);
         }
+        if (wel.size() == 0) {
+            this.captureEvidence(this.getDriver(), "framehtmlSource");
+            this.captureEvidence(this.getDriver(), "htmlSource");
+            this.captureEvidence(this.getDriver(), "screenCapture");
+        }
+
         return wel;
     }
 
@@ -229,7 +236,7 @@ public class CommonG {
         return newVal;
     }
 
-    public String captureEvidence(WebDriver driver, String type) throws Exception {
+    public String captureEvidence(WebDriver driver, String type) {
 
         String dir = "./target/executions/";
 
@@ -268,13 +275,17 @@ public class CommonG {
                 File fout = new File(outputFile);
                 boolean dirs = fout.getParentFile().mkdirs();
 
-                FileOutputStream fos = new FileOutputStream(fout, true);
-
-                Writer out = new OutputStreamWriter(fos, "UTF8");
-                PrintWriter writer = new PrintWriter(out, false);
-                writer.append(source);
-                writer.close();
-                out.close();
+                FileOutputStream fos;
+                try {
+                    fos = new FileOutputStream(fout, true);
+                    Writer out = new OutputStreamWriter(fos, "UTF8");
+                    PrintWriter writer = new PrintWriter(out, false);
+                    writer.append(source);
+                    writer.close();
+                    out.close();
+                } catch (IOException e) {
+                    logger.error("Exception on evidence capture", e);
+                }
             }
 
         } else if (type.equals("screenCapture")) {
@@ -302,7 +313,7 @@ public class CommonG {
 
     }
 
-    private File adjustLastCapture(Integer newTrailingImageHeight, List<File> capture) throws IOException {
+    private File adjustLastCapture(Integer newTrailingImageHeight, List<File> capture) {
         // cuts last image just in case it dupes information
         Integer finalHeight = 0;
         Integer finalWidth = 0;
@@ -310,46 +321,50 @@ public class CommonG {
         File trailingImage = capture.get(capture.size() - 1);
         capture.remove(capture.size() - 1);
 
-        BufferedImage oldTrailingImage = ImageIO.read(trailingImage);
-        BufferedImage newTrailingImage = new BufferedImage(oldTrailingImage.getWidth(), oldTrailingImage.getHeight()
-                - newTrailingImageHeight, BufferedImage.TYPE_INT_RGB);
+        BufferedImage oldTrailingImage;
+        File temp = null;
+        try {
+            oldTrailingImage = ImageIO.read(trailingImage);
+            BufferedImage newTrailingImage = new BufferedImage(oldTrailingImage.getWidth(),
+                    oldTrailingImage.getHeight() - newTrailingImageHeight, BufferedImage.TYPE_INT_RGB);
 
-        newTrailingImage.createGraphics().drawImage(oldTrailingImage, 0, 0 - newTrailingImageHeight, null);
+            newTrailingImage.createGraphics().drawImage(oldTrailingImage, 0, 0 - newTrailingImageHeight, null);
 
-        File newTrailingImageF = File.createTempFile("tmpnewTrailingImage", ".png");
-        newTrailingImageF.deleteOnExit();
+            File newTrailingImageF = File.createTempFile("tmpnewTrailingImage", ".png");
+            newTrailingImageF.deleteOnExit();
 
-        ImageIO.write(newTrailingImage, "png", newTrailingImageF);
+            ImageIO.write(newTrailingImage, "png", newTrailingImageF);
 
-        capture.add(newTrailingImageF);
+            capture.add(newTrailingImageF);
 
-        finalWidth = ImageIO.read(capture.get(0)).getWidth();
-        for (File cap : capture) {
-            finalHeight += ImageIO.read(cap).getHeight();
+            finalWidth = ImageIO.read(capture.get(0)).getWidth();
+            for (File cap : capture) {
+                finalHeight += ImageIO.read(cap).getHeight();
+            }
+
+            BufferedImage img = new BufferedImage(finalWidth, finalHeight, BufferedImage.TYPE_INT_RGB);
+
+            Integer y = 0;
+            BufferedImage tmpImg = null;
+            for (File cap : capture) {
+                tmpImg = ImageIO.read(cap);
+                img.createGraphics().drawImage(tmpImg, 0, y, null);
+                y += tmpImg.getHeight();
+            }
+
+            long ts = System.currentTimeMillis() / DEFAULT_CURRENT_TIME;
+
+            temp = File.createTempFile("chromecap" + Long.toString(ts), ".png");
+            temp.deleteOnExit();
+            ImageIO.write(img, "png", temp);
+
+        } catch (IOException e) {
+            logger.error("Cant read image", e);
         }
-
-        BufferedImage img = new BufferedImage(finalWidth, finalHeight, BufferedImage.TYPE_INT_RGB);
-
-        Integer y = 0;
-        BufferedImage tmpImg = null;
-        for (File cap : capture) {
-            tmpImg = ImageIO.read(cap);
-            img.createGraphics().drawImage(tmpImg, 0, y, null);
-            y += tmpImg.getHeight();
-        }
-
-        long ts = System.currentTimeMillis() / DEFAULT_CURRENT_TIME;
-
-        File temp;
-
-        temp = File.createTempFile("chromecap" + Long.toString(ts), ".png");
-        temp.deleteOnExit();
-        ImageIO.write(img, "png", temp);
-
         return temp;
     }
 
-    private File chromeFullScreenCapture(WebDriver driver) throws IOException, InterruptedException {
+    private File chromeFullScreenCapture(WebDriver driver) {
         driver.switchTo().defaultContent();
         // scroll loop n times to get the whole page if browser is chrome
         ArrayList<File> capture = new ArrayList<File>();
@@ -361,18 +376,25 @@ public class CommonG {
         Integer accuScroll = 0;
         Integer newTrailingImageHeight = 0;
 
-        while (!atBottom) {
-            Thread.sleep(DEFAULT_SLEEP_TIME);
-            capture.add(((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE));
+        try {
+            while (!atBottom) {
 
-            ((JavascriptExecutor) driver).executeScript("if(window.screen)" + " {window.scrollBy(0," + windowSize
-                    + ");};");
+                Thread.sleep(DEFAULT_SLEEP_TIME);
+                capture.add(((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE));
 
-            accuScroll += windowSize;
-            if (getDocumentHeight(driver) <= accuScroll) {
-                atBottom = true;
+                ((JavascriptExecutor) driver).executeScript("if(window.screen)" + " {window.scrollBy(0," + windowSize
+                        + ");};");
+
+                accuScroll += windowSize;
+                if (getDocumentHeight(driver) <= accuScroll) {
+                    atBottom = true;
+                }
             }
+
+        } catch (InterruptedException e) {
+            logger.error("Interrupted waits among scrolls", e);
         }
+
         newTrailingImageHeight = accuScroll - getDocumentHeight(driver);
         return adjustLastCapture(newTrailingImageHeight, capture);
     }

@@ -1,7 +1,6 @@
 package com.stratio.specs;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Fail.fail;
 
 import java.util.List;
 
@@ -54,11 +53,9 @@ public class WhenGSpec extends BaseGSpec {
         commonspec.getLogger().info("Clicking at {}", elem);
         List<WebElement> wel = commonspec.locateElement(elem);
 
-        if (wel.size() != 0) {
-            wel.get(0).click();
-        } else {
-            fail("No element found with locator " + element);
-        }
+        assertThat(wel).as("No element found with locator " + element).isNotEmpty();
+
+        wel.get(0).click();
     }
 
     /**
@@ -73,8 +70,6 @@ public class WhenGSpec extends BaseGSpec {
         String newText = commonspec.replacePlaceholders(text);
         commonspec.getLogger().info("Typing {} on {}", newText, element);
         List<WebElement> wel = commonspec.locateElement(element);
-
-        assertThat(wel).as("No element found with locator " + element).isNotEmpty();
 
         wel.get(0).sendKeys(newText);
     }

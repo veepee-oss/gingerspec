@@ -340,23 +340,23 @@ public class ThenGSpec extends BaseGSpec {
     /**
      * Checks if the first element found has an expecific text.
      * 
-     * @param target
+     * @param element
      * @param texts
      */
     @Then("^an element '(.*?)' has '(.*?)' as content$")
-    public void assertTextInElement(String target, @Transform(ArrayListConverter.class) List<String> texts) {
+    public void assertTextInElement(String element, @Transform(ArrayListConverter.class) List<String> texts) {
         commonspec.getLogger().info("Verifying text content of elements {}", texts);
 
-        List<WebElement> wel = commonspec.locateElement(target);
+        List<WebElement> wel = commonspec.locateElement(element);
 
-        assertThat(wel).isNotEmpty();
+        assertThat(wel).as("No element with with " + element + " attribute found").isNotEmpty();
         String[] expectedTexts = texts.toArray(new String[texts.size()]);
         assertThat(wel.get(0)).as("Element doesnt contains expected text").contains(expectedTexts);
     }
 
     /**
      * Queries a web each {@code poll} minutes, for a maximum of {@code totalTime} minutes, until at least an element
-     * with attribute like data-ng-{@code attrib} with a value {@code element} exists.
+     * with attribute {@code attrib} with a value {@code element} exists.
      * 
      * @param totalTime
      * @param poll
@@ -390,7 +390,7 @@ public class ThenGSpec extends BaseGSpec {
         commonspec.getLogger().info("Verifying text unexistance");
 
         List<WebElement> wel = commonspec.locateElement(element);
-        assertThat(wel).isNotEmpty();
+        assertThat(wel).as("No element with with " + element + " attribute found").isNotEmpty();
         assertThat(wel.get(0)).contains(text);
     }
 

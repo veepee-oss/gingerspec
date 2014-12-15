@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 
 import com.stratio.assertions.SeleniumAssert;
 import com.stratio.specs.BaseGSpec;
-import com.stratio.specs.CommonG;
 
 /**
  * @author Javier Delgado
@@ -25,10 +24,6 @@ import com.stratio.specs.CommonG;
 public class SeleniumAspect extends BaseGSpec {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
-
-    public SeleniumAspect(CommonG spec) {
-        this.commonspec = spec;
-    }
 
     @Pointcut("call(* com.stratio.assertions.SeleniumAssert.*(..))" + " || call(* org.openqa.selenium.*.click(..))"
             + " || call(* org.openqa.selenium.*.findElement(..))")
