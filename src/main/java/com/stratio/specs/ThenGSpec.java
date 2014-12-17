@@ -343,11 +343,12 @@ public class ThenGSpec extends BaseGSpec {
      * @param element
      * @param texts
      */
-    @Then("^an element '(.*?)' has '(.*?)' as content$")
-    public void assertTextInElement(String element, @Transform(ArrayListConverter.class) List<String> texts) {
+    @Then("^an element '([^:]*?):([^:]*?)' has '(.*?)' as content$")
+    public void assertTextInElement(String method, String element,
+            @Transform(ArrayListConverter.class) List<String> texts) {
         commonspec.getLogger().info("Verifying text content of elements {}", texts);
 
-        List<WebElement> wel = commonspec.locateElement(element);
+        List<WebElement> wel = commonspec.locateElement(method, element);
 
         assertThat(wel).as("No element with with " + element + " attribute found").isNotEmpty();
         String[] expectedTexts = texts.toArray(new String[texts.size()]);
@@ -363,17 +364,18 @@ public class ThenGSpec extends BaseGSpec {
      * @param attrib
      * @param element
      */
-    @Then("^waiting during '(.*?)' minutes and polling every '(.*?)', an element '(.*?)' exists$")
-    public void pollElementAngular(Integer totalTime, Integer poll, String element) throws InterruptedException {
+    @Then("^waiting during '(.*?)' minutes and polling every '(.*?)', an element '([^:]*?):([^:]*?)' exists$")
+    public void pollForElement(Integer totalTime, Integer poll, String method, String element)
+            throws InterruptedException {
         commonspec.getLogger().info("Waiting for element to be available: {} minutes", totalTime);
-        List<WebElement> wel = commonspec.locateElement(element);
+        List<WebElement> wel = commonspec.locateElement(method, element);
         int i = totalTime;
 
         while ((i >= 0) && (wel.size() == 0)) {
             i = i - poll;
             Thread.sleep(poll * 1000 * 60);
             commonspec.getLogger().info("Waited {}", totalTime - i);
-            wel = commonspec.locateElement(element);
+            wel = commonspec.locateElement(method, element);
         }
 
         assertThat(wel).as("No element with with " + element + " attribute found").isNotEmpty();
@@ -385,11 +387,11 @@ public class ThenGSpec extends BaseGSpec {
      * @param element
      * @param text
      */
-    @Then("^an element '(.*?)' does has a text '(.*?)'$")
-    public void textOnElementPresent(String element, String text) {
+    @Then("^an element '([^:]*?):([^:]*?)' does has a text '(.*?)'$")
+    public void textOnElementPresent(String method, String element, String text) {
         commonspec.getLogger().info("Verifying text unexistance");
 
-        List<WebElement> wel = commonspec.locateElement(element);
+        List<WebElement> wel = commonspec.locateElement(method, element);
         assertThat(wel).as("No element with with " + element + " attribute found").isNotEmpty();
         assertThat(wel.get(0)).contains(text);
     }
@@ -400,11 +402,11 @@ public class ThenGSpec extends BaseGSpec {
      * @param target
      * @param texts
      */
-    @Then("^an element '(.*?)' exists")
-    public void assertElementExists(String element) {
+    @Then("^an element '([^:]*?):([^:]*?)' exists")
+    public void assertElementExists(String method, String element) {
         commonspec.getLogger().info("Verifying elements { existance}", element);
 
-        List<WebElement> wel = commonspec.locateElement(element);
+        List<WebElement> wel = commonspec.locateElement(method, element);
 
         assertThat(wel).as("Element " + element + " not found").isNotEmpty();
     }

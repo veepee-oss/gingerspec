@@ -1,5 +1,7 @@
 package com.stratio.specs;
 
+import static org.testng.Assert.fail;
+
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -151,57 +153,38 @@ public class CommonG {
      * @param element
      * @throws Exception
      */
-    public List<WebElement> locateElement(String element) {
+    public List<WebElement> locateElement(String method, String element) {
 
         List<WebElement> wel = null;
 
-        if (!element.contains(":")) {
-            wel = this.locateSelenium(element);
+        if ("id".equals(method)) {
+            logger.info("Locating {} by id", element);
+            wel = this.getDriver().findElements(By.id(element));
+        } else if ("name".equals(method)) {
+            logger.info("Locating {} by name", element);
+            wel = this.getDriver().findElements(By.name(element));
+        } else if ("xpath".equals(method)) {
+            logger.info("Locating {} by xpath", element);
+            wel = this.getDriver().findElements(By.xpath(element));
+        } else if ("css".equals(method)) {
+            if (!element.contains("=")) {
+                fail("Bad css search method attributes: " + element);
+            } else {
+                logger.info("Locating {} by css", element);
+                String[] attr = element.split("=");
+                wel = this.getDriver().findElements(By.cssSelector("[" + attr[0] + "=\"" + attr[1] + "\"]"));
+            }
         } else {
-            String[] attrib = element.split(":");
-            wel = this.locateCssSelector(attrib[0], attrib[1]);
+            fail("Unknown search method: " + method);
         }
+
         if (wel.size() == 0) {
-            this.captureEvidence(this.getDriver(), "framehtmlSource");
+            // this.captureEvidence(this.getDriver(), "framehtmlSource");
             this.captureEvidence(this.getDriver(), "htmlSource");
             this.captureEvidence(this.getDriver(), "screenCapture");
         }
 
         return wel;
-    }
-
-    /**
-     * Looks for webelements inside a selenium context. This search will be made by id, name and xpath expression
-     * matching an {@code locator} value
-     * 
-     * @param element
-     */
-    private List<WebElement> locateSelenium(String element) {
-
-        List<WebElement> we = new ArrayList<WebElement>();
-        we = this.getDriver().findElements(By.id(element));
-        if (we.size() == 0) {
-            we = this.getDriver().findElements(By.name(element));
-            if (we.size() == 0) {
-                we = this.getDriver().findElements(By.xpath(element));
-            }
-        }
-
-        return we;
-    }
-
-    /**
-     * Looks for webelements inside a selenium context. This search will be made by a css selector using
-     * {@code attribute} and {@code value} value
-     * 
-     * @param attribute
-     * @param value
-     */
-    private List<WebElement> locateCssSelector(String attribute, String value) {
-        List<WebElement> we = new ArrayList<WebElement>();
-        we = this.getDriver().findElements(By.cssSelector("[" + attribute + "=\"" + value + "\"]"));
-
-        return we;
     }
 
     /**

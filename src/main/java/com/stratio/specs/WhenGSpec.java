@@ -47,11 +47,11 @@ public class WhenGSpec extends BaseGSpec {
      * @param zone
      * @param target
      */
-    @When("^I click on '(.*?)'")
-    public void searchAndClick(String element) {
+    @When("^I click on '([^:]*?):([^:]*?)'")
+    public void searchAndClick(String method, String element) {
         String elem = commonspec.replacePlaceholders(element);
         commonspec.getLogger().info("Clicking at {}", elem);
-        List<WebElement> wel = commonspec.locateElement(elem);
+        List<WebElement> wel = commonspec.locateElement(method, elem);
 
         assertThat(wel).as("No element found with locator " + element).isNotEmpty();
 
@@ -65,11 +65,11 @@ public class WhenGSpec extends BaseGSpec {
      * @param text
      * @param target
      */
-    @When("^I type '(.*?)' at '(.*?)'")
-    public void searchAndType(String text, String element) {
+    @When("^I type '(.*?)' at '([^:]*?):([^:]*?)'")
+    public void searchAndType(String text, String method, String element) {
         String newText = commonspec.replacePlaceholders(text);
         commonspec.getLogger().info("Typing {} on {}", newText, element);
-        List<WebElement> wel = commonspec.locateElement(element);
+        List<WebElement> wel = commonspec.locateElement(method, element);
 
         wel.get(0).sendKeys(newText);
     }
@@ -81,11 +81,11 @@ public class WhenGSpec extends BaseGSpec {
      * @param text
      * @param target
      */
-    @When("^I select '(.*?)' on '(.*?)'$")
-    public void elementSelect(String option, String element) {
+    @When("^I select '(.*?)' on '([^:]*?):([^:]*?)'$")
+    public void elementSelect(String option, String method, String element) {
         commonspec.getLogger().info("Choosing option on select");
         String opt = commonspec.replacePlaceholders(option);
-        List<WebElement> wel = commonspec.locateElement(element);
+        List<WebElement> wel = commonspec.locateElement(method, element);
 
         Select sel = null;
         sel = new Select(wel.get(0));
@@ -102,14 +102,14 @@ public class WhenGSpec extends BaseGSpec {
      * @param source
      * @param destination
      */
-    @When("^I drag '(.*?)' and drop it to '(.*?)'$")
-    public void dragElement(String source, String destination) {
+    @When("^I drag '([^:]*?):([^:]*?)' and drop it to '([^:]*?):([^:]*?)'$")
+    public void dragElement(String smethod, String source, String dmethod, String destination) {
         commonspec.getLogger().info("Dragging element");
 
         Actions builder = new Actions(commonspec.getDriver());
 
-        List<WebElement> sourceElement = commonspec.locateElement(source);
-        List<WebElement> destinationElement = commonspec.locateElement(destination);
+        List<WebElement> sourceElement = commonspec.locateElement(smethod, source);
+        List<WebElement> destinationElement = commonspec.locateElement(dmethod, destination);
 
         builder.dragAndDrop(sourceElement.get(0), destinationElement.get(0)).perform();
     }

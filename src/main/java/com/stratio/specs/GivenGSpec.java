@@ -180,8 +180,8 @@ public class GivenGSpec extends BaseGSpec {
      * @param element
      * @throws InterruptedException
      */
-    @Given("^I browse to '(.*?)', during '(.*?)' minutes and polling every '(.*?)', an element '(.*?)' exists$")
-    public void seleniumBrowseRepeatedly(String url, Integer totalTime, Integer poll, String element)
+    @Given("^I browse to '(.*?)', during '(.*?)' minutes and polling every '(.*?)', an element '([^:]*?):([^:]*?)' exists$")
+    public void seleniumBrowseRepeatedly(String url, Integer totalTime, Integer poll, String method, String element)
             throws InterruptedException {
         assertThat(url).isNotEmpty();
         String newUrl = commonspec.replacePlaceholders(url);
@@ -189,7 +189,7 @@ public class GivenGSpec extends BaseGSpec {
                 .info("Browsing to {} with {}, during {}", newUrl, commonspec.getBrowserName(), totalTime);
 
         commonspec.getDriver().get("http://" + newUrl);
-        List<WebElement> wel = commonspec.locateElement(element);
+        List<WebElement> wel = commonspec.locateElement(method, element);
         int i = totalTime;
 
         while ((i >= 0) && (wel.size() == 0)) {
@@ -197,7 +197,7 @@ public class GivenGSpec extends BaseGSpec {
             Thread.sleep(poll * 1000 * 60);
             commonspec.getLogger().info("Waited {}", totalTime - i);
             commonspec.getDriver().get("http://" + newUrl);
-            wel = commonspec.locateElement(element);
+            wel = commonspec.locateElement(method, element);
         }
     }
 
