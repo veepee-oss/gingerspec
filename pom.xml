@@ -18,7 +18,7 @@
 		<slf4j-api.version>1.7.7</slf4j-api.version>
 		<reflections.version>0.9.9-RC1</reflections.version>
 		<org.jacoco.core.version>0.7.1.201405082137</org.jacoco.core.version>
-		<aspectjweaver.version>1.8.2</aspectjweaver.version>		
+		<aspectjweaver.version>1.8.2</aspectjweaver.version>
 		<cassandra-driver-core.version>2.1.1</cassandra-driver-core.version>
 		<guava.version>15.0</guava.version>
 		<lz4.version>1.2.0</lz4.version>
@@ -26,7 +26,8 @@
 		<aerospike-client.version>[3.0.0,)</aerospike-client.version>
 		<mongo-java-driver.version>2.12.3</mongo-java-driver.version>
 		<selenium-java.version>2.44.0</selenium-java.version>
-		<jsoup.version>1.7.3</jsoup.version>		
+		<jsoup.version>1.7.3</jsoup.version>
+
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<build>
@@ -111,16 +112,16 @@
 			<version>${aspectjweaver.version}</version>
 		</dependency>
 		<dependency>
-            <groupId>com.datastax.cassandra</groupId>
-            <artifactId>cassandra-driver-core</artifactId>
-            <version>${cassandra-driver-core.version}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>netty</artifactId>
-                    <groupId>io.netty</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>        
+			<groupId>com.datastax.cassandra</groupId>
+			<artifactId>cassandra-driver-core</artifactId>
+			<version>${cassandra-driver-core.version}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>netty</artifactId>
+					<groupId>io.netty</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
@@ -156,7 +157,7 @@
 			<artifactId>jsoup</artifactId>
 			<version>${jsoup.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-slf4j-impl</artifactId>
@@ -174,6 +175,6 @@
 			<artifactId>log4j-1.2-api</artifactId>
 			<version>2.0</version>
 			<scope>test</scope>
-		</dependency>		
+		</dependency>
 	</dependencies>
 </project>

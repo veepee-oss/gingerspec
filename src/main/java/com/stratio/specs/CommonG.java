@@ -171,8 +171,9 @@ public class CommonG {
                 fail("Bad css search method attributes: " + element);
             } else {
                 logger.info("Locating {} by css", element);
-                String[] attr = element.split("=");
-                wel = this.getDriver().findElements(By.cssSelector("[" + attr[0] + "=\"" + attr[1] + "\"]"));
+                String attribute = element.substring(0, element.indexOf("="));
+                String value = element.substring(element.indexOf("=") + 1);
+                wel = this.getDriver().findElements(By.cssSelector("[" + attribute + "=\"" + value + "\"]"));
             }
         } else {
             fail("Unknown search method: " + method);
