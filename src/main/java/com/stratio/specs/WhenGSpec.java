@@ -73,13 +73,13 @@ public class WhenGSpec extends BaseGSpec {
         List<WebElement> wel = commonspec.locateElement(method, element);
 
         while (newText.length() > 0) {
-            if (-1 == newText.indexOf("\n")) {
+            if (-1 == newText.indexOf("\\n")) {
                 wel.get(0).sendKeys(newText);
                 newText = "";
             } else {
-                wel.get(0).sendKeys(newText.substring(0, newText.indexOf("\n")));
+                wel.get(0).sendKeys(newText.substring(0, newText.indexOf("\\n")));
                 wel.get(0).sendKeys(Keys.ENTER);
-                newText = newText.substring(newText.indexOf("\n") + 2);
+                newText = newText.substring(newText.indexOf("\\n") + 2);
             }
         }
     }
