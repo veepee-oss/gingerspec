@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.Select;
@@ -71,7 +72,16 @@ public class WhenGSpec extends BaseGSpec {
         commonspec.getLogger().info("Typing {} on {}", newText, element);
         List<WebElement> wel = commonspec.locateElement(method, element);
 
-        wel.get(0).sendKeys(newText);
+        while (newText.length() > 0) {
+            if (-1 == newText.indexOf("\n")) {
+                wel.get(0).sendKeys(newText);
+                newText = "";
+            } else {
+                wel.get(0).sendKeys(newText.substring(0, newText.indexOf("\n")));
+                wel.get(0).sendKeys(Keys.ENTER);
+                newText = newText.substring(newText.indexOf("\n") + 2);
+            }
+        }
     }
 
     /**
