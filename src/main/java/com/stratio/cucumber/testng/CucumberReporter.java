@@ -1,10 +1,22 @@
 package com.stratio.cucumber.testng;
 
+import gherkin.formatter.Formatter;
+import gherkin.formatter.Reporter;
+import gherkin.formatter.model.Background;
+import gherkin.formatter.model.DataTableRow;
+import gherkin.formatter.model.Examples;
+import gherkin.formatter.model.Feature;
+import gherkin.formatter.model.Match;
+import gherkin.formatter.model.Result;
+import gherkin.formatter.model.Scenario;
+import gherkin.formatter.model.ScenarioOutline;
+import gherkin.formatter.model.Step;
+import gherkin.formatter.model.Tag;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -28,33 +40,22 @@ import org.w3c.dom.NodeList;
 import com.stratio.tests.utils.ThreadProperty;
 
 import cucumber.runtime.CucumberException;
+import cucumber.runtime.Utils;
 import cucumber.runtime.io.URLOutputStream;
 import cucumber.runtime.io.UTF8OutputStreamWriter;
-import gherkin.formatter.Formatter;
-import gherkin.formatter.Reporter;
-import gherkin.formatter.model.Background;
-import gherkin.formatter.model.DataTableRow;
-import gherkin.formatter.model.Examples;
-import gherkin.formatter.model.Feature;
-import gherkin.formatter.model.Match;
-import gherkin.formatter.model.Result;
-import gherkin.formatter.model.Scenario;
-import gherkin.formatter.model.ScenarioOutline;
-import gherkin.formatter.model.Step;
-import gherkin.formatter.model.Tag;
 
-class CucumberReporter implements Formatter, Reporter {
+public class CucumberReporter implements Formatter, Reporter {
     public static final int DURATION_STRING = 1000000;
     public static final int DEFAULT_LENGTH = 11;
     public static final int DEFAULT_MAX_LENGTH = 140;
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-    private final Writer writer;
-    private final Document document;
-    private final Element results;
-    private final Element suite;
-    private final Element test;
+    private final Writer writer, writerJunit;
+    private final Document document, jUnitDocument;
+    private final Element results, jUnitResults;
+    private final Element suite, jUnitSuite;
+    private final Element test, jUnitTest;
     private Element clazz;
-    private Element root;
+    private Element root, jUnitRoot;
     private TestMethod testMethod;
     private Examples tmpExamples;
     private List<Result> tmpHooks = new ArrayList<Result>();
@@ -65,6 +66,8 @@ class CucumberReporter implements Formatter, Reporter {
     private String callerClass;
     private Background background;
     private static final String STATUS = "status";
+    long time_start, time_end;
+    String featureName;
 
     /**
      * Constructor of cucumberReporter.
@@ -73,8 +76,11 @@ class CucumberReporter implements Formatter, Reporter {
      * @param cClass
      * @throws IOException
      */
-    public CucumberReporter(URL url, String cClass) throws IOException {
-        this.writer = new UTF8OutputStreamWriter(new URLOutputStream(url));
+    public CucumberReporter(String url, String cClass, String additional) throws IOException {
+        this.writer = new UTF8OutputStreamWriter(new URLOutputStream(Utils.toURL(url + cClass + additional
+                + "TESTNG.xml")));
+        this.writerJunit = new UTF8OutputStreamWriter(new URLOutputStream(Utils.toURL(url + cClass + additional
+                + "JUNIT.xml")));
         TestMethod.treatSkippedAsFailure = false;
         try {
             document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
@@ -85,6 +91,12 @@ class CucumberReporter implements Formatter, Reporter {
             suite.appendChild(test);
             results.appendChild(suite);
             document.appendChild(results);
+            jUnitDocument = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+            jUnitResults = jUnitDocument.createElement("testsuites");
+            jUnitSuite = jUnitDocument.createElement("testsuite");
+            jUnitTest = jUnitDocument.createElement("testcase");
+            jUnitDocument.appendChild(jUnitResults);
+            jUnitResults.appendChild(jUnitSuite);
         } catch (ParserConfigurationException e) {
             throw new CucumberException("Error initializing DocumentBuilder.", e);
         }
@@ -100,6 +112,7 @@ class CucumberReporter implements Formatter, Reporter {
 
     @Override
     public void feature(Feature feature) {
+        featureName = feature.getName();
         clazz = document.createElement("class");
         clazz.setAttribute("name", callerClass);
         test.appendChild(clazz);
@@ -122,6 +135,8 @@ class CucumberReporter implements Formatter, Reporter {
     @Override
     public void startOfScenarioLifeCycle(Scenario scenario) {
         root = document.createElement("test-method");
+        jUnitRoot = jUnitDocument.createElement("testcase");
+        jUnitSuite.appendChild(jUnitRoot);
         clazz.appendChild(root);
         testMethod = new TestMethod(scenario);
         testMethod.hooks = tmpHooks;
@@ -134,7 +149,7 @@ class CucumberReporter implements Formatter, Reporter {
             testMethod.stepsbg = tmpStepsBG;
         }
         testMethod.examplesData = tmpExamples;
-        testMethod.start(root, iteration);
+        testMethod.start(root, iteration, jUnitRoot);
         iteration++;
     }
 
@@ -168,7 +183,7 @@ class CucumberReporter implements Formatter, Reporter {
             }
         }
 
-        testMethod.finish(document, root, this.position, ignored);
+        testMethod.finish(document, root, this.position, ignored, jUnitDocument, jUnitRoot);
         this.position++;
         if ((tmpExamples != null) && (iteration >= tmpExamples.getRows().size())) {
             tmpExamples = null;
@@ -177,6 +192,7 @@ class CucumberReporter implements Formatter, Reporter {
         tmpSteps.clear();
         tmpStepsBG.clear();
         testMethod = null;
+        jUnitRoot.setAttribute("classname", callerClass);
     }
 
     @Override
@@ -191,15 +207,30 @@ class CucumberReporter implements Formatter, Reporter {
             results.setAttribute("failed", String.valueOf(getElementsCountByAttribute(suite, STATUS, "FAIL")));
             results.setAttribute("skipped", String.valueOf(getElementsCountByAttribute(suite, STATUS, "SKIP")));
             suite.setAttribute("name", CucumberReporter.class.getName());
-            suite.setAttribute("duration-ms", getTotalDuration(suite.getElementsByTagName("test-method")));
+            suite.setAttribute("duration-ms",
+                    String.valueOf(getTotalDuration(suite.getElementsByTagName("test-method"))));
             test.setAttribute("name", CucumberReporter.class.getName());
-            test.setAttribute("duration-ms", getTotalDuration(suite.getElementsByTagName("test-method")));
+            test.setAttribute("duration-ms",
+                    String.valueOf(getTotalDuration(suite.getElementsByTagName("test-method"))));
 
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
             StreamResult streamResult = new StreamResult(writer);
             DOMSource domSource = new DOMSource(document);
             transformer.transform(domSource, streamResult);
+            jUnitSuite.setAttribute("name", callerClass + "." + featureName);
+            jUnitSuite.setAttribute("tests", String.valueOf(getElementsCountByAttribute(suite, STATUS, ".*")));
+            jUnitSuite.setAttribute("failures", String.valueOf(getElementsCountByAttribute(suite, STATUS, "FAIL")));
+            jUnitSuite.setAttribute("skipped", String.valueOf(getElementsCountByAttribute(suite, STATUS, "SKIP")));
+            jUnitSuite.setAttribute("timestamp", new java.util.Date().toString());
+            jUnitSuite.setAttribute("time",
+                    String.valueOf(getTotalDurationMs(suite.getElementsByTagName("test-method"))));
+            Transformer transformerJunit = TransformerFactory.newInstance().newTransformer();
+            transformerJunit.setOutputProperty(OutputKeys.INDENT, "yes");
+            StreamResult streamResultJunit = new StreamResult(writerJunit);
+            DOMSource domSourceJunit = new DOMSource(jUnitDocument);
+            transformerJunit.transform(domSourceJunit, streamResultJunit);
+
         } catch (TransformerException e) {
             throw new CucumberException("Error transforming report.", e);
         }
@@ -254,8 +285,8 @@ class CucumberReporter implements Formatter, Reporter {
         return count;
     }
 
-    private String getTotalDuration(NodeList testCaseNodes) {
-        long totalDuration = 0;
+    private double getTotalDuration(NodeList testCaseNodes) {
+        double totalDuration = 0;
         for (int i = 0; i < testCaseNodes.getLength(); i++) {
             try {
                 String duration = "0";
@@ -263,12 +294,16 @@ class CucumberReporter implements Formatter, Reporter {
                 if (durationms != null) {
                     duration = durationms.getNodeValue();
                 }
-                totalDuration += Long.parseLong(duration);
+                totalDuration += Double.parseDouble(duration);
             } catch (NumberFormatException e) {
                 throw new CucumberException(e);
             }
         }
-        return String.valueOf(totalDuration);
+        return totalDuration;
+    }
+
+    private double getTotalDurationMs(NodeList testCaseNodes) {
+        return getTotalDuration(testCaseNodes) / 1000;
     }
 
     private static final class TestMethod {
@@ -286,15 +321,17 @@ class CucumberReporter implements Formatter, Reporter {
             this.scenario = scenario;
         }
 
-        private void start(Element element, Integer iteration) {
+        private void start(Element element, Integer iteration, Element JunitElement) {
             this.iteration = iteration;
             if ((examplesData == null) || (this.iteration >= examplesData.getRows().size())) {
                 element.setAttribute("name", scenario.getName());
+                JunitElement.setAttribute("name", scenario.getName());
                 ThreadProperty.set("dataSet", "");
             } else {
                 String data = examplesData.getRows().get(iteration).getCells().toString();
                 data = data.replaceAll("\"", "¨");
                 element.setAttribute("name", scenario.getName() + " " + data);
+                JunitElement.setAttribute("name", scenario.getName() + " " + data);
                 ThreadProperty.set("dataSet", data);
             }
             element.setAttribute("started-at", DATE_FORMAT.format(new Date()));
@@ -308,10 +345,14 @@ class CucumberReporter implements Formatter, Reporter {
          * @param position
          * @param ignored
          */
-        public void finish(Document doc, Element element, Integer position, Boolean ignored) {
+        public void finish(Document doc, Element element, Integer position, Boolean ignored, Document docJunit,
+                Element Junit) {
 
-            element.setAttribute("duration-ms", calculateTotalDurationString());
+            Junit.setAttribute("time", String.valueOf(calculateTotalDurationString() / 1000));
+
+            element.setAttribute("duration-ms", String.valueOf(calculateTotalDurationString()));
             element.setAttribute("finished-at", DATE_FORMAT.format(new Date()));
+
             StringBuilder stringBuilder = new StringBuilder();
 
             addStepAndResultListing(stringBuilder);
@@ -322,6 +363,11 @@ class CucumberReporter implements Formatter, Reporter {
                 Element exception = createException(doc, "SkippedDueTagException",
                         "This scenario was skipped due the use of the @ignore tag", " ");
                 element.appendChild(exception);
+                Element skippedElementJunit = docJunit.createElement("skipped");
+                Junit.appendChild(skippedElementJunit);
+                Element systemOut = systemOutPrintJunit(docJunit,
+                        "This scenario was skipped due the use of the @ignore tag");
+                Junit.appendChild(systemOut);
             } else {
                 for (Result result : results) {
                     if ("failed".equals(result.getStatus())) {
@@ -342,34 +388,46 @@ class CucumberReporter implements Formatter, Reporter {
                     Element exception = createException(doc, failed.getError().getClass().getName(),
                             stringBuilder.toString(), stringWriter.toString());
                     element.appendChild(exception);
-
+                    Element exceptionJunit = createExceptionJunit(docJunit, failed.getError().getClass().getName(),
+                            stringBuilder.toString(), stringWriter.toString());
+                    Junit.appendChild(exceptionJunit);
                 } else if (skipped != null) {
                     if (treatSkippedAsFailure) {
                         element.setAttribute(STATUS, "FAIL");
                         Element exception = createException(doc, "The scenario has pending or undefined step(s)",
                                 stringBuilder.toString(), "The scenario has pending or undefined step(s)");
                         element.appendChild(exception);
+                        Element exceptionJunit = createExceptionJunit(docJunit,
+                                "The scenario has pending or undefined step(s)", stringBuilder.toString(),
+                                "The scenario has pending or undefined step(s)");
+                        Junit.appendChild(exceptionJunit);
                     } else {
                         element.setAttribute(STATUS, "SKIP");
+                        Element skippedElementJunit = docJunit.createElement("skipped");
+                        Junit.appendChild(skippedElementJunit);
+                        Element systemOut = systemOutPrintJunit(docJunit, stringBuilder.toString());
+                        Junit.appendChild(systemOut);
                     }
+
                 } else {
                     element.setAttribute(STATUS, "PASS");
-
                     Element exception = createException(doc, "NonRealException", stringBuilder.toString(), " ");
                     element.appendChild(exception);
+                    Element systemOut = systemOutPrintJunit(docJunit, stringBuilder.toString());
+                    Junit.appendChild(systemOut);
                 }
             }
         }
 
-        private String calculateTotalDurationString() {
-            long totalDurationNanos = 0;
+        private double calculateTotalDurationString() {
+            double totalDurationNanos = 0;
             for (Result r : results) {
                 totalDurationNanos += r.getDuration() == null ? 0 : r.getDuration();
             }
             for (Result r : hooks) {
                 totalDurationNanos += r.getDuration() == null ? 0 : r.getDuration();
             }
-            return String.valueOf(totalDurationNanos / DURATION_STRING);
+            return totalDurationNanos / DURATION_STRING;
         }
 
         private void addStepAndResultListing(StringBuilder sb) {
@@ -431,6 +489,21 @@ class CucumberReporter implements Formatter, Reporter {
             exceptionElement.appendChild(stacktraceElement);
 
             return exceptionElement;
+        }
+
+        private Element createExceptionJunit(Document doc, String clazz, String message, String stacktrace) {
+            Element exceptionElement = doc.createElement("failure");
+            if (message != null) {
+                exceptionElement.setAttribute("message", "\r\n" + message + "\r\n");
+            }
+            exceptionElement.appendChild(doc.createCDATASection(stacktrace));
+            return exceptionElement;
+        }
+
+        private Element systemOutPrintJunit(Document doc, String message) {
+            Element systemOut = doc.createElement("system-out");
+            systemOut.appendChild(doc.createCDATASection("\r\n" + message + "\r\n"));
+            return systemOut;
         }
     }
 }

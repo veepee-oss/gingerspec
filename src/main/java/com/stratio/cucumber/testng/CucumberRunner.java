@@ -14,7 +14,6 @@ import cucumber.api.CucumberOptions;
 import cucumber.runtime.ClassFinder;
 import cucumber.runtime.RuntimeOptions;
 import cucumber.runtime.RuntimeOptionsFactory;
-import cucumber.runtime.Utils;
 import cucumber.runtime.io.MultiLoader;
 import cucumber.runtime.io.ResourceLoader;
 import cucumber.runtime.io.ResourceLoaderClassFinder;
@@ -51,18 +50,16 @@ public class CucumberRunner {
         RuntimeOptions runtimeOptions = runtimeOptionsFactory.create();
 
         boolean aux = new File("target/executions/").mkdirs();
-        CucumberReporter reporter;
-        if ((feature.length == 0)) {
-            reporter = new CucumberReporter(Utils.toURL("target/executions/" + clazz.getCanonicalName() + ".xml"),
-                    clazz.getCanonicalName());
+        CucumberReporter reporterTestNG;
 
+        if ((feature.length == 0)) {
+            reporterTestNG = new CucumberReporter("target/executions/", clazz.getCanonicalName(), "");
         } else {
             List<String> features = new ArrayList<String>();
             String fPath = "src/test/resources/features/" + feature[0] + ".feature";
             features.add(fPath);
             runtimeOptions.getFeaturePaths().addAll(features);
-            reporter = new CucumberReporter(Utils.toURL("target/executions/" + clazz.getCanonicalName() + "$"
-                    + feature[0] + ".xml"), clazz.getCanonicalName());
+            reporterTestNG = new CucumberReporter("target/executions/", clazz.getCanonicalName(), feature[0]);
         }
 
         List<String> uniqueGlue = new ArrayList<String>();
@@ -76,8 +73,7 @@ public class CucumberRunner {
         runtimeOptions.getGlue().clear();
         runtimeOptions.getGlue().addAll(uniqueGlue);
 
-        runtimeOptions.addFormatter(reporter);
-
+        runtimeOptions.addFormatter(reporterTestNG);
         Set<Class<? extends ICucumberFormatter>> implementers = new Reflections("com.stratio.tests.utils")
                 .getSubTypesOf(ICucumberFormatter.class);
 
