@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +36,7 @@ public class CassandraUtils {
     private final String host;
     private Metadata metadata;
     private Session session;
-    private QueryUtils queryUtils;
+    private CassandraQueryUtils CassandraqueryUtils;
 
     /**
      * Generic contructor of CassandraUtils.
@@ -49,7 +50,7 @@ public class CassandraUtils {
      */
     public void connect() {
         buildCluster();
-        this.queryUtils = new QueryUtils();
+        this.CassandraqueryUtils = new CassandraQueryUtils();
         this.metadata = this.cluster.getMetadata();
         LOGGER.debug("Connected to cluster (" + host + "): " + metadata.getClusterName() + "\n");
         this.session = this.cluster.connect();
@@ -141,11 +142,11 @@ public class CassandraUtils {
      * @param keyspace
      */
     public void createKeyspace(String keyspace) {
-        Map<String, String> replicationSimpleOneExtra = new Hashtable<String, String>();
+        Map<String, String> replicationSimpleOneExtra = new HashMap<>();
         replicationSimpleOneExtra.put("'class'", "'SimpleStrategy'");
         replicationSimpleOneExtra.put("'replication_factor'", "1");
-        String query = this.queryUtils.createKeyspaceQuery(true, keyspace,
-                queryUtils.createKeyspaceReplication(replicationSimpleOneExtra), "");
+        String query = this.CassandraqueryUtils.createKeyspaceQuery(true, keyspace,
+                this.CassandraqueryUtils.createKeyspaceReplication(replicationSimpleOneExtra), "");
         LOGGER.debug(query);
         executeQuery(query);
     }
@@ -196,7 +197,7 @@ public class CassandraUtils {
      * @param keyspace
      */
     public void dropKeyspace(String keyspace) {
-        executeQuery(this.queryUtils.dropKeyspaceQuery(false, keyspace));
+        executeQuery(this.CassandraqueryUtils.dropKeyspaceQuery(false, keyspace));
     }
 
     /**
@@ -206,7 +207,7 @@ public class CassandraUtils {
      * @param keyspace
      */
     public void dropKeyspace(boolean ifExists, String keyspace) {
-        executeQuery(this.queryUtils.dropKeyspaceQuery(ifExists, keyspace));
+        executeQuery(this.CassandraqueryUtils.dropKeyspaceQuery(ifExists, keyspace));
     }
 
     /**
@@ -215,7 +216,7 @@ public class CassandraUtils {
      * @param keyspace
      */
     public void useKeyspace(String keyspace) {
-        executeQuery(this.queryUtils.useQuery(keyspace));
+        executeQuery(this.CassandraqueryUtils.useQuery(keyspace));
     }
 
     /**
@@ -272,7 +273,7 @@ public class CassandraUtils {
      */
     public void dropTable(String keyspace, String table) {
         // se elimina la table
-        executeQuery(this.queryUtils.dropTableQuery(false, table));
+        executeQuery(this.CassandraqueryUtils.dropTableQuery(false, table));
     }
 
     /**

@@ -9,8 +9,9 @@ import java.util.Map;
  * @author Hugo Dominguez
  * 
  */
-public class QueryUtils {
-    /**
+public class CassandraQueryUtils {
+    
+     /**
      * Use Keyspace Query.
      * 
      * @param keyspace
