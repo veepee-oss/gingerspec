@@ -10,6 +10,13 @@
 	<name>stratio-test-bdd</name>
 	<url>https://github.com/Stratio/stratio-test-bdd</url>
 
+    <scm>
+        <url>https://github.com/Stratio/stratio-test-bdd</url>
+        <connection>scm:git:git://github.com/Stratio/stratio-test-bdd.git</connection>
+        <developerConnection>scm:git:git@github.com:Stratio/stratio-test-bdd.git
+        </developerConnection>
+    </scm>
+    
 	<properties>
 		<cucumber-java.version>1.1.6</cucumber-java.version>
 		<testng.version>6.8.8</testng.version>
