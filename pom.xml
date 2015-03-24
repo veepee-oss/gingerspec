@@ -17,7 +17,7 @@
         <scm>
             <url>https://github.com/Stratio/stratio-test-bdd</url>
             <connection>scm:git:git://github.com/Stratio/stratio-test-bdd.git</connection>
-            <developerConnection>scm:git:git@github.com:Stratio/stratio-test-bdd.git
+            <developerConnection>scm:git:https://github.com/Stratio/stratio-test-bdd.git
             </developerConnection>
         </scm>
     
