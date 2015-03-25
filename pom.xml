@@ -18,6 +18,7 @@
             <connection>scm:git:git://github.com/Stratio/stratio-test-bdd.git</connection>
             <developerConnection>scm:git:https://github.com/Stratio/stratio-test-bdd.git
             </developerConnection>
+            <tag>HEAD</tag>
         </scm>
     
 	<properties>
