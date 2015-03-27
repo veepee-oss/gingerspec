@@ -1,10 +1,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-        <parent>
-               <groupId>com.stratio</groupId>
-	       <artifactId>parent</artifactId>
-   	       <version>0.1.0</version>
-        </parent>
+	<parent>
+		<groupId>com.stratio</groupId>
+		<artifactId>parent</artifactId>
+		<version>0.1.0</version>
+	</parent>
 	<groupId>com.stratio.qa</groupId>
 	<artifactId>stratio-test-bdd</artifactId>
 	<version>0.2.0-SNAPSHOT</version>
@@ -13,14 +13,14 @@
 	<name>Stratio BDD testing lib</name>
 	<url>https://github.com/Stratio/stratio-test-bdd</url>
 
-        <scm>
-            <url>https://github.com/Stratio/stratio-test-bdd</url>
-            <connection>scm:git:git://github.com/Stratio/stratio-test-bdd.git</connection>
-            <developerConnection>scm:git:https://github.com/Stratio/stratio-test-bdd.git
-            </developerConnection>
-            <tag>HEAD</tag>
-        </scm>
-    
+	<scm>
+		<url>https://github.com/Stratio/stratio-test-bdd</url>
+		<connection>scm:git:git@github.com:Stratio/stratio-test-bdd.git</connection>
+		<developerConnection>scm:git:git@github.com:Stratio/stratio-test-bdd.git
+        </developerConnection>
+		<tag>HEAD</tag>
+	</scm>
+
 	<properties>
 		<cucumber-java.version>1.1.6</cucumber-java.version>
 		<testng.version>6.8.8</testng.version>
