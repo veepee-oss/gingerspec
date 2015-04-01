@@ -65,8 +65,9 @@
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
 				<version>0.7.1.201405082137</version>
-				<configuration>
+				<configuration>				    
 					<destFile>${project.build.directory}/jacocoUT.exec</destFile>
+					<propertyName>jacoco-UT-argline</propertyName>
 				</configuration>
 				<executions>
 					<execution>
