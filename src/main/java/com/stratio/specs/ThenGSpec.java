@@ -33,10 +33,8 @@ import com.datastax.driver.core.DataType;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.mongodb.DBObject;
-import com.stratio.cucumber.converter.ArrayListConverter;
 
 import cucumber.api.DataTable;
-import cucumber.api.Transform;
 import cucumber.api.java.en.Then;
 
 /**
@@ -332,94 +330,57 @@ public class ThenGSpec extends BaseGSpec {
      * @param text
      */
     @Then("^a text '(.*?)' exists$")
-    public void assertTextInSource(String text) {
-        commonspec.getLogger().info("Verifying if our current page contains the text {}", text);
-        assertThat(commonspec.getDriver()).as("Expected text not found at page").contains(text);
+    public void assertSeleniumTextInSource(String text) {
+
+        String newText = commonspec.replacePlaceholders(text);
+
+        commonspec.getLogger().info("Verifying if our current page contains the text {}", newText);
+        assertThat(commonspec.getDriver()).as("Expected text not found at page").contains(newText);
     }
 
     /**
-     * Checks if the first element found has an expecific text.
+     * Verifies that a webelement previously found has {@code text} as text
      * 
-     * @param element
-     * @param texts
-     */
-    @Then("^an element '([^:]*?):([^:]*?)' has '(.*?)' as content$")
-    public void assertTextInElement(String method, String element,
-            @Transform(ArrayListConverter.class) List<String> texts) {
-        commonspec.getLogger().info("Verifying text content of elements {}", texts);
-
-        List<WebElement> wel = commonspec.locateElement(method, element);
-
-        assertThat(wel).as("No element with with " + element + " attribute found").isNotEmpty();
-        String[] expectedTexts = texts.toArray(new String[texts.size()]);
-        assertThat(wel.get(0)).as("Element doesnt contains expected text").contains(expectedTexts);
-    }
-
-    /**
-     * Queries a web each {@code poll} minutes, for a maximum of {@code totalTime} minutes, until at least an element
-     * with attribute {@code attrib} with a value {@code element} exists.
-     * 
-     * @param totalTime
-     * @param poll
-     * @param attrib
-     * @param element
-     */
-    @Then("^waiting during '(.*?)' minutes and polling every '(.*?)', an element '([^:]*?):([^:]*?)' exists$")
-    public void pollForElement(Integer totalTime, Integer poll, String method, String element)
-            throws InterruptedException {
-        commonspec.getLogger().info("Waiting for element to be available: {} minutes", totalTime);
-        List<WebElement> wel = commonspec.locateElement(method, element);
-        int i = totalTime;
-
-        while ((i >= 0) && (wel.size() == 0)) {
-            i = i - poll;
-            Thread.sleep(poll * 1000 * 60);
-            commonspec.getLogger().info("Waited {}", totalTime - i);
-            wel = commonspec.locateElement(method, element);
-        }
-
-        assertThat(wel).as("No element with with " + element + " attribute found").isNotEmpty();
-    }
-
-    /**
-     * Verifies that the first webelement found identified as {@code element} has {@code text} as text
-     * 
-     * @param element
+     * @param index
      * @param text
      */
-    @Then("^an element '([^:]*?):([^:]*?)' does has a text '(.*?)'$")
-    public void textOnElementPresent(String method, String element, String text) {
-        commonspec.getLogger().info("Verifying text unexistance");
+    @Then("^the element on index '(.*?)' has '([^:]*?):([^:]*?)' as text$")
+    public void assertSeleniumTextOnElementPresent(Integer index, String text) {
+        commonspec.getLogger().info("Verifying text existance");
 
-        List<WebElement> wel = commonspec.locateElement(method, element);
-        assertThat(wel).as("No element with with " + element + " attribute found").isNotEmpty();
-        assertThat(wel.get(0)).contains(text);
+        String newText = commonspec.replacePlaceholders(text);
+
+        assertThat(commonspec.getPreviousWebElements().size()).as("There are less found elements than required")
+                .isGreaterThan(index);
+        assertThat(commonspec.getPreviousWebElements().get(index)).contains(newText);
     }
 
     /**
-     * Checks if the first element found has an expecific text.
+     * Checks if {@code expectedCount} webelements are found, with a location {@code method}.
      * 
+     * @param expectedCount
      * @param target
      * @param texts
      */
-    @Then("^an element '([^:]*?):([^:]*?)' exists")
-    public void assertElementExists(String method, String element) {
+    @Then("^'(.*?)' element\\(s\\) exists with '([^:]*?):([^:]*?)'$")
+    public void assertSeleniumNElementExists(String expectedCount, String method, String element) {
         commonspec.getLogger().info("Verifying elements { existance}", element);
 
         List<WebElement> wel = commonspec.locateElement(method, element);
 
+        assertThat(wel.size()).as("Element count doesnt match").isEqualTo(expectedCount);
         assertThat(wel).as("Element " + element + " not found").isNotEmpty();
+
+        commonspec.setPreviousWebElements(wel);
     }
 
     /**
      * Takes an snapshot of the current page
      * 
-     * @param target
-     * @param texts
      * @throws Exception
      */
     @Then("^I take a snapshot$")
-    public void takeSnapshot() throws Exception {
+    public void seleniumSnapshot() throws Exception {
 
         commonspec.captureEvidence(commonspec.getDriver(), "screenCapture");
     }
