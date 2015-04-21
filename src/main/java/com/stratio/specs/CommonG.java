@@ -55,6 +55,7 @@ public class CommonG {
 
     private RemoteWebDriver driver = null;
     private String browserName = null;
+    private List<WebElement> previousWebElements = null;
 
     /**
      * Get the common logger.
@@ -281,6 +282,7 @@ public class CommonG {
             if (currentBrowser.startsWith("chrome") || currentBrowser.startsWith("droidemu")) {
                 Actions actions = new Actions(driver);
                 actions.keyDown(Keys.CONTROL).sendKeys(Keys.HOME).perform();
+                actions.keyUp(Keys.CONTROL).perform();
 
                 file = chromeFullScreenCapture(driver);
             } else {
@@ -386,5 +388,13 @@ public class CommonG {
     private Integer getDocumentHeight(WebDriver driver) {
         WebElement body = driver.findElement(By.tagName("html"));
         return body.getSize().getHeight();
+    }
+
+    public List<WebElement> getPreviousWebElements() {
+        return previousWebElements;
+    }
+
+    public void setPreviousWebElements(List<WebElement> previousWebElements) {
+        this.previousWebElements = previousWebElements;
     }
 }
