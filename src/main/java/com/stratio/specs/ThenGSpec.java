@@ -363,7 +363,7 @@ public class ThenGSpec extends BaseGSpec {
      * @param texts
      */
     @Then("^'(.*?)' element\\(s\\) exists with '([^:]*?):([^:]*?)'$")
-    public void assertSeleniumNElementExists(String expectedCount, String method, String element) {
+    public void assertSeleniumNElementExists(Integer expectedCount, String method, String element) {
         commonspec.getLogger().info("Verifying elements { existance}", element);
 
         List<WebElement> wel = commonspec.locateElement(method, element);
