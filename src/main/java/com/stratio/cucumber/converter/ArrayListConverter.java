@@ -18,7 +18,7 @@ public class ArrayListConverter extends Transformer<List<String>> {
         List<String> response = new ArrayList<String>();
         String[] aInput = input.split(",");
         for (String content : aInput) {
-            response.add(content);
+            response.add(content.trim());
         }
 
         return response;
