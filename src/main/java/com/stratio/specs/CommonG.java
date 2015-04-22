@@ -164,18 +164,14 @@ public class CommonG {
         } else if ("name".equals(method)) {
             logger.info("Locating {} by name", element);
             wel = this.getDriver().findElements(By.name(element));
+        } else if ("class".equals(method)) {
+            logger.info("Locating {} by class", element);
+            wel = this.getDriver().findElements(By.className(element));
         } else if ("xpath".equals(method)) {
             logger.info("Locating {} by xpath", element);
             wel = this.getDriver().findElements(By.xpath(element));
         } else if ("css".equals(method)) {
-            if (!element.contains("=")) {
-                fail("Bad css search method attributes: " + element);
-            } else {
-                logger.info("Locating {} by css", element);
-                String attribute = element.substring(0, element.indexOf("="));
-                String value = element.substring(element.indexOf("=") + 1);
-                wel = this.getDriver().findElements(By.cssSelector("[" + attribute + "=\"" + value + "\"]"));
-            }
+            wel = this.getDriver().findElements(By.cssSelector(element));            
         } else {
             fail("Unknown search method: " + method);
         }

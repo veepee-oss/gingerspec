@@ -66,7 +66,7 @@ public class WhenGSpec extends BaseGSpec {
      */
     @When("^I click on the element on index '(.*?)'$")
     public void seleniumClick(Integer index) {
-        commonspec.getLogger().info("Cliciking on element with index {}", index, commonspec.getBrowserName());
+        commonspec.getLogger().info("Clicking on element with index {}", index);
 
         assertThat(commonspec.getPreviousWebElements()).isNotEmpty();
         commonspec.getPreviousWebElements().get(index).click();
@@ -79,7 +79,7 @@ public class WhenGSpec extends BaseGSpec {
      */
     @When("^I type '(.*?)' on the element on index '(.*?)'$")
     public void seleniumType(String text, Integer index) {
-        commonspec.getLogger().info("Cliciking on element with index {}", index, commonspec.getBrowserName());
+        commonspec.getLogger().info("Typing on element with index {}", index);
 
         String newText = commonspec.replacePlaceholders(text);
 
