@@ -2,6 +2,8 @@ package com.stratio.specs;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.openqa.selenium.WebElement;
+
 import cucumber.api.DataTable;
 import cucumber.api.java.en.Given;
 
@@ -164,6 +166,7 @@ public class GivenGSpec extends BaseGSpec {
         commonspec.getLogger().info("Browsing to {} with {}", newUrl, commonspec.getBrowserName());
 
         commonspec.getDriver().get("http://" + newUrl);
+        commonspec.setParentWindow(commonspec.getDriver().getWindowHandle());
     }
 
     /**
@@ -173,5 +176,37 @@ public class GivenGSpec extends BaseGSpec {
     @Given("^I maximize the browser$")
     public void seleniumMaximize(String url) {
         commonspec.getDriver().manage().window().maximize();
+    }
+
+    /**
+     * Switches to a frame/ iframe.
+     * 
+     */
+    @Given("^I switch to the iframe on index '(.*?)' $")
+    public void seleniumSwitchFrame(Integer index) {
+
+        assertThat(commonspec.getPreviousWebElements().size()).as("There are less found elements than required")
+                .isGreaterThan(index);
+
+        WebElement elem = commonspec.getPreviousWebElements().get(index);
+        commonspec.getDriver().switchTo().frame(elem);
+    }
+
+    /**
+     * Switches to a parent frame/ iframe.
+     * 
+     */
+    @Given("^I switch to a parent frame$")
+    public void seleniumSwitchAParentFrame() {
+        commonspec.getDriver().switchTo().parentFrame();
+    }
+
+    /**
+     * Switches to the frames main container.
+     * 
+     */
+    @Given("^I switch to the main frame container$")
+    public void seleniumSwitchParentFrame() {
+        commonspec.getDriver().switchTo().frame(commonspec.getParentWindow());
     }
 }

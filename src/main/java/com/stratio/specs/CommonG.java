@@ -56,6 +56,7 @@ public class CommonG {
     private RemoteWebDriver driver = null;
     private String browserName = null;
     private List<WebElement> previousWebElements = null;
+    private String parentWindow = "";
 
     /**
      * Get the common logger.
@@ -171,7 +172,7 @@ public class CommonG {
             logger.info("Locating {} by xpath", element);
             wel = this.getDriver().findElements(By.xpath(element));
         } else if ("css".equals(method)) {
-            wel = this.getDriver().findElements(By.cssSelector(element));            
+            wel = this.getDriver().findElements(By.cssSelector(element));
         } else {
             fail("Unknown search method: " + method);
         }
@@ -392,5 +393,14 @@ public class CommonG {
 
     public void setPreviousWebElements(List<WebElement> previousWebElements) {
         this.previousWebElements = previousWebElements;
+    }
+
+    public String getParentWindow() {
+        return this.parentWindow;
+    }
+
+    public void setParentWindow(String windowHandle) {
+        this.parentWindow = windowHandle;
+
     }
 }

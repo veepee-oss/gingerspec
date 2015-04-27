@@ -41,4 +41,11 @@ public class ArrayListConverterTest {
         assertThat("Single string input converter", converter.transform("foo , , bar"),
                 allOf(hasItem("foo"), hasItem(" "), hasItem("bar")));
     }
+
+    @Test
+    public void test_6() {
+        assertThat("Single string input converter", converter.transform("foo ,   , bar"),
+                allOf(hasItem("foo"), hasItem("   "), hasItem("bar")));
+    }
+
 }

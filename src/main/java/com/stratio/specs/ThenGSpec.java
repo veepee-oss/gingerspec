@@ -375,6 +375,72 @@ public class ThenGSpec extends BaseGSpec {
     }
 
     /**
+     * Verifies that a webelement previously found {@code isDisplayed}
+     * 
+     * @param index
+     * @param isDisplayed
+     */
+    @Then("^the element on index '(.*?)' (IS|IS NOT) displayed$")
+    public void assertSeleniumIsDispalyed(Integer index, Boolean isDisplayed) {
+        commonspec.getLogger().info("Verifying element visibility");
+
+        assertThat(commonspec.getPreviousWebElements().size()).as("There are less found elements than required")
+                .isGreaterThan(index);
+        assertThat(commonspec.getPreviousWebElements().get(index).isDisplayed()).as(
+                "Unexpected element display property").isEqualTo(isDisplayed);
+    }
+
+    /**
+     * Verifies that a webelement previously found {@code isEnabled}
+     * 
+     * @param index
+     * @param isEnabled
+     */
+    @Then("^the element on index '(.*?)' (IS|IS NOT) displayed$")
+    public void assertSeleniumIsEnabled(Integer index, Boolean isEnabled) {
+        commonspec.getLogger().info("Verifying element enableness");
+
+        assertThat(commonspec.getPreviousWebElements().size()).as("There are less found elements than required")
+                .isGreaterThan(index);
+        assertThat(commonspec.getPreviousWebElements().get(index).isEnabled())
+                .as("Unexpected element enabled property").isEqualTo(isEnabled);
+    }
+
+    /**
+     * Verifies that a webelement previously found {@code isSelected}
+     * 
+     * @param index
+     * @param isSelected
+     */
+    @Then("^the element on index '(.*?)' (IS|IS NOT) selected$")
+    public void assertSeleniumIsSelected(Integer index, Boolean isSelected) {
+        commonspec.getLogger().info("Verifying element enableness");
+
+        assertThat(commonspec.getPreviousWebElements().size()).as("There are less found elements than required")
+                .isGreaterThan(index);
+        assertThat(commonspec.getPreviousWebElements().get(index).isSelected()).as(
+                "Unexpected element selected property").isEqualTo(isSelected);
+    }
+
+    /**
+     * Verifies that a webelement previously found has {@code attribute} with {@code value} (as a regexp)
+     * 
+     * @param index
+     * @param attribute
+     * @param value
+     */
+    @Then("^the element on index '(.*?)' has '(.*?)' as '(.*?)'$")
+    public void assertSeleniumHasAttributeValue(Integer index, String attribute, String value) {
+        commonspec.getLogger().info("Verifying element attribute");
+
+        assertThat(commonspec.getPreviousWebElements().size()).as("There are less found elements than required")
+                .isGreaterThan(index);
+        String val = commonspec.getPreviousWebElements().get(index).getAttribute(attribute);
+        assertThat(val).as("Attribute not found").isNot(null);
+        assertThat(val).as("Unexpected value for specified attribute").matches(value);
+    }
+
+    /**
      * Takes an snapshot of the current page
      * 
      * @throws Exception
