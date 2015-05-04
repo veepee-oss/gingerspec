@@ -412,7 +412,7 @@ public class ThenGSpec extends BaseGSpec {
      * @param isDisplayed
      */
     @Then("^the element on index '(.*?)' (IS|IS NOT) displayed$")
-    public void assertSeleniumIsDispalyed(Integer index, Boolean isDisplayed) {
+    public void assertSeleniumIsDisplayed(Integer index, Boolean isDisplayed) {
         commonspec.getLogger().info("Verifying element visibility");
 
         assertThat(commonspec.getPreviousWebElements().size()).as("There are less found elements than required")
@@ -427,7 +427,7 @@ public class ThenGSpec extends BaseGSpec {
      * @param index
      * @param isEnabled
      */
-    @Then("^the element on index '(.*?)' (IS|IS NOT) displayed$")
+    @Then("^the element on index '(.*?)' (IS|IS NOT) enabled$")
     public void assertSeleniumIsEnabled(Integer index, Boolean isEnabled) {
         commonspec.getLogger().info("Verifying element enableness");
 
