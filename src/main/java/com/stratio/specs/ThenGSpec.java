@@ -67,7 +67,7 @@ public class ThenGSpec extends BaseGSpec {
      * @param bar
      * @param exceptionMsg
      */
-    @Then("^an exception '(.*?)' thrown( with class '(.*?)'( and message like '(.*?)')?)?")
+    @Then("^an exception '(.+?)' thrown( with class '(.+?)'( and message like '(.+?)')?)?")
     public void assertExceptionNotThrown(String exception, String foo, String clazz, String bar, String exceptionMsg)
             throws ClassNotFoundException {
         commonspec.getLogger().info("Verifying thrown exceptions existance");
@@ -99,7 +99,7 @@ public class ThenGSpec extends BaseGSpec {
      * 
      * @param keyspace
      */
-    @Then("^a Casandra keyspace '(.*?)' exists$")
+    @Then("^a Casandra keyspace '(.+?)' exists$")
     public void assertKeyspaceOnCassandraExists(String keyspace) {
         commonspec.getLogger().info("Verifying if the keyspace {} exists", keyspace);
         org.hamcrest.MatcherAssert.assertThat("The keyspace " + keyspace + "exists on cassandra", commonspec
@@ -112,7 +112,7 @@ public class ThenGSpec extends BaseGSpec {
      * @param keyspace
      * @param tableName
      */
-    @Then("^a Casandra keyspace '(.*?)' contains a table '(.*?)'$")
+    @Then("^a Casandra keyspace '(.+?)' contains a table '(.+?)'$")
     public void assertTableExistsOnCassandraKeyspace(String keyspace, String tableName) {
         commonspec.getLogger().info("Verifying if the table {} exists in the keyspace {}", tableName, keyspace);
         org.hamcrest.MatcherAssert.assertThat("The table " + tableName + "exists on cassandra", commonspec
@@ -126,7 +126,7 @@ public class ThenGSpec extends BaseGSpec {
      * @param tableName
      * @param numberRows
      */
-    @Then("^a Casandra keyspace '(.*?)' contains a table '(.*?)' with '(.*?)' rows$")
+    @Then("^a Casandra keyspace '(.+?)' contains a table '(.+?)' with '(.+?)' rows$")
     public void assertRowNumberOfTableOnCassandraKeyspace(String keyspace, String tableName, String numberRows) {
         Long numberRowsLong = Long.parseLong(numberRows);
         commonspec.getLogger().info("Verifying if the keyspace {} exists", keyspace);
@@ -144,7 +144,7 @@ public class ThenGSpec extends BaseGSpec {
      * @param data
      * @throws InterruptedException
      */
-    @Then("^a Casandra keyspace '(.*?)' contains a table '(.*?)' with values:$")
+    @Then("^a Casandra keyspace '(.+?)' contains a table '(.+?)' with values:$")
     public void assertValuesOfTable(String keyspace, String tableName, DataTable data) throws InterruptedException {
         // Primero hacemos USE del Keyspace
         commonspec.getLogger().info("Verifying if the keyspace {} exists", keyspace);
@@ -244,7 +244,7 @@ public class ThenGSpec extends BaseGSpec {
      * @param type
      * @param data
      */
-    @Then("^the '(.*?)' index has a type '(.*?)' with content \\(key and value\\): '(.*?)'$")
+    @Then("^the '(.+?)' index has a type '(.+?)' with content \\(key and value\\): '(.+?)'$")
     public void assertIndexHasContent(String indexName, String type, String data) {
         commonspec.getLogger().info("Verifying elasticseach content existance");
 
@@ -253,7 +253,7 @@ public class ThenGSpec extends BaseGSpec {
         for (String query : data.split(",")) {
             String response = commonspec.getElasticSearchClient().queryIndex(indexName, type, query);
 
-            Pattern pat = Pattern.compile(".*?source.*?\\{(.*?)\\}.*?");
+            Pattern pat = Pattern.compile(".*?source.*?\\{(.+?)\\}.*?");
             Matcher m = pat.matcher(response);
             while (m.find()) {
                 responseList.add(m.group(1).replaceAll("\"", ""));
@@ -281,7 +281,7 @@ public class ThenGSpec extends BaseGSpec {
      * @param tableName
      * @param data
      */
-    @Then("^checking if a Aerospike namespace '(.*?)' with table '(.*?)' and data exists:$")
+    @Then("^checking if a Aerospike namespace '(.+?)' with table '(.+?)' and data exists:$")
     public void assertValuesOfTableAeroSpike(String nameSpace, String tableName, DataTable data) {
         commonspec.getLogger().info("Verifying if the nameSpace {} exists and tableName {} exists on Aerospike",
                 nameSpace, tableName);
@@ -297,7 +297,7 @@ public class ThenGSpec extends BaseGSpec {
      * @param tableName
      * @param data
      */
-    @Then("^a Mongo dataBase '(.*?)' contains a table '(.*?)' with values:")
+    @Then("^a Mongo dataBase '(.+?)' contains a table '(.+?)' with values:")
     public void assertValuesOfTableMongo(String dataBase, String tableName, DataTable data) {
         commonspec.getLogger().info("Verifying if the dataBase {} exists and tableName {} exists on MongoDB", dataBase,
                 tableName);
@@ -315,7 +315,7 @@ public class ThenGSpec extends BaseGSpec {
      * @param database
      * @param tableName
      */
-    @Then("^a Mongo dataBase '(.*?)' doesnt contains a table '(.*?)'$")
+    @Then("^a Mongo dataBase '(.+?)' doesnt contains a table '(.+?)'$")
     public void aMongoDataBaseContainsaTable(String database, String tableName) {
         commonspec.getLogger().info("Verifying if the dataBase {} contains the table {}", database, tableName);
         commonspec.getMongoDBClient().connectToMongoDBDataBase(database);
@@ -329,7 +329,7 @@ public class ThenGSpec extends BaseGSpec {
      * 
      * @param text
      */
-    @Then("^a text '(.*?)' exists$")
+    @Then("^a text '(.+?)' exists$")
     public void assertSeleniumTextInSource(String text) {
 
         String newText = commonspec.replacePlaceholders(text);
@@ -344,7 +344,7 @@ public class ThenGSpec extends BaseGSpec {
      * @param index
      * @param text
      */
-    @Then("^the element on index '(.*?)' has '([^:]*?):([^:]*?)' as text$")
+    @Then("^the element on index '(\\d+?)' has '([^:]*?):([^:]*?)' as text$")
     public void assertSeleniumTextOnElementPresent(Integer index, String text) {
         commonspec.getLogger().info("Verifying text existance");
 
@@ -362,7 +362,7 @@ public class ThenGSpec extends BaseGSpec {
      * @param target
      * @param texts
      */
-    @Then("^'(.*?)' element\\(s\\) exists with '([^:]*?):([^:]*?)'$")
+    @Then("^'(\\d+?)' elements exists with '([^:]*?):([^:]*?)'$")
     public void assertSeleniumNElementExists(Integer expectedCount, String method, String element) {
         commonspec.getLogger().info("Verifying {} existance", element);
 
@@ -384,7 +384,7 @@ public class ThenGSpec extends BaseGSpec {
      * @param texts
      * @throws InterruptedException
      */
-    @Then("^in less than '(\\d*?)' seconds, '(\\d*?)' element\\(s\\) exists with '([^:]*?):([^:]*?)'$")
+    @Then("^in less than '(\\d+?)' seconds, '(\\d+?)' elements exists with '([^:]*?):([^:]*?)'$")
     public void assertSeleniumNElementExistsOnTimeOut(Integer timeout, Integer expectedCount, String method,
             String element) throws InterruptedException {
         commonspec.getLogger().info("Verifying {} existance", element);
@@ -411,7 +411,7 @@ public class ThenGSpec extends BaseGSpec {
      * @param index
      * @param isDisplayed
      */
-    @Then("^the element on index '(.*?)' (IS|IS NOT) displayed$")
+    @Then("^the element on index '(\\d+?)' (IS|IS NOT) displayed$")
     public void assertSeleniumIsDisplayed(Integer index, Boolean isDisplayed) {
         commonspec.getLogger().info("Verifying element visibility");
 
@@ -427,7 +427,7 @@ public class ThenGSpec extends BaseGSpec {
      * @param index
      * @param isEnabled
      */
-    @Then("^the element on index '(.*?)' (IS|IS NOT) enabled$")
+    @Then("^the element on index '(\\d+?)' (IS|IS NOT) enabled$")
     public void assertSeleniumIsEnabled(Integer index, Boolean isEnabled) {
         commonspec.getLogger().info("Verifying element enableness");
 
@@ -443,7 +443,7 @@ public class ThenGSpec extends BaseGSpec {
      * @param index
      * @param isSelected
      */
-    @Then("^the element on index '(.*?)' (IS|IS NOT) selected$")
+    @Then("^the element on index '(\\d+?)' (IS|IS NOT) selected$")
     public void assertSeleniumIsSelected(Integer index, Boolean isSelected) {
         commonspec.getLogger().info("Verifying element enableness");
 
@@ -460,7 +460,7 @@ public class ThenGSpec extends BaseGSpec {
      * @param attribute
      * @param value
      */
-    @Then("^the element on index '(.*?)' has '(.*?)' as '(.*?)'$")
+    @Then("^the element on index '(\\d+?)' has '(.+?)' as '(.+?)'$")
     public void assertSeleniumHasAttributeValue(Integer index, String attribute, String value) {
         commonspec.getLogger().info("Verifying element attribute");
 

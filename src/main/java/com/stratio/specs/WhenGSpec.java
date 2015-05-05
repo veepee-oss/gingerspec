@@ -39,7 +39,7 @@ public class WhenGSpec extends BaseGSpec {
      * @param seconds
      * @throws InterruptedException
      */
-    @When("^I wait '(.*?)' seconds?$")
+    @When("^I wait '(\\d+?)' seconds?$")
     public void idleWait(Integer seconds) throws InterruptedException {
         commonspec.getLogger().info("Idling a while");
         Thread.sleep(seconds * DEFAULT_TIMEOUT);
@@ -68,7 +68,7 @@ public class WhenGSpec extends BaseGSpec {
      * 
      * @param index
      */
-    @When("^I click on the element on index '(.*?)'$")
+    @When("^I click on the element on index '(\\d+?)'$")
     public void seleniumClick(Integer index) {
         commonspec.getLogger().info("Clicking on element with index {}", index);
 
@@ -82,7 +82,7 @@ public class WhenGSpec extends BaseGSpec {
      * @param test
      * @param index
      */
-    @When("^I type '(.*?)' on the element on index '(.*?)'$")
+    @When("^I type '(.+?)' on the element on index '(\\d+?)'$")
     public void seleniumType(String text, Integer index) {
         commonspec.getLogger().info("Typing on element with index {}", index);
 
@@ -114,7 +114,7 @@ public class WhenGSpec extends BaseGSpec {
      * @param strokes
      * @param index
      */
-    @When("^I send '(.*?)' on the element on index '(.*?)'$")
+    @When("^I send '(.+?)' on the element on index '(\\d+?)'$")
     public void seleniumKeys(@Transform(ArrayListConverter.class) List<String> strokes, Integer index) {
         commonspec.getLogger().info("Sending keys on element with index {}", index);
 
@@ -140,7 +140,7 @@ public class WhenGSpec extends BaseGSpec {
      * @param option
      * @param index
      */
-    @When("^I select '(.*?)' on the element on index '(.*?)'$")
+    @When("^I select '(.+?)' on the element on index '(\\d+?)'$")
     public void elementSelect(String option, Integer index) {
         commonspec.getLogger().info("Choosing option on select");
         String opt = commonspec.replacePlaceholders(option);
@@ -157,7 +157,7 @@ public class WhenGSpec extends BaseGSpec {
      * @param option
      * @param index
      */
-    @When("^I de-select every item on the element on index '(.*?)'$")
+    @When("^I de-select every item on the element on index '(\\d+?)'$")
     public void elementDeSelect(Integer index) {
         commonspec.getLogger().info("Unselecting everything");
 

@@ -39,7 +39,7 @@ public class GivenGSpec extends BaseGSpec {
      * 
      * @param index
      */
-    @Given("^I empty an elasticsearch index named '(.*?)'$")
+    @Given("^I empty an elasticsearch index named '(.+?)'$")
     public void emptyElasticsearchIndex(String index) {
         commonspec.getLogger().info("Emptying an es index: {}", index);
         commonspec.getElasticSearchClient().emptyIndex(index);
@@ -59,7 +59,7 @@ public class GivenGSpec extends BaseGSpec {
      * 
      * @param index
      */
-    @Given("^I drop an elasticsearch index named '(.*?)'$")
+    @Given("^I drop an elasticsearch index named '(.+?)'$")
     public void dropElasticsearchIndex(String index) {
         commonspec.getLogger().info("Dropping an es index: {}", index);
         commonspec.getElasticSearchClient().dropIndex(index);
@@ -71,7 +71,7 @@ public class GivenGSpec extends BaseGSpec {
      * @param filename
      * @param keyspace
      */
-    @Given("a C* script with name '(.*?)' and default keyspace '(.*?)'$")
+    @Given("a C* script with name '(.+?)' and default keyspace '(.+?)'$")
     public void insertDataOnCassandraFromFile(String filename, String keyspace) {
         commonspec.getLogger().info("Inserting data on cassandra from file");
         commonspec.getCassandraClient().loadTestData(keyspace, "/scripts/" + filename);
@@ -82,7 +82,7 @@ public class GivenGSpec extends BaseGSpec {
      * 
      * @param keyspace
      */
-    @Given("^I drop an C* keyspace '(.*?)'$")
+    @Given("^I drop an C* keyspace '(.+?)'$")
     public void dropCassandraKeyspace(String keyspace) {
         commonspec.getLogger().info("Dropping a C* keyspace", keyspace);
         commonspec.getCassandraClient().dropKeyspace(keyspace);
@@ -95,7 +95,7 @@ public class GivenGSpec extends BaseGSpec {
      * @param tableName
      * @param tab
      */
-    @Given("^I create an AeroSpike namespace '(.*?)' with table '(.*?)':$")
+    @Given("^I create an AeroSpike namespace '(.+?)' with table '(.+?)':$")
     public void createAeroSpikeTable(String nameSpace, String tableName, DataTable tab) {
         commonspec.getLogger().info("Creating a table on AeroSpike");
         if (commonspec.getAerospikeClient().isConnected()) {
@@ -109,7 +109,7 @@ public class GivenGSpec extends BaseGSpec {
      * 
      * @param databaseName
      */
-    @Given("^I create a MongoDB dataBase '(.*?)'$")
+    @Given("^I create a MongoDB dataBase '(.+?)'$")
     public void createMongoDBDataBase(String databaseName) {
         commonspec.getLogger().info("Creating a database on MongoDB");
         commonspec.getMongoDBClient().connectToMongoDBDataBase(databaseName);
@@ -121,7 +121,7 @@ public class GivenGSpec extends BaseGSpec {
      * 
      * @param databaseName
      */
-    @Given("^I drop a MongoDB database '(.*?)'$")
+    @Given("^I drop a MongoDB database '(.+?)'$")
     public void dropMongoDBDataBase(String databaseName) {
         commonspec.getLogger().info("Creating a database on MongoDB");
         commonspec.getMongoDBClient().dropMongoDBDataBase(databaseName);
@@ -134,7 +134,7 @@ public class GivenGSpec extends BaseGSpec {
      * @param tabName
      * @param table
      */
-    @Given("^I insert into a MongoDB database '(.*?)' and table '(.*?)' this values:$")
+    @Given("^I insert into a MongoDB database '(.+?)' and table '(.+?)' this values:$")
     public void insertOnMongoTable(String dataBase, String tabName, DataTable table) {
         commonspec.getLogger().info("Inserting data in a database on MongoDB");
         commonspec.getMongoDBClient().connectToMongoDBDataBase(dataBase);
@@ -147,7 +147,7 @@ public class GivenGSpec extends BaseGSpec {
      * @param database
      * @param table
      */
-    @Given("^I drop every document at a MongoDB database '(.*?)' and table '(.*?)'")
+    @Given("^I drop every document at a MongoDB database '(.+?)' and table '(.+?)'")
     public void truncateTableInMongo(String database, String table) {
         commonspec.getLogger().info("Truncating a table in MongoDB");
         commonspec.getMongoDBClient().connectToMongoDBDataBase(database);
@@ -159,7 +159,7 @@ public class GivenGSpec extends BaseGSpec {
      * 
      * @param url
      */
-    @Given("^I browse to '(.*?)'$")
+    @Given("^I browse to '(.+?)'$")
     public void seleniumBrowse(String url) {
         assertThat(url).isNotEmpty();
         String newUrl = commonspec.replacePlaceholders(url);
@@ -182,7 +182,7 @@ public class GivenGSpec extends BaseGSpec {
      * Switches to a frame/ iframe.
      * 
      */
-    @Given("^I switch to the iframe on index '(.*?)' $")
+    @Given("^I switch to the iframe on index '(\\d+?)' $")
     public void seleniumSwitchFrame(Integer index) {
 
         assertThat(commonspec.getPreviousWebElements().size()).as("There are less found elements than required")
