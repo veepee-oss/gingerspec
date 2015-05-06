@@ -376,17 +376,19 @@ public class ThenGSpec extends BaseGSpec {
 
     /**
      * Checks if {@code expectedCount} webelements are found, whithin a {@code timeout} and with a location
-     * {@code method}. Selenium loookup times are not accounted for the mentioned timeout.
+     * {@code method}. Each negative lookup is followed by a wait of {@code wait} seconds. Selenium times are not
+     * accounted for the mentioned timeout.
      * 
      * @param timeout
+     * @param wait
      * @param expectedCount
      * @param target
      * @param texts
      * @throws InterruptedException
      */
-    @Then("^in less than '(\\d+?)' seconds, '(\\d+?)' elements exists with '([^:]*?):([^:]*?)'$")
-    public void assertSeleniumNElementExistsOnTimeOut(Integer timeout, Integer expectedCount, String method,
-            String element) throws InterruptedException {
+    @Then("^in less than '(\\d+?)' seconds, checking each '(\\d+?)' seconds, '(\\d+?)' elements exists with '([^:]*?):([^:]*?)'$")
+    public void assertSeleniumNElementExistsOnTimeOut(Integer timeout, Integer wait, Integer expectedCount,
+            String method, String element) throws InterruptedException {
         commonspec.getLogger().info("Verifying {} existance", element);
 
         List<WebElement> wel = null;
@@ -395,7 +397,7 @@ public class ThenGSpec extends BaseGSpec {
             if (wel.size() == expectedCount) {
                 break;
             } else {
-                Thread.sleep(1000);
+                Thread.sleep(wait * 1000);
             }
         }
 
