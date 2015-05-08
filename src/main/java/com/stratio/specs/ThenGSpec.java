@@ -392,7 +392,7 @@ public class ThenGSpec extends BaseGSpec {
         commonspec.getLogger().info("Verifying {} existance", element);
 
         List<WebElement> wel = null;
-        for (int i = 0; i < timeout; i++) {
+        for (int i = 0; i < timeout; i += wait) {
             wel = commonspec.locateElement(method, element);
             if (wel.size() == expectedCount) {
                 break;
