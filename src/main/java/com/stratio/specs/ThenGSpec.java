@@ -344,7 +344,7 @@ public class ThenGSpec extends BaseGSpec {
      * @param index
      * @param text
      */
-    @Then("^the element on index '(\\d+?)' has '([^:]*?):([^:]*?)' as text$")
+    @Then("^the element on index '(\\d+?)' has '(.*?)' as text$")
     public void assertSeleniumTextOnElementPresent(Integer index, String text) {
         commonspec.getLogger().info("Verifying text existance");
 
