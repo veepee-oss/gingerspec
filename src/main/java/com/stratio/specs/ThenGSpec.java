@@ -366,10 +366,7 @@ public class ThenGSpec extends BaseGSpec {
     public void assertSeleniumNElementExists(Integer expectedCount, String method, String element) {
         commonspec.getLogger().info("Verifying {} existance", element);
 
-        List<WebElement> wel = commonspec.locateElement(method, element);
-
-        assertThat(wel.size()).as("Element count doesnt match").isEqualTo(expectedCount);
-        assertThat(wel).as("Element " + element + " not found").isNotEmpty();
+        List<WebElement> wel = commonspec.locateElement(method, element, expectedCount);
 
         commonspec.setPreviousWebElements(wel);
     }
@@ -393,7 +390,7 @@ public class ThenGSpec extends BaseGSpec {
 
         List<WebElement> wel = null;
         for (int i = 0; i < timeout; i += wait) {
-            wel = commonspec.locateElement(method, element);
+            wel = commonspec.locateElement(method, element, -1);
             if (wel.size() == expectedCount) {
                 break;
             } else {

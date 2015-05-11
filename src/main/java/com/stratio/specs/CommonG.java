@@ -1,5 +1,6 @@
 package com.stratio.specs;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.testng.Assert.fail;
 
 import java.awt.image.BufferedImage;
@@ -155,7 +156,7 @@ public class CommonG {
      * @param element
      * @throws Exception
      */
-    public List<WebElement> locateElement(String method, String element) {
+    public List<WebElement> locateElement(String method, String element, Integer expectedCount) {
 
         List<WebElement> wel = null;
 
@@ -177,10 +178,8 @@ public class CommonG {
             fail("Unknown search method: " + method);
         }
 
-        if (wel.size() == 0) {
-            // this.captureEvidence(this.getDriver(), "framehtmlSource");
-            this.captureEvidence(this.getDriver(), "htmlSource");
-            this.captureEvidence(this.getDriver(), "screenCapture");
+        if (expectedCount != -1) {
+            assertThat(wel.size()).as("Element count doesnt match").isEqualTo(expectedCount);
         }
 
         return wel;

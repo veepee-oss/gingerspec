@@ -57,8 +57,8 @@ public class WhenGSpec extends BaseGSpec {
 
         Actions builder = new Actions(commonspec.getDriver());
 
-        List<WebElement> sourceElement = commonspec.locateElement(smethod, source);
-        List<WebElement> destinationElement = commonspec.locateElement(dmethod, destination);
+        List<WebElement> sourceElement = commonspec.locateElement(smethod, source, 1);
+        List<WebElement> destinationElement = commonspec.locateElement(dmethod, destination, 1);
 
         builder.dragAndDrop(sourceElement.get(0), destinationElement.get(0)).perform();
     }
