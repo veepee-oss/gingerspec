@@ -399,7 +399,6 @@ public class ThenGSpec extends BaseGSpec {
         }
 
         assertThat(wel.size()).as("Element count doesnt match").isEqualTo(expectedCount);
-        assertThat(wel).as("Element " + element + " not found").isNotEmpty();
 
         commonspec.setPreviousWebElements(wel);
     }
