@@ -23,7 +23,7 @@ public class ListLastElementExceptionMatcher extends TypeSafeMatcher<List<Except
      * 
      * @param clazz
      * @param regex
-     * @return
+     * @return matcher
      */
     @Factory
     public static Matcher<List<Exception>> lastElementHasClassAndMessage(String clazz, String regex) {
@@ -35,7 +35,7 @@ public class ListLastElementExceptionMatcher extends TypeSafeMatcher<List<Except
      * 
      * @param clazz
      * @param messagePattern
-     * @return
+     * @return matcher
      */
     @Factory
     public static Matcher<List<Exception>> lastElementHasClassAndMessage(String clazz, Pattern messagePattern) {
@@ -50,7 +50,7 @@ public class ListLastElementExceptionMatcher extends TypeSafeMatcher<List<Except
     /**
      * Message showed in the case that a matcher fails.
      * 
-     * @param Description
+     * @param description
      */
     public void describeTo(Description description) {
 

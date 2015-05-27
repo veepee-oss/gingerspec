@@ -39,7 +39,7 @@ public final class BrowsersDataProvider {
      * 
      * @param context
      * @param testConstructor
-     * @return
+     * @return an iterator
      * @throws Exception
      */
     @DataProvider(parallel = true)

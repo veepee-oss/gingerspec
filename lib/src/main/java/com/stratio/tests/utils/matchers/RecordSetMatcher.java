@@ -34,7 +34,6 @@ public class RecordSetMatcher extends TypeSafeMatcher<RecordSet> {
     /**
      * Checks if a dataTable is contained in a recordSet.
      * @param table
-     * @return
      */
     @Factory
     public static RecordSetMatcher containedInRecordSet(DataTable table) {
