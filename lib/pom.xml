@@ -9,7 +9,7 @@
 	<artifactId>bdt-lib</artifactId>	
 	<packaging>jar</packaging>
 
-	<name>Stratio behaviuor driven testing core lib</name>
+	<name>Stratio BDT framework lib</name>
 	
 	<properties>
 		<cucumber-java.version>1.1.6</cucumber-java.version>

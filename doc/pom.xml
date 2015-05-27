@@ -9,7 +9,7 @@
 	<artifactId>bdt-doc</artifactId>	
 	<packaging>pom</packaging>
 
-	<name>Stratio behaviuor driven testing lib documentation</name>
+	<name>Stratio BDT framework docs</name>
 	
 	<build>
 		<plugins>
