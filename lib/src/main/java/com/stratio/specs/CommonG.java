@@ -159,21 +159,22 @@ public class CommonG {
     public List<WebElement> locateElement(String method, String element, Integer expectedCount) {
 
         List<WebElement> wel = null;
+        String newElement = replacePlaceholders(element);
 
         if ("id".equals(method)) {
-            logger.info("Locating {} by id", element);
-            wel = this.getDriver().findElements(By.id(element));
+            logger.info("Locating {} by id", newElement);
+            wel = this.getDriver().findElements(By.id(newElement));
         } else if ("name".equals(method)) {
-            logger.info("Locating {} by name", element);
-            wel = this.getDriver().findElements(By.name(element));
+            logger.info("Locating {} by name", newElement);
+            wel = this.getDriver().findElements(By.name(newElement));
         } else if ("class".equals(method)) {
-            logger.info("Locating {} by class", element);
-            wel = this.getDriver().findElements(By.className(element));
+            logger.info("Locating {} by class", newElement);
+            wel = this.getDriver().findElements(By.className(newElement));
         } else if ("xpath".equals(method)) {
-            logger.info("Locating {} by xpath", element);
-            wel = this.getDriver().findElements(By.xpath(element));
+            logger.info("Locating {} by xpath", newElement);
+            wel = this.getDriver().findElements(By.xpath(newElement));
         } else if ("css".equals(method)) {
-            wel = this.getDriver().findElements(By.cssSelector(element));
+            wel = this.getDriver().findElements(By.cssSelector(newElement));
         } else {
             fail("Unknown search method: " + method);
         }
