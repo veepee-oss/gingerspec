@@ -352,7 +352,7 @@ public class ThenGSpec extends BaseGSpec {
 
         assertThat(commonspec.getPreviousWebElements().size()).as("There are less found elements than required")
                 .isGreaterThan(index);
-        assertThat(commonspec.getPreviousWebElements().get(index)).contains(newText);
+        assertThat(commonspec.getPreviousWebElements().get(index).getText()).contains(newText);
     }
 
     /**
