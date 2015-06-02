@@ -123,11 +123,12 @@ public class WhenGSpec extends BaseGSpec {
 
         for (String stroke : strokes) {
             if (stroke.contains("+")) {
-                List<CharSequence> csl = new ArrayList<CharSequence>();
-                for (String strokeInChord : stroke.split("+")) {
-                    csl.add(strokeInChord.trim());
-                }
-                commonspec.getPreviousWebElements().get(index).sendKeys(Keys.chord(csl));
+                List<Keys> csl = new ArrayList<Keys>();
+                for (String strokeInChord : stroke.split("\\+")) {
+                    csl.add(Keys.valueOf(strokeInChord.trim()));
+                }                                
+                Keys[] csa = csl.toArray(new Keys[csl.size()]);
+                commonspec.getPreviousWebElements().get(index).sendKeys(csa);
             } else {
                 commonspec.getPreviousWebElements().get(index).sendKeys(Keys.valueOf(stroke));
             }
