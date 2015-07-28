@@ -4,11 +4,7 @@ import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 import org.hamcrest.Factory;
-/**
- * @author Javier Delgado
- * @author Hugo Dominguez
- *
- */
+
 public class ColumnDefinitionsMatcher extends TypeSafeMatcher<String> {
 
     private final String columnName;

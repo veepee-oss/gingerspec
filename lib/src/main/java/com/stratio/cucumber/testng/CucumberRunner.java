@@ -18,11 +18,7 @@ import cucumber.runtime.io.MultiLoader;
 import cucumber.runtime.io.ResourceLoader;
 import cucumber.runtime.io.ResourceLoaderClassFinder;
 
-/**
- * @author Javier Delgado
- * @author Hugo Dominguez
- * 
- */
+
 public class CucumberRunner {
 
     private final cucumber.runtime.Runtime runtime;

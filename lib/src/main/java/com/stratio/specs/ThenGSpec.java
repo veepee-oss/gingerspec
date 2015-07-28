@@ -14,6 +14,7 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
 
+import java.awt.DisplayMode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -25,6 +26,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 
 import com.aerospike.client.query.RecordSet;
@@ -37,12 +39,6 @@ import com.mongodb.DBObject;
 import cucumber.api.DataTable;
 import cucumber.api.java.en.Then;
 
-/**
- * @author Hugo Dominguez
- * @author Javier Delgado
- * 
- *         Then generic Specs that could be used in tests projects.
- */
 
 public class ThenGSpec extends BaseGSpec {
 
@@ -359,8 +355,8 @@ public class ThenGSpec extends BaseGSpec {
      * Checks if {@code expectedCount} webelements are found, with a location {@code method}.
      * 
      * @param expectedCount
-     * @param target
-     * @param texts
+     * @param method
+     * @param element
      */
     @Then("^'(\\d+?)' elements exists with '([^:]*?):([^:]*?)'$")
     public void assertSeleniumNElementExists(Integer expectedCount, String method, String element) {
@@ -371,6 +367,22 @@ public class ThenGSpec extends BaseGSpec {
         commonspec.setPreviousWebElements(wel);
     }
 
+    
+    /**
+     * Checks if an unknown number of webelements are found, with a location {@code method}.
+     * 
+     * @param method
+     * @param element
+     */
+    @Then("^an unknown number of elements exists with '([^:]*?):([^:]*?)'$")
+    public void assertSeleniumNElementsExists(String method, String element) {
+        commonspec.getLogger().info("Verifying {} existance", element);
+
+        List<WebElement> wel = commonspec.locateElements(method, element);
+
+        commonspec.setPreviousWebElements(wel);
+    }
+    
     /**
      * Checks if {@code expectedCount} webelements are found, whithin a {@code timeout} and with a location
      * {@code method}. Each negative lookup is followed by a wait of {@code wait} seconds. Selenium times are not
@@ -379,8 +391,8 @@ public class ThenGSpec extends BaseGSpec {
      * @param timeout
      * @param wait
      * @param expectedCount
-     * @param target
-     * @param texts
+     * @param method
+     * @param element
      * @throws InterruptedException
      */
     @Then("^in less than '(\\d+?)' seconds, checking each '(\\d+?)' seconds, '(\\d+?)' elements exists with '([^:]*?):([^:]*?)'$")
@@ -403,6 +415,29 @@ public class ThenGSpec extends BaseGSpec {
         commonspec.setPreviousWebElements(wel);
     }
 
+    
+    /**
+     * Set the webelement previously found to Displayed {@code isDisplayed}
+     * 
+     * @param index
+     */
+    @Then("^I set the element on index '(\\d+?)' as displayed$")
+    public void assertSeleniumToDisplayed(Integer index) {
+        commonspec.getLogger().info("Setting element on index as displayed");
+
+        assertThat(commonspec.getPreviousWebElements().size()).as("There are less found elements than required")
+                .isGreaterThan(index);        
+
+        WebElement element = commonspec.getPreviousWebElements().get(index);
+        String js = "setAttribute('style', '\"display:inline\"')";
+        
+        
+
+        ((JavascriptExecutor) commonspec).executeScript(js, element);
+        
+		assertThat(commonspec.getPreviousWebElements().set(index, element));
+    }
+    
     /**
      * Verifies that a webelement previously found {@code isDisplayed}
      * 

@@ -1,10 +1,6 @@
 package com.stratio.tests.utils;
 
-/**
- * @author Javier Delgado
- * @author Hugo Dominguez
- * 
- */
+
 public enum AerospikeUtil {
     INSTANCE;
 

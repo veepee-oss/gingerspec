@@ -17,11 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import cucumber.runtime.Runtime;
 import cucumber.runtime.model.CucumberScenario;
-/**
- * @author Javier Delgado
- * @author Hugo Dominguez
- *
- */
+
 @Aspect
 public class IgnoreTagAspect {
 

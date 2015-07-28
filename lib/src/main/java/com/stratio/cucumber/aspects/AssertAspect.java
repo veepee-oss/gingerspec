@@ -10,11 +10,7 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.hamcrest.Matcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-/**
- * @author Javier Delgado
- * @author Hugo Dominguez
- *
- */
+
 @Aspect
 public class AssertAspect {
 

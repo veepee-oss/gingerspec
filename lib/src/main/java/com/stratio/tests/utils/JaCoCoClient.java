@@ -14,8 +14,6 @@ import org.testng.ITestContext;
 import org.testng.TestListenerAdapter;
 /**
  * Jacoco client for Server coverages.
- * @author Hugo dominguez
- * @author Javier Delgado
  *
  */
 public class JaCoCoClient extends TestListenerAdapter {

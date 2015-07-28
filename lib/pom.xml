@@ -18,7 +18,7 @@
 		<assertj-core.version>1.7.0</assertj-core.version>
 		<slf4j-api.version>1.7.7</slf4j-api.version>
 		<reflections.version>0.9.9-RC1</reflections.version>
-		<org.jacoco.core.version>0.7.1.201405082137</org.jacoco.core.version>
+		<org.jacoco.core.version>0.7.4.201502262128</org.jacoco.core.version>
 		<aspectjweaver.version>1.8.2</aspectjweaver.version>
 		<cassandra-driver-core.version>2.1.1</cassandra-driver-core.version>
 		<guava.version>15.0</guava.version>
@@ -62,12 +62,7 @@
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.18.1</version>
-				<configuration>
-					<argLine>${jacoco-UT-argline}</argLine>
-					<skipTests>${skipUTs}</skipTests>
-				</configuration>
+				<artifactId>maven-surefire-plugin</artifactId>				
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -80,20 +75,7 @@
 			</plugin>
 			<plugin>
 				<groupId>org.jacoco</groupId>
-				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.7.1.201405082137</version>
-				<configuration>
-					<destFile>${project.build.directory}/jacocoUT.exec</destFile>
-					<propertyName>jacoco-UT-argline</propertyName>
-				</configuration>
-				<executions>
-					<execution>
-						<id>jacoco-initialize</id>
-						<goals>
-							<goal>prepare-agent</goal>
-						</goals>
-					</execution>
-				</executions>
+				<artifactId>jacoco-maven-plugin</artifactId>				
 			</plugin>
 		</plugins>
 	</build>
@@ -213,6 +195,11 @@
 			<artifactId>log4j-1.2-api</artifactId>
 			<version>2.0</version>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.ning</groupId>
+			<artifactId>async-http-client</artifactId>
+			<version>1.8.14</version>
 		</dependency>
 	</dependencies>
 </project>

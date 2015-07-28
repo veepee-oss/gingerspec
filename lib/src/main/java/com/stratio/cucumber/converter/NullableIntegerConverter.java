@@ -1,11 +1,7 @@
 package com.stratio.cucumber.converter;
 
 import cucumber.api.Transformer;
-/**
- * 
- * @author Hugo Dominguez
- * @author Javier Delgado
- */
+
 public class NullableIntegerConverter extends Transformer<Integer> {
 
     @Override

@@ -6,7 +6,6 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
@@ -25,8 +24,6 @@ import com.stratio.exceptions.DBException;
 /**
  * Generic utilities for operations over Cassandra.
  * 
- * @author Hugo Dominguez
- * @author Javier Delgado
  */
 public class CassandraUtils {
 
@@ -177,7 +174,7 @@ public class CassandraUtils {
     /**
      * Get a list of the existing keyspaces in Cassandra.
      * 
-     * @return
+     * @return List<String>
      */
     public List<String> getKeyspaces() {
         ArrayList<String> result = new ArrayList<String>();
@@ -225,7 +222,7 @@ public class CassandraUtils {
      * @param keyspace
      * @param table
      * @param showLog
-     * @return
+     * @return boolean
      */
     public boolean existsTable(String keyspace, String table, boolean showLog) {
         this.metadata = this.cluster.getMetadata();
@@ -248,7 +245,7 @@ public class CassandraUtils {
      * Get tables of a keyspace.
      * 
      * @param keyspace
-     * @return
+     * @return List<String>
      */
     public List<String> getTables(String keyspace) {
         ArrayList<String> result = new ArrayList<String>();

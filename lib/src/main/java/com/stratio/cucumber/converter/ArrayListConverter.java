@@ -5,11 +5,7 @@ import java.util.List;
 
 import cucumber.api.Transformer;
 
-/**
- * @author Javier Delgado
- * @author Hugo Dominguez
- *
- */
+
 public class ArrayListConverter extends Transformer<List<String>> {
 
     @Override

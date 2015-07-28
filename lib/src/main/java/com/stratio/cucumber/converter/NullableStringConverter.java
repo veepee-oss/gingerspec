@@ -1,10 +1,7 @@
 package com.stratio.cucumber.converter;
 
 import cucumber.api.Transformer;
-/**
- * @author Javier Delgado
- * @author Hugo Dominguez
- */
+
 public class NullableStringConverter extends Transformer<String> {
     public static final int DEFAULT_RADIX = 16;
     @Override

@@ -11,10 +11,7 @@ import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
-/**
- * @author Hugo Dominguez
- *@author Javier Delgado
- */
+
 public abstract class BaseGTest {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());

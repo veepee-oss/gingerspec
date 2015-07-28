@@ -15,11 +15,6 @@ import com.stratio.cucumber.converter.ArrayListConverter;
 import cucumber.api.Transform;
 import cucumber.api.java.en.When;
 
-/**
- * @author Javier Delgado
- * @author Hugo Dominguez
- *
- */
 public class WhenGSpec extends BaseGSpec {
 
     public static final int DEFAULT_TIMEOUT = 1000;
@@ -75,11 +70,11 @@ public class WhenGSpec extends BaseGSpec {
         assertThat(commonspec.getPreviousWebElements()).isNotEmpty();
         commonspec.getPreviousWebElements().get(index).click();
     }
-
+  
     /**
      * Type a {@code text} on an numbered {@code index} previously found element.
      * 
-     * @param test
+     * @param text
      * @param index
      */
     @When("^I type '(.+?)' on the element on index '(\\d+?)'$")
@@ -134,7 +129,7 @@ public class WhenGSpec extends BaseGSpec {
             }
         }
     }
-
+    
     /**
      * Choose an @{code option} from a select webelement found previously
      * 
@@ -155,7 +150,6 @@ public class WhenGSpec extends BaseGSpec {
     /**
      * Choose no option from a select webelement found previously
      * 
-     * @param option
      * @param index
      */
     @When("^I de-select every item on the element on index '(\\d+?)'$")

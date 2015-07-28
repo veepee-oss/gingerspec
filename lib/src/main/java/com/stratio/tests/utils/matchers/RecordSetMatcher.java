@@ -14,11 +14,7 @@ import com.aerospike.client.Record;
 import com.aerospike.client.query.RecordSet;
 
 import cucumber.api.DataTable;
-/**
- * @author Javier Delgado
- * @author Hugo Dominguez
- *
- */
+
 public class RecordSetMatcher extends TypeSafeMatcher<RecordSet> {
     private final DataTable table;
 

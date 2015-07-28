@@ -8,11 +8,6 @@ import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 
-/**
- * @author Javier Delgado
- * @author Hugo Dominguez
- * 
- */
 public class ListLastElementExceptionMatcher extends TypeSafeMatcher<List<Exception>> {
     public static final int VALUE = 3;
     private final String clazz;

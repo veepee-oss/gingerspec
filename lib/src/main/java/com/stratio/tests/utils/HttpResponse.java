@@ -1,21 +1,21 @@
 package com.stratio.tests.utils;
 
-/**
- * @author Javier Delgado
- * @author Hugo Dominguez
- * 
- */
+import java.util.List;
+import com.ning.http.client.cookie.Cookie;
+
 public class HttpResponse {
     private int statusCode;
     private String response;
+    private List<Cookie> cookies;
 /**
  * Constructor of an HttpResponse.
  * @param statusCode
  * @param response
  */
-    public HttpResponse(Integer statusCode, String response) {
+    public HttpResponse(Integer statusCode, String response, List<Cookie> cookies) {
         this.statusCode = statusCode;
         this.response = response;
+        this.setCookies(cookies);
     }
 
     public int getStatusCode() {
@@ -33,5 +33,13 @@ public class HttpResponse {
     public void setResponse(String response) {
         this.response = response;
     }
+
+	public List<Cookie> getCookies() {
+		return cookies;
+	}
+
+	public void setCookies(List<Cookie> cookies) {
+		this.cookies = cookies;
+	}
 
 }

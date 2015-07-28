@@ -21,11 +21,7 @@ import org.testng.annotations.DataProvider;
 
 import com.google.common.collect.Lists;
 
-/**
- * @author Javier Delgado
- * @author Hugo Dominguez
- *
- */
+
 public final class BrowsersDataProvider {
     public static final int DEFAULT_TIMEOUT = 20000;
     public static final int DEFAULT_LESS_LENGTH = 4;

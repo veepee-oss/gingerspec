@@ -10,9 +10,6 @@ import cucumber.api.java.en.Given;
 /**
  * Generic Given Specs.
  * 
- * @author Hugo Dominguez
- * @author Javier Delgado
- * 
  */
 public class GivenGSpec extends BaseGSpec {
 

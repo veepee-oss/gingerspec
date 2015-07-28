@@ -1,10 +1,6 @@
 package com.stratio.specs;
 
-/**
- * @author Javier Delgado
- * @author Hugo Dominguez
- * 
- */
+
 public class BaseGSpec {
 
     protected CommonG commonspec;
