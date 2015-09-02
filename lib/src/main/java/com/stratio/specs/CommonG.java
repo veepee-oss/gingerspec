@@ -4,19 +4,30 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.testng.Assert.fail;
 
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.concurrent.Future;
 
 import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FileUtils;
+import org.hjson.JsonObject;
+import org.hjson.JsonValue;
+import org.json.JSONObject;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
@@ -30,6 +41,11 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.jayway.jsonpath.JsonPath;
+import com.ning.http.client.AsyncHttpClient;
+import com.ning.http.client.Response;
+import com.ning.http.client.AsyncHttpClient.BoundRequestBuilder;
+import com.ning.http.client.cookie.Cookie;
 import com.stratio.tests.utils.AerospikeUtil;
 import com.stratio.tests.utils.AerospikeUtils;
 import com.stratio.tests.utils.CassandraUtil;
@@ -38,9 +54,12 @@ import com.stratio.tests.utils.ElasticSearchUtil;
 import com.stratio.tests.utils.ElasticSearchUtils;
 import com.stratio.tests.utils.ExceptionList;
 import com.stratio.tests.utils.HashUtils;
+import com.stratio.tests.utils.HttpResponse;
 import com.stratio.tests.utils.MongoDBUtil;
 import com.stratio.tests.utils.MongoDBUtils;
 import com.stratio.tests.utils.ThreadProperty;
+
+import cucumber.api.DataTable;
 
 public class CommonG {
 
@@ -54,7 +73,56 @@ public class CommonG {
 	private String browserName = null;
 	private List<WebElement> previousWebElements = null;
 	private String parentWindow = "";
+	
+	// COPIED FROM COMMON.JAVA
+	private AsyncHttpClient client;
+	//private String URL;
+	private HttpResponse response;
 
+	// CONNECTION DETAILS
+	private String restHost;
+	private String restPort;
+	private String webHost;
+	private String webPort;
+	private String restURL;
+	private String webURL;
+	
+	/**
+	 * Get the common REST host.
+	 * 
+	 * @return String
+	 */
+	public String getRestHost() {
+		return this.restHost;
+	}
+	
+	/**
+	 * Get the common REST port.
+	 * 
+	 * @return String
+	 */
+	public String getRestPort() {
+		return this.restPort;
+	}
+	
+	/**
+	 * Get the common WEB host.
+	 * 
+	 * @return String
+	 */
+	public String getWebHost() {
+		return this.webHost;
+	}
+	
+	/**
+	 * Get the common WEB port.
+	 * 
+	 * @return String
+	 */
+	public String getWebPort() {
+		return this.webPort;
+	}
+	
 	/**
 	 * Get the common logger.
 	 * 
@@ -118,6 +186,43 @@ public class CommonG {
 		return driver;
 	}
 
+	/**
+	 * Set the REST host.
+	 * 
+	 * @param restHost
+	 */
+	public void setRestHost(String restHost) {
+		this.restHost = restHost;
+	}
+	
+	/**
+	 * Set the REST port.
+	 * 
+	 * @param restPort
+	 */
+	public void setRestPort(String restPort) {
+		this.restPort = restPort;
+	}
+	
+	/**
+	 * Set the WEB host.
+	 * 
+	 * @param webHost
+	 */
+	public void setWebHost(String webHost) {
+		this.webHost = webHost;
+	}
+	
+	/**
+	 * Set the WEB port.
+	 * 
+	 * @param webPort
+	 */
+	public void setWebPort(String webPort) {
+		this.webPort = webPort;
+	}
+	
+	
 	/**
 	 * Set the remoteDriver.
 	 * 
@@ -480,5 +585,229 @@ public class CommonG {
 	public void setParentWindow(String windowHandle) {
 		this.parentWindow = windowHandle;
 
+	}
+	
+	// COPIED FROM COMMON.JAVA
+	public AsyncHttpClient getClient() {
+	    return client;
+	}
+
+	public void setClient(AsyncHttpClient client) {
+	    this.client = client;
+	}
+
+	public String getRestURL() {
+	    return restURL;
+	}
+
+	public void setRestURL(String restURL) {
+	    this.restURL = restURL;
+	}
+	
+	public String getWebURL() {
+	    return webURL;
+	}
+
+	public void setWebURL(String webURL) {
+	    this.webURL = webURL;
+	}
+	
+
+	public HttpResponse getResponse() {
+	    return response;
+	}
+
+	public void setResponse(String endpoint, Response response) throws IOException {
+
+	    Integer statusCode = response.getStatusCode();
+	    String httpResponse = response.getResponseBody();
+	    List<Cookie> cookies = response.getCookies();
+	    this.response = new HttpResponse(statusCode, httpResponse, cookies);
+	}
+	
+	
+	
+	
+	/**
+	 * Returns the information contained in file passed as parameter
+	 * 
+	 * @param baseData path to file to be read
+	 * @param type type of information, it can be: json|string
+	 * 
+	 * @return String
+	 */
+	public String retrieveData(String baseData, String type) throws IOException {
+	    String result;
+	    
+	    InputStream stream = getClass().getClassLoader().getResourceAsStream(baseData);
+		
+	    Writer writer=new StringWriter();
+	    char[] buffer=new char[1024];
+	    Reader reader;
+	    try {
+		reader=new BufferedReader(new InputStreamReader(stream, "UTF-8"));
+		int n;
+		while ((n=reader.read(buffer))!=-1) writer.write(buffer, 0, n);
+	    } finally {
+		stream.close();
+	    }
+	    String text = writer.toString();
+		
+	    String std=text.replace("\r", ""); // make sure we have unix style text regardless of the input
+	    std.replace("\n", "");
+
+	    if ("json".equals(type)) {
+		result = JsonValue.readHjson(std).asObject().toString();
+	    } else {
+		result = std;
+	    }
+	    return result;
+	}
+	
+	
+	/**
+	 * Returns the information modified
+	 * 
+	 * @param data string containing the information
+	 * @param type type of information, it can be: json|string
+	 * @param modifications changes to make
+	 * 
+	 * @return String
+	 * @throws Exception 
+	 */
+	public Object modifyData(String data, String type, DataTable modifications) throws Exception {
+	    
+	    if ("json".equals(type)) {
+		for (int i = 0; i < modifications.raw().size(); i++) {
+		    //commonspec.getLogger().info("DATATABLE {}", modifications.raw().get(i));
+		    String composeKey = modifications.raw().get(i).get(0);
+		    String operation =  modifications.raw().get(i).get(1);
+		    String newValue =  modifications.raw().get(i).get(2);
+		    
+		    String elem = JsonValue.readHjson(data).asObject().toString();
+		    
+		    switch(operation.toUpperCase()) {
+	    		case "DELETE":
+	    		    return JsonPath.parse(elem).delete(composeKey).json();
+	    		case "ADD":
+	    		    // Get the last key
+	    		    String newKey = composeKey.substring(composeKey.lastIndexOf('.') + 1);
+	    		    String newComposeKey = composeKey.substring(1, composeKey.lastIndexOf('.') + 1);
+	    		    return JsonPath.parse(elem).put(newComposeKey, newKey, newValue).json();
+	    		case "UPDATE":
+	    		    return JsonPath.parse(elem).set(composeKey, newValue).json();
+	    		default:
+	    		    throw new Exception("Modification type does not exist: " + operation);
+		    }
+		}
+	    } else {
+		for (int i = 0; i < modifications.raw().size(); i++) {
+		    //commonspec.getLogger().info("DATATABLE {}", modifications.raw().get(i));
+		    String value = modifications.raw().get(i).get(0);
+		    String operation =  modifications.raw().get(i).get(1);
+		    String newValue =  modifications.raw().get(i).get(2);
+	    
+		    switch(operation.toUpperCase()) {
+	    		case "DELETE":
+	    		    return data.replace(value,"");
+	    		case "ADD":
+	    		    return data + newValue;
+	    		case "UPDATE":
+	    		    return data.replace(value, newValue);
+	    		default:
+	    		    throw new Exception("Modification type does not exist: " + operation);
+		    }
+		}
+	    }
+	    return ""; 	    
+	}
+	
+	/**
+	 * Generates the request based on the type of request, the end point, the data and type passed
+	 * @param requestType type of request to be sent
+	 * @param endPoint end point to sent the request to
+	 * @param data to be sent for PUT/POST requests
+	 * @param type type of data to be sent (json|string)
+	 * @param commonspec 
+	 * 
+	 * @throws Exception 
+	 * 
+	 */
+	public Future<Response> generateRequest(String requestType, String endPoint, String data, String type, CommonG commonspec) throws Exception {
+	    Future<Response> response = null;
+	    BoundRequestBuilder request;
+
+	    commonspec.getLogger().info("URL: {}", commonspec.getRestURL());
+	    switch(requestType.toUpperCase()) {
+	    case "GET":
+		request = commonspec.getClient().prepareGet(commonspec.getRestURL() + endPoint);
+
+		if (commonspec.getResponse() != null) {
+		    request = request.setCookies(commonspec.getResponse().getCookies());
+		}
+
+		response = request.execute();
+		break;
+	    case "DELETE":
+		request = commonspec.getClient().prepareDelete(commonspec.getRestURL() + endPoint);
+
+		if (commonspec.getResponse() != null) {
+		    request = request.setCookies(commonspec.getResponse().getCookies());
+		}
+
+		response = request.execute();
+		break;
+	    case "POST":
+		if (data == null) {
+		    Exception missingFields = new Exception("Missing fields in request.");
+		    throw missingFields;
+		} else {
+		    request = commonspec.getClient().preparePost(commonspec.getRestURL() + endPoint).setBody(data);
+		    if ("json".equals(type)) {
+			request = request.setHeader("Content-Type","application/json");
+		    } else if ("string".equals(type)){
+			commonspec.getLogger().info("Sending request as: {}", type);
+			request = request.setHeader("Content-Type", "application/x-www-form-urlencoded");
+		    }
+
+		    if (commonspec.getResponse() != null) {
+			request = request.setCookies(commonspec.getResponse().getCookies());
+		    }
+
+		    response = commonspec.getClient().executeRequest(request.build());
+		    break;
+		}
+	    case "PUT":
+		if (data == null) {
+		    Exception missingFields = new Exception("Missing fields in request.");
+		    throw missingFields;
+		} else {
+		    request = commonspec.getClient().preparePut(commonspec.getRestURL() + endPoint).setBody(data);
+		    if ("json".equals(type)) {
+			request = request.setHeader("Content-Type","application/json");
+		    } else if ("string".equals(type)){
+			request = request.setHeader("Content-Type", "application/x-www-form-urlencoded");
+		    }
+
+		    if (commonspec.getResponse() != null) {
+			request = request.setCookies(commonspec.getResponse().getCookies());
+		    }
+
+		    response = commonspec.getClient().executeRequest(request.build());
+		    break;
+		}
+	    case "CONNECT":
+	    case "PATCH":
+	    case "HEAD":
+	    case "OPTIONS":
+	    case "REQUEST":
+	    case "TRACE":
+		Exception notImplemented = new Exception("Operation not implemented: " + requestType);
+		throw notImplemented;
+	    default:
+		Exception incorrectOperation = new Exception("Operation not valid: " + requestType);
+		throw incorrectOperation;
+	    }
+	    return response;
 	}
 }
