@@ -14,7 +14,6 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
 
-import java.awt.DisplayMode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;

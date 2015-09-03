@@ -1,27 +1,9 @@
 package com.stratio.specs;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.testng.Assert.fail;
-
-import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
-import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.remote.RemoteWebDriver;
-
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.AsyncHttpClientConfig;
-import com.ning.http.client.Response;
-import com.stratio.tests.utils.ThreadProperty;
-import com.thoughtworks.selenium.SeleniumException;
 
 import cucumber.api.DataTable;
 import cucumber.api.java.en.Given;

@@ -14,7 +14,6 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -25,7 +24,6 @@ import java.util.concurrent.Future;
 import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FileUtils;
-import org.hjson.JsonObject;
 import org.hjson.JsonValue;
 import org.json.JSONObject;
 import org.openqa.selenium.By;

@@ -2,43 +2,20 @@ package com.stratio.specs;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Properties;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import org.hjson.JsonObject;
-import org.hjson.JsonValue;
-import org.hjson.Stringify;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.Select;
 
-import com.jayway.jsonpath.JsonPath;
-import com.ning.http.client.AsyncHttpClient.BoundRequestBuilder;
-import com.ning.http.client.ListenableFuture;
-import com.ning.http.client.Request;
 import com.ning.http.client.Response;
 import com.stratio.cucumber.converter.ArrayListConverter;
 
 import cucumber.api.DataTable;
 import cucumber.api.Transform;
-import cucumber.api.java.en.Given;
 import cucumber.api.java.en.When;
 
 public class WhenGSpec extends BaseGSpec {
