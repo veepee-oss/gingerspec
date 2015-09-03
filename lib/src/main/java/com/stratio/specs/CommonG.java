@@ -747,26 +747,26 @@ public class CommonG {
 	 * @throws Exception 
 	 * 
 	 */
-	public Future<Response> generateRequest(String requestType, String endPoint, String data, String type, CommonG commonspec) throws Exception {
+	public Future<Response> generateRequest(String requestType, String endPoint, String data, String type) throws Exception {
 	    Future<Response> response = null;
 	    BoundRequestBuilder request;
 
-	    commonspec.getLogger().info("URL: {}", commonspec.getRestURL());
+	    this.getLogger().info("URL: {}", this.getRestURL());
 	    switch(requestType.toUpperCase()) {
 	    case "GET":
-		request = commonspec.getClient().prepareGet(commonspec.getRestURL() + endPoint);
+		request = this.getClient().prepareGet(this.getRestURL() + endPoint);
 
-		if (commonspec.getResponse() != null) {
-		    request = request.setCookies(commonspec.getResponse().getCookies());
+		if (this.getResponse() != null) {
+		    request = request.setCookies(this.getResponse().getCookies());
 		}
 
 		response = request.execute();
 		break;
 	    case "DELETE":
-		request = commonspec.getClient().prepareDelete(commonspec.getRestURL() + endPoint);
+		request = this.getClient().prepareDelete(this.getRestURL() + endPoint);
 
-		if (commonspec.getResponse() != null) {
-		    request = request.setCookies(commonspec.getResponse().getCookies());
+		if (this.getResponse() != null) {
+		    request = request.setCookies(this.getResponse().getCookies());
 		}
 
 		response = request.execute();
@@ -776,19 +776,19 @@ public class CommonG {
 		    Exception missingFields = new Exception("Missing fields in request.");
 		    throw missingFields;
 		} else {
-		    request = commonspec.getClient().preparePost(commonspec.getRestURL() + endPoint).setBody(data);
+		    request = this.getClient().preparePost(this.getRestURL() + endPoint).setBody(data);
 		    if ("json".equals(type)) {
 			request = request.setHeader("Content-Type","application/json");
 		    } else if ("string".equals(type)){
-			commonspec.getLogger().info("Sending request as: {}", type);
+			this.getLogger().info("Sending request as: {}", type);
 			request = request.setHeader("Content-Type", "application/x-www-form-urlencoded");
 		    }
 
-		    if (commonspec.getResponse() != null) {
-			request = request.setCookies(commonspec.getResponse().getCookies());
+		    if (this.getResponse() != null) {
+			request = request.setCookies(this.getResponse().getCookies());
 		    }
 
-		    response = commonspec.getClient().executeRequest(request.build());
+		    response = this.getClient().executeRequest(request.build());
 		    break;
 		}
 	    case "PUT":
@@ -796,18 +796,18 @@ public class CommonG {
 		    Exception missingFields = new Exception("Missing fields in request.");
 		    throw missingFields;
 		} else {
-		    request = commonspec.getClient().preparePut(commonspec.getRestURL() + endPoint).setBody(data);
+		    request = this.getClient().preparePut(this.getRestURL() + endPoint).setBody(data);
 		    if ("json".equals(type)) {
 			request = request.setHeader("Content-Type","application/json");
 		    } else if ("string".equals(type)){
 			request = request.setHeader("Content-Type", "application/x-www-form-urlencoded");
 		    }
 
-		    if (commonspec.getResponse() != null) {
-			request = request.setCookies(commonspec.getResponse().getCookies());
+		    if (this.getResponse() != null) {
+			request = request.setCookies(this.getResponse().getCookies());
 		    }
 
-		    response = commonspec.getClient().executeRequest(request.build());
+		    response = this.getClient().executeRequest(request.build());
 		    break;
 		}
 	    case "CONNECT":

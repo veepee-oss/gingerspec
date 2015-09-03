@@ -226,7 +226,7 @@ public class WhenGSpec extends BaseGSpec {
 	modifiedData = commonspec.modifyData(retrievedData, type, modifications).toString();
 
 	commonspec.getLogger().info("Generating request {} to {} with data {} as {}", requestType, endPoint, modifiedData, type);
-	Future<Response> response = commonspec.generateRequest(requestType, endPoint, modifiedData, type, commonspec);
+	Future<Response> response = commonspec.generateRequest(requestType, endPoint, modifiedData, type);
 			
 	// Save response
 	commonspec.getLogger().info("Saving response");
@@ -241,10 +241,10 @@ public class WhenGSpec extends BaseGSpec {
 	    // Retrieve data
 	    String retrievedData = commonspec.retrieveData(baseData, type);
 	    // Generate request
-	    response = commonspec.generateRequest(requestType, endPoint, retrievedData, type, commonspec);
+	    response = commonspec.generateRequest(requestType, endPoint, retrievedData, type);
 	} else {
 	    // Generate request
-	    response = commonspec.generateRequest(requestType, endPoint, null, type, commonspec);
+	    response = commonspec.generateRequest(requestType, endPoint, null, type);
 	}
 			
 	// Save response
