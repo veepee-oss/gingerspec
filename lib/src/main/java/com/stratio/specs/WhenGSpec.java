@@ -190,25 +190,6 @@ public class WhenGSpec extends BaseGSpec {
         }
     }
     
-    @When("^I send a '(.+?)' request to '(.+?)'( based on '([^:]+?):([^:]+?)'( as '(json|string)')?)?$")
-    public void sendRequestNoDataTable (String requestType, String endPoint, String foo, String baseData, String element, String bar, String type) throws Exception {
-	Future<Response> response;
-	
-	if (baseData != null) {
-	    // Retrieve data
-	    String retrievedData = commonspec.retrieveData(baseData, type);
-	    // Generate request
-	    response = commonspec.generateRequest(requestType, endPoint, retrievedData, type, commonspec);
-	} else {
-	    // Generate request
-	    response = commonspec.generateRequest(requestType, endPoint, null, type, commonspec);
-	}
-			
-	// Save response
-	commonspec.setResponse(requestType, response.get());
-    }
-    
-    
     /**
      * Send a request of the type specified 
      * 
@@ -242,14 +223,8 @@ public class WhenGSpec extends BaseGSpec {
 	// Modify data
 	commonspec.getLogger().info("Modifying data {} as {}", retrievedData, type);
 	String modifiedData;
-	if ("string".equals(type)) {
-	    modifiedData = commonspec.modifyData(retrievedData, type, modifications).toString();
-	} else {
-	    LinkedHashMap data = ((LinkedHashMap) commonspec.modifyData(retrievedData, type, modifications));
-	    modifiedData = new JSONObject(data).toString();
-	}
-	
-	// Generate request
+	modifiedData = commonspec.modifyData(retrievedData, type, modifications).toString();
+
 	commonspec.getLogger().info("Generating request {} to {} with data {} as {}", requestType, endPoint, modifiedData, type);
 	Future<Response> response = commonspec.generateRequest(requestType, endPoint, modifiedData, type, commonspec);
 			
@@ -257,12 +232,38 @@ public class WhenGSpec extends BaseGSpec {
 	commonspec.getLogger().info("Saving response");
 	commonspec.setResponse(requestType, response.get());
     }
+
+    @When("^I send a '(.+?)' request to '(.+?)'( based on '([^:]+?)'( as '(json|string)')?)?$")
+    public void sendRequestNoDataTable (String requestType, String endPoint, String foo, String baseData, String bar, String type) throws Exception {
+	Future<Response> response;
+	
+	if (baseData != null) {
+	    // Retrieve data
+	    String retrievedData = commonspec.retrieveData(baseData, type);
+	    // Generate request
+	    response = commonspec.generateRequest(requestType, endPoint, retrievedData, type, commonspec);
+	} else {
+	    // Generate request
+	    response = commonspec.generateRequest(requestType, endPoint, null, type, commonspec);
+	}
+			
+	// Save response
+	commonspec.setResponse(requestType, response.get());
+    }
     
-    @When("^I attempt a login to '(.+?)' based on '([^:]+?):([^:]+?)' as '(json|string)' with:$")
-    public void loginUser(String endPoint, String baseData, String element, String type, DataTable modifications) throws Exception {
+    @When("^I attempt a login to '(.+?)' based on '([^:]+?)' as '(json|string)'$")
+    public void loginUser(String endPoint, String baseData, String type) throws Exception {
+	sendRequestNoDataTable("POST", endPoint, null, baseData, null, type);
+    }
+    
+    @When("^I attempt a login to '(.+?)' based on '([^:]+?)' as '(json|string)' with:$")
+    public void loginUser(String endPoint, String baseData, String type, DataTable modifications) throws Exception {
 	sendRequest("POST", endPoint, baseData, "", type, modifications);
     }
-
     
+    @When("^I attempt a logout to '(.+?)'$")
+    public void logoutUser(String endPoint) throws Exception {
+	sendRequestNoDataTable("GET", endPoint, null, "", null, "");
+    }    
     
 }

@@ -675,51 +675,65 @@ public class CommonG {
 	 * @return String
 	 * @throws Exception 
 	 */
-	public Object modifyData(String data, String type, DataTable modifications) throws Exception {
+	public String modifyData(String data, String type, DataTable modifications) throws Exception {
+	    String modifiedData = data;
 	    
 	    if ("json".equals(type)) {
-		for (int i = 0; i < modifications.raw().size(); i++) {
-		    //commonspec.getLogger().info("DATATABLE {}", modifications.raw().get(i));
+		LinkedHashMap linkedHashMap;
+		for (int i = 0; i < modifications.raw().size(); i ++) {
 		    String composeKey = modifications.raw().get(i).get(0);
 		    String operation =  modifications.raw().get(i).get(1);
 		    String newValue =  modifications.raw().get(i).get(2);
 		    
-		    String elem = JsonValue.readHjson(data).asObject().toString();
+		    modifiedData = JsonValue.readHjson(modifiedData).asObject().toString();
 		    
 		    switch(operation.toUpperCase()) {
 	    		case "DELETE":
-	    		    return JsonPath.parse(elem).delete(composeKey).json();
+	    		    linkedHashMap = JsonPath.parse(modifiedData).delete(composeKey).json();
+	    		    break;
 	    		case "ADD":
 	    		    // Get the last key
-	    		    String newKey = composeKey.substring(composeKey.lastIndexOf('.') + 1);
-	    		    String newComposeKey = composeKey.substring(1, composeKey.lastIndexOf('.') + 1);
-	    		    return JsonPath.parse(elem).put(newComposeKey, newKey, newValue).json();
+	    		    String newKey;
+	    		    String newComposeKey;
+	    		    if (composeKey.contains(".")) {
+	    			newKey = composeKey.substring(composeKey.lastIndexOf('.') + 1);
+	    			newComposeKey = composeKey.substring(0, composeKey.lastIndexOf('.'));
+	    		    } else {
+	    			newKey = composeKey;
+	    			newComposeKey = "$";
+	    		    }
+	    		    linkedHashMap = JsonPath.parse(modifiedData).put(newComposeKey, newKey, newValue).json();
+	    		    break;
 	    		case "UPDATE":
-	    		    return JsonPath.parse(elem).set(composeKey, newValue).json();
+	    		    linkedHashMap = JsonPath.parse(modifiedData).set(composeKey, newValue).json();
+	    		    break;
 	    		default:
 	    		    throw new Exception("Modification type does not exist: " + operation);
 		    }
+		    modifiedData = new JSONObject(linkedHashMap).toString();
 		}
 	    } else {
-		for (int i = 0; i < modifications.raw().size(); i++) {
-		    //commonspec.getLogger().info("DATATABLE {}", modifications.raw().get(i));
+		for (int i = 0; i < modifications.raw().size(); i ++) {
 		    String value = modifications.raw().get(i).get(0);
 		    String operation =  modifications.raw().get(i).get(1);
 		    String newValue =  modifications.raw().get(i).get(2);
 	    
 		    switch(operation.toUpperCase()) {
 	    		case "DELETE":
-	    		    return data.replace(value,"");
+	    		    modifiedData = modifiedData.replace(value,"");
+	    		    break;
 	    		case "ADD":
-	    		    return data + newValue;
+	    		    modifiedData = modifiedData + newValue;
+	    		    break;
 	    		case "UPDATE":
-	    		    return data.replace(value, newValue);
+	    		    modifiedData = modifiedData.replace(value, newValue);
+	    		    break;
 	    		default:
 	    		    throw new Exception("Modification type does not exist: " + operation);
 		    }
 		}
 	    }
-	    return ""; 	    
+	    return modifiedData;
 	}
 	
 	/**
@@ -802,11 +816,9 @@ public class CommonG {
 	    case "OPTIONS":
 	    case "REQUEST":
 	    case "TRACE":
-		Exception notImplemented = new Exception("Operation not implemented: " + requestType);
-		throw notImplemented;
+		throw new Exception("Operation not implemented: " + requestType);
 	    default:
-		Exception incorrectOperation = new Exception("Operation not valid: " + requestType);
-		throw incorrectOperation;
+		throw new Exception("Operation not valid: " + requestType);
 	    }
 	    return response;
 	}
