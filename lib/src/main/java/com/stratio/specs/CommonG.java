@@ -678,9 +678,9 @@ public class CommonG {
 	 * @param type type of information, it can be: json|string
 	 * 
 	 * @return String
-	 * @throws IOException 
+	 * @throws Exception 
 	 */
-	public String retrieveData(String baseData, String type) throws IOException {
+	public String retrieveData(String baseData, String type) throws Exception {
 	    String result;
 	    
 	    InputStream stream = getClass().getClassLoader().getResourceAsStream(baseData);
@@ -688,6 +688,11 @@ public class CommonG {
 	    Writer writer=new StringWriter();
 	    char[] buffer=new char[1024];
 	    Reader reader;
+	    
+	    if (stream == null) {
+		throw new Exception("File does not exist: " + baseData);
+	    }
+	    
 	    try {
 		reader=new BufferedReader(new InputStreamReader(stream, "UTF-8"));
 		int n;

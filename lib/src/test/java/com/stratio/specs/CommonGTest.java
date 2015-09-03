@@ -75,12 +75,13 @@ public class CommonGTest {
 	    commong.retrieveData(baseData, type);
 	    org.testng.Assert.fail("Expected Exception");
 	} catch (Exception e) {
-	    assertThat(e.getClass().toString()).as("Unexpected exception").isEqualTo(NullPointerException.class.toString());
+	    assertThat(e.getClass().toString()).as("Unexpected exception").isEqualTo(Exception.class.toString());
+	    assertThat(e.getMessage()).as("Unexpected exception message").isEqualTo("File does not exist: " + baseData);
 	}
     }
     
     @Test
-    public void retrieveDataStringTest() throws IOException {
+    public void retrieveDataStringTest() throws Exception {
 	ThreadProperty.set("class", this.getClass().getCanonicalName());
 	CommonG commong = new CommonG();
 	String baseData = "retrieveDataStringTest.conf";
