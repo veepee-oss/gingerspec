@@ -6,9 +6,8 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import org.eclipse.jetty.http.HttpContent;
 import org.hjson.ParseException;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
+import org.mockito.Mockito;
 import org.testng.annotations.Test;
 
 import com.stratio.tests.utils.ThreadProperty;
@@ -292,5 +291,40 @@ public class CommonGTest {
 	    assertThat(e.getMessage()).as("Unexpected exception message").isEqualTo("Operation not implemented: TRACE");
 	}
     }
-   
+    
+    @Test
+    public void generateRequestDataNullPUTTest() throws Exception {
+	ThreadProperty.set("class", this.getClass().getCanonicalName());
+	CommonG commong = new CommonG();
+	String requestType = "PUT";
+	String endPoint = "endpoint";
+	String type = "string";
+	
+	try {
+	    commong.setURL("http://localhost:80");
+	    commong.generateRequest(requestType, endPoint, null, type);
+	    org.testng.Assert.fail("Expected Exception");
+	} catch (Exception e) {
+	    assertThat(e.getClass().toString()).as("Unexpected exception").isEqualTo(Exception.class.toString());
+	    assertThat(e.getMessage()).as("Unexpected exception message").isEqualTo("Missing fields in request.");
+	}
+    }
+    
+    @Test
+    public void generateRequestDataNullPOSTTest() throws Exception {
+	ThreadProperty.set("class", this.getClass().getCanonicalName());
+	CommonG commong = new CommonG();
+	String requestType = "POST";
+	String endPoint = "endpoint";
+	String type = "string";
+	
+	try {
+	    commong.setURL("http://localhost:80");
+	    commong.generateRequest(requestType, endPoint, null, type);
+	    org.testng.Assert.fail("Expected Exception");
+	} catch (Exception e) {
+	    assertThat(e.getClass().toString()).as("Unexpected exception").isEqualTo(Exception.class.toString());
+	    assertThat(e.getMessage()).as("Unexpected exception message").isEqualTo("Missing fields in request.");
+	}
+    }
 }
