@@ -1,6 +1,7 @@
 package com.stratio.specs;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
 import java.net.MalformedURLException;
 
 import org.openqa.selenium.WebElement;
@@ -160,15 +161,46 @@ public class GivenGSpec extends BaseGSpec {
      * Browse to {@code url} using the current browser.
      * 
      * @param url
+     * @throws Exception 
      */
     @Given("^I browse to '(.+?)'$")
-    public void seleniumBrowse(String url) {
+    public void seleniumBrowse(String url) throws Exception {
 	assertThat(url).isNotEmpty();
 	String newUrl = commonspec.replacePlaceholders(url);
+	
+	String webURL = commonspec.getURL();
+	if (webURL == null) {
+	    webURL = commonspec.getWebURL();
+	    if (webURL == null) {
+		throw new Exception("Application URL has not been set");
+	    }
+	}
 	commonspec.getLogger().info("Browsing to {}{} with {}", commonspec.getWebURL(), newUrl, commonspec.getBrowserName());
-	commonspec.getDriver().get(commonspec.getWebURL() + newUrl);
+	commonspec.getDriver().get(webURL + newUrl);
 	commonspec.setParentWindow(commonspec.getDriver().getWindowHandle());
     }
+    
+    /**
+     * Set app host, port and url {@code host, @code port}
+     * 
+     * @param host
+     * @param port
+     * 
+     */
+    @Given("^My app is running in '([^:]+?)':'([^:]+?)'$")
+    public void setupApp(String host, String port) {
+	assertThat(host).isNotEmpty();
+        assertThat(port).isNotEmpty();
+        String newHost = commonspec.replacePlaceholders(host);
+        String newPort = commonspec.replacePlaceholders(port);
+        
+        commonspec.setHost(newHost);
+        commonspec.setPort(newPort);
+        commonspec.setURL("http://" + newHost + ":" + newPort + "/");
+        
+        commonspec.getLogger().info("Set URL to http://{}:{}/", newHost, newPort);
+    }
+    
     
     /**
      * Browse to {@code webHost, @code webPort} using the current browser.
@@ -187,7 +219,7 @@ public class GivenGSpec extends BaseGSpec {
         commonspec.setWebPort(newWebPort);
         commonspec.setWebURL("http://" + newWebHost + ":" + newWebPort + "/");
         
-        commonspec.getLogger().info("Set web base URL to  http://{}:{}/", newWebHost, newWebPort);  
+        commonspec.getLogger().info("Set web base URL to http://{}:{}/", newWebHost, newWebPort);  
     }
     
     /**

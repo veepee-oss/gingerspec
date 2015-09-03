@@ -64,8 +64,7 @@ public class CommonG {
 	private static final long DEFAULT_CURRENT_TIME = 1000L;
 	private static final int DEFAULT_SLEEP_TIME = 1500;
 
-	private final Logger logger = LoggerFactory.getLogger(ThreadProperty
-			.get("class"));
+	private final Logger logger = LoggerFactory.getLogger(ThreadProperty.get("class"));
 
 	private RemoteWebDriver driver = null;
 	private String browserName = null;
@@ -78,12 +77,33 @@ public class CommonG {
 	private HttpResponse response;
 
 	// CONNECTION DETAILS
+	private String host;
+	private String port;
+	private String uRL;
 	private String restHost;
 	private String restPort;
 	private String webHost;
 	private String webPort;
 	private String restURL;
 	private String webURL;
+	
+	/**
+	 * Get the common host.
+	 * 
+	 * @return String
+	 */
+	public String getHost() {
+		return this.host;
+	}
+	
+	/**
+	 * Get the common port.
+	 * 
+	 * @return String
+	 */
+	public String getPort() {
+		return this.port;
+	}	
 	
 	/**
 	 * Get the common REST host.
@@ -182,6 +202,24 @@ public class CommonG {
 	 */
 	public RemoteWebDriver getDriver() {
 		return driver;
+	}
+	
+	/**
+	 * Set the host.
+	 * 
+	 * @param host
+	 */
+	public void setHost(String host) {
+		this.host = host;
+	}
+	
+	/**
+	 * Set the port.
+	 * 
+	 * @param port
+	 */
+	public void setPort(String port) {
+		this.port = port;
 	}
 
 	/**
@@ -610,6 +648,13 @@ public class CommonG {
 	    this.webURL = webURL;
 	}
 	
+	public String getURL() {
+	    return uRL;
+	}
+
+	public void setURL(String uRL) {
+	    this.uRL = uRL;
+	}	
 
 	public HttpResponse getResponse() {
 	    return response;
@@ -633,6 +678,7 @@ public class CommonG {
 	 * @param type type of information, it can be: json|string
 	 * 
 	 * @return String
+	 * @throws IOException 
 	 */
 	public String retrieveData(String baseData, String type) throws IOException {
 	    String result;
@@ -749,10 +795,17 @@ public class CommonG {
 	    Future<Response> response = null;
 	    BoundRequestBuilder request;
 
-	    this.getLogger().info("URL: {}", this.getRestURL());
+	    String restURL = this.getURL();
+	    if (restURL == null) {
+		restURL = this.getRestURL();
+		if (restURL == null) {
+		    throw new Exception("Application URL has not been set");
+		}
+	    }
+	    
 	    switch(requestType.toUpperCase()) {
 	    case "GET":
-		request = this.getClient().prepareGet(this.getRestURL() + endPoint);
+		request = this.getClient().prepareGet(restURL + endPoint);
 
 		if (this.getResponse() != null) {
 		    request = request.setCookies(this.getResponse().getCookies());
@@ -761,7 +814,7 @@ public class CommonG {
 		response = request.execute();
 		break;
 	    case "DELETE":
-		request = this.getClient().prepareDelete(this.getRestURL() + endPoint);
+		request = this.getClient().prepareDelete(restURL + endPoint);
 
 		if (this.getResponse() != null) {
 		    request = request.setCookies(this.getResponse().getCookies());
@@ -774,7 +827,7 @@ public class CommonG {
 		    Exception missingFields = new Exception("Missing fields in request.");
 		    throw missingFields;
 		} else {
-		    request = this.getClient().preparePost(this.getRestURL() + endPoint).setBody(data);
+		    request = this.getClient().preparePost(restURL + endPoint).setBody(data);
 		    if ("json".equals(type)) {
 			request = request.setHeader("Content-Type","application/json");
 		    } else if ("string".equals(type)){
@@ -794,7 +847,7 @@ public class CommonG {
 		    Exception missingFields = new Exception("Missing fields in request.");
 		    throw missingFields;
 		} else {
-		    request = this.getClient().preparePut(this.getRestURL() + endPoint).setBody(data);
+		    request = this.getClient().preparePut(restURL + endPoint).setBody(data);
 		    if ("json".equals(type)) {
 			request = request.setHeader("Content-Type","application/json");
 		    } else if ("string".equals(type)){
