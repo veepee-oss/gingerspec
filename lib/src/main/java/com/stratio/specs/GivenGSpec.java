@@ -2,6 +2,8 @@ package com.stratio.specs;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.net.MalformedURLException;
+
 import org.openqa.selenium.WebElement;
 
 import cucumber.api.DataTable;
@@ -13,6 +15,10 @@ import cucumber.api.java.en.Given;
  */
 public class GivenGSpec extends BaseGSpec {
 
+    public static final int PAGE_LOAD_TIMEOUT = 120;
+    public static final int IMPLICITLY_WAIT = 10;
+    public static final int SCRIPT_TIMEOUT = 30;
+    
     /**
      * Generic constructor.
      * 
@@ -155,17 +161,86 @@ public class GivenGSpec extends BaseGSpec {
      * Browse to {@code url} using the current browser.
      * 
      * @param url
+     * @throws Exception 
      */
     @Given("^I browse to '(.+?)'$")
-    public void seleniumBrowse(String url) {
-        assertThat(url).isNotEmpty();
-        String newUrl = commonspec.replacePlaceholders(url);
-        commonspec.getLogger().info("Browsing to {} with {}", newUrl, commonspec.getBrowserName());
-
-        commonspec.getDriver().get("http://" + newUrl);
-        commonspec.setParentWindow(commonspec.getDriver().getWindowHandle());
+    public void seleniumBrowse(String url) throws Exception {
+	assertThat(url).isNotEmpty();
+	String newUrl = commonspec.replacePlaceholders(url);
+	
+	String webURL = commonspec.getURL();
+	if (webURL == null) {
+	    webURL = commonspec.getWebURL();
+	    if (webURL == null) {
+		throw new Exception("Application URL has not been set");
+	    }
+	}
+	commonspec.getLogger().info("Browsing to {}{} with {}", commonspec.getWebURL(), newUrl, commonspec.getBrowserName());
+	commonspec.getDriver().get(webURL + newUrl);
+	commonspec.setParentWindow(commonspec.getDriver().getWindowHandle());
     }
-
+    
+    /**
+     * Set app host, port and url {@code host, @code port}
+     * 
+     * @param host
+     * @param port
+     * 
+     */
+    @Given("^My app is running in '([^:]+?)':'([^:]+?)'$")
+    public void setupApp(String host, String port) {
+	assertThat(host).isNotEmpty();
+        assertThat(port).isNotEmpty();
+        String newHost = commonspec.replacePlaceholders(host);
+        String newPort = commonspec.replacePlaceholders(port);
+        
+        commonspec.setHost(newHost);
+        commonspec.setPort(newPort);
+        commonspec.setURL("http://" + newHost + ":" + newPort + "/");
+        
+        commonspec.getLogger().info("Set URL to http://{}:{}/", newHost, newPort);
+    }
+    
+    
+    /**
+     * Browse to {@code webHost, @code webPort} using the current browser.
+     *
+     * @param url
+     * @throws MalformedURLException 
+     */
+    @Given("^I set web base url to '([^:]+?)':'([^:]+?)'$")
+    public void setupWeb(String webHost, String webPort) throws MalformedURLException {
+        assertThat(webHost).isNotEmpty();
+        assertThat(webPort).isNotEmpty();
+        String newWebHost = commonspec.replacePlaceholders(webHost);
+        String newWebPort = commonspec.replacePlaceholders(webPort);
+        
+        commonspec.setWebHost(newWebHost);
+        commonspec.setWebPort(newWebPort);
+        commonspec.setWebURL("http://" + newWebHost + ":" + newWebPort + "/");
+        
+        commonspec.getLogger().info("Set web base URL to http://{}:{}/", newWebHost, newWebPort);  
+    }
+    
+    /**
+     * Send requests to {@code restHost @code restPort}.
+     * 
+     * @param restHost
+     * @param restPort
+     */
+    @Given("^I send requests to '([^:]+?)':'([^:]+?)'$")
+    public void setupRestClient(String restHost, String restPort) {
+        assertThat(restHost).isNotEmpty();
+        assertThat(restPort).isNotEmpty();
+        String newRestHost = commonspec.replacePlaceholders(restHost);
+        String newRestPort = commonspec.replacePlaceholders(restPort);
+        
+        commonspec.setRestHost(newRestHost);
+        commonspec.setRestPort(newRestPort);
+        commonspec.setRestURL("http://" + newRestHost + ":" + newRestPort + "/");
+        commonspec.getLogger().info("Sending requests to http://{}:{}", newRestHost, newRestPort);
+    }
+    
     /**
      * Maximizes current browser window. Mind the current resolution could break a test.
      * 

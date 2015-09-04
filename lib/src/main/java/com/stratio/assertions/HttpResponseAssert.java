@@ -1,8 +1,10 @@
 package com.stratio.assertions;
 
+import org.apache.http.util.EntityUtils;
 import org.assertj.core.api.AbstractAssert;
 
 import com.stratio.tests.utils.HttpResponse;
+import org.json.JSONArray;
 
 
 public class HttpResponseAssert extends
@@ -152,5 +154,39 @@ public class HttpResponseAssert extends
 		}
 		return this;
 	}
+	
+	/**
+	 * Checks if a HttpResponse has a specific message and has a specific length
+	 * 
+	 * @param status
+	 * @param length
+	 * @return HttpResponseAssert
+	 */
+	public HttpResponseAssert hasStatusCodeAndLength(Integer status,
+			Integer length) {
 
+		String msg = "";
+		if (actual.getStatusCode() != status) {
+			msg += String.format(
+					"Expected response status code to be <%s> but was <%s>",
+					status, actual.getStatusCode());
+		}
+		
+		JSONArray bodyJson  = new JSONArray(actual.getResponse());
+		
+		if (bodyJson.length() != length) {
+		    String nl = "";
+		    if (!"".equals(msg)) {
+			nl = String.format("%s%26s", System.lineSeparator(), " ");
+		    }
+		    msg += String.format(
+				"%sExpected response length to be <%s> but was <%s>",
+				nl, length, bodyJson.length());
+		}
+		
+		if (!"".equals(msg)) {
+			failWithMessage(msg);
+		}
+		return this;
+	}
 }

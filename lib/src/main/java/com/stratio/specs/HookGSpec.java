@@ -2,6 +2,7 @@ package com.stratio.specs;
 
 import static org.testng.Assert.fail;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
@@ -11,6 +12,8 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
+import com.ning.http.client.AsyncHttpClient;
+import com.ning.http.client.AsyncHttpClientConfig;
 import com.stratio.exceptions.DBException;
 import com.stratio.tests.utils.ThreadProperty;
 import com.thoughtworks.selenium.SeleniumException;
@@ -200,5 +203,19 @@ public class HookGSpec extends BaseGSpec {
     @After(order = 0)
     public void teardown() {
         commonspec.getLogger().info("Ended running hooks");
+    }
+    
+    @Before(order = 10, value = "@rest")
+    public void restClientSetup() throws Exception {
+        commonspec.getLogger().info("Starting a REST client");
+
+        commonspec.setClient(new AsyncHttpClient(new AsyncHttpClientConfig.Builder().setAllowPoolingConnection(false)
+                .build()));        
+    }
+ 
+    @After(order = 10, value = "@rest")
+    public void restClientTeardown() throws IOException {
+        commonspec.getLogger().info("Shutting down REST client");
+        commonspec.getClient().close();
     }
 }
