@@ -791,7 +791,6 @@ public class CommonG {
 	 * @param endPoint end point to sent the request to
 	 * @param data to be sent for PUT/POST requests
 	 * @param type type of data to be sent (json|string)
-	 * @param commonspec 
 	 * 
 	 * @throws Exception 
 	 * 
