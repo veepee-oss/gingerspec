@@ -893,29 +893,6 @@ public class CommonG {
 	    return response;
 	}
 	
-	
-//	public void setPreviousElement(String element, String value) throws ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException {
-//	    this.getLogger().info("COMMONG SETTING VALUE TO: {}", value);
-//	    
-//	    this.setAux(value);
-//	    this.getLogger().info("VALUE SET");
-//	}
-	
-	
-//	public void setPreviousElement(String element, String value) throws ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchFieldException, InstantiationException {
-//	    this.getLogger().info("COMMONG SETTING VALUE TO: {}", value);
-//	    
-//	    Reflections reflections = new Reflections("com.stratio");
-//	    Set<Class<? extends CommonG>> classes = reflections.getSubTypesOf(CommonG.class);
-//	    
-//	    Object pp = (classes.toArray())[0];
-//	    String qq = (pp.toString().split(" "))[1];
-//	    Class<?> c = Class.forName(qq);
-//	    
-//	    Method factoryMethod = c.getDeclaredMethod("set" + element, String.class);
-//	    Object o = factoryMethod.invoke(null, value);
-//	}
-	
 	public void setPreviousElement(String element, String value) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, InstantiationException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException {
 	    Reflections reflections = new Reflections("com.stratio");    
 	    Set classes = reflections.getSubTypesOf(CommonG.class);
