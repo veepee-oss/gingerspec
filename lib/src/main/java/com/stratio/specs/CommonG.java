@@ -15,10 +15,14 @@ import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Future;
 
 import javax.imageio.ImageIO;
@@ -36,6 +40,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.internal.Locatable;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,6 +91,16 @@ public class CommonG {
 	private String webPort;
 	private String restURL;
 	private String webURL;
+	
+	private String aux;
+	
+	public String getAux() {
+	    return this.aux;
+	}
+	
+	public void setAux(String aux) {
+	    this.aux = aux;
+	}
 	
 	/**
 	 * Get the common host.
@@ -877,4 +892,41 @@ public class CommonG {
 	    }
 	    return response;
 	}
+	
+	
+//	public void setPreviousElement(String element, String value) throws ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException {
+//	    this.getLogger().info("COMMONG SETTING VALUE TO: {}", value);
+//	    
+//	    this.setAux(value);
+//	    this.getLogger().info("VALUE SET");
+//	}
+	
+	
+//	public void setPreviousElement(String element, String value) throws ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchFieldException, InstantiationException {
+//	    this.getLogger().info("COMMONG SETTING VALUE TO: {}", value);
+//	    
+//	    Reflections reflections = new Reflections("com.stratio");
+//	    Set<Class<? extends CommonG>> classes = reflections.getSubTypesOf(CommonG.class);
+//	    
+//	    Object pp = (classes.toArray())[0];
+//	    String qq = (pp.toString().split(" "))[1];
+//	    Class<?> c = Class.forName(qq);
+//	    
+//	    Method factoryMethod = c.getDeclaredMethod("set" + element, String.class);
+//	    Object o = factoryMethod.invoke(null, value);
+//	}
+	
+	public void setPreviousElement(String element, String value) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, InstantiationException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException {
+	    Reflections reflections = new Reflections("com.stratio");    
+	    Set classes = reflections.getSubTypesOf(CommonG.class);
+	    
+	    Object pp = (classes.toArray())[0];
+	    String qq = (pp.toString().split(" "))[1];
+	    Class<?> c = Class.forName(qq.toString());
+	    
+	    Field ff = c.getDeclaredField(element);
+	    ff.setAccessible(true);
+	    ff.set(null, value);
+	}
+	
 }
