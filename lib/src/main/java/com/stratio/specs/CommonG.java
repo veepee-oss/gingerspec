@@ -367,6 +367,33 @@ public class CommonG {
 		return wel;
 	}
 
+	
+	public String replaceReflectionPlaceholders(String element) throws ClassNotFoundException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+		String newVal = element;
+		while (newVal.contains("!{")) {
+			String placeholder = newVal.substring(newVal.indexOf("!{"),
+					newVal.indexOf("}") + 1);
+			String attribute = placeholder.substring(2, placeholder.length() - 1);
+			
+			// we want to use value previously saved
+			Reflections reflections = new Reflections("com.stratio");    
+			Set classes = reflections.getSubTypesOf(CommonG.class);
+			    
+			Object pp = (classes.toArray())[0];
+			String qq = (pp.toString().split(" "))[1];
+			Class<?> c = Class.forName(qq.toString());
+			
+			Field ff = c.getDeclaredField(attribute);
+			ff.setAccessible(true);
+			String prop = (String)ff.get(null);
+			
+			newVal = newVal.replace(placeholder, prop);
+		}
+
+		return newVal;
+	}
+	
+	
 	/**
 	 * Replaces every placeholded element, enclosed in ${} with the
 	 * corresponding java property
@@ -739,7 +766,8 @@ public class CommonG {
 		    String operation =  modifications.raw().get(i).get(1);
 		    String newValue =  modifications.raw().get(i).get(2);
 		    newValue = replacePlaceholders(newValue);
-		    
+		    newValue = replaceReflectionPlaceholders(newValue);
+	    
 		    modifiedData = JsonValue.readHjson(modifiedData).asObject().toString();
 		    
 		    switch(operation.toUpperCase()) {
@@ -766,6 +794,7 @@ public class CommonG {
 	    		    throw new Exception("Modification type does not exist: " + operation);
 		    }
 		    modifiedData = new JSONObject(linkedHashMap).toString();
+		    
 		}
 	    } else {
 		for (int i = 0; i < modifications.raw().size(); i ++) {
@@ -789,6 +818,8 @@ public class CommonG {
 		    }
 		}
 	    }
+	    
+	    modifiedData = modifiedData.replace("\"NULL\"", "null");
 	    return modifiedData;
 	}
 	
@@ -813,6 +844,8 @@ public class CommonG {
 		    throw new Exception("Application URL has not been set");
 		}
 	    }
+	    
+	    endPoint = replaceReflectionPlaceholders(endPoint);
 	    
 	    switch(requestType.toUpperCase()) {
 	    case "GET":
