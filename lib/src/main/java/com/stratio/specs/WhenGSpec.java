@@ -209,6 +209,16 @@ public class WhenGSpec extends BaseGSpec {
 	commonspec.getLogger().info("Saving response");
 	commonspec.setResponse(requestType, response.get());
     }
+    
+    @When("^I send a '(.+?)' request to '(.+?)' as json with empty data$")
+    public void sendRequestEmptyData(String requestType, String endPoint) throws Exception {
+	commonspec.getLogger().info("Generating request {} to {} with empty data {} as json", requestType, endPoint, "", "json");
+	Future<Response> response = commonspec.generateRequest(requestType, endPoint, "", "json");
+			
+	// Save response
+	commonspec.getLogger().info("Saving response");
+	commonspec.setResponse(requestType, response.get());
+    }
 
     @When("^I send a '(.+?)' request to '(.+?)'( based on '([^:]+?)'( as '(json|string)')?)?$")
     public void sendRequestNoDataTable (String requestType, String endPoint, String foo, String baseData, String bar, String type) throws Exception {
