@@ -23,8 +23,6 @@ public class GivenGSpec extends BaseGSpec {
     public static final int IMPLICITLY_WAIT = 10;
     public static final int SCRIPT_TIMEOUT = 30;
     
-    public String previousFragmentID = "";
-    
     /**
      * Generic constructor.
      * 

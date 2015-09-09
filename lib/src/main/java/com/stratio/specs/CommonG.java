@@ -92,16 +92,6 @@ public class CommonG {
 	private String restURL;
 	private String webURL;
 	
-	private String aux;
-	
-	public String getAux() {
-	    return this.aux;
-	}
-	
-	public void setAux(String aux) {
-	    this.aux = aux;
-	}
-	
 	/**
 	 * Get the common host.
 	 * 
