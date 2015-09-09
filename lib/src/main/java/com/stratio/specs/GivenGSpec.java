@@ -37,6 +37,9 @@ public class GivenGSpec extends BaseGSpec {
     /**
      * Save value for future use
      * 
+     * @param element key in the json response to be saved
+     * @param attribute attribute in the class where to store the value
+     * 
      * @throws IllegalAccessException 
      * @throws IllegalArgumentException 
      * @throws SecurityException 
@@ -56,11 +59,7 @@ public class GivenGSpec extends BaseGSpec {
 	
 	commonspec.setPreviousElement(attribute, value);
     }
-    
-    
-    
-    
-    
+        
     /**
      * Empty all the indexes of ElasticSearch.
      */

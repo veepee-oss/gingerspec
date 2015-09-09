@@ -748,6 +748,7 @@ public class CommonG {
 		    String composeKey = modifications.raw().get(i).get(0);
 		    String operation =  modifications.raw().get(i).get(1);
 		    String newValue =  modifications.raw().get(i).get(2);
+		    newValue = replacePlaceholders(newValue);
 		    
 		    modifiedData = JsonValue.readHjson(modifiedData).asObject().toString();
 		    
@@ -781,6 +782,7 @@ public class CommonG {
 		    String value = modifications.raw().get(i).get(0);
 		    String operation =  modifications.raw().get(i).get(1);
 		    String newValue =  modifications.raw().get(i).get(2);
+		    newValue = replacePlaceholders(newValue);
 	    
 		    switch(operation.toUpperCase()) {
 	    		case "DELETE":
@@ -892,6 +894,22 @@ public class CommonG {
 	    }
 	    return response;
 	}
+	
+	/**
+	 * Saves the 
+	 * 
+	 * @param element attribute in class where to store the value
+	 * @param value value to be stored
+	 * 
+	 * @throws NoSuchFieldException
+	 * @throws SecurityException
+	 * @throws IllegalArgumentException
+	 * @throws IllegalAccessException
+	 * @throws InstantiationException
+	 * @throws ClassNotFoundException
+	 * @throws NoSuchMethodException
+	 * @throws InvocationTargetException
+	 */
 	
 	public void setPreviousElement(String element, String value) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, InstantiationException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException {
 	    Reflections reflections = new Reflections("com.stratio");    
