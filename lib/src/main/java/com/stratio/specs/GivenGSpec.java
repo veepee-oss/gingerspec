@@ -35,8 +35,8 @@ public class GivenGSpec extends BaseGSpec {
     /**
      * Save value for future use
      * 
-     * @param element key in the json response to be saved
-     * @param attribute attribute in the class where to store the value
+     * @param element key in the json response to be saved (i.e. $.fragments[0].id)
+     * @param attribute STATIC attribute in the class where to store the value
      * 
      * @throws IllegalAccessException 
      * @throws IllegalArgumentException 

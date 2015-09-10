@@ -770,6 +770,7 @@ public class CommonG {
 	    
 		    modifiedData = JsonValue.readHjson(modifiedData).asObject().toString();
 		    
+		    modifiedData = modifiedData.replaceAll("null", "\"TO_BE_NULL\"");
 		    switch(operation.toUpperCase()) {
 	    		case "DELETE":
 	    		    linkedHashMap = JsonPath.parse(modifiedData).delete(composeKey).json();
@@ -793,8 +794,9 @@ public class CommonG {
 	    		default:
 	    		    throw new Exception("Modification type does not exist: " + operation);
 		    }
-		    modifiedData = new JSONObject(linkedHashMap).toString();
 		    
+		    modifiedData = new JSONObject(linkedHashMap).toString();
+		    modifiedData = modifiedData.replaceAll("\"TO_BE_NULL\"", "null");
 		}
 	    } else {
 		for (int i = 0; i < modifications.raw().size(); i ++) {
@@ -818,8 +820,6 @@ public class CommonG {
 		    }
 		}
 	    }
-	    
-	    modifiedData = modifiedData.replace("\"NULL\"", "null");
 	    return modifiedData;
 	}
 	

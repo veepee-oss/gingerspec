@@ -118,6 +118,20 @@ public class CommonGTest {
     }
     
     @Test
+    public void modifyDataNullValueJsonTest() throws Exception {
+	ThreadProperty.set("class", this.getClass().getCanonicalName());
+	CommonG commong = new CommonG();
+	String data = "{\"key1\": \"value1\", \"key2\": {\"key3\": null}}";
+	String expectedData = "{\"key2\":{\"key3\":null}}";
+	String type = "json";
+	List<List<String>> rawData = Arrays.asList(Arrays.asList("key1", "DELETE", "N/A")); 
+	DataTable modifications = DataTable.create(rawData);
+	
+	String modifiedData = commong.modifyData(data, type, modifications);
+	assertThat(modifiedData).as("Unexpected modified data").isEqualTo(expectedData);
+    }
+    
+    @Test
     public void modifyDataInvalidModificationTypeStringTest() throws Exception {
 	ThreadProperty.set("class", this.getClass().getCanonicalName());
 	CommonG commong = new CommonG();

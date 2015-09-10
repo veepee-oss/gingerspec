@@ -209,18 +209,22 @@ public class WhenGSpec extends BaseGSpec {
 	commonspec.getLogger().info("Saving response");
 	commonspec.setResponse(requestType, response.get());
     }
-    
-    @When("^I send a '(.+?)' request to '(.+?)' as json with empty data$")
-    public void sendRequestEmptyData(String requestType, String endPoint) throws Exception {
-	commonspec.getLogger().info("Generating request {} to {} with empty data {} as json", requestType, endPoint, "", "json");
-	Future<Response> response = commonspec.generateRequest(requestType, endPoint, "", "json");
-			
-	// Save response
-	commonspec.getLogger().info("Saving response");
-	commonspec.setResponse(requestType, response.get());
-    }
 
-    @When("^I send a '(.+?)' request to '(.+?)'( based on '([^:]+?)'( as '(json|string)')?)?$")
+    /**
+     * Same sendRequest, but in this case, we do not receive a data table with modifications.
+     * Besides, the data and request header are optional as well.
+     * In case we want to simulate sending a json request with empty data, we just to avoid baseData
+     * 
+     * @param requestType
+     * @param endPoint
+     * @param foo
+     * @param baseData
+     * @param bar
+     * @param type
+     * 
+     * @throws Exception
+     */
+    @When("^I send a '(.+?)' request to '(.+?)'( based on '([^:]+?)')?( as '(json|string)')?$")
     public void sendRequestNoDataTable (String requestType, String endPoint, String foo, String baseData, String bar, String type) throws Exception {
 	Future<Response> response;
 	
@@ -231,7 +235,7 @@ public class WhenGSpec extends BaseGSpec {
 	    response = commonspec.generateRequest(requestType, endPoint, retrievedData, type);
 	} else {
 	    // Generate request
-	    response = commonspec.generateRequest(requestType, endPoint, null, type);
+	    response = commonspec.generateRequest(requestType, endPoint, "", type);
 	}
 			
 	// Save response
