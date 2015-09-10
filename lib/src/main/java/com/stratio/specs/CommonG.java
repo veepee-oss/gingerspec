@@ -15,10 +15,14 @@ import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Future;
 
 import javax.imageio.ImageIO;
@@ -36,6 +40,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.internal.Locatable;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -362,6 +367,33 @@ public class CommonG {
 		return wel;
 	}
 
+	
+	public String replaceReflectionPlaceholders(String element) throws ClassNotFoundException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+		String newVal = element;
+		while (newVal.contains("!{")) {
+			String placeholder = newVal.substring(newVal.indexOf("!{"),
+					newVal.indexOf("}") + 1);
+			String attribute = placeholder.substring(2, placeholder.length() - 1);
+			
+			// we want to use value previously saved
+			Reflections reflections = new Reflections("com.stratio");    
+			Set classes = reflections.getSubTypesOf(CommonG.class);
+			    
+			Object pp = (classes.toArray())[0];
+			String qq = (pp.toString().split(" "))[1];
+			Class<?> c = Class.forName(qq.toString());
+			
+			Field ff = c.getDeclaredField(attribute);
+			ff.setAccessible(true);
+			String prop = (String)ff.get(null);
+			
+			newVal = newVal.replace(placeholder, prop);
+		}
+
+		return newVal;
+	}
+	
+	
 	/**
 	 * Replaces every placeholded element, enclosed in ${} with the
 	 * corresponding java property
@@ -733,9 +765,12 @@ public class CommonG {
 		    String composeKey = modifications.raw().get(i).get(0);
 		    String operation =  modifications.raw().get(i).get(1);
 		    String newValue =  modifications.raw().get(i).get(2);
-		    
+		    newValue = replacePlaceholders(newValue);
+		    newValue = replaceReflectionPlaceholders(newValue);
+	    
 		    modifiedData = JsonValue.readHjson(modifiedData).asObject().toString();
 		    
+		    modifiedData = modifiedData.replaceAll("null", "\"TO_BE_NULL\"");
 		    switch(operation.toUpperCase()) {
 	    		case "DELETE":
 	    		    linkedHashMap = JsonPath.parse(modifiedData).delete(composeKey).json();
@@ -759,13 +794,16 @@ public class CommonG {
 	    		default:
 	    		    throw new Exception("Modification type does not exist: " + operation);
 		    }
+		    
 		    modifiedData = new JSONObject(linkedHashMap).toString();
+		    modifiedData = modifiedData.replaceAll("\"TO_BE_NULL\"", "null");
 		}
 	    } else {
 		for (int i = 0; i < modifications.raw().size(); i ++) {
 		    String value = modifications.raw().get(i).get(0);
 		    String operation =  modifications.raw().get(i).get(1);
 		    String newValue =  modifications.raw().get(i).get(2);
+		    newValue = replacePlaceholders(newValue);
 	    
 		    switch(operation.toUpperCase()) {
 	    		case "DELETE":
@@ -791,7 +829,6 @@ public class CommonG {
 	 * @param endPoint end point to sent the request to
 	 * @param data to be sent for PUT/POST requests
 	 * @param type type of data to be sent (json|string)
-	 * @param commonspec 
 	 * 
 	 * @throws Exception 
 	 * 
@@ -807,6 +844,8 @@ public class CommonG {
 		    throw new Exception("Application URL has not been set");
 		}
 	    }
+	    
+	    endPoint = replaceReflectionPlaceholders(endPoint);
 	    
 	    switch(requestType.toUpperCase()) {
 	    case "GET":
@@ -878,4 +917,34 @@ public class CommonG {
 	    }
 	    return response;
 	}
+	
+	/**
+	 * Saves the 
+	 * 
+	 * @param element attribute in class where to store the value
+	 * @param value value to be stored
+	 * 
+	 * @throws NoSuchFieldException
+	 * @throws SecurityException
+	 * @throws IllegalArgumentException
+	 * @throws IllegalAccessException
+	 * @throws InstantiationException
+	 * @throws ClassNotFoundException
+	 * @throws NoSuchMethodException
+	 * @throws InvocationTargetException
+	 */
+	
+	public void setPreviousElement(String element, String value) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, InstantiationException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException {
+	    Reflections reflections = new Reflections("com.stratio");    
+	    Set classes = reflections.getSubTypesOf(CommonG.class);
+	    
+	    Object pp = (classes.toArray())[0];
+	    String qq = (pp.toString().split(" "))[1];
+	    Class<?> c = Class.forName(qq.toString());
+	    
+	    Field ff = c.getDeclaredField(element);
+	    ff.setAccessible(true);
+	    ff.set(null, value);
+	}
+	
 }

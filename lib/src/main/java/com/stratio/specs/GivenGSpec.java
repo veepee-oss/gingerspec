@@ -2,9 +2,13 @@ package com.stratio.specs;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 
+import org.hjson.JsonValue;
 import org.openqa.selenium.WebElement;
+
+import com.jayway.jsonpath.JsonPath;
 
 import cucumber.api.DataTable;
 import cucumber.api.java.en.Given;
@@ -28,6 +32,32 @@ public class GivenGSpec extends BaseGSpec {
         this.commonspec = spec;
     }
 
+    /**
+     * Save value for future use
+     * 
+     * @param element key in the json response to be saved (i.e. $.fragments[0].id)
+     * @param attribute STATIC attribute in the class where to store the value
+     * 
+     * @throws IllegalAccessException 
+     * @throws IllegalArgumentException 
+     * @throws SecurityException 
+     * @throws NoSuchFieldException 
+     * @throws ClassNotFoundException 
+     * @throws InstantiationException 
+     * @throws InvocationTargetException 
+     * @throws NoSuchMethodException 
+     */
+    @Given("^I save element '(.+?)' in attribute '(.+?)'$")
+    public void saveElement(String element, String attribute) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, InstantiationException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException {
+	commonspec.getLogger().info("Saving element: {} in attribute: {}", element, attribute);
+	
+	String json = commonspec.getResponse().getResponse();
+	String hjson = JsonValue.readHjson(json).asObject().toString();
+	String value = JsonPath.parse(hjson).read(element);
+	
+	commonspec.setPreviousElement(attribute, value);
+    }
+        
     /**
      * Empty all the indexes of ElasticSearch.
      */
