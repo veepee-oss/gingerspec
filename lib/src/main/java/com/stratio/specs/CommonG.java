@@ -299,13 +299,20 @@ public class CommonG {
 	 * @throws Exception
 	 * 
 	 * @return List<WebElement>
+	 * @throws IllegalAccessException 
+	 * @throws IllegalArgumentException 
+	 * @throws SecurityException 
+	 * @throws NoSuchFieldException 
+	 * @throws ClassNotFoundException 
 	 */
 	public List<WebElement> locateElement(String method, String element,
-			Integer expectedCount) {
+			Integer expectedCount) throws ClassNotFoundException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 
 		List<WebElement> wel = null;
 		String newElement = replacePlaceholders(element);
-
+		
+		newElement = replaceReflectionPlaceholders(newElement);
+		
 		if ("id".equals(method)) {
 			logger.info("Locating {} by id", newElement);
 			wel = this.getDriver().findElements(By.id(newElement));
