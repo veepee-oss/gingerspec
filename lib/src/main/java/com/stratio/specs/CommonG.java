@@ -83,33 +83,10 @@ public class CommonG {
 	private HttpResponse response;
 
 	// CONNECTION DETAILS
-	private String host;
-	private String port;
-	private String uRL;
 	private String restHost;
 	private String restPort;
 	private String webHost;
 	private String webPort;
-	private String restURL;
-	private String webURL;
-	
-	/**
-	 * Get the common host.
-	 * 
-	 * @return String
-	 */
-	public String getHost() {
-		return this.host;
-	}
-	
-	/**
-	 * Get the common port.
-	 * 
-	 * @return String
-	 */
-	public String getPort() {
-		return this.port;
-	}	
 	
 	/**
 	 * Get the common REST host.
@@ -219,24 +196,6 @@ public class CommonG {
 		return driver;
 	}
 	
-	/**
-	 * Set the host.
-	 * 
-	 * @param host
-	 */
-	public void setHost(String host) {
-		this.host = host;
-	}
-	
-	/**
-	 * Set the port.
-	 * 
-	 * @param port
-	 */
-	public void setPort(String port) {
-		this.port = port;
-	}
-
 	/**
 	 * Set the REST host.
 	 * 
@@ -681,30 +640,6 @@ public class CommonG {
 	    this.client = client;
 	}
 
-	public String getRestURL() {
-	    return restURL;
-	}
-
-	public void setRestURL(String restURL) {
-	    this.restURL = restURL;
-	}
-	
-	public String getWebURL() {
-	    return webURL;
-	}
-
-	public void setWebURL(String webURL) {
-	    this.webURL = webURL;
-	}
-	
-	public String getURL() {
-	    return uRL;
-	}
-
-	public void setURL(String uRL) {
-	    this.uRL = uRL;
-	}	
-
 	public HttpResponse getResponse() {
 	    return response;
 	}
@@ -716,9 +651,6 @@ public class CommonG {
 	    List<Cookie> cookies = response.getCookies();
 	    this.response = new HttpResponse(statusCode, httpResponse, cookies);
 	}
-	
-	
-	
 	
 	/**
 	 * Returns the information contained in file passed as parameter
@@ -854,13 +786,16 @@ public class CommonG {
 	    Future<Response> response = null;
 	    BoundRequestBuilder request;
 
-	    String restURL = this.getURL();
-	    if (restURL == null) {
-		restURL = this.getRestURL();
-		if (restURL == null) {
-		    throw new Exception("Application URL has not been set");
-		}
+	    if (this.getRestHost() == null) {
+		throw new Exception("Rest host has not been set");
 	    }
+	    
+	    if (this.getRestPort() == null) {
+		throw new Exception("Rest port has not been set");
+	    }
+	    
+	    String restURL = "http://" + this.getRestHost() + this.getRestPort();
+	    
 	    
 	    endPoint = replaceReflectionPlaceholders(endPoint);
 	    

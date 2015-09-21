@@ -265,7 +265,7 @@ public class CommonGTest {
 	    org.testng.Assert.fail("Expected Exception");
 	} catch (Exception e) {
 	    assertThat(e.getClass().toString()).as("Unexpected exception").isEqualTo(Exception.class.toString());
-	    assertThat(e.getMessage()).as("Unexpected exception message").isEqualTo("Application URL has not been set");
+	    assertThat(e.getMessage()).as("Unexpected exception message").isEqualTo("Rest host has not been set");
 	}
     }
     
@@ -279,7 +279,8 @@ public class CommonGTest {
 	String type = "string";
 	
 	try {
-	    commong.setURL("http://localhost:80");
+	    commong.setRestHost("localhost");
+	    commong.setRestPort("80");
 	    commong.generateRequest(requestType, endPoint, data, type);
 	    org.testng.Assert.fail("Expected Exception");
 	} catch (Exception e) {
@@ -298,7 +299,8 @@ public class CommonGTest {
 	String type = "string";
 	
 	try {
-	    commong.setURL("http://localhost:80");
+	    commong.setRestHost("localhost");
+	    commong.setRestPort("80");
 	    commong.generateRequest(requestType, endPoint, data, type);
 	    org.testng.Assert.fail("Expected Exception");
 	} catch (Exception e) {
@@ -316,7 +318,8 @@ public class CommonGTest {
 	String type = "string";
 	
 	try {
-	    commong.setURL("http://localhost:80");
+	    commong.setRestHost("localhost");
+	    commong.setRestPort("80");
 	    commong.generateRequest(requestType, endPoint, null, type);
 	    org.testng.Assert.fail("Expected Exception");
 	} catch (Exception e) {
@@ -334,7 +337,8 @@ public class CommonGTest {
 	String type = "string";
 	
 	try {
-	    commong.setURL("http://localhost:80");
+	    commong.setRestHost("localhost");
+	    commong.setRestPort("80");
 	    commong.generateRequest(requestType, endPoint, null, type);
 	    org.testng.Assert.fail("Expected Exception");
 	} catch (Exception e) {

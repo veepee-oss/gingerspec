@@ -527,11 +527,23 @@ public class ThenGSpec extends BaseGSpec {
      * Checks that we are in the URL passed
      * 
      * @param url
+     * @throws Exception 
      */
     @Then("^we are in page '(.+?)'$")
-    public void checkURL(String url) {
-	assertThat(commonspec.getDriver().getCurrentUrl()).as("We are not in the expected url: " + commonspec.getWebURL() + url)
-        .isEqualTo(commonspec.getWebURL() + url);
+    public void checkURL(String url) throws Exception {
+	
+	if (commonspec.getWebHost() == null) {
+	    throw new Exception("Web host has not been set");
+	}
+	    
+	if (commonspec.getWebPort() == null) {
+	    throw new Exception("Web port has not been set");
+	}
+	    
+	String webURL = "http://" + commonspec.getWebHost() + commonspec.getWebPort();
+	
+	assertThat(commonspec.getDriver().getCurrentUrl()).as("We are not in the expected url: " + webURL + url)
+        .isEqualTo(webURL + url);
     }
     
     @Then("^the service response status must be '(.*?)'.$")

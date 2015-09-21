@@ -198,14 +198,17 @@ public class GivenGSpec extends BaseGSpec {
 	assertThat(url).isNotEmpty();
 	String newUrl = commonspec.replacePlaceholders(url);
 	
-	String webURL = commonspec.getURL();
-	if (webURL == null) {
-	    webURL = commonspec.getWebURL();
-	    if (webURL == null) {
-		throw new Exception("Application URL has not been set");
-	    }
+	if (commonspec.getWebHost() == null) {
+	    throw new Exception("Web host has not been set");
 	}
-	commonspec.getLogger().info("Browsing to {}{} with {}", commonspec.getWebURL(), newUrl, commonspec.getBrowserName());
+	    
+	if (commonspec.getWebPort() == null) {
+	    throw new Exception("Web port has not been set");
+	}
+	    
+	String webURL = "http://" + commonspec.getWebHost() + commonspec.getWebPort();	
+	
+	commonspec.getLogger().info("Browsing to {}{} with {}", webURL, newUrl, commonspec.getBrowserName());
 	commonspec.getDriver().get(webURL + newUrl);
 	commonspec.setParentWindow(commonspec.getDriver().getWindowHandle());
     }
@@ -224,9 +227,10 @@ public class GivenGSpec extends BaseGSpec {
         String newHost = commonspec.replacePlaceholders(host);
         String newPort = commonspec.replacePlaceholders(port);
         
-        commonspec.setHost(newHost);
-        commonspec.setPort(newPort);
-        commonspec.setURL("http://" + newHost + ":" + newPort + "/");
+        commonspec.setWebHost(newHost);
+        commonspec.setWebPort(newPort);
+        commonspec.setRestHost(newHost);
+        commonspec.setRestPort(newPort);
         
         commonspec.getLogger().info("Set URL to http://{}:{}/", newHost, newPort);
     }
@@ -247,7 +251,6 @@ public class GivenGSpec extends BaseGSpec {
         
         commonspec.setWebHost(newWebHost);
         commonspec.setWebPort(newWebPort);
-        commonspec.setWebURL("http://" + newWebHost + ":" + newWebPort + "/");
         
         commonspec.getLogger().info("Set web base URL to http://{}:{}/", newWebHost, newWebPort);  
     }
@@ -267,7 +270,6 @@ public class GivenGSpec extends BaseGSpec {
         
         commonspec.setRestHost(newRestHost);
         commonspec.setRestPort(newRestPort);
-        commonspec.setRestURL("http://" + newRestHost + ":" + newRestPort + "/");
         commonspec.getLogger().info("Sending requests to http://{}:{}", newRestHost, newRestPort);
     }
     
