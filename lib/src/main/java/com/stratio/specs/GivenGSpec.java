@@ -194,19 +194,22 @@ public class GivenGSpec extends BaseGSpec {
      * @throws Exception 
      */
     @Given("^I browse to '(.+?)'$")
-    public void seleniumBrowse(String url) throws Exception {
-	assertThat(url).isNotEmpty();
-	String newUrl = commonspec.replacePlaceholders(url);
+    public void seleniumBrowse(String path) throws Exception {
+	assertThat(path).isNotEmpty();
+	String newPath = commonspec.replacePlaceholders(path);
 	
-	String webURL = commonspec.getURL();
-	if (webURL == null) {
-	    webURL = commonspec.getWebURL();
-	    if (webURL == null) {
-		throw new Exception("Application URL has not been set");
-	    }
+	if (commonspec.getWebHost() == null) {
+	    throw new Exception("Web host has not been set");
 	}
-	commonspec.getLogger().info("Browsing to {}{} with {}", commonspec.getWebURL(), newUrl, commonspec.getBrowserName());
-	commonspec.getDriver().get(webURL + newUrl);
+	    
+	if (commonspec.getWebPort() == null) {
+	    throw new Exception("Web port has not been set");
+	}
+	    
+	String webURL = "http://" + commonspec.getWebHost() + commonspec.getWebPort();	
+	
+	commonspec.getLogger().info("Browsing to {}{} with {}", webURL, newPath, commonspec.getBrowserName());
+	commonspec.getDriver().get(webURL + newPath);
 	commonspec.setParentWindow(commonspec.getDriver().getWindowHandle());
     }
     
@@ -217,18 +220,24 @@ public class GivenGSpec extends BaseGSpec {
      * @param port
      * 
      */
-    @Given("^My app is running in '([^:]+?)':'([^:]+?)'$")
+    @Given("^My app is running in '([^:]+?)(:.+?)?'$")
     public void setupApp(String host, String port) {
 	assertThat(host).isNotEmpty();
         assertThat(port).isNotEmpty();
+        
         String newHost = commonspec.replacePlaceholders(host);
         String newPort = commonspec.replacePlaceholders(port);
         
-        commonspec.setHost(newHost);
-        commonspec.setPort(newPort);
-        commonspec.setURL("http://" + newHost + ":" + newPort + "/");
+        if (newPort == null) {
+            newPort = ":80";
+        }
         
-        commonspec.getLogger().info("Set URL to http://{}:{}/", newHost, newPort);
+        commonspec.setWebHost(newHost);
+        commonspec.setWebPort(newPort);
+        commonspec.setRestHost(newHost);
+        commonspec.setRestPort(newPort);
+        
+        commonspec.getLogger().info("Set URL to http://{}{}/", newHost, newPort);
     }
     
     
@@ -238,18 +247,21 @@ public class GivenGSpec extends BaseGSpec {
      * @param url
      * @throws MalformedURLException 
      */
-    @Given("^I set web base url to '([^:]+?)':'([^:]+?)'$")
+    @Given("^I set web base url to '([^:]+?)(:.+?)?'$")
     public void setupWeb(String webHost, String webPort) throws MalformedURLException {
         assertThat(webHost).isNotEmpty();
         assertThat(webPort).isNotEmpty();
         String newWebHost = commonspec.replacePlaceholders(webHost);
         String newWebPort = commonspec.replacePlaceholders(webPort);
         
+        if (newWebPort == null) {
+            newWebPort = ":80";
+        }
+        
         commonspec.setWebHost(newWebHost);
         commonspec.setWebPort(newWebPort);
-        commonspec.setWebURL("http://" + newWebHost + ":" + newWebPort + "/");
         
-        commonspec.getLogger().info("Set web base URL to http://{}:{}/", newWebHost, newWebPort);  
+        commonspec.getLogger().info("Set web base URL to http://{}{}/", newWebHost, newWebPort);  
     }
     
     /**
@@ -258,17 +270,20 @@ public class GivenGSpec extends BaseGSpec {
      * @param restHost
      * @param restPort
      */
-    @Given("^I send requests to '([^:]+?)':'([^:]+?)'$")
+    @Given("^I send requests to '([^:]+?)(:.+?)?'$")
     public void setupRestClient(String restHost, String restPort) {
         assertThat(restHost).isNotEmpty();
         assertThat(restPort).isNotEmpty();
         String newRestHost = commonspec.replacePlaceholders(restHost);
         String newRestPort = commonspec.replacePlaceholders(restPort);
         
+        if (newRestPort == null) {
+            newRestPort = ":80";
+        }
+        
         commonspec.setRestHost(newRestHost);
         commonspec.setRestPort(newRestPort);
-        commonspec.setRestURL("http://" + newRestHost + ":" + newRestPort + "/");
-        commonspec.getLogger().info("Sending requests to http://{}:{}", newRestHost, newRestPort);
+        commonspec.getLogger().info("Sending requests to http://{}{}", newRestHost, newRestPort);
     }
     
     /**

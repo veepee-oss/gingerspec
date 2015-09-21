@@ -1,6 +1,7 @@
 package com.stratio.specs;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -73,7 +74,7 @@ public class CommonGTest {
 	
 	try {
 	    commong.retrieveData(baseData, type);
-	    org.testng.Assert.fail("Expected Exception");
+	    fail("Expected Exception");
 	} catch (Exception e) {
 	    assertThat(e.getClass().toString()).as("Unexpected exception").isEqualTo(Exception.class.toString());
 	    assertThat(e.getMessage()).as("Unexpected exception message").isEqualTo("File does not exist: " + baseData);
@@ -142,7 +143,7 @@ public class CommonGTest {
 	
 	try {
 	    commong.modifyData(data, type, modifications);
-	    org.testng.Assert.fail("Expected Exception");
+	    fail("Expected Exception");
 	} catch (Exception e) {
 	    assertThat(e.getClass().toString()).as("Unexpected exception").isEqualTo(Exception.class.toString());
 	    assertThat(e.getMessage()).as("Unexpected exception message").isEqualTo("Modification type does not exist: REMOVE");
@@ -160,7 +161,7 @@ public class CommonGTest {
 	
 	try {
 	    commong.modifyData(data, type, modifications);
-	    org.testng.Assert.fail("Expected Exception");
+	    fail("Expected Exception");
 	} catch (Exception e) {
 	    assertThat(e.getClass().toString()).as("Unexpected exception").isEqualTo(Exception.class.toString());
 	    assertThat(e.getMessage()).as("Unexpected exception message").isEqualTo("Modification type does not exist: REMOVE");
@@ -262,10 +263,10 @@ public class CommonGTest {
 	
 	try {
 	    commong.generateRequest(requestType, endPoint, data, type);
-	    org.testng.Assert.fail("Expected Exception");
+	    fail("Expected Exception");
 	} catch (Exception e) {
 	    assertThat(e.getClass().toString()).as("Unexpected exception").isEqualTo(Exception.class.toString());
-	    assertThat(e.getMessage()).as("Unexpected exception message").isEqualTo("Application URL has not been set");
+	    assertThat(e.getMessage()).as("Unexpected exception message").isEqualTo("Rest host has not been set");
 	}
     }
     
@@ -279,9 +280,10 @@ public class CommonGTest {
 	String type = "string";
 	
 	try {
-	    commong.setURL("http://localhost:80");
+	    commong.setRestHost("localhost");
+	    commong.setRestPort("80");
 	    commong.generateRequest(requestType, endPoint, data, type);
-	    org.testng.Assert.fail("Expected Exception");
+	    fail("Expected Exception");
 	} catch (Exception e) {
 	    assertThat(e.getClass().toString()).as("Unexpected exception").isEqualTo(Exception.class.toString());
 	    assertThat(e.getMessage()).as("Unexpected exception message").isEqualTo("Operation not valid: MYREQUEST");
@@ -298,9 +300,10 @@ public class CommonGTest {
 	String type = "string";
 	
 	try {
-	    commong.setURL("http://localhost:80");
+	    commong.setRestHost("localhost");
+	    commong.setRestPort("80");
 	    commong.generateRequest(requestType, endPoint, data, type);
-	    org.testng.Assert.fail("Expected Exception");
+	    fail("Expected Exception");
 	} catch (Exception e) {
 	    assertThat(e.getClass().toString()).as("Unexpected exception").isEqualTo(Exception.class.toString());
 	    assertThat(e.getMessage()).as("Unexpected exception message").isEqualTo("Operation not implemented: TRACE");
@@ -316,9 +319,10 @@ public class CommonGTest {
 	String type = "string";
 	
 	try {
-	    commong.setURL("http://localhost:80");
+	    commong.setRestHost("localhost");
+	    commong.setRestPort("80");
 	    commong.generateRequest(requestType, endPoint, null, type);
-	    org.testng.Assert.fail("Expected Exception");
+	    fail("Expected Exception");
 	} catch (Exception e) {
 	    assertThat(e.getClass().toString()).as("Unexpected exception").isEqualTo(Exception.class.toString());
 	    assertThat(e.getMessage()).as("Unexpected exception message").isEqualTo("Missing fields in request.");
@@ -334,9 +338,10 @@ public class CommonGTest {
 	String type = "string";
 	
 	try {
-	    commong.setURL("http://localhost:80");
+	    commong.setRestHost("localhost");
+	    commong.setRestPort("80");
 	    commong.generateRequest(requestType, endPoint, null, type);
-	    org.testng.Assert.fail("Expected Exception");
+	    fail("Expected Exception");
 	} catch (Exception e) {
 	    assertThat(e.getClass().toString()).as("Unexpected exception").isEqualTo(Exception.class.toString());
 	    assertThat(e.getMessage()).as("Unexpected exception message").isEqualTo("Missing fields in request.");
