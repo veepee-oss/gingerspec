@@ -261,7 +261,7 @@ public class GivenGSpec extends BaseGSpec {
         commonspec.setWebHost(newWebHost);
         commonspec.setWebPort(newWebPort);
         
-        commonspec.getLogger().info("Set web base URL to http://{}:{}/", newWebHost, newWebPort);  
+        commonspec.getLogger().info("Set web base URL to http://{}{}/", newWebHost, newWebPort);  
     }
     
     /**
@@ -283,7 +283,7 @@ public class GivenGSpec extends BaseGSpec {
         
         commonspec.setRestHost(newRestHost);
         commonspec.setRestPort(newRestPort);
-        commonspec.getLogger().info("Sending requests to http://{}:{}", newRestHost, newRestPort);
+        commonspec.getLogger().info("Sending requests to http://{}{}", newRestHost, newRestPort);
     }
     
     /**
