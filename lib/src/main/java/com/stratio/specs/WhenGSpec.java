@@ -84,14 +84,17 @@ public class WhenGSpec extends BaseGSpec {
      * 
      * @param index
      */
-    @When("^I clear text in the element on index '(\\d+?)'$")
+    @When("^I clear the content on text input at index '(\\d+?)'$")
     public void seleniumClear(Integer index) {
 	commonspec.getLogger().info("Clearing text on element with index {}", index);
 	
-	assertThat(commonspec.getPreviousWebElements()).isNotEmpty();
+	assertThat(commonspec.getPreviousWebElements().size()).isGreaterThan(index);
 	
-	commonspec.getPreviousWebElements().get(index).clear();
+	assertThat(commonspec.getPreviousWebElements().get(index)).is(commonspec.getTextFieldCondition());
+	
+	commonspec.getPreviousWebElements().get(index).clear();	
     }
+    
     
     /**
      * Type a {@code text} on an numbered {@code index} previously found element.
