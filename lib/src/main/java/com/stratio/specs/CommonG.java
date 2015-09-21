@@ -17,7 +17,6 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -28,6 +27,7 @@ import java.util.concurrent.Future;
 import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FileUtils;
+import org.assertj.core.api.Condition;
 import org.hjson.JsonValue;
 import org.json.JSONObject;
 import org.openqa.selenium.By;
@@ -49,6 +49,7 @@ import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Response;
 import com.ning.http.client.AsyncHttpClient.BoundRequestBuilder;
 import com.ning.http.client.cookie.Cookie;
+import com.stratio.conditions.Conditions;
 import com.stratio.tests.utils.AerospikeUtil;
 import com.stratio.tests.utils.AerospikeUtils;
 import com.stratio.tests.utils.CassandraUtil;
@@ -162,6 +163,15 @@ public class CommonG {
 	 */
 	public List<Exception> getExceptions() {
 		return ExceptionList.INSTANCE.getExceptions();
+	}
+	
+	/**
+	 * Get the textFieldCondition list.
+	 * 
+	 * @return List<Exception>
+	 */
+	public Condition<WebElement> getTextFieldCondition() {
+		return Conditions.INSTANCE.getTextFieldCondition();
 	}
 
 	/**
@@ -299,13 +309,20 @@ public class CommonG {
 	 * @throws Exception
 	 * 
 	 * @return List<WebElement>
+	 * @throws IllegalAccessException 
+	 * @throws IllegalArgumentException 
+	 * @throws SecurityException 
+	 * @throws NoSuchFieldException 
+	 * @throws ClassNotFoundException 
 	 */
 	public List<WebElement> locateElement(String method, String element,
-			Integer expectedCount) {
+			Integer expectedCount) throws ClassNotFoundException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 
 		List<WebElement> wel = null;
 		String newElement = replacePlaceholders(element);
-
+		
+		newElement = replaceReflectionPlaceholders(newElement);
+		
 		if ("id".equals(method)) {
 			logger.info("Locating {} by id", newElement);
 			wel = this.getDriver().findElements(By.id(newElement));

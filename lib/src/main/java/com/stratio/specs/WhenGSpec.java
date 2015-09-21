@@ -48,9 +48,14 @@ public class WhenGSpec extends BaseGSpec {
      * 
      * @param source
      * @param destination
+     * @throws IllegalAccessException 
+     * @throws IllegalArgumentException 
+     * @throws SecurityException 
+     * @throws NoSuchFieldException 
+     * @throws ClassNotFoundException 
      */
     @When("^I drag '([^:]*?):([^:]*?)' and drop it to '([^:]*?):([^:]*?)'$")
-    public void seleniumDrag(String smethod, String source, String dmethod, String destination) {
+    public void seleniumDrag(String smethod, String source, String dmethod, String destination) throws ClassNotFoundException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
         commonspec.getLogger().info("Dragging element");
 
         Actions builder = new Actions(commonspec.getDriver());
@@ -74,6 +79,23 @@ public class WhenGSpec extends BaseGSpec {
         commonspec.getPreviousWebElements().get(index).click();
     }
   
+    /**
+     * Clear the text on a numbered {@code index} previously found element.
+     * 
+     * @param index
+     */
+    @When("^I clear the content on text input at index '(\\d+?)'$")
+    public void seleniumClear(Integer index) {
+	commonspec.getLogger().info("Clearing text on element with index {}", index);
+	
+	assertThat(commonspec.getPreviousWebElements().size()).isGreaterThan(index);
+	
+	assertThat(commonspec.getPreviousWebElements().get(index)).is(commonspec.getTextFieldCondition());
+	
+	commonspec.getPreviousWebElements().get(index).clear();	
+    }
+    
+    
     /**
      * Type a {@code text} on an numbered {@code index} previously found element.
      * 

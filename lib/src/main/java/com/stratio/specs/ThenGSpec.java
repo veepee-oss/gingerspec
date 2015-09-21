@@ -356,16 +356,20 @@ public class ThenGSpec extends BaseGSpec {
      * @param expectedCount
      * @param method
      * @param element
+     * @throws IllegalAccessException 
+     * @throws IllegalArgumentException 
+     * @throws SecurityException 
+     * @throws NoSuchFieldException 
+     * @throws ClassNotFoundException 
      */
-    @Then("^'(\\d+?)' elements exists with '([^:]*?):([^:]*?)'$")
-    public void assertSeleniumNElementExists(Integer expectedCount, String method, String element) {
+    @Then("^'(\\d+?)' elements? exists? with '([^:]*?):([^:]*?)'$")
+    public void assertSeleniumNElementExists(Integer expectedCount, String method, String element) throws ClassNotFoundException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
         commonspec.getLogger().info("Verifying {} existance", element);
 
         List<WebElement> wel = commonspec.locateElement(method, element, expectedCount);
 
         commonspec.setPreviousWebElements(wel);
     }
-
     
     /**
      * Checks if an unknown number of webelements are found, with a location {@code method}.
@@ -393,10 +397,15 @@ public class ThenGSpec extends BaseGSpec {
      * @param method
      * @param element
      * @throws InterruptedException
+     * @throws IllegalAccessException 
+     * @throws IllegalArgumentException 
+     * @throws SecurityException 
+     * @throws NoSuchFieldException 
+     * @throws ClassNotFoundException 
      */
     @Then("^in less than '(\\d+?)' seconds, checking each '(\\d+?)' seconds, '(\\d+?)' elements exists with '([^:]*?):([^:]*?)'$")
     public void assertSeleniumNElementExistsOnTimeOut(Integer timeout, Integer wait, Integer expectedCount,
-            String method, String element) throws InterruptedException {
+            String method, String element) throws InterruptedException, ClassNotFoundException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
         commonspec.getLogger().info("Verifying {} existance", element);
 
         List<WebElement> wel = null;
@@ -514,6 +523,16 @@ public class ThenGSpec extends BaseGSpec {
         commonspec.captureEvidence(commonspec.getDriver(), "screenCapture");
     }
     
+    /**
+     * Checks that we are in the URL passed
+     * 
+     * @param url
+     */
+    @Then("^we are in page '(.+?)'$")
+    public void checkURL(String url) {
+	assertThat(commonspec.getDriver().getCurrentUrl()).as("We are not in the expected url: " + commonspec.getWebURL() + url)
+        .isEqualTo(commonspec.getWebURL() + url);
+    }
     
     @Then("^the service response status must be '(.*?)'.$")
     public void assertResponseStatus(Integer expectedStatus) {
