@@ -808,6 +808,21 @@ public class CommonG {
 	    		case "UPDATE":
 	    		    linkedHashMap = JsonPath.parse(modifiedData).set(composeKey, newValue).json();
 	    		    break;
+	    		case "APPEND":
+	    		    String appendValue = JsonPath.parse(modifiedData).read(composeKey);
+	    		    linkedHashMap = JsonPath.parse(modifiedData).set(composeKey, appendValue + newValue).json();
+	    		    break;
+	    		case "PREPEND":
+	    		    String prependValue = JsonPath.parse(modifiedData).read(composeKey);
+	    		    linkedHashMap = JsonPath.parse(modifiedData).set(composeKey, newValue + prependValue).json();
+	    		    break;
+	    		case "REPLACE":
+	    		    String replaceValue = JsonPath.parse(modifiedData).read(composeKey);
+	    		    String toBeReplaced = newValue.split("->")[0];
+	    		    String replacement = newValue.split("->")[1];
+	    		    newValue = replaceValue.replace(toBeReplaced, replacement);
+	    		    linkedHashMap = JsonPath.parse(modifiedData).set(composeKey, newValue).json();	    		    
+	    		    break;
 	    		default:
 	    		    throw new Exception("Modification type does not exist: " + operation);
 		    }
@@ -827,10 +842,15 @@ public class CommonG {
 	    		    modifiedData = modifiedData.replace(value,"");
 	    		    break;
 	    		case "ADD":
+	    		case "APPEND":
 	    		    modifiedData = modifiedData + newValue;
 	    		    break;
 	    		case "UPDATE":
+	    		case "REPLACE":
 	    		    modifiedData = modifiedData.replace(value, newValue);
+	    		    break;
+	    		case "PREPEND":
+	    		    modifiedData = newValue + modifiedData;
 	    		    break;
 	    		default:
 	    		    throw new Exception("Modification type does not exist: " + operation);

@@ -208,6 +208,20 @@ public class CommonGTest {
 	String modifiedData = commong.modifyData(data, type, modifications);
 	assertThat(modifiedData).as("Unexpected modified data").isEqualTo(expectedData);	
     }
+        
+    @Test
+    public void modifyDataPrependStringTest() throws Exception {
+	ThreadProperty.set("class", this.getClass().getCanonicalName());
+	CommonG commong = new CommonG();
+	String data = "username=username&password=password";
+	String expectedData = "key1=value1&username=username&password=password";
+	String type = "string";
+	List<List<String>> rawData = Arrays.asList(Arrays.asList("username=username", "PREPEND", "key1=value1&")); 
+	DataTable modifications = DataTable.create(rawData);
+	
+	String modifiedData = commong.modifyData(data, type, modifications);
+	assertThat(modifiedData).as("Unexpected modified data").isEqualTo(expectedData);	
+    }    
     
     @Test
     public void modifyDataDeleteJsonTest() throws Exception {
@@ -250,6 +264,49 @@ public class CommonGTest {
 	String modifiedData = commong.modifyData(data, type, modifications);
 	assertThat(modifiedData).as("Unexpected modified data").isEqualTo(expectedData);
     }
+    
+    @Test
+    public void modifyDataAppendJsonTest() throws Exception {
+	ThreadProperty.set("class", this.getClass().getCanonicalName());
+	CommonG commong = new CommonG();
+	String data = "{\"key1\": \"value1\", \"key2\": {\"key3\": \"value3\"}}";
+	String expectedData = "{\"key2\":{\"key3\":\"value3Append\"},\"key1\":\"value1\"}";
+	String type = "json";
+	List<List<String>> rawData = Arrays.asList(Arrays.asList("key2.key3", "APPEND", "Append")); 
+	DataTable modifications = DataTable.create(rawData);
+	
+	String modifiedData = commong.modifyData(data, type, modifications);
+	assertThat(modifiedData).as("Unexpected modified data").isEqualTo(expectedData);
+    }
+    
+    @Test
+    public void modifyDataPrependJsonTest() throws Exception {
+	ThreadProperty.set("class", this.getClass().getCanonicalName());
+	CommonG commong = new CommonG();
+	String data = "{\"key1\": \"value1\", \"key2\": {\"key3\": \"value3\"}}";
+	String expectedData = "{\"key2\":{\"key3\":\"Prependvalue3\"},\"key1\":\"value1\"}";
+	String type = "json";
+	List<List<String>> rawData = Arrays.asList(Arrays.asList("key2.key3", "PREPEND", "Prepend")); 
+	DataTable modifications = DataTable.create(rawData);
+	
+	String modifiedData = commong.modifyData(data, type, modifications);
+	assertThat(modifiedData).as("Unexpected modified data").isEqualTo(expectedData);
+    }
+    
+    @Test
+    public void modifyDataReplaceJsonTest() throws Exception {
+	ThreadProperty.set("class", this.getClass().getCanonicalName());
+	CommonG commong = new CommonG();
+	String data = "{\"key1\": \"value1\", \"key2\": {\"key3\": \"value3\"}}";
+	String expectedData = "{\"key2\":{\"key3\":\"vaREPLACEe3\"},\"key1\":\"value1\"}";
+	String type = "json";
+	List<List<String>> rawData = Arrays.asList(Arrays.asList("key2.key3", "REPLACE", "lu->REPLACE")); 
+	DataTable modifications = DataTable.create(rawData);
+	
+	String modifiedData = commong.modifyData(data, type, modifications);
+	assertThat(modifiedData).as("Unexpected modified data").isEqualTo(expectedData);
+    }
+    
     
     @Test
     public void generateRequestNoAppURLTest() throws Exception {
