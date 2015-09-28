@@ -13,9 +13,9 @@ public class TextFieldCondition {
 	    public boolean matches(WebElement value) {
 		switch (value.getTagName()) {
 			case "input":
-			    return ("text".equals(value.getAttribute("type")) || "".equals(value.getAttribute("type")));
+			    return ("text".equals(value.getAttribute("type")) || "input".equals(value.getAttribute("type")));
 			case "textarea":
-			    return ("text".equals(value.getAttribute("type")) || "".equals(value.getAttribute("type")));
+			    return ("text".equals(value.getAttribute("type")) || "textarea".equals(value.getAttribute("type")));
 			default:
 			    return false;			       
 		}
