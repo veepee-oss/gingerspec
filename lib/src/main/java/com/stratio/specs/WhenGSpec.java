@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Future;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -154,13 +155,13 @@ public class WhenGSpec extends BaseGSpec {
 		}                                
 		Keys[] csa = csl.toArray(new Keys[csl.size()]);
 		if (index == null) {
-		    new Actions(commonspec.getDriver()).sendKeys(commonspec.getDriver().findElementByXPath("//body"), csa).perform();
+		    new Actions(commonspec.getDriver()).sendKeys(commonspec.getDriver().findElement(By.tagName("body")), csa).perform();
 		} else {
 		    commonspec.getPreviousWebElements().get(index).sendKeys(csa);
 		}
 	    } else {
 		if (index == null) {
-		    new Actions(commonspec.getDriver()).sendKeys(commonspec.getDriver().findElementByXPath("//body"), Keys.valueOf(stroke)).perform();
+		    new Actions(commonspec.getDriver()).sendKeys(commonspec.getDriver().findElement(By.tagName("body")), Keys.valueOf(stroke)).perform();
 		} else {
 		    commonspec.getPreviousWebElements().get(index).sendKeys(Keys.valueOf(stroke));
 		}
