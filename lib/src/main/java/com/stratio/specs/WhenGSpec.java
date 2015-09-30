@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Future;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -122,7 +123,7 @@ public class WhenGSpec extends BaseGSpec {
     }
 
     /**
-     * Send a {@code strokes} list on an numbered {@code url} previously found element. strokes examples are "HOME, END"
+     * Send a {@code strokes} list on an numbered {@code url} previously found element or to the driver. strokes examples are "HOME, END"
      * or "END, SHIFT + HOME, DELETE". Each element in the stroke list has to be an element from
      * {@link org.openqa.selenium.Keys} (NULL, CANCEL, HELP, BACK_SPACE, TAB, CLEAR, RETURN, ENTER, SHIFT, LEFT_SHIFT,
      * CONTROL, LEFT_CONTROL, ALT, LEFT_ALT, PAUSE, ESCAPE, SPACE, PAGE_UP, PAGE_DOWN, END, HOME, LEFT, ARROW_LEFT, UP,
@@ -132,27 +133,40 @@ public class WhenGSpec extends BaseGSpec {
      * comma (,) or spaces ( )
      * 
      * @param strokes
+     * @param foo
      * @param index
      */
-    @When("^I send '(.+?)' on the element on index '(\\d+?)'$")
-    public void seleniumKeys(@Transform(ArrayListConverter.class) List<String> strokes, Integer index) {
-        commonspec.getLogger().info("Sending keys on element with index {}", index);
+    @When("^I send '(.+?)'( on the element on index '(\\d+?)')?$")
+    public void seleniumKeys(@Transform(ArrayListConverter.class) List<String> strokes, String foo, Integer index) {
+	if (index == null) {
+	    commonspec.getLogger().info("Sending keys to driver");
+	} else {
+	    commonspec.getLogger().info("Sending keys on element with index {}", index);
 
-        assertThat(commonspec.getPreviousWebElements()).isNotEmpty();
-        assertThat(strokes).isNotEmpty();
-
-        for (String stroke : strokes) {
-            if (stroke.contains("+")) {
-                List<Keys> csl = new ArrayList<Keys>();
-                for (String strokeInChord : stroke.split("\\+")) {
-                    csl.add(Keys.valueOf(strokeInChord.trim()));
-                }                                
-                Keys[] csa = csl.toArray(new Keys[csl.size()]);
-                commonspec.getPreviousWebElements().get(index).sendKeys(csa);
-            } else {
-                commonspec.getPreviousWebElements().get(index).sendKeys(Keys.valueOf(stroke));
-            }
-        }
+	    assertThat(commonspec.getPreviousWebElements().size()).isGreaterThan(index);
+	}
+	assertThat(strokes).isNotEmpty();
+	
+	for (String stroke : strokes) {
+	    if (stroke.contains("+")) {
+		List<Keys> csl = new ArrayList<Keys>();
+		for (String strokeInChord : stroke.split("\\+")) {
+		    csl.add(Keys.valueOf(strokeInChord.trim()));
+		}                                
+		Keys[] csa = csl.toArray(new Keys[csl.size()]);
+		if (index == null) {
+		    new Actions(commonspec.getDriver()).sendKeys(commonspec.getDriver().findElement(By.tagName("body")), csa).perform();
+		} else {
+		    commonspec.getPreviousWebElements().get(index).sendKeys(csa);
+		}
+	    } else {
+		if (index == null) {
+		    new Actions(commonspec.getDriver()).sendKeys(commonspec.getDriver().findElement(By.tagName("body")), Keys.valueOf(stroke)).perform();
+		} else {
+		    commonspec.getPreviousWebElements().get(index).sendKeys(Keys.valueOf(stroke));
+		}
+	    }
+	}
     }
     
     /**
