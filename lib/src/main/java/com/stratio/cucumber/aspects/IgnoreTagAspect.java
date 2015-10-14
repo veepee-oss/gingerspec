@@ -1,7 +1,10 @@
 package com.stratio.cucumber.aspects;
 
+import com.stratio.cucumber.testng.CucumberReporter;
+import cucumber.runtime.CucumberException;
 import gherkin.formatter.Formatter;
 import gherkin.formatter.Reporter;
+import gherkin.formatter.model.Result;
 import gherkin.formatter.model.Scenario;
 import gherkin.formatter.model.Tag;
 
@@ -49,10 +52,37 @@ public class IgnoreTagAspect {
         Set<Tag> tags = (Set<Tag>) tt.invoke(scen);
 
         Boolean ignore = false;
+        Boolean ignoreReason = false;
+
         for (Tag tag : tags) {
-            if ("@ignore".equals(tag.getName())) {
+            if(tag.getName().equals("@ignore")) {
                 ignore = true;
+                for (Tag tagNs : tags){
+                    //@tillFixed
+                    if ((tagNs.getName()).matches("@tillfixed\\(\\w+-\\d+\\)")){
+                        String issueNumb = tagNs.getName().substring(tagNs.getName().lastIndexOf('(') + 1);
+                        logger.warn("Scenario '"+scenario.getName()+"' ignored because of Issue: " + issueNumb.subSequence(0, issueNumb.length() - 1) +".");
+                        ignoreReason=true;
+                        break;
+                    }
+                    //@unimplemented
+                    if (tagNs.getName().matches("@unimplemented")){
+                        logger.warn("Scenario '"+scenario.getName()+"' ignored because is not yet implemented.");
+                        ignoreReason=true;
+                        break;
+                    }
+                    //@toocomplex
+                    if (tagNs.getName().matches("@toocomplex")){
+                        logger.warn("Scenario '"+scenario.getName()+"' ignored because test is too complex.");
+                        ignoreReason=true;
+                        break;
+                    }
+                }
             }
+        }
+
+        if (ignore && !ignoreReason){
+            logger.error("Scenario '" + scenario.getName() + "' failed due to wrong use of the @ignore tag. ");
         }
 
         if (ignore) {
