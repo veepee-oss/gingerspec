@@ -1,26 +1,14 @@
 package com.stratio.cucumber.testng;
 
+import com.stratio.tests.utils.ThreadProperty;
+import cucumber.runtime.CucumberException;
+import cucumber.runtime.Utils;
+import cucumber.runtime.io.URLOutputStream;
+import cucumber.runtime.io.UTF8OutputStreamWriter;
 import gherkin.formatter.Formatter;
 import gherkin.formatter.Reporter;
-import gherkin.formatter.model.Background;
-import gherkin.formatter.model.DataTableRow;
-import gherkin.formatter.model.Examples;
-import gherkin.formatter.model.Feature;
-import gherkin.formatter.model.Match;
-import gherkin.formatter.model.Result;
-import gherkin.formatter.model.Scenario;
-import gherkin.formatter.model.ScenarioOutline;
-import gherkin.formatter.model.Step;
-import gherkin.formatter.model.Tag;
-
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import gherkin.formatter.model.*;
+import org.w3c.dom.*;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -30,19 +18,14 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import com.stratio.tests.utils.ThreadProperty;
-
-import cucumber.runtime.CucumberException;
-import cucumber.runtime.Utils;
-import cucumber.runtime.io.URLOutputStream;
-import cucumber.runtime.io.UTF8OutputStreamWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 public class CucumberReporter implements Formatter, Reporter {
     public static final int DURATION_STRING = 1000000;
@@ -176,14 +159,10 @@ public class CucumberReporter implements Formatter, Reporter {
 
     @Override
     public void endOfScenarioLifeCycle(Scenario scenario) {
-        Boolean ignored = false;
-        for (Tag tag : scenario.getTags()) {
-            if ("@ignore".equals(tag.getName())) {
-                ignored = true;
-            }
-        }
 
-        testMethod.finish(document, root, this.position, ignored, jUnitDocument, jUnitRoot);
+        List<Tag> tags = scenario.getTags();
+
+        testMethod.finish(document, root, this.position, tags, jUnitDocument, jUnitRoot);
         this.position++;
         if ((tmpExamples != null) && (iteration >= tmpExamples.getRows().size())) {
             tmpExamples = null;
@@ -343,9 +322,9 @@ public class CucumberReporter implements Formatter, Reporter {
          * @param doc
          * @param element
          * @param position
-         * @param ignored
+         * @param tags
          */
-        public void finish(Document doc, Element element, Integer position, Boolean ignored, Document docJunit,
+        public void finish(Document doc, Element element, Integer position, List<Tag> tags, Document docJunit,
                 Element Junit) {
 
             Junit.setAttribute("time", String.valueOf(calculateTotalDurationString() / 1000));
@@ -356,17 +335,65 @@ public class CucumberReporter implements Formatter, Reporter {
             StringBuilder stringBuilder = new StringBuilder();
 
             addStepAndResultListing(stringBuilder);
+
             Result skipped = null;
             Result failed = null;
-            if (ignored) {
+
+            Boolean ignored = false;
+
+            Boolean ignoreReason = false;
+            String exceptionmsg = "Failed";
+
+            for (Tag tag : tags) {
+                if ("@ignore".equals(tag.getName())){
+                    ignored=true;
+
+                    for (Tag tagNs : tags) {
+                        if (!(tagNs.getName().equals("@ignore"))) {
+
+                            //@tillFixed
+                            if ((tagNs.getName()).matches("@tillfixed\\(\\w+-\\d+\\)")){
+                                String issueNumb = tagNs.getName().substring(tagNs.getName().lastIndexOf("(") +1);
+                                exceptionmsg = "This scenario was skipped because of <a href=\"https://stratio.atlassian.net/browse/" + (issueNumb.subSequence(0, issueNumb.length() - 1)).toString().toUpperCase()+">"+(issueNumb.subSequence(0, issueNumb.length() - 1))+"</a>";
+                                ignoreReason = true;
+                                break;
+                            }
+
+                            //@unimplemented
+                            if (tagNs.getName().matches("@unimplemented")) {
+                                exceptionmsg = "This scenario was skipped because of it is not yet implemented";
+                                ignoreReason = true;
+                                break;
+                            }
+
+                            //@toocomplex
+                            if (tagNs.getName().matches("@toocomplex")) {
+                                exceptionmsg = "This scenario was skipped because of being too complex to test";
+                                ignoreReason = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (ignored && ignoreReason) {
                 element.setAttribute(STATUS, "SKIP");
-                Element exception = createException(doc, "SkippedDueTagException",
-                        "This scenario was skipped due the use of the @ignore tag", " ");
+                Element exception = createException(doc, "skipped",
+                        exceptionmsg, " ");
                 element.appendChild(exception);
                 Element skippedElementJunit = docJunit.createElement("skipped");
                 Junit.appendChild(skippedElementJunit);
-                Element systemOut = systemOutPrintJunit(docJunit,
-                        "This scenario was skipped due the use of the @ignore tag");
+                Element systemOut = systemOutPrintJunit(docJunit, exceptionmsg);
+                Junit.appendChild(systemOut);
+            } else if (ignored && !ignoreReason) {
+                element.setAttribute(STATUS, "FAIL");
+                Element exception = createException(doc, "failed",
+                        "Nonexistent ignore reason", " ");
+                element.appendChild(exception);
+                Element skippedElementJunit = docJunit.createElement("failed");
+                Junit.appendChild(skippedElementJunit);
+                Element systemOut = systemOutPrintJunit(docJunit, "Nonexistent ignore reason");
                 Junit.appendChild(systemOut);
             } else {
                 for (Result result : results) {
