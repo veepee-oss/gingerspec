@@ -196,7 +196,6 @@ public class GivenGSpec extends BaseGSpec {
     @Given("^I browse to '(.+?)'$")
     public void seleniumBrowse(String path) throws Exception {
 	assertThat(path).isNotEmpty();
-	String newPath = commonspec.replacePlaceholders(path);
 	
 	if (commonspec.getWebHost() == null) {
 	    throw new Exception("Web host has not been set");
@@ -208,8 +207,8 @@ public class GivenGSpec extends BaseGSpec {
 	    
 	String webURL = "http://" + commonspec.getWebHost() + commonspec.getWebPort();	
 	
-	commonspec.getLogger().info("Browsing to {}{} with {}", webURL, newPath, commonspec.getBrowserName());
-	commonspec.getDriver().get(webURL + newPath);
+	commonspec.getLogger().info("Browsing to {}{} with {}", webURL, path, commonspec.getBrowserName());
+	commonspec.getDriver().get(webURL + path);
 	commonspec.setParentWindow(commonspec.getDriver().getWindowHandle());
     }
     
@@ -225,19 +224,16 @@ public class GivenGSpec extends BaseGSpec {
 	assertThat(host).isNotEmpty();
         assertThat(port).isNotEmpty();
         
-        String newHost = commonspec.replacePlaceholders(host);
-        String newPort = commonspec.replacePlaceholders(port);
-        
-        if (newPort == null) {
-            newPort = ":80";
+        if (port == null) {
+            port = ":80";
         }
         
-        commonspec.setWebHost(newHost);
-        commonspec.setWebPort(newPort);
-        commonspec.setRestHost(newHost);
-        commonspec.setRestPort(newPort);
+        commonspec.setWebHost(host);
+        commonspec.setWebPort(port);
+        commonspec.setRestHost(host);
+        commonspec.setRestPort(port);
         
-        commonspec.getLogger().info("Set URL to http://{}{}/", newHost, newPort);
+        commonspec.getLogger().info("Set URL to http://{}{}/", host, port);
     }
     
     
@@ -251,17 +247,15 @@ public class GivenGSpec extends BaseGSpec {
     public void setupWeb(String webHost, String webPort) throws MalformedURLException {
         assertThat(webHost).isNotEmpty();
         assertThat(webPort).isNotEmpty();
-        String newWebHost = commonspec.replacePlaceholders(webHost);
-        String newWebPort = commonspec.replacePlaceholders(webPort);
         
-        if (newWebPort == null) {
-            newWebPort = ":80";
+        if (webPort == null) {
+            webPort = ":80";
         }
         
-        commonspec.setWebHost(newWebHost);
-        commonspec.setWebPort(newWebPort);
+        commonspec.setWebHost(webHost);
+        commonspec.setWebPort(webPort);
         
-        commonspec.getLogger().info("Set web base URL to http://{}{}/", newWebHost, newWebPort);  
+        commonspec.getLogger().info("Set web base URL to http://{}{}/", webHost, webPort);  
     }
     
     /**
@@ -274,16 +268,14 @@ public class GivenGSpec extends BaseGSpec {
     public void setupRestClient(String restHost, String restPort) {
         assertThat(restHost).isNotEmpty();
         assertThat(restPort).isNotEmpty();
-        String newRestHost = commonspec.replacePlaceholders(restHost);
-        String newRestPort = commonspec.replacePlaceholders(restPort);
         
-        if (newRestPort == null) {
-            newRestPort = ":80";
+        if (restPort == null) {
+            restPort = ":80";
         }
         
-        commonspec.setRestHost(newRestHost);
-        commonspec.setRestPort(newRestPort);
-        commonspec.getLogger().info("Sending requests to http://{}{}", newRestHost, newRestPort);
+        commonspec.setRestHost(restHost);
+        commonspec.setRestPort(restPort);
+        commonspec.getLogger().info("Sending requests to http://{}{}", restHost, restPort);
     }
     
     /**

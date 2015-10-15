@@ -278,24 +278,21 @@ public class CommonG {
 			Integer expectedCount) throws ClassNotFoundException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 
 		List<WebElement> wel = null;
-		String newElement = replacePlaceholders(element);
-		
-		newElement = replaceReflectionPlaceholders(newElement);
 		
 		if ("id".equals(method)) {
-			logger.info("Locating {} by id", newElement);
-			wel = this.getDriver().findElements(By.id(newElement));
+			logger.info("Locating {} by id", element);
+			wel = this.getDriver().findElements(By.id(element));
 		} else if ("name".equals(method)) {
-			logger.info("Locating {} by name", newElement);
-			wel = this.getDriver().findElements(By.name(newElement));
+			logger.info("Locating {} by name", element);
+			wel = this.getDriver().findElements(By.name(element));
 		} else if ("class".equals(method)) {
-			logger.info("Locating {} by class", newElement);
-			wel = this.getDriver().findElements(By.className(newElement));
+			logger.info("Locating {} by class", element);
+			wel = this.getDriver().findElements(By.className(element));
 		} else if ("xpath".equals(method)) {
-			logger.info("Locating {} by xpath", newElement);
-			wel = this.getDriver().findElements(By.xpath(newElement));
+			logger.info("Locating {} by xpath", element);
+			wel = this.getDriver().findElements(By.xpath(element));
 		} else if ("css".equals(method)) {
-			wel = this.getDriver().findElements(By.cssSelector(newElement));
+			wel = this.getDriver().findElements(By.cssSelector(element));
 		} else {
 			fail("Unknown search method: " + method);
 		}
@@ -320,93 +317,28 @@ public class CommonG {
 	public List<WebElement> locateElements(String method, String element) {
 
 		List<WebElement> wel = null;
-		String newElement = replacePlaceholders(element);
 
 		if ("id".equals(method)) {
-			logger.info("Locating {} by id", newElement);
-			wel = this.getDriver().findElements(By.id(newElement));
+			logger.info("Locating {} by id", element);
+			wel = this.getDriver().findElements(By.id(element));
 		} else if ("name".equals(method)) {
-			logger.info("Locating {} by name", newElement);
-			wel = this.getDriver().findElements(By.name(newElement));
+			logger.info("Locating {} by name", element);
+			wel = this.getDriver().findElements(By.name(element));
 		} else if ("class".equals(method)) {
-			logger.info("Locating {} by class", newElement);
-			wel = this.getDriver().findElements(By.className(newElement));
+			logger.info("Locating {} by class", element);
+			wel = this.getDriver().findElements(By.className(element));
 		} else if ("xpath".equals(method)) {
-			logger.info("Locating {} by xpath", newElement);
-			wel = this.getDriver().findElements(By.xpath(newElement));
+			logger.info("Locating {} by xpath", element);
+			wel = this.getDriver().findElements(By.xpath(element));
 		} else if ("css".equals(method)) {
-			wel = this.getDriver().findElements(By.cssSelector(newElement));
+			wel = this.getDriver().findElements(By.cssSelector(element));
 		} else {
 			fail("Unknown search method: " + method);
 		}
 
 		return wel;
 	}
-
 	
-	public String replaceReflectionPlaceholders(String element) throws ClassNotFoundException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
-		String newVal = element;
-		while (newVal.contains("!{")) {
-			String placeholder = newVal.substring(newVal.indexOf("!{"),
-					newVal.indexOf("}") + 1);
-			String attribute = placeholder.substring(2, placeholder.length() - 1);
-			
-			// we want to use value previously saved
-			Reflections reflections = new Reflections("com.stratio");    
-			Set classes = reflections.getSubTypesOf(CommonG.class);
-			    
-			Object pp = (classes.toArray())[0];
-			String qq = (pp.toString().split(" "))[1];
-			Class<?> c = Class.forName(qq.toString());
-			
-			Field ff = c.getDeclaredField(attribute);
-			ff.setAccessible(true);
-			String prop = (String)ff.get(null);
-			
-			newVal = newVal.replace(placeholder, prop);
-		}
-
-		return newVal;
-	}
-	
-	
-	/**
-	 * Replaces every placeholded element, enclosed in ${} with the
-	 * corresponding java property
-	 * 
-	 * @param element
-	 * 
-	 * @return String
-	 */
-	public String replacePlaceholders(String element) {
-		String newVal = element;
-		while (newVal.contains("${")) {
-			String placeholder = newVal.substring(newVal.indexOf("${"),
-					newVal.indexOf("}") + 1);
-			String modifier = "";
-			String sysProp = "";
-			if (placeholder.contains(".")) {
-				sysProp = placeholder.substring(2, placeholder.indexOf("."));
-				modifier = placeholder.substring(placeholder.indexOf(".") + 1,
-						placeholder.length() - 1);
-			} else {
-				sysProp = placeholder.substring(2, placeholder.length() - 1);
-			}
-
-			String prop = "";
-			if ("toLower".equals(modifier)) {
-				prop = System.getProperty(sysProp, "").toLowerCase();
-			} else if ("toUpper".equals(modifier)) {
-				prop = System.getProperty(sysProp, "").toUpperCase();
-			} else {
-				prop = System.getProperty(sysProp, "");
-			}
-			newVal = newVal.replace(placeholder, prop);
-		}
-
-		return newVal;
-	}
-
 	/**
 	 * Capture a snapshot or an evidence in the driver
 	 * 
@@ -714,8 +646,6 @@ public class CommonG {
 		    String composeKey = modifications.raw().get(i).get(0);
 		    String operation =  modifications.raw().get(i).get(1);
 		    String newValue =  modifications.raw().get(i).get(2);
-		    newValue = replacePlaceholders(newValue);
-		    newValue = replaceReflectionPlaceholders(newValue);
 	    
 		    modifiedData = JsonValue.readHjson(modifiedData).asObject().toString();
 		    
@@ -767,7 +697,6 @@ public class CommonG {
 		    String value = modifications.raw().get(i).get(0);
 		    String operation =  modifications.raw().get(i).get(1);
 		    String newValue =  modifications.raw().get(i).get(2);
-		    newValue = replacePlaceholders(newValue);
 	    
 		    switch(operation.toUpperCase()) {
 	    		case "DELETE":
@@ -815,9 +744,6 @@ public class CommonG {
 	    }
 	    
 	    String restURL = "http://" + this.getRestHost() + this.getRestPort();
-	    
-	    
-	    endPoint = replaceReflectionPlaceholders(endPoint);
 	    
 	    switch(requestType.toUpperCase()) {
 	    case "GET":
