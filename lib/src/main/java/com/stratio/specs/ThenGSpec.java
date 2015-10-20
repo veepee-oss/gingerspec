@@ -327,10 +327,8 @@ public class ThenGSpec extends BaseGSpec {
     @Then("^a text '(.+?)' exists$")
     public void assertSeleniumTextInSource(String text) {
 
-        String newText = commonspec.replacePlaceholders(text);
-
-        commonspec.getLogger().info("Verifying if our current page contains the text {}", newText);
-        assertThat(commonspec.getDriver()).as("Expected text not found at page").contains(newText);
+        commonspec.getLogger().info("Verifying if our current page contains the text {}", text);
+        assertThat(commonspec.getDriver()).as("Expected text not found at page").contains(text);
     }
 
     /**
@@ -343,11 +341,9 @@ public class ThenGSpec extends BaseGSpec {
     public void assertSeleniumTextOnElementPresent(Integer index, String text) {
         commonspec.getLogger().info("Verifying text existance");
 
-        String newText = commonspec.replacePlaceholders(text);
-
         assertThat(commonspec.getPreviousWebElements().size()).as("There are less found elements than required")
                 .isGreaterThan(index);
-        assertThat(commonspec.getPreviousWebElements().get(index).getText()).contains(newText);
+        assertThat(commonspec.getPreviousWebElements().get(index).getText()).contains(text);
     }
 
     /**
@@ -553,25 +549,25 @@ public class ThenGSpec extends BaseGSpec {
     }
     
     @Then("^the service response must contain the text '(.*?)'$")
-    public void assertResponseMessage(String expectedText) {
+    public void assertResponseMessage(String expectedText) throws ClassNotFoundException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
         commonspec.getLogger().info("Verifying response message");
         assertThat(commonspec.getResponse()).hasMessage(expectedText);
     }
 
     @Then("^the service response must NOT contain the text '(.*?)'$")
-    public void assertNegativeResponseMessage(String expectedText) {
+    public void assertNegativeResponseMessage(String expectedText) throws ClassNotFoundException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
         commonspec.getLogger().info("Verifying response message");
         assertThat(commonspec.getResponse()).doesNotHaveMessage(expectedText);
     }
 
     @Then("^the service response status must be '(.*?)' and its response must contain the text '(.*?)'$")
-    public void assertResponseStatusMessage(Integer expectedStatus, String expectedText) {
+    public void assertResponseStatusMessage(Integer expectedStatus, String expectedText) throws ClassNotFoundException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
         commonspec.getLogger().info("Verifying response status code and message");
         assertThat(commonspec.getResponse()).hasStatusCodeAndMessage(expectedStatus, expectedText);
     }
 
     @Then("^the service response status must NOT be '(.*?)' and its response must NOT contain the text '(.*?)'$")
-    public void assertNegativeResponseStatusMessage(Integer unexpectedStatus, String unexpectedText) {
+    public void assertNegativeResponseStatusMessage(Integer unexpectedStatus, String unexpectedText) throws ClassNotFoundException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
         commonspec.getLogger().info("Verifying response status code and message");
         assertThat(commonspec.getResponse()).doesNotHaveStatusCodeNorMessage(unexpectedStatus, unexpectedText);
     }

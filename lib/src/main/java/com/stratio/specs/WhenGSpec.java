@@ -107,17 +107,15 @@ public class WhenGSpec extends BaseGSpec {
     public void seleniumType(String text, Integer index) {
         commonspec.getLogger().info("Typing on element with index {}", index);
 
-        String newText = commonspec.replacePlaceholders(text);
-
         assertThat(commonspec.getPreviousWebElements()).isNotEmpty();
-        while (newText.length() > 0) {
-            if (-1 == newText.indexOf("\\n")) {
-                commonspec.getPreviousWebElements().get(index).sendKeys(newText);
-                newText = "";
+        while (text.length() > 0) {
+            if (-1 == text.indexOf("\\n")) {
+                commonspec.getPreviousWebElements().get(index).sendKeys(text);
+                text = "";
             } else {
-                commonspec.getPreviousWebElements().get(index).sendKeys(newText.substring(0, newText.indexOf("\\n")));
+                commonspec.getPreviousWebElements().get(index).sendKeys(text.substring(0, text.indexOf("\\n")));
                 commonspec.getPreviousWebElements().get(index).sendKeys(Keys.ENTER);
-                newText = newText.substring(newText.indexOf("\\n") + 2);
+                text = text.substring(text.indexOf("\\n") + 2);
             }
         }
     }
@@ -178,12 +176,11 @@ public class WhenGSpec extends BaseGSpec {
     @When("^I select '(.+?)' on the element on index '(\\d+?)'$")
     public void elementSelect(String option, Integer index) {
         commonspec.getLogger().info("Choosing option on select");
-        String opt = commonspec.replacePlaceholders(option);
 
         Select sel = null;
         sel = new Select(commonspec.getPreviousWebElements().get(index));
 
-        sel.selectByVisibleText(opt);
+        sel.selectByVisibleText(option);
     }
 
     /**

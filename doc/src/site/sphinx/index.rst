@@ -4,4 +4,6 @@ Contents:
     :maxdepth: 4
     :numbered:
 
-    about.rst    
+    about.rst
+    aspects.rst
+    commong.rst   
