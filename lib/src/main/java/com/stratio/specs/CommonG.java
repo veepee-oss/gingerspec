@@ -817,7 +817,7 @@ public class CommonG {
 	}
 	
 	/**
-	 * Saves the 
+	 * Saves the value in the attribute in class extending CommonG.
 	 * 
 	 * @param element attribute in class where to store the value
 	 * @param value value to be stored

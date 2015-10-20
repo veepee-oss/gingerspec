@@ -1,5 +1,9 @@
 package com.stratio.cucumber.aspects;
 
+import gherkin.formatter.Argument;
+import gherkin.formatter.model.DataTableRow;
+import gherkin.formatter.model.Step;
+
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +19,8 @@ import org.slf4j.LoggerFactory;
 
 import com.stratio.specs.CommonG;
 
-import cucumber.api.DataTable;
+import cucumber.runtime.StepDefinition;
+import cucumber.runtime.xstream.LocalizedXStreams;
 
 @Aspect
 public class ReplacementAspect {
@@ -23,80 +28,79 @@ public class ReplacementAspect {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass()
 			.getCanonicalName());
 
-	@Pointcut("execution(* com.stratio.specs.GivenGSpec..*(..))"
-		+ " || execution(* com.stratio.specs.WhenGSpec..*(..))"
-		+ " || execution(* com.stratio.specs.HookGSpec..*(..))"
-		+ " || execution(* com.stratio.specs.BaseGSpec..*(..))"
-		+ " || execution(* com.stratio.specs.ThenGSpec..*(..))")
-	protected void replacementCallPointcut() {
+	@Pointcut("call(cucumber.runtime.StepDefinitionMatch.new(..)) && "
+            + "args (arguments, stepDefinition, featurePath, step, localizedXStreams)")
+	protected void replacementCallPointcut(List<Argument> arguments, StepDefinition stepDefinition, String featurePath, Step step, LocalizedXStreams localizedXStreams) {
 	}
-
-	/**
-	 * When performing calls to methods in com.stratio.specs, we replace the system
-	 * and stored variables with the actual value
-	 * 
-	 * @param pjp
-	 * @return Object
-	 * @throws Throwable 
-	 */
-	@Around(value = "replacementCallPointcut()")
-	public void aroundReplacementCalls(ProceedingJoinPoint pjp) throws Throwable {
-	    Object[] args = pjp.getArgs();
-	    if (args.length > 0) {
-		for (int i = 0; i < args.length; i++) {
-		    if (args[i] != null) {
-			if (args[i] instanceof DataTable) {
-			   DataTable dataTable = (DataTable)args[i];
-			   List<List<String>> listOfLists = new ArrayList<List<String>>();
-			   for (int j = 0; j < dataTable.raw().size(); j ++) {
-			       List<String> list = new ArrayList<String>();
-			       for (int k = 0; k < dataTable.raw().get(j).size(); k ++) {
-				   String res = dataTable.raw().get(j).get(k);
-				   if (res.contains("${")) {
-				       res = replacePlaceholders(res);
-				   }
-				   if (res.contains("!{")) {
-				       res = replaceReflectionPlaceholders(res);
-				   }
-				   list.add(res);
-			       }
-			       listOfLists.add(list);
-			   }
-			   args[i] = DataTable.create(listOfLists);  
+	
+	@Around(value = "replacementCallPointcut(arguments, stepDefinition, featurePath, step, localizedXStreams)")
+	public Object aroundReplacementCalls(ProceedingJoinPoint pjp, List<Argument> arguments, StepDefinition stepDefinition, String featurePath, Step step, LocalizedXStreams localizedXStreams) throws Throwable {
+	    if (arguments.size() > 0) {
+		List<Argument> myArguments = new ArrayList<Argument>();
+		if (arguments != null) {
+		    for (Argument arg: arguments) {
+			if (arg.getVal() != null) {
+			    String value = arg.getVal();
+			    if (value.contains("${")) {
+				value = replacePlaceholders(value);
+			    }
+			    if (value.contains("!{")) {
+				value = replaceReflectionPlaceholders(value);
+			    }
+			    Argument myArg = new Argument(arg.getOffset(), value);
+			    myArguments.add(myArg);
 			} else {
-			    String res = args[i].toString();
-			    if (res.contains("${")) {
-				res = replacePlaceholders(res);
-			    }
-			    if (res.contains("!{")) {
-		    		res = replaceReflectionPlaceholders(res);
-			    }
-			    
-			    switch(args[i].getClass().getName()) {
-			    	case "java.lang.Integer":
-			    	    args[i] = Integer.parseInt(res);
-			    	    break;
-			    	case "java.lang.Double":
-			    	    args[i] = Double.parseDouble(res);
-			    	    break;
-			    	case "java.lang.Float":
-			    	    args[i] = Float.parseFloat(res);
-			    	    break;
-			    	case "java.lang.Long":
-			    	    args[i] = Long.parseLong(res);
-			    	    break;
-			    	default:
-			    	    args[i] = res;
-			    	    break;
-			    }			    
+			    myArguments.add(arg);
 			}
 		    }
+		    arguments = myArguments;
 		}
-		pjp.proceed(args);
-	    } else {
-		pjp.proceed();
+		
+		// We need to modify the line and the datatable if available
+		if (step != null) {
+		    // Modify line
+		    String stepName = step.getName();
+		    
+		    if (stepName.contains("${")) {
+			stepName = replacePlaceholders(stepName);
+		    }
+		    if (stepName.contains("!{")) {
+			stepName = replaceReflectionPlaceholders(stepName);
+		    }
+		    
+		    // Modify datatable
+		    List<DataTableRow> stepRows = step.getRows();
+		    
+		    List<DataTableRow> myRows = null;
+		    if (stepRows != null) {			
+			DataTableRow myRow;
+			myRows =  new ArrayList<DataTableRow>();
+			for (DataTableRow row: stepRows) {
+			    List<String> cells = row.getCells();
+			    List<String> myCells = new ArrayList<String>();
+			    for (String cell: cells) {
+				if (cell.contains("${")) {
+				    cell = replacePlaceholders(cell);
+				}
+				if (cell.contains("!{")) {
+				    cell = replaceReflectionPlaceholders(cell);
+				}
+				myCells.add(cell);
+			    }
+			    myRow = new DataTableRow(row.getComments(), myCells, row.getLine());
+			    myRows.add(myRow);
+			}
+		    }
+		    
+		    // Redefine step
+		    step = new Step(step.getComments(), step.getKeyword(), stepName, step.getLine(), myRows, step.getDocString());	    
+		}
 	    }
+	    // Proceed with new modified params
+	    Object[] myArray = {arguments, stepDefinition, featurePath, step, localizedXStreams};
+	    return pjp.proceed(myArray);
 	}
+
 	
 	/**
 	 * Replaces every placeholded element, enclosed in !{} with the

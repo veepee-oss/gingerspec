@@ -269,6 +269,10 @@ public class GivenGSpec extends BaseGSpec {
         assertThat(restHost).isNotEmpty();
         assertThat(restPort).isNotEmpty();
         
+        if (restHost == null) {
+            restHost = "localhost";
+        }
+        
         if (restPort == null) {
             restPort = ":80";
         }
