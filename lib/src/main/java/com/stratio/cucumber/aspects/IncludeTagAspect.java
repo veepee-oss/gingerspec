@@ -1,32 +1,22 @@
 package com.stratio.cucumber.aspects;
 
 import com.stratio.exceptions.IncludeException;
-import cucumber.runtime.CucumberException;
-import cucumber.runtime.Runtime;
+
 import cucumber.runtime.io.Resource;
-import cucumber.runtime.model.CucumberScenario;
-import gherkin.formatter.Formatter;
-import gherkin.formatter.Reporter;
-import gherkin.formatter.model.Scenario;
-import gherkin.formatter.model.Tag;
-import gherkin.lexer.Encoding;
-import gherkin.util.FixJava;
-import org.apache.commons.collections.MapIterator;
-import org.aspectj.lang.ProceedingJoinPoint;
+
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.lang.reflect.Method;
+
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
+
 import java.nio.file.Paths;
-import java.security.Key;
+
 import java.util.*;
 
 @Aspect
@@ -63,7 +53,7 @@ public class IncludeTagAspect {
                 String[] params = getParams(lines.get(i));
                 if (i==0){
                     for (int j=i; j<lines.size();j++){
-                        if (lines.get(j).contains("Background:") && !marked) {
+                        if (lines.get(j).toUpperCase().contains("BACKGROUND:") && !marked) {
                             lines.add(j + 1, featureStepConverter(pth + featureName, scenarioName, params));
                             marked = true;
                         }
@@ -79,8 +69,7 @@ public class IncludeTagAspect {
             }
             nwsource += lines.get(i) + "\n";
         }
-
-        logger.info(nwsource);
+        
         return nwsource;
     }
 
@@ -120,12 +109,14 @@ public class IncludeTagAspect {
         return vals;
     }
 
-    private String doReplaceKeys(String parsedFeature, String[] params) {
+    private String doReplaceKeys(String parsedFeature, String[] params) throws IncludeException {
         for (int i=0; i<params.length;i++) {
             parsedFeature = parsedFeature.replaceAll(params[i],params[i+1]);
             i++;
         }
-        //return feature with no parses
+        if (parsedFeature.contains("<")){
+            throw new IncludeException("-> Error while parsing keys, check your params");
+        }
         return parsedFeature;
     }
 
@@ -135,25 +126,42 @@ public class IncludeTagAspect {
         String parsedFeature = "";
         String sCurrentLine;
 
+
         try {
 
             br = new BufferedReader(new FileReader(feature));
-
             while ((sCurrentLine = br.readLine()) != null) {
                 if (sCurrentLine.contains(scenarioName)){
+                    scenarioexists= true;
+                    if (sCurrentLine.toUpperCase().contains("OUTLINE") && params==null){
+                        throw new IncludeException("->  Parameters were not given for this scenario outline.");
+                    }
+                    else if (sCurrentLine.toUpperCase().contains("OUTLINE")){
+                        BufferedReader tr = br;
+                        String sParamline;
+                        while ((sParamline=tr.readLine())!=null && !sParamline.toUpperCase().contains("SCENARIO")){
+                            if(sParamline.contains("|")){
+                                if (!checkParams(sParamline,params)){
+                                    throw  new IncludeException("-> Wrong number of parameters.");
+                                }
+                            }else{
+                                if(!sParamline.toUpperCase().contains("EXAMPLE"))
+                                parsedFeature = parsedFeature +sParamline +"\n";
+                            }
+                        }
 
-                    while((sCurrentLine = br.readLine())!=null && !(sCurrentLine.contains("Scenario:") || sCurrentLine.contains("Examples:"))){
+                    }
+                    while((sCurrentLine = br.readLine())!=null && !sCurrentLine.toUpperCase().contains("SCENARIO:") && !sCurrentLine.toUpperCase().contains("EXAMPLES:") && !sCurrentLine.contains("|")){
                         parsedFeature = parsedFeature + sCurrentLine + "\n";
                     }
-                    scenarioexists= true;
                 }
             }
-
             if (!scenarioexists){
-                throw new IncludeException("-> Scenario not present at the given feature.");
+                throw new IncludeException("-> Scenario not present at the given feature: "+scenarioName);
             }
+
         } catch (FileNotFoundException e) {
-            throw new IncludeException("-> Feature file were not found.");
+            throw new IncludeException("-> Feature file were not found: "+feature);
         } catch (IOException e) {
             throw new IncludeException("-> An I/O error appeared.");
         } finally {
@@ -163,12 +171,34 @@ public class IncludeTagAspect {
                 ex.printStackTrace();
             }
         }
+
         if (params!=null) {
             parsedFeature = doReplaceKeys(parsedFeature, params);
         }
 
         return parsedFeature;
 
+    }
+
+    private boolean checkParams(String sCurrentLine, String[] params) {
+        int paramcounter = 0;
+        boolean checker= false;
+        if(sCurrentLine.contains("|")){
+
+            for( int i=0; i<sCurrentLine.length(); i++ ) {
+                if( sCurrentLine.charAt(i) == '|' ) {
+                    paramcounter++;
+                }
+                checker = true;
+
+            }
+
+            if ((params!=null) && (paramcounter-1)!=(params.length/2)){
+                checker = false;
+            }
+        }
+
+        return checker;
     }
 
 
