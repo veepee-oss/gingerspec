@@ -60,13 +60,16 @@ public class CucumberRunner {
 
         List<String> uniqueGlue = new ArrayList<String>();
         uniqueGlue.add("classpath:com/stratio/specs");
-	uniqueGlue.add("classpath:com/stratio/sparkta/specs");
-        uniqueGlue.add("classpath:com/stratio/crossdata/specs");
-        uniqueGlue.add("classpath:com/stratio/streaming/specs");
-        uniqueGlue.add("classpath:com/stratio/ingestion/specs");
-        uniqueGlue.add("classpath:com/stratio/datavis/specs");
-        uniqueGlue.add("classpath:com/stratio/connectors/specs");
-        uniqueGlue.add("classpath:com/stratio/admin/specs");
+	uniqueGlue.add("classpath:com/stratio/sparkta/testsAT/specs");
+        uniqueGlue.add("classpath:com/stratio/crossdata/testsAT/specs");
+        uniqueGlue.add("classpath:com/stratio/streaming/testsAT/specs");
+        uniqueGlue.add("classpath:com/stratio/decision/testsAT/specs");
+        uniqueGlue.add("classpath:com/stratio/ingestion/testsAT/specs");
+        uniqueGlue.add("classpath:com/stratio/datavis/testsAT/specs");
+        uniqueGlue.add("classpath:com/stratio/viewer/testsAT/specs");
+        uniqueGlue.add("classpath:com/stratio/connectors/testsAT/specs");
+        uniqueGlue.add("classpath:com/stratio/admin/testsAT/specs");
+        uniqueGlue.add("classpath:com/stratio/manager/testsAT/specs");
         runtimeOptions.getGlue().clear();
         runtimeOptions.getGlue().addAll(uniqueGlue);
 

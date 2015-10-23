@@ -3,11 +3,20 @@ package com.stratio.assertions;
 import java.util.List;
 
 import org.assertj.core.api.AbstractAssert;
+import org.assertj.core.api.Condition;
 import org.assertj.core.internal.Strings;
+import org.assertj.core.internal.Integers;
+import org.assertj.core.internal.Conditions;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import com.stratio.specs.CommonG;
+import com.stratio.tests.utils.PreviousWebElements;
+
 public class SeleniumAssert extends AbstractAssert<SeleniumAssert, Object> {
+    
+    	private CommonG commonspec;
+    
 	/**
 	 * Constructor with WebElement.
 	 * 
@@ -35,6 +44,31 @@ public class SeleniumAssert extends AbstractAssert<SeleniumAssert, Object> {
 		super(actual, SeleniumAssert.class);
 	}
 
+	public SeleniumAssert(CommonG commong, WebDriver actual) {
+	    super(actual, SeleniumAssert.class);
+	    this.commonspec = commong;
+	}
+	
+	public SeleniumAssert(CommonG commong, WebElement actual) {
+	    super(actual, SeleniumAssert.class);
+	    this.commonspec = commong;
+	}
+	
+	public SeleniumAssert(CommonG commong, List<WebElement> actual) {
+	    super(actual, SeleniumAssert.class);
+	    this.commonspec = commong;
+	}
+	
+	public SeleniumAssert(CommonG commong, PreviousWebElements actual) {
+	    super(actual, SeleniumAssert.class);
+	    this.commonspec = commong;
+	}
+	
+	
+	public CommonG getCommonspec() {
+	    return this.commonspec;
+	}
+	
 	/**
 	 * Checks a selenium WebElement.
 	 * 
@@ -65,6 +99,17 @@ public class SeleniumAssert extends AbstractAssert<SeleniumAssert, Object> {
 		return new SeleniumAssert(actual);
 	}
 
+	
+	public static SeleniumAssert assertThat(CommonG commong, WebDriver actual) {
+	    return new SeleniumAssert(commong, actual);
+	}
+	
+	public static SeleniumAssert assertThat(CommonG commong, PreviousWebElements actual) {
+	    return new SeleniumAssert(commong, actual);
+	}
+	
+	
+	
 	/**
 	 * Checks if a webDriver or WebElement has values.
 	 * 
@@ -81,4 +126,37 @@ public class SeleniumAssert extends AbstractAssert<SeleniumAssert, Object> {
 		}
 		return this;
 	}
+	
+
+	public SeleniumAssert isTextField(Condition<WebElement> cond) {
+	    if (actual instanceof List) {
+		Conditions.instance().equals(cond);
+	    }
+	    return this;
+	}
+	
+	
+	public SeleniumAssert hasAtLeast(Integer size) {
+	    if (actual instanceof List) {
+		Integers.instance().assertGreaterThanOrEqualTo(info, ((List<WebElement>) actual).size(), size);
+	    }
+	    return this;
+	}
+	
+	
+//	public SeleniumAssert hasSize(Integer size) {
+//	    if (actual instanceof List) {
+//		Integers.instance().assertEqual(info, ((List<WebElement>) actual).size(), size);
+//	    }
+//	    return this;
+//	}
+	
+	public SeleniumAssert hasSize(Integer size) {
+	    if (actual instanceof PreviousWebElements) {
+		Integers.instance().assertEqual(info, ((PreviousWebElements) actual).getPreviousWebElements().size(), size);
+	    }
+	    return this;
+	}
+	
+
 }

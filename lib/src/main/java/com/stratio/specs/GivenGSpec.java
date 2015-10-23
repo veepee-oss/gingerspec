@@ -1,5 +1,6 @@
 package com.stratio.specs;
 
+import static com.stratio.assertions.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.lang.reflect.InvocationTargetException;
@@ -255,7 +256,7 @@ public class GivenGSpec extends BaseGSpec {
         commonspec.setWebHost(webHost);
         commonspec.setWebPort(webPort);
         
-        commonspec.getLogger().info("Set web base URL to http://{}{}/", webHost, webPort);  
+        commonspec.getLogger().info("Set web base URL to http://{}{}", webHost, webPort);  
     }
     
     /**
@@ -298,10 +299,10 @@ public class GivenGSpec extends BaseGSpec {
     @Given("^I switch to the iframe on index '(\\d+?)' $")
     public void seleniumSwitchFrame(Integer index) {
 
-        assertThat(commonspec.getPreviousWebElements().size()).as("There are less found elements than required")
-                .isGreaterThan(index);
+        assertThat(commonspec.getPreviousWebElements()).as("There are less found elements than required")
+        	.hasAtLeast(index);
 
-        WebElement elem = commonspec.getPreviousWebElements().get(index);
+        WebElement elem = commonspec.getPreviousWebElements().getPreviousWebElements().get(index);
         commonspec.getDriver().switchTo().frame(elem);
     }
 

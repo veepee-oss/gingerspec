@@ -1,5 +1,6 @@
 package com.stratio.specs;
 
+import static com.stratio.assertions.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.testng.Assert.fail;
 
@@ -61,6 +62,7 @@ import com.stratio.tests.utils.HashUtils;
 import com.stratio.tests.utils.HttpResponse;
 import com.stratio.tests.utils.MongoDBUtil;
 import com.stratio.tests.utils.MongoDBUtils;
+import com.stratio.tests.utils.PreviousWebElements;
 import com.stratio.tests.utils.ThreadProperty;
 
 import cucumber.api.DataTable;
@@ -74,7 +76,7 @@ public class CommonG {
 
 	private RemoteWebDriver driver = null;
 	private String browserName = null;
-	private List<WebElement> previousWebElements = null;
+	private PreviousWebElements previousWebElements = null;
 	private String parentWindow = "";
 	
 	// COPIED FROM COMMON.JAVA
@@ -298,8 +300,8 @@ public class CommonG {
 		}
 
 		if (expectedCount != -1) {
-			assertThat(wel.size()).as("Element count doesnt match").isEqualTo(
-					expectedCount);
+		    	PreviousWebElements pwel = new PreviousWebElements(wel);
+		    	assertThat(this, pwel).as("Element count doesnt match").hasSize(expectedCount);
 		}
 
 		return wel;
@@ -533,7 +535,7 @@ public class CommonG {
 	 * 
 	 * @return List<WebElement>
 	 */
-	public List<WebElement> getPreviousWebElements() {
+	public PreviousWebElements getPreviousWebElements() {
 		return previousWebElements;
 	}
 
@@ -541,7 +543,7 @@ public class CommonG {
 	 * Set the previous webElement
 	 * 
 	 */
-	public void setPreviousWebElements(List<WebElement> previousWebElements) {
+	public void setPreviousWebElements(PreviousWebElements previousWebElements) {
 		this.previousWebElements = previousWebElements;
 	}
 

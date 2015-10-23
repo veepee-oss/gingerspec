@@ -6,7 +6,7 @@ import static com.stratio.tests.utils.matchers.DBObjectsMatcher.containedInMongo
 import static com.stratio.tests.utils.matchers.ExceptionMatcher.hasClassAndMessage;
 import static com.stratio.tests.utils.matchers.ListLastElementExceptionMatcher.lastElementHasClassAndMessage;
 import static com.stratio.tests.utils.matchers.RecordSetMatcher.containedInRecordSet;
-import static org.assertj.core.api.Assertions.assertThat;
+//import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
@@ -34,6 +34,7 @@ import com.datastax.driver.core.DataType;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.mongodb.DBObject;
+import com.stratio.tests.utils.PreviousWebElements;
 
 import cucumber.api.DataTable;
 import cucumber.api.java.en.Then;
@@ -328,7 +329,7 @@ public class ThenGSpec extends BaseGSpec {
     public void assertSeleniumTextInSource(String text) {
 
         commonspec.getLogger().info("Verifying if our current page contains the text {}", text);
-        assertThat(commonspec.getDriver()).as("Expected text not found at page").contains(text);
+        assertThat(this.commonspec, commonspec.getDriver()).as("Expected text not found at page").contains(text);
     }
 
     /**
@@ -341,9 +342,9 @@ public class ThenGSpec extends BaseGSpec {
     public void assertSeleniumTextOnElementPresent(Integer index, String text) {
         commonspec.getLogger().info("Verifying text existance");
 
-        assertThat(commonspec.getPreviousWebElements().size()).as("There are less found elements than required")
-                .isGreaterThan(index);
-        assertThat(commonspec.getPreviousWebElements().get(index).getText()).contains(text);
+        assertThat(commonspec.getPreviousWebElements()).as("There are less found elements than required")
+                .hasAtLeast(index);
+        assertThat(commonspec.getPreviousWebElements().getPreviousWebElements().get(index)).contains(text);
     }
 
     /**
@@ -363,8 +364,8 @@ public class ThenGSpec extends BaseGSpec {
         commonspec.getLogger().info("Verifying {} existance", element);
 
         List<WebElement> wel = commonspec.locateElement(method, element, expectedCount);
-
-        commonspec.setPreviousWebElements(wel);
+        PreviousWebElements pwel = new PreviousWebElements(wel);
+        commonspec.setPreviousWebElements(pwel);
     }
     
     /**
@@ -379,7 +380,7 @@ public class ThenGSpec extends BaseGSpec {
 
         List<WebElement> wel = commonspec.locateElements(method, element);
 
-        commonspec.setPreviousWebElements(wel);
+        commonspec.getPreviousWebElements().setPreviousWebElements(wel);
     }
     
     /**
@@ -416,7 +417,7 @@ public class ThenGSpec extends BaseGSpec {
 
         assertThat(wel.size()).as("Element count doesnt match").isEqualTo(expectedCount);
 
-        commonspec.setPreviousWebElements(wel);
+        commonspec.getPreviousWebElements().setPreviousWebElements(wel);
     }
 
     
@@ -429,17 +430,17 @@ public class ThenGSpec extends BaseGSpec {
     public void assertSeleniumToDisplayed(Integer index) {
         commonspec.getLogger().info("Setting element on index as displayed");
 
-        assertThat(commonspec.getPreviousWebElements().size()).as("There are less found elements than required")
-                .isGreaterThan(index);        
+        assertThat(commonspec.getPreviousWebElements()).as("There are less found elements than required")
+                .hasAtLeast(index);        
 
-        WebElement element = commonspec.getPreviousWebElements().get(index);
+        WebElement element = commonspec.getPreviousWebElements().getPreviousWebElements().get(index);
         String js = "setAttribute('style', '\"display:inline\"')";
         
         
 
         ((JavascriptExecutor) commonspec).executeScript(js, element);
         
-		assertThat(commonspec.getPreviousWebElements().set(index, element));
+		assertThat(commonspec.getPreviousWebElements().getPreviousWebElements().set(index, element));
     }
     
     /**
@@ -452,9 +453,9 @@ public class ThenGSpec extends BaseGSpec {
     public void assertSeleniumIsDisplayed(Integer index, Boolean isDisplayed) {
         commonspec.getLogger().info("Verifying element visibility");
 
-        assertThat(commonspec.getPreviousWebElements().size()).as("There are less found elements than required")
-                .isGreaterThan(index);
-        assertThat(commonspec.getPreviousWebElements().get(index).isDisplayed()).as(
+        assertThat(commonspec.getPreviousWebElements()).as("There are less found elements than required")
+                .hasAtLeast(index);
+        assertThat(commonspec.getPreviousWebElements().getPreviousWebElements().get(index).isDisplayed()).as(
                 "Unexpected element display property").isEqualTo(isDisplayed);
     }
 
@@ -468,9 +469,9 @@ public class ThenGSpec extends BaseGSpec {
     public void assertSeleniumIsEnabled(Integer index, Boolean isEnabled) {
         commonspec.getLogger().info("Verifying element enableness");
 
-        assertThat(commonspec.getPreviousWebElements().size()).as("There are less found elements than required")
-                .isGreaterThan(index);
-        assertThat(commonspec.getPreviousWebElements().get(index).isEnabled())
+        assertThat(commonspec.getPreviousWebElements()).as("There are less found elements than required")
+                .hasAtLeast(index);
+        assertThat(commonspec.getPreviousWebElements().getPreviousWebElements().get(index).isEnabled())
                 .as("Unexpected element enabled property").isEqualTo(isEnabled);
     }
 
@@ -484,9 +485,9 @@ public class ThenGSpec extends BaseGSpec {
     public void assertSeleniumIsSelected(Integer index, Boolean isSelected) {
         commonspec.getLogger().info("Verifying element enableness");
 
-        assertThat(commonspec.getPreviousWebElements().size()).as("There are less found elements than required")
-                .isGreaterThan(index);
-        assertThat(commonspec.getPreviousWebElements().get(index).isSelected()).as(
+        assertThat(commonspec.getPreviousWebElements()).as("There are less found elements than required")
+                .hasAtLeast(index);
+        assertThat(commonspec.getPreviousWebElements().getPreviousWebElements().get(index).isSelected()).as(
                 "Unexpected element selected property").isEqualTo(isSelected);
     }
 
@@ -501,9 +502,9 @@ public class ThenGSpec extends BaseGSpec {
     public void assertSeleniumHasAttributeValue(Integer index, String attribute, String value) {
         commonspec.getLogger().info("Verifying element attribute");
 
-        assertThat(commonspec.getPreviousWebElements().size()).as("There are less found elements than required")
-                .isGreaterThan(index);
-        String val = commonspec.getPreviousWebElements().get(index).getAttribute(attribute);
+        assertThat(commonspec.getPreviousWebElements()).as("There are less found elements than required")
+                .hasAtLeast(index);
+        String val = commonspec.getPreviousWebElements().getPreviousWebElements().get(index).getAttribute(attribute);
         assertThat(val).as("Attribute not found").isNot(null);
         assertThat(val).as("Unexpected value for specified attribute").matches(value);
     }
