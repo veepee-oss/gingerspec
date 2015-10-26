@@ -366,6 +366,13 @@ public class CucumberReporter implements Formatter, Reporter {
                                 break;
                             }
 
+                            //@manual
+                            if (tagNs.getName().matches("@manual")) {
+                                ignoreReason = true;
+                                exceptionmsg = "This scenario was skipped because it is marked as manual.";
+                                break;
+                            }
+
                             //@toocomplex
                             if (tagNs.getName().matches("@toocomplex")) {
                                 exceptionmsg = "This scenario was skipped because of being too complex to test";
