@@ -68,24 +68,23 @@ public class SeleniumAspect extends BaseGSpec {
 					driver = (WebDriver) actual.get(as);
 				} else if (realActual instanceof ArrayList) {
 				    if (((ArrayList) realActual).get(0) instanceof RemoteWebElement) {
-					driver = ((RemoteWebElement) ((ArrayList) realActual).get(0))
-							.getWrappedDriver();
+					driver = ((RemoteWebElement) ((ArrayList) realActual).get(0)).getWrappedDriver();
 				    }
-				} else if (realActual instanceof PreviousWebElements) {
-				    driver = ((RemoteWebElement) ((PreviousWebElements) realActual).getPreviousWebElements().get(0))
-						.getWrappedDriver();
+				} else if ((realActual instanceof PreviousWebElements) ||
+					(realActual instanceof Boolean) ||
+					(realActual instanceof String) ||
+					(realActual == null)) {
+				    driver = ((CommonG) ((SeleniumAssert) pjp.getTarget()).getCommonspec()).getDriver();
 				} else if (realActual instanceof RemoteWebElement) {
-					driver = ((RemoteWebElement) actual.get(as))
-							.getWrappedDriver();
+				    driver = ((RemoteWebElement) actual.get(as)).getWrappedDriver();
 				}
 			}
 			if (driver != null) {
-			    	((CommonG) ((SeleniumAssert) pjp.getTarget()).getCommonspec()).captureEvidence(driver, "framehtmlSource");
-			    	((CommonG) ((SeleniumAssert) pjp.getTarget()).getCommonspec()).captureEvidence(driver, "htmlSource");
-			    	((CommonG) ((SeleniumAssert) pjp.getTarget()).getCommonspec()).captureEvidence(driver, "screenCapture");
-//				commonspec.captureEvidence(driver, "framehtmlSource");
-//				commonspec.captureEvidence(driver, "htmlSource");
-//				commonspec.captureEvidence(driver, "screenCapture");
+			    logger.info("Trying to capture screenshots...");
+			    ((CommonG) ((SeleniumAssert) pjp.getTarget()).getCommonspec()).captureEvidence(driver, "framehtmlSource");
+			    ((CommonG) ((SeleniumAssert) pjp.getTarget()).getCommonspec()).captureEvidence(driver, "htmlSource");
+			    ((CommonG) ((SeleniumAssert) pjp.getTarget()).getCommonspec()).captureEvidence(driver, "screenCapture");
+			    logger.info("Screenshots are available at target/executions");
 			} else {
 				logger.info("Got no Selenium driver to capture a screen");
 			}

@@ -62,4 +62,12 @@ public class Assertions extends org.assertj.core.api.Assertions {
 	    return new SeleniumAssert(common, actual);
 	}
 	
+	public static SeleniumAssert assertThat(CommonG common, boolean actual) {
+	    return new SeleniumAssert(common, actual);
+	}
+	
+	public static SeleniumAssert assertThat(CommonG common, String actual) {
+	    return new SeleniumAssert(common, actual);
+	}
+	
 }

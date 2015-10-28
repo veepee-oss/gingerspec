@@ -77,7 +77,8 @@ public class WhenGSpec extends BaseGSpec {
     public void seleniumClick(Integer index) {
         commonspec.getLogger().info("Clicking on element with index {}", index);
 
-        assertThat(commonspec.getPreviousWebElements()).hasAtLeast(1);
+        assertThat(this.commonspec, commonspec.getPreviousWebElements()).as("There are less found elements than required")
+        	.hasAtLeast(index);
         commonspec.getPreviousWebElements().getPreviousWebElements().get(index).click();
     }
   
@@ -90,11 +91,10 @@ public class WhenGSpec extends BaseGSpec {
     public void seleniumClear(Integer index) {
 	commonspec.getLogger().info("Clearing text on element with index {}", index);
 	
-	//assertThat(commonspec.getPreviousWebElements())).hasAtLeast(index);
-	assertThat(commonspec.getPreviousWebElements()).as("There are less found elements than required")
+	assertThat(this.commonspec, commonspec.getPreviousWebElements()).as("There are less found elements than required")
         	.hasAtLeast(index);
 	
-	assertThat(commonspec.getPreviousWebElements().getPreviousWebElements().get(index)).isTextField(commonspec.getTextFieldCondition());
+	assertThat(this.commonspec, commonspec.getPreviousWebElements().getPreviousWebElements().get(index)).isTextField(commonspec.getTextFieldCondition());
 	
 	commonspec.getPreviousWebElements().getPreviousWebElements().get(index).clear();	
     }
@@ -110,7 +110,8 @@ public class WhenGSpec extends BaseGSpec {
     public void seleniumType(String text, Integer index) {
         commonspec.getLogger().info("Typing on element with index {}", index);
 
-        assertThat(commonspec.getPreviousWebElements()).hasAtLeast(1);
+        assertThat(this.commonspec, commonspec.getPreviousWebElements()).as("There are less found elements than required")
+		.hasAtLeast(index);
         while (text.length() > 0) {
             if (-1 == text.indexOf("\\n")) {
                 commonspec.getPreviousWebElements().getPreviousWebElements().get(index).sendKeys(text);
@@ -144,7 +145,8 @@ public class WhenGSpec extends BaseGSpec {
 	} else {
 	    commonspec.getLogger().info("Sending keys on element with index {}", index);
 
-	    assertThat(commonspec.getPreviousWebElements()).hasAtLeast(index);
+	    assertThat(this.commonspec, commonspec.getPreviousWebElements()).as("There are less found elements than required")
+	    	.hasAtLeast(index);
 	}
 	assertThat(strokes).isNotEmpty();
 	
