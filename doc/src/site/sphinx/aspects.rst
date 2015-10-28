@@ -67,6 +67,8 @@ There are three reasons for ignoring a test:
 
 * '@toocomplex': Feature is too complex to be tested.
 
+* '@manual': Test is not ready to be automated, need some work.
+
 It is compulsory to define one of these extra tags.
 
 ReplacementAspect
