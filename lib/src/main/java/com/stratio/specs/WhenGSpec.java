@@ -1,6 +1,7 @@
 package com.stratio.specs;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static com.stratio.assertions.Assertions.assertThat;
+//import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,8 +77,9 @@ public class WhenGSpec extends BaseGSpec {
     public void seleniumClick(Integer index) {
         commonspec.getLogger().info("Clicking on element with index {}", index);
 
-        assertThat(commonspec.getPreviousWebElements()).isNotEmpty();
-        commonspec.getPreviousWebElements().get(index).click();
+        assertThat(this.commonspec, commonspec.getPreviousWebElements()).as("There are less found elements than required")
+        	.hasAtLeast(index);
+        commonspec.getPreviousWebElements().getPreviousWebElements().get(index).click();
     }
   
     /**
@@ -89,11 +91,12 @@ public class WhenGSpec extends BaseGSpec {
     public void seleniumClear(Integer index) {
 	commonspec.getLogger().info("Clearing text on element with index {}", index);
 	
-	assertThat(commonspec.getPreviousWebElements().size()).isGreaterThan(index);
+	assertThat(this.commonspec, commonspec.getPreviousWebElements()).as("There are less found elements than required")
+        	.hasAtLeast(index);
 	
-	assertThat(commonspec.getPreviousWebElements().get(index)).is(commonspec.getTextFieldCondition());
+	assertThat(this.commonspec, commonspec.getPreviousWebElements().getPreviousWebElements().get(index)).isTextField(commonspec.getTextFieldCondition());
 	
-	commonspec.getPreviousWebElements().get(index).clear();	
+	commonspec.getPreviousWebElements().getPreviousWebElements().get(index).clear();	
     }
     
     
@@ -107,14 +110,15 @@ public class WhenGSpec extends BaseGSpec {
     public void seleniumType(String text, Integer index) {
         commonspec.getLogger().info("Typing on element with index {}", index);
 
-        assertThat(commonspec.getPreviousWebElements()).isNotEmpty();
+        assertThat(this.commonspec, commonspec.getPreviousWebElements()).as("There are less found elements than required")
+		.hasAtLeast(index);
         while (text.length() > 0) {
             if (-1 == text.indexOf("\\n")) {
-                commonspec.getPreviousWebElements().get(index).sendKeys(text);
+                commonspec.getPreviousWebElements().getPreviousWebElements().get(index).sendKeys(text);
                 text = "";
             } else {
-                commonspec.getPreviousWebElements().get(index).sendKeys(text.substring(0, text.indexOf("\\n")));
-                commonspec.getPreviousWebElements().get(index).sendKeys(Keys.ENTER);
+                commonspec.getPreviousWebElements().getPreviousWebElements().get(index).sendKeys(text.substring(0, text.indexOf("\\n")));
+                commonspec.getPreviousWebElements().getPreviousWebElements().get(index).sendKeys(Keys.ENTER);
                 text = text.substring(text.indexOf("\\n") + 2);
             }
         }
@@ -141,7 +145,8 @@ public class WhenGSpec extends BaseGSpec {
 	} else {
 	    commonspec.getLogger().info("Sending keys on element with index {}", index);
 
-	    assertThat(commonspec.getPreviousWebElements().size()).isGreaterThan(index);
+	    assertThat(this.commonspec, commonspec.getPreviousWebElements()).as("There are less found elements than required")
+	    	.hasAtLeast(index);
 	}
 	assertThat(strokes).isNotEmpty();
 	
@@ -155,13 +160,13 @@ public class WhenGSpec extends BaseGSpec {
 		if (index == null) {
 		    new Actions(commonspec.getDriver()).sendKeys(commonspec.getDriver().findElement(By.tagName("body")), csa).perform();
 		} else {
-		    commonspec.getPreviousWebElements().get(index).sendKeys(csa);
+		    commonspec.getPreviousWebElements().getPreviousWebElements().get(index).sendKeys(csa);
 		}
 	    } else {
 		if (index == null) {
 		    new Actions(commonspec.getDriver()).sendKeys(commonspec.getDriver().findElement(By.tagName("body")), Keys.valueOf(stroke)).perform();
 		} else {
-		    commonspec.getPreviousWebElements().get(index).sendKeys(Keys.valueOf(stroke));
+		    commonspec.getPreviousWebElements().getPreviousWebElements().get(index).sendKeys(Keys.valueOf(stroke));
 		}
 	    }
 	}
@@ -178,7 +183,7 @@ public class WhenGSpec extends BaseGSpec {
         commonspec.getLogger().info("Choosing option on select");
 
         Select sel = null;
-        sel = new Select(commonspec.getPreviousWebElements().get(index));
+        sel = new Select(commonspec.getPreviousWebElements().getPreviousWebElements().get(index));
 
         sel.selectByVisibleText(option);
     }
@@ -193,7 +198,7 @@ public class WhenGSpec extends BaseGSpec {
         commonspec.getLogger().info("Unselecting everything");
 
         Select sel = null;
-        sel = new Select(commonspec.getPreviousWebElements().get(index));
+        sel = new Select(commonspec.getPreviousWebElements().getPreviousWebElements().get(index));
 
         if (sel.isMultiple()) {
             sel.deselectAll();
