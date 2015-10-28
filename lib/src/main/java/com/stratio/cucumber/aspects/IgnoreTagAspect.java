@@ -67,13 +67,19 @@ public class IgnoreTagAspect {
                     }
                     //@unimplemented
                     if (tagNs.getName().matches("@unimplemented")){
-                        logger.warn("Scenario '"+scenario.getName()+"' ignored because is not yet implemented.");
+                        logger.warn("Scenario '"+scenario.getName()+"' ignored because it is not yet implemented.");
+                        ignoreReason=true;
+                        break;
+                    }
+                    //@manual
+                    if (tagNs.getName().matches("@manual")){
+                        logger.warn("Scenario '"+scenario.getName()+"' ignored because it is marked as manual test.");
                         ignoreReason=true;
                         break;
                     }
                     //@toocomplex
                     if (tagNs.getName().matches("@toocomplex")){
-                        logger.warn("Scenario '"+scenario.getName()+"' ignored because test is too complex.");
+                        logger.warn("Scenario '"+scenario.getName()+"' ignored because the test is too complex.");
                         ignoreReason=true;
                         break;
                     }
