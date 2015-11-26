@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.hjson.ParseException;
 import org.mockito.Mockito;
+import org.skyscreamer.jsonassert.JSONAssert;
 import org.testng.annotations.Test;
 
 import com.stratio.tests.utils.ThreadProperty;
@@ -86,7 +87,7 @@ public class CommonGTest {
 	DataTable modifications = DataTable.create(rawData);
 	
 	String modifiedData = commong.modifyData(data, type, modifications);
-	assertThat(modifiedData).as("Unexpected modified data").isEqualTo(expectedData);
+	JSONAssert.assertEquals(expectedData,modifiedData,false);
     }
     
     @Test
@@ -192,7 +193,7 @@ public class CommonGTest {
 	DataTable modifications = DataTable.create(rawData);
 	
 	String modifiedData = commong.modifyData(data, type, modifications);
-	assertThat(modifiedData).as("Unexpected modified data").isEqualTo(expectedData);
+	JSONAssert.assertEquals(expectedData,modifiedData,false);
     }
     
     @Test
@@ -206,7 +207,7 @@ public class CommonGTest {
 	DataTable modifications = DataTable.create(rawData);
 	
 	String modifiedData = commong.modifyData(data, type, modifications);
-	assertThat(modifiedData).as("Unexpected modified data").isEqualTo(expectedData);
+	JSONAssert.assertEquals(expectedData,modifiedData,false);
     }
     
     @Test
@@ -220,7 +221,7 @@ public class CommonGTest {
 	DataTable modifications = DataTable.create(rawData);
 	
 	String modifiedData = commong.modifyData(data, type, modifications);
-	assertThat(modifiedData).as("Unexpected modified data").isEqualTo(expectedData);
+	JSONAssert.assertEquals(expectedData,modifiedData,false);
     }
     
     @Test
@@ -234,7 +235,7 @@ public class CommonGTest {
 	DataTable modifications = DataTable.create(rawData);
 	
 	String modifiedData = commong.modifyData(data, type, modifications);
-	assertThat(modifiedData).as("Unexpected modified data").isEqualTo(expectedData);
+	JSONAssert.assertEquals(expectedData,modifiedData,false);
     }
     
     @Test
@@ -248,7 +249,7 @@ public class CommonGTest {
 	DataTable modifications = DataTable.create(rawData);
 	
 	String modifiedData = commong.modifyData(data, type, modifications);
-	assertThat(modifiedData).as("Unexpected modified data").isEqualTo(expectedData);
+	JSONAssert.assertEquals(expectedData,modifiedData,false);
     }
     
     @Test
@@ -262,7 +263,7 @@ public class CommonGTest {
 	DataTable modifications = DataTable.create(rawData);
 	
 	String modifiedData = commong.modifyData(data, type, modifications);
-	assertThat(modifiedData).as("Unexpected modified data").isEqualTo(expectedData);
+	JSONAssert.assertEquals(expectedData,modifiedData,false);
     }
     
     
