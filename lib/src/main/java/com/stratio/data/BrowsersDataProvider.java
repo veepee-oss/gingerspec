@@ -84,46 +84,52 @@ public final class BrowsersDataProvider {
     private static List<String> gridBrowsers() {
         ArrayList<String> response = new ArrayList<String>();
 
-        String grid = System.getProperty("SELENIUM_GRID", "127.0.0.1:4444");
-        grid = "http://" + grid + "/grid/console";
-        Document doc;
-        try {
-            doc = Jsoup.connect(grid).timeout(DEFAULT_TIMEOUT).get();
-        } catch (IOException e) {
-            LOGGER.error("Exception on connecting to Selenium grid: {}", e.getMessage());
-            return response;
-        }
-
-        Elements slaves = (Elements) doc.select("div.proxy");
-
-        for (Element slave : slaves) {
-            String slaveStatus = slave.select("p.proxyname").first().text();
-            if (!slaveStatus.contains("Connection") && !slaveStatus.contains("Conexión")) {
-                Integer iBusy = 0;
-                Elements browserList = slave.select("div.content_detail").select("*[title]");
-                Elements busyBrowserList = slave.select("div.content_detail").select("p > .busy");
-                for (Element browserDetails : browserList) {
-                    if (browserDetails.attr("title").startsWith("{")) {
-                        Pattern pat = Pattern.compile("browserName=(.*?),.*?(version=(.*?))?}");
-                        Matcher m = pat.matcher(browserDetails.attr("title"));
-                        while (m.find()) {
-                            response.add(m.group(1) + "_" + m.group(3));
-                        }
-                    } else {
-                        String version = busyBrowserList.get(iBusy).parent().text();
-                        String browser = busyBrowserList.get(iBusy).text();
-                        version = version.substring(2);
-                        version = version.replace(browser, "");
-                        String browserSrc = busyBrowserList.get(iBusy).select("img").attr("src");
-                        if (!browserSrc.equals("")) {
-                            browser = browserSrc.substring(browserSrc.lastIndexOf('/') + 1, browserSrc.length()
-                                    - DEFAULT_LESS_LENGTH);
-                        }
-                        response.add(browser + "_" + version);
-                        iBusy++;
-                    }
-                }
+        //String grid = System.getProperty("SELENIUM_GRID", "127.0.0.1:4444");
+        String grid = System.getProperty("SELENIUM_GRID");
+        
+        if (grid != null) {
+            grid = "http://" + grid + "/grid/console";
+            Document doc;
+            try {
+        	doc = Jsoup.connect(grid).timeout(DEFAULT_TIMEOUT).get();
+            } catch (IOException e) {
+        	LOGGER.error("Exception on connecting to Selenium grid: {}", e.getMessage());
+        	return response;
             }
+
+            Elements slaves = (Elements) doc.select("div.proxy");
+
+            for (Element slave : slaves) {
+        	String slaveStatus = slave.select("p.proxyname").first().text();
+        	if (!slaveStatus.contains("Connection") && !slaveStatus.contains("Conexión")) {
+        	    Integer iBusy = 0;
+        	    Elements browserList = slave.select("div.content_detail").select("*[title]");
+        	    Elements busyBrowserList = slave.select("div.content_detail").select("p > .busy");
+        	    for (Element browserDetails : browserList) {
+        		if (browserDetails.attr("title").startsWith("{")) {
+        		    Pattern pat = Pattern.compile("browserName=(.*?),.*?(version=(.*?))?}");
+        		    Matcher m = pat.matcher(browserDetails.attr("title"));
+        		    while (m.find()) {
+        			response.add(m.group(1) + "_" + m.group(3));
+        		    }
+        		} else {
+        		    String version = busyBrowserList.get(iBusy).parent().text();
+        		    String browser = busyBrowserList.get(iBusy).text();
+        		    version = version.substring(2);
+        		    version = version.replace(browser, "");
+        		    String browserSrc = busyBrowserList.get(iBusy).select("img").attr("src");
+        		    if (!browserSrc.equals("")) {
+        			browser = browserSrc.substring(browserSrc.lastIndexOf('/') + 1, browserSrc.length()
+                                    - DEFAULT_LESS_LENGTH);
+        		    }
+        		    response.add(browser + "_" + version);
+        		    iBusy++;
+        		}
+        	    }
+        	}
+            }
+        } else {
+            LOGGER.debug("Selenium grid not defined");
         }
         // Sort response
         Collections.sort(response);
