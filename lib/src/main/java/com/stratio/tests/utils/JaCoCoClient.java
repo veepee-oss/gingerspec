@@ -18,7 +18,7 @@ import org.testng.TestListenerAdapter;
  */
 public class JaCoCoClient extends TestListenerAdapter {
 
-    private static final String DESTFILE = "target/executions/jacoco-client.exec";
+    private static final String DESTFILE = "target/jacocoAT.exec";
     private static final int PORT = 6300;
 
     private final Logger logger = LoggerFactory.getLogger(JaCoCoClient.class);
