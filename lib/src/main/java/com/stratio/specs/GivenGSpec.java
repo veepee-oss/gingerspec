@@ -68,6 +68,7 @@ public class GivenGSpec extends BaseGSpec {
         commonspec.getElasticSearchClient().emptyIndexes();
     }
 
+    
     /**
      * Empty a specific index of ElasticSearch.
      * 
@@ -116,11 +117,12 @@ public class GivenGSpec extends BaseGSpec {
      * 
      * @param keyspace
      */
-    @Given("^I drop an C* keyspace '(.+?)'$")
+    @Given("^I drop a C keyspace '(.+)'$")
     public void dropCassandraKeyspace(String keyspace) {
         commonspec.getLogger().info("Dropping a C* keyspace", keyspace);
         commonspec.getCassandraClient().dropKeyspace(keyspace);
     }
+    
 
     /**
      * Create a AeroSpike namespace, table and the data of the table.

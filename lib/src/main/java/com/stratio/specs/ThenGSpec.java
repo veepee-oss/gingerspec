@@ -95,7 +95,7 @@ public class ThenGSpec extends BaseGSpec {
      * 
      * @param keyspace
      */
-    @Then("^a Casandra keyspace '(.+?)' exists$")
+    @Then("^a Cassandra keyspace '(.+?)' exists$")
     public void assertKeyspaceOnCassandraExists(String keyspace) {
         commonspec.getLogger().info("Verifying if the keyspace {} exists", keyspace);
         org.hamcrest.MatcherAssert.assertThat("The keyspace " + keyspace + "exists on cassandra", commonspec

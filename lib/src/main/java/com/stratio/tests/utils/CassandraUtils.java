@@ -21,6 +21,7 @@ import com.datastax.driver.core.Session;
 import com.datastax.driver.core.TableMetadata;
 import com.stratio.exceptions.DBException;
 
+
 /**
  * Generic utilities for operations over Cassandra.
  * 
@@ -34,7 +35,7 @@ public class CassandraUtils {
 	private final String host;
 	private Metadata metadata;
 	private Session session;
-	private CassandraQueryUtils CassandraqueryUtils;
+	private CassandraQueryUtils cassandraqueryUtils;
 
 	/**
 	 * Generic contructor of CassandraUtils.
@@ -48,7 +49,7 @@ public class CassandraUtils {
 	 */
 	public void connect() {
 		buildCluster();
-		this.CassandraqueryUtils = new CassandraQueryUtils();
+		this.cassandraqueryUtils = new CassandraQueryUtils();
 		this.metadata = this.cluster.getMetadata();
 		LOGGER.debug("Connected to cluster (" + host + "): "
 				+ metadata.getClusterName() + "\n");
@@ -138,6 +139,36 @@ public class CassandraUtils {
 		return this.session;
 	}
 
+	
+	 /**
+     * geoBbox search with Cassandra.
+     * 
+     * @param data
+     * @param min
+     * 
+     */
+    public ResultSet geoBboxSearch(String table, String magic_colum, double min_latitude, double min_longitude, double max_latitude, double max_longitude, String filter_query, String field) {
+        String query=cassandraqueryUtils.searchGeoBbox(table, magic_colum, min_latitude, min_longitude, max_latitude, max_longitude, filter_query, field);
+        LOGGER.info(query);
+        return executeQuery(query);
+       
+    }
+	
+    /**
+    * Create a geoPoint mapper
+    * 
+    * @param magic_column
+    * @param lat
+    * @param lon
+    * @param maxLevels
+    * 
+    */
+   public void geoPointMap(String keyspace, String table,String magic_column, String lat, String lon, String maxLevels) {
+       String query=cassandraqueryUtils.createMapperGeoPoint(keyspace,table,magic_column, lat, lon, maxLevels);
+       LOGGER.info(query);
+      
+   }
+    
 	/**
 	 * Create a keyspace in Cassandra.
 	 * 
@@ -147,14 +178,38 @@ public class CassandraUtils {
 		Map<String, String> replicationSimpleOneExtra = new HashMap<>();
 		replicationSimpleOneExtra.put("'class'", "'SimpleStrategy'");
 		replicationSimpleOneExtra.put("'replication_factor'", "1");
-		String query = this.CassandraqueryUtils.createKeyspaceQuery(true,
-				keyspace, this.CassandraqueryUtils
+		String query = this.cassandraqueryUtils.createKeyspaceQuery(true,
+				keyspace, this.cassandraqueryUtils
 						.createKeyspaceReplication(replicationSimpleOneExtra),
 				"");
 		LOGGER.debug(query);
 		executeQuery(query);
 	}
 
+	   /**
+     * Create a table in Cassandra.
+     * 
+     * @param table
+     * @param colums
+     */
+    public void createTableWithData(String table, Map<String, String> colums, ArrayList<String> pk) {
+        String query = this.cassandraqueryUtils.createTable(table, colums, pk);
+        LOGGER.debug(query);
+        executeQuery(query);
+    }
+    
+    /**
+   * Insert data in a keyspace.
+   * 
+   * @param table
+   * @param fields
+   */
+  public void insertData(String table, Map<String, Object> fields) {
+      String query = this.cassandraqueryUtils.insertData(table, fields);
+      LOGGER.debug(query);
+      executeQuery(query);
+  }
+  
 	/**
 	 * Checks if a keyspace exists in Cassandra.
 	 * 
@@ -201,7 +256,7 @@ public class CassandraUtils {
 	 * @param keyspace
 	 */
 	public void dropKeyspace(String keyspace) {
-		executeQuery(this.CassandraqueryUtils
+		executeQuery(this.cassandraqueryUtils
 				.dropKeyspaceQuery(false, keyspace));
 	}
 
@@ -212,7 +267,7 @@ public class CassandraUtils {
 	 * @param keyspace
 	 */
 	public void dropKeyspace(boolean ifExists, String keyspace) {
-		executeQuery(this.CassandraqueryUtils.dropKeyspaceQuery(ifExists,
+		executeQuery(this.cassandraqueryUtils.dropKeyspaceQuery(ifExists,
 				keyspace));
 	}
 
@@ -222,7 +277,7 @@ public class CassandraUtils {
 	 * @param keyspace
 	 */
 	public void useKeyspace(String keyspace) {
-		executeQuery(this.CassandraqueryUtils.useQuery(keyspace));
+		executeQuery(this.cassandraqueryUtils.useQuery(keyspace));
 	}
 
 	/**
@@ -279,7 +334,7 @@ public class CassandraUtils {
 	 */
 	public void dropTable(String keyspace, String table) {
 		// se elimina la table
-		executeQuery(this.CassandraqueryUtils.dropTableQuery(false, table));
+		executeQuery(this.cassandraqueryUtils.dropTableQuery(false, table));
 	}
 
 	/**
