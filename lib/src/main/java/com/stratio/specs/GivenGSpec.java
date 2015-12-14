@@ -5,10 +5,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.hjson.JsonValue;
 import org.openqa.selenium.WebElement;
 
+import com.datastax.driver.core.ResultSet;
+import com.datastax.driver.core.Row;
 import com.jayway.jsonpath.JsonPath;
 
 import cucumber.api.DataTable;
@@ -23,6 +29,7 @@ public class GivenGSpec extends BaseGSpec {
     public static final int PAGE_LOAD_TIMEOUT = 120;
     public static final int IMPLICITLY_WAIT = 10;
     public static final int SCRIPT_TIMEOUT = 30;
+    public ResultSet results;
     
     /**
      * Generic constructor.
@@ -31,8 +38,177 @@ public class GivenGSpec extends BaseGSpec {
      */
     public GivenGSpec(CommonG spec) {
         this.commonspec = spec;
+        this.results = null;
+
     }
 
+    /**
+     * Create a Mapping.
+     * 
+     * @param index_name: index name
+     * @param scheme: the file of configuration (.conf) with the options of mappin
+     * @param type: type of the changes in scheme (string or json)
+     * @param table: table for create the index
+     * @param magic_column: magic column where index will be saved
+     * @param keyspace: keyspace used
+     * @param modifications: data introduced for query fields defined on scheme
+     * @throws Exception 
+     * 
+     */
+    @Given("^I create a mapping with index name '(.+?)' with scheme '(.+?)' of type '(.+?)' in table '(.+?)' using magic_column '(.+?)' using keyspace '(.+?)' and this options:$")
+    public void createCustomMapping(String index_name, String scheme, String type, String table, String magic_column, String keyspace, DataTable modifications) throws Exception {
+        commonspec.getLogger().info("Creating a custom mapping", "");
+        String retrievedData = commonspec.retrieveData(scheme, type);
+        String modifiedData = commonspec.modifyData(retrievedData, type, modifications).toString();
+        String query="CREATE CUSTOM INDEX "+index_name+" ON "+keyspace+"."+table+"("+magic_column+") USING 'com.stratio.cassandra.lucene.Index' WITH OPTIONS = "+modifiedData;
+        commonspec.getCassandraClient().executeQuery(query);
+    }
+    
+    
+    
+    /**
+     * Create a basic Index.
+     * 
+     * @param index_name: index name
+     * @param table: the table where index will be created.
+     * @param column: the column where index will be saved
+     * @param keyspace: keyspace used
+     * @throws Exception 
+     * 
+     */
+    @Given("^I create a mapping with index name '(.+?)' in table '(.+?)' using magic_column '(.+?)' using keyspace '(.+?)'$")
+    public void createBasicMapping(String index_name, String table, String column, String keyspace) throws Exception {
+        commonspec.getLogger().info("Creating a basic index", "");
+        String query="CREATE INDEX "+index_name+" ON "+table+" ("+column+");";
+        commonspec.getCassandraClient().executeQuery(query);
+    }
+    
+    /**
+     * Create a Cassandra Keyspace.
+     * 
+     * @param keyspace
+     */
+    @Given("^I create a Cassandra keyspace named '(.+)'$")
+    public void createCassandraKeyspace(String keyspace) {
+        commonspec.getLogger().info("Creating a C* keyspace", "");
+        commonspec.getCassandraClient().createKeyspace(keyspace);
+    }
+    /**
+     * Connect to cluster.
+     * 
+     * @param node: number of nodes
+     * @param url: url where is started Cassandra cluster
+     */
+    @Given("^I connect to Cassandra cluster with '(.+)' nodes and this url '(.+)'$")
+    public void connect(String node, String url) {
+        System.setProperty("CASSANDRA_HOST", url);
+        commonspec.getLogger().info("Connecting to cluster", "");
+        commonspec.getCassandraClient().buildCluster();
+        commonspec.getCassandraClient().connect();
+    }
+    
+
+    /**
+     * Execute a query with scheme over a cluster
+     * 
+     * @param scheme: the file of configuration (.conf) with the options of mappin
+     * @param type: type of the changes in scheme (string or json)
+     * @param table: table for create the index
+     * @param magic_column: magic column where index will be saved
+     * @param keyspace: keyspace used
+     * @param modifications: query fields on scheme
+     * @throws Exception
+     */
+    @Given("^I send a query with scheme '(.+?)' of type '(.+?)' with magic_column '(.+?)' from table: '(.+?)' using keyspace: '(.+?)' and this modifications:$")
+    public void sendQueryOfType(String scheme, String type, String magic_column, String table, String keyspace, DataTable modifications) throws Exception {
+        commonspec.getCassandraClient().useKeyspace(keyspace);  
+        commonspec.getLogger().info("Starting a query of type ", "");
+        String retrievedData = commonspec.retrieveData(scheme, type);
+        String modifiedData = commonspec.modifyData(retrievedData, type, modifications).toString();
+        String query="SELECT * FROM "+table+" WHERE "+magic_column+" = '"+modifiedData+"';";
+        System.out.println("query: "+query);
+        this.results=commonspec.getCassandraClient().executeQuery(query);
+
+
+        
+    }
+    
+    /**
+     * Checks the number of results after a query execution
+     * 
+     * @param resultNumber: number of rows obtained after a query execution
+     * @throws Exception
+     */
+    
+    @Given("^There are '(.+?)' results after execute the last query$")
+    public void resultsMustBe(String resultNumber) throws Exception {
+        if(this.results!=null){
+            List<Row> rows = this.results.all();
+            assertThat(Integer.parseInt(resultNumber)).isEqualTo(rows.size()).overridingErrorMessage("No se han encontrado "+resultNumber+" resultados"
+                    + " se han encontrado: "+rows.size());
+        //Assert.assertEquals("No se han encontrado "+resultNumber+" resultados"
+          //      + " se han encontrado: "+rows.size(), Integer.parseInt(resultNumber), rows.size());
+        }else{
+            throw new Exception("You must send a query after get results");
+        }
+        }
+    
+    
+    /**
+     * Create table
+     * 
+     * @param table
+     * @param datatable
+     * @param keyspace
+     * @throws Exception 
+     */
+    @Given("^I create a table named: '(.+?)' using the keyspace: '(.+?)' and this datatable:$")
+    public void createTableWithData(String table, String keyspace, DataTable datatable) throws Exception {
+        
+        commonspec.getCassandraClient().useKeyspace(keyspace);        
+        commonspec.getLogger().info("Starting a table creation", "");
+        int attrLength=datatable.getGherkinRows().get(0).getCells().size();
+        Map<String,String> columns =  new HashMap<String,String>();
+        ArrayList<String> pk=new ArrayList<String>();
+
+        for(int i=0; i<attrLength; i++){
+        columns.put(datatable.getGherkinRows().get(0).getCells().get(i), datatable.getGherkinRows().get(1).getCells().get(i));    
+        if(datatable.getGherkinRows().get(2).getCells().get(i).equalsIgnoreCase("PK")){
+            pk.add(datatable.getGherkinRows().get(0).getCells().get(i));
+        }
+        } 
+        if(pk.isEmpty()){
+            throw new Exception("A PK is needed");
+        }
+        commonspec.getCassandraClient().createTableWithData(table, columns, pk);
+    }
+    
+    /**
+     * Insert Data
+     * 
+     * @param table
+     * @param datatable
+     * @param keyspace
+     * @throws Exception 
+     */
+    @Given("^I insert in keyspace '(.+?)' and table '(.+?)' this data:$")
+    public void insertData(String keyspace, String table, DataTable datatable) throws Exception {
+        
+        commonspec.getCassandraClient().useKeyspace(keyspace);        
+        commonspec.getLogger().info("Starting a table creation", "");
+        int attrLength=datatable.getGherkinRows().get(0).getCells().size();
+        Map<String, Object> fields =  new HashMap<String,Object>();
+        for(int e=1; e<datatable.getGherkinRows().size();e++){
+        for(int i=0; i<attrLength; i++){
+        fields.put(datatable.getGherkinRows().get(0).getCells().get(i), datatable.getGherkinRows().get(e).getCells().get(i));    
+
+        }
+        commonspec.getCassandraClient().insertData(keyspace+"."+table, fields);
+
+        }
+    }
+
+    
     /**
      * Save value for future use
      * 
@@ -106,7 +282,7 @@ public class GivenGSpec extends BaseGSpec {
      * @param filename
      * @param keyspace
      */
-    @Given("a C* script with name '(.+?)' and default keyspace '(.+?)'$")
+    @Given("a Cassandra script with name '(.+?)' and default keyspace '(.+?)'$")
     public void insertDataOnCassandraFromFile(String filename, String keyspace) {
         commonspec.getLogger().info("Inserting data on cassandra from file");
         commonspec.getCassandraClient().loadTestData(keyspace, "/scripts/" + filename);
@@ -117,7 +293,7 @@ public class GivenGSpec extends BaseGSpec {
      * 
      * @param keyspace
      */
-    @Given("^I drop a C keyspace '(.+)'$")
+    @Given("^I drop a Cassandra keyspace '(.+)'$")
     public void dropCassandraKeyspace(String keyspace) {
         commonspec.getLogger().info("Dropping a C* keyspace", keyspace);
         commonspec.getCassandraClient().dropKeyspace(keyspace);

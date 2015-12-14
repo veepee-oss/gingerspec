@@ -3,31 +3,10 @@ package com.stratio.tests.utils;
 import java.util.ArrayList;
 import java.util.Map;
 
-import cucumber.api.DataTable;
 
 public class CassandraQueryUtils {
-
-    public String createMapperGeoPoint(String keyspace, String table,String magic_column, String lat, String lon, String maxLevels){
-        String query="CREATE CUSTOM INDEX index ON "+keyspace+"."+table+"("+magic_column+") USING 'com.stratio.cassandra.lucene.Index' WITH OPTIONS = { 'refresh_seconds' : '1', 'schema' : '{ fields : { geo_point : { type       : \"geo_point\", latitude   : "+lat+", longitude  : "+lon+", max_levels : "+maxLevels+"}}}'};";
-        
-   return query;     
-    }
-    
-    
-	public String searchGeoBbox(String table, String magic_colum, double min_latitude, double min_longitude, double max_latitude, double max_longitude, String filter_query, String field){
-	    String query= "SELECT * FROM "+table+" WHERE "
-	            +magic_colum+" = '{"+filter_query+" : "
-	            + "{ type : \"geo_bbox\", "
-	            + "field : \""+field+"\", "
-	            + "min_latitude : "+min_latitude+", "
-	            + "max_latitude : "+max_latitude+", "
-	            + "min_longitude : "+min_longitude+", "
-	            + "max_longitude : "+max_longitude+" }}';";
-
-	    return query;
-	    
-	}
-	
+   
+    	
 	   public String insertData(String table, Map<String, Object> fields){
 	        String query= "INSERT INTO "+table+" (";
 	          for(int i=0; i<fields.size()-1; i++){
@@ -49,7 +28,6 @@ public class CassandraQueryUtils {
 	        
 	    }
 	   public String createTable(String table, Map<String, String> colums, ArrayList<String> primaryKey){
-         //  String query= "CREATE TABLE tweets (id INT PRIMARY KEY, user TEXT, body TEXT, time TIMESTAMP, latitude FLOAT, longitude FLOAT, lucene TEXT);";
            String query= "CREATE TABLE "+table+" (";
 
 	       for(int i=0; i<colums.size(); i++){
