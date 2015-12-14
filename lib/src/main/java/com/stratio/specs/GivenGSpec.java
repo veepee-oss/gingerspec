@@ -55,7 +55,7 @@ public class GivenGSpec extends BaseGSpec {
      * @throws Exception 
      * 
      */
-    @Given("^I create a mapping with index name '(.+?)' with scheme '(.+?)' of type '(.+?)' in table '(.+?)' using magic_column '(.+?)' using keyspace '(.+?)' and this options:$")
+    @Given("^I create a map with index name '(.+?)' with scheme '(.+?)' of type '(.+?)' in table '(.+?)' using magic_column '(.+?)' using keyspace '(.+?)' with:$")
     public void createCustomMapping(String index_name, String scheme, String type, String table, String magic_column, String keyspace, DataTable modifications) throws Exception {
         commonspec.getLogger().info("Creating a custom mapping", "");
         String retrievedData = commonspec.retrieveData(scheme, type);
@@ -76,7 +76,7 @@ public class GivenGSpec extends BaseGSpec {
      * @throws Exception 
      * 
      */
-    @Given("^I create a mapping with index name '(.+?)' in table '(.+?)' using magic_column '(.+?)' using keyspace '(.+?)'$")
+    @Given("^I create a map with index name '(.+?)' in table '(.+?)' using magic_column '(.+?)' using keyspace '(.+?)'$")
     public void createBasicMapping(String index_name, String table, String column, String keyspace) throws Exception {
         commonspec.getLogger().info("Creating a basic index", "");
         String query="CREATE INDEX "+index_name+" ON "+table+" ("+column+");";
@@ -119,7 +119,7 @@ public class GivenGSpec extends BaseGSpec {
      * @param modifications: query fields on scheme
      * @throws Exception
      */
-    @Given("^I send a query with scheme '(.+?)' of type '(.+?)' with magic_column '(.+?)' from table: '(.+?)' using keyspace: '(.+?)' and this modifications:$")
+    @Given("^I send a query with scheme '(.+?)' of type '(.+?)' with magic_column '(.+?)' from table: '(.+?)' using keyspace: '(.+?)' with:$")
     public void sendQueryOfType(String scheme, String type, String magic_column, String table, String keyspace, DataTable modifications) throws Exception {
         commonspec.getCassandraClient().useKeyspace(keyspace);  
         commonspec.getLogger().info("Starting a query of type ", "");
@@ -140,15 +140,13 @@ public class GivenGSpec extends BaseGSpec {
      * @throws Exception
      */
     
-    @Given("^There are '(.+?)' results after execute the last query$")
+    @Given("^There are '(.+?)' results after executing the last query$")
     public void resultsMustBe(String resultNumber) throws Exception {
         if(this.results!=null){
             List<Row> rows = this.results.all();
             assertThat(Integer.parseInt(resultNumber)).isEqualTo(rows.size()).overridingErrorMessage("No se han encontrado "+resultNumber+" resultados"
                     + " se han encontrado: "+rows.size());
-        //Assert.assertEquals("No se han encontrado "+resultNumber+" resultados"
-          //      + " se han encontrado: "+rows.size(), Integer.parseInt(resultNumber), rows.size());
-        }else{
+              }else{
             throw new Exception("You must send a query after get results");
         }
         }
@@ -162,7 +160,7 @@ public class GivenGSpec extends BaseGSpec {
      * @param keyspace
      * @throws Exception 
      */
-    @Given("^I create a table named: '(.+?)' using the keyspace: '(.+?)' and this datatable:$")
+    @Given("^I create table named: '(.+?)' using keyspace: '(.+?)' with:$")
     public void createTableWithData(String table, String keyspace, DataTable datatable) throws Exception {
         
         commonspec.getCassandraClient().useKeyspace(keyspace);        
@@ -191,7 +189,7 @@ public class GivenGSpec extends BaseGSpec {
      * @param keyspace
      * @throws Exception 
      */
-    @Given("^I insert in keyspace '(.+?)' and table '(.+?)' this data:$")
+    @Given("^I insert in keyspace '(.+?)' and table '(.+?)' with:$")
     public void insertData(String keyspace, String table, DataTable datatable) throws Exception {
         
         commonspec.getCassandraClient().useKeyspace(keyspace);        
@@ -295,7 +293,7 @@ public class GivenGSpec extends BaseGSpec {
      */
     @Given("^I drop a Cassandra keyspace '(.+)'$")
     public void dropCassandraKeyspace(String keyspace) {
-        commonspec.getLogger().info("Dropping a C* keyspace", keyspace);
+        commonspec.getLogger().info("Dropping a Cassandra keyspace", keyspace);
         commonspec.getCassandraClient().dropKeyspace(keyspace);
     }
     
