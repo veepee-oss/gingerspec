@@ -57,7 +57,8 @@ public class GivenGSpec extends BaseGSpec {
         commonspec.getLogger().info("Creating a custom mapping", "");
         String retrievedData = commonspec.retrieveData(scheme, type);
         String modifiedData = commonspec.modifyData(retrievedData, type, modifications).toString();
-        String query="CREATE CUSTOM INDEX "+index_name+" ON "+keyspace+"."+table+"("+magic_column+") USING 'com.stratio.cassandra.lucene.Index' WITH OPTIONS = "+modifiedData;
+        String query="CREATE CUSTOM INDEX "+index_name+" ON "+keyspace+"."+table+"("+magic_column+") "
+                + "USING 'com.stratio.cassandra.lucene.Index' WITH OPTIONS = "+modifiedData;
         commonspec.getCassandraClient().executeQuery(query);
     }
 
@@ -141,8 +142,9 @@ public class GivenGSpec extends BaseGSpec {
     public void resultsMustBe(String resultNumber) throws Exception {
         if(commonspec.getResults()!=null){
             List<Row> rows = commonspec.getResults().all();
-            assertThat(Integer.parseInt(resultNumber)).isEqualTo(rows.size()).overridingErrorMessage("No se han encontrado "+resultNumber+" resultados"
-                    + " se han encontrado: "+rows.size());
+            assertThat(Integer.parseInt(resultNumber)).isEqualTo(rows.size())
+            .overridingErrorMessage(resultNumber+" results were expected and "
+            +rows.size()+" were found");
         }else{
             throw new Exception("You must send a query after get results");
         }
@@ -167,7 +169,8 @@ public class GivenGSpec extends BaseGSpec {
         ArrayList<String> pk=new ArrayList<String>();
 
         for(int i=0; i<attrLength; i++){
-            columns.put(datatable.getGherkinRows().get(0).getCells().get(i), datatable.getGherkinRows().get(1).getCells().get(i));    
+            columns.put(datatable.getGherkinRows().get(0).getCells().get(i), 
+            datatable.getGherkinRows().get(1).getCells().get(i));    
             if(datatable.getGherkinRows().get(2).getCells().get(i).equalsIgnoreCase("PK")){
                 pk.add(datatable.getGherkinRows().get(0).getCells().get(i));
             }
