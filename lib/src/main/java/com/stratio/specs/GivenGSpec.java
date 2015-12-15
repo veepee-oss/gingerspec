@@ -132,7 +132,7 @@ public class GivenGSpec extends BaseGSpec {
     }
 
     /**
-     * Checks the number of results after a query execution
+     * You must send a query before trying to get results
      * 
      * @param resultNumber: number of rows obtained after a query execution
      * @throws Exception
@@ -146,7 +146,7 @@ public class GivenGSpec extends BaseGSpec {
             .overridingErrorMessage(resultNumber+" results were expected and "
             +rows.size()+" were found");
         }else{
-            throw new Exception("You must send a query after get results");
+            throw new Exception("You must send a query before trying to get results");
         }
     }
 
