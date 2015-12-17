@@ -40,31 +40,6 @@ public class GivenGSpec extends BaseGSpec {
     }
 
     /**
-     * Create a Mapping.
-     * 
-     * @param index_name: index name
-     * @param scheme: the file of configuration (.conf) with the options of mappin
-     * @param type: type of the changes in scheme (string or json)
-     * @param table: table for create the index
-     * @param magic_column: magic column where index will be saved
-     * @param keyspace: keyspace used
-     * @param modifications: data introduced for query fields defined on scheme
-     * @throws Exception 
-     * 
-     */
-    @Given("^I create a map with index name '(.+?)' with scheme '(.+?)' of type '(.+?)' in table '(.+?)' using magic_column '(.+?)' using keyspace '(.+?)' with:$")
-    public void createCustomMapping(String index_name, String scheme, String type, String table, String magic_column, String keyspace, DataTable modifications) throws Exception {
-        commonspec.getLogger().info("Creating a custom mapping", "");
-        String retrievedData = commonspec.retrieveData(scheme, type);
-        String modifiedData = commonspec.modifyData(retrievedData, type, modifications).toString();
-        String query="CREATE CUSTOM INDEX "+index_name+" ON "+keyspace+"."+table+"("+magic_column+") "
-                + "USING 'com.stratio.cassandra.lucene.Index' WITH OPTIONS = "+modifiedData;
-        commonspec.getCassandraClient().executeQuery(query);
-    }
-
-
-
-    /**
      * Create a basic Index.
      * 
      * @param index_name: index name
@@ -74,10 +49,10 @@ public class GivenGSpec extends BaseGSpec {
      * @throws Exception 
      * 
      */
-    @Given("^I create a map with index name '(.+?)' in table '(.+?)' using magic_column '(.+?)' using keyspace '(.+?)'$")
+    @Given("^I create a Cassandra index named '(.+?)' in table '(.+?)' using magic_column '(.+?)' using keyspace '(.+?)'$")
     public void createBasicMapping(String index_name, String table, String column, String keyspace) throws Exception {
-        commonspec.getLogger().info("Creating a basic index", "");
-        String query="CREATE INDEX "+index_name+" ON "+table+" ("+column+");";
+        commonspec.getLogger().info("Creating a basic index");
+        String query="CREATE INDEX "+ index_name +" ON "+ table +" ("+ column +");";
         commonspec.getCassandraClient().executeQuery(query);
     }
 
@@ -88,7 +63,7 @@ public class GivenGSpec extends BaseGSpec {
      */
     @Given("^I create a Cassandra keyspace named '(.+)'$")
     public void createCassandraKeyspace(String keyspace) {
-        commonspec.getLogger().info("Creating a Cassandra keyspace", "");
+        commonspec.getLogger().info("Creating a Cassandra keyspace");
         commonspec.getCassandraClient().createKeyspace(keyspace);
     }
     /**
@@ -97,59 +72,12 @@ public class GivenGSpec extends BaseGSpec {
      * @param node: number of nodes
      * @param url: url where is started Cassandra cluster
      */
-    @Given("^I connect to Cassandra cluster with '(.+)' nodes and this url '(.+)'$")
-    public void connect(String node, String url) {
-        System.setProperty("CASSANDRA_HOST", url);
+    @Given("^I connect to Cassandra cluster at '(.+)'$")
+    public void connect(String url) {
         commonspec.getLogger().info("Connecting to cluster", "");
         commonspec.getCassandraClient().buildCluster();
         commonspec.getCassandraClient().connect();
     }
-
-
-    /**
-     * Execute a query with scheme over a cluster
-     * 
-     * @param scheme: the file of configuration (.conf) with the options of mappin
-     * @param type: type of the changes in scheme (string or json)
-     * @param table: table for create the index
-     * @param magic_column: magic column where index will be saved
-     * @param keyspace: keyspace used
-     * @param modifications: query fields on scheme
-     * @throws Exception
-     */
-    @Given("^I send a query with scheme '(.+?)' of type '(.+?)' with magic_column '(.+?)' from table: '(.+?)' using keyspace: '(.+?)' with:$")
-    public void sendQueryOfType(String scheme, String type, String magic_column, String table, String keyspace, DataTable modifications) throws Exception {
-        commonspec.getCassandraClient().useKeyspace(keyspace);  
-        commonspec.getLogger().info("Starting a query of type ", "");
-        String retrievedData = commonspec.retrieveData(scheme, type);
-        String modifiedData = commonspec.modifyData(retrievedData, type, modifications).toString();
-        String query="SELECT * FROM "+table+" WHERE "+magic_column+" = '"+modifiedData+"';";
-        System.out.println("query: "+query);
-        commonspec.setResults(commonspec.getCassandraClient().executeQuery(query));
-
-
-
-    }
-
-    /**
-     * You must send a query before trying to get results
-     * 
-     * @param resultNumber: number of rows obtained after a query execution
-     * @throws Exception
-     */
-
-    @Given("^There are '(.+?)' results after executing the last query$")
-    public void resultsMustBe(String resultNumber) throws Exception {
-        if(commonspec.getResults()!=null){
-            List<Row> rows = commonspec.getResults().all();
-            assertThat(Integer.parseInt(resultNumber)).isEqualTo(rows.size())
-            .overridingErrorMessage(resultNumber+" results were expected and "
-            +rows.size()+" were found");
-        }else{
-            throw new Exception("You must send a query before trying to get results");
-        }
-    }
-
 
     /**
      * Create table
@@ -159,7 +87,7 @@ public class GivenGSpec extends BaseGSpec {
      * @param keyspace
      * @throws Exception 
      */
-    @Given("^I create table named: '(.+?)' using keyspace: '(.+?)' with:$")
+    @Given("^I create a Cassandra table named '(.+?)' using keyspace '(.+?)' with:$")
     public void createTableWithData(String table, String keyspace, DataTable datatable) throws Exception {
 
         commonspec.getCassandraClient().useKeyspace(keyspace);        

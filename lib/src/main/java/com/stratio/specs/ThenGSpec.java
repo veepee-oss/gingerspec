@@ -6,6 +6,7 @@ import static com.stratio.tests.utils.matchers.DBObjectsMatcher.containedInMongo
 import static com.stratio.tests.utils.matchers.ExceptionMatcher.hasClassAndMessage;
 import static com.stratio.tests.utils.matchers.ListLastElementExceptionMatcher.lastElementHasClassAndMessage;
 import static com.stratio.tests.utils.matchers.RecordSetMatcher.containedInRecordSet;
+import static org.assertj.core.api.Assertions.assertThat;
 //import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.equalTo;
@@ -25,7 +26,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 
 import com.aerospike.client.query.RecordSet;
@@ -343,7 +343,7 @@ public class ThenGSpec extends BaseGSpec {
         commonspec.getLogger().info("Verifying text existance");
 
         assertThat(commonspec.getPreviousWebElements()).as("There are less found elements than required")
-                .hasAtLeast(index);
+        .hasAtLeast(index);
         assertThat(commonspec.getPreviousWebElements().getPreviousWebElements().get(index)).contains(text);
     }
 
@@ -367,23 +367,23 @@ public class ThenGSpec extends BaseGSpec {
         PreviousWebElements pwel = new PreviousWebElements(wel);
         commonspec.setPreviousWebElements(pwel);
     }
-    
-//    /**
-//     * Checks if an unknown number of webelements are found, with a location {@code method}.
-//     * 
-//     * @param method
-//     * @param element
-//     */
-//    @Then("^an unknown number of elements exists with '([^:]*?):([^:]*?)'$")
-//    public void assertSeleniumNElementsExists(String method, String element) {
-//        commonspec.getLogger().info("Verifying {} existance", element);
-//
-//        List<WebElement> wel = commonspec.locateElements(method, element);
-//        PreviousWebElements pwel = new PreviousWebElements(wel);
-//        //commonspec.getPreviousWebElements().setPreviousWebElements(wel);
-//        commonspec.setPreviousWebElements(pwel);
-//    }
-    
+
+    //    /**
+    //     * Checks if an unknown number of webelements are found, with a location {@code method}.
+    //     * 
+    //     * @param method
+    //     * @param element
+    //     */
+    //    @Then("^an unknown number of elements exists with '([^:]*?):([^:]*?)'$")
+    //    public void assertSeleniumNElementsExists(String method, String element) {
+    //        commonspec.getLogger().info("Verifying {} existance", element);
+    //
+    //        List<WebElement> wel = commonspec.locateElements(method, element);
+    //        PreviousWebElements pwel = new PreviousWebElements(wel);
+    //        //commonspec.getPreviousWebElements().setPreviousWebElements(wel);
+    //        commonspec.setPreviousWebElements(pwel);
+    //    }
+
     /**
      * Checks if {@code expectedCount} webelements are found, whithin a {@code timeout} and with a location
      * {@code method}. Each negative lookup is followed by a wait of {@code wait} seconds. Selenium times are not
@@ -417,12 +417,12 @@ public class ThenGSpec extends BaseGSpec {
         }
 
         PreviousWebElements pwel = new PreviousWebElements(wel);
-    	assertThat(this.commonspec, pwel).as("Element count doesnt match").hasSize(expectedCount);
+        assertThat(this.commonspec, pwel).as("Element count doesnt match").hasSize(expectedCount);
         commonspec.setPreviousWebElements(pwel);
-        
+
     }
 
-    
+
     /**
      * Verifies that a webelement previously found {@code isDisplayed}
      * 
@@ -434,7 +434,7 @@ public class ThenGSpec extends BaseGSpec {
         commonspec.getLogger().info("Verifying element visibility");
 
         assertThat(this.commonspec, commonspec.getPreviousWebElements()).as("There are less found elements than required")
-                .hasAtLeast(index);
+        .hasAtLeast(index);
         assertThat(this.commonspec, commonspec.getPreviousWebElements().getPreviousWebElements().get(index).isDisplayed()).as(
                 "Unexpected element display property").isEqualTo(isDisplayed);
     }
@@ -450,9 +450,9 @@ public class ThenGSpec extends BaseGSpec {
         commonspec.getLogger().info("Verifying element enableness");
 
         assertThat(this.commonspec, commonspec.getPreviousWebElements()).as("There are less found elements than required")
-                .hasAtLeast(index);
+        .hasAtLeast(index);
         assertThat(this.commonspec, commonspec.getPreviousWebElements().getPreviousWebElements().get(index).isEnabled())
-                .as("Unexpected element enabled property").isEqualTo(isEnabled);
+        .as("Unexpected element enabled property").isEqualTo(isEnabled);
     }
 
     /**
@@ -466,7 +466,7 @@ public class ThenGSpec extends BaseGSpec {
         commonspec.getLogger().info("Verifying element enableness");
 
         assertThat(this.commonspec, commonspec.getPreviousWebElements()).as("There are less found elements than required")
-                .hasAtLeast(index);
+        .hasAtLeast(index);
         assertThat(this.commonspec, commonspec.getPreviousWebElements().getPreviousWebElements().get(index).isSelected()).as(
                 "Unexpected element selected property").isEqualTo(isSelected);
     }
@@ -483,7 +483,7 @@ public class ThenGSpec extends BaseGSpec {
         commonspec.getLogger().info("Verifying element attribute");
 
         assertThat(this.commonspec, commonspec.getPreviousWebElements()).as("There are less found elements than required")
-                .hasAtLeast(index);
+        .hasAtLeast(index);
         String val = commonspec.getPreviousWebElements().getPreviousWebElements().get(index).getAttribute(attribute);
         assertThat(this.commonspec, val).as("Attribute not found").isNotNull();
         assertThat(this.commonspec, val).as("Unexpected value for specified attribute").matches(value);
@@ -499,7 +499,7 @@ public class ThenGSpec extends BaseGSpec {
 
         commonspec.captureEvidence(commonspec.getDriver(), "screenCapture");
     }
-    
+
     /**
      * Checks that we are in the URL passed
      * 
@@ -508,27 +508,27 @@ public class ThenGSpec extends BaseGSpec {
      */
     @Then("^we are in page '(.+?)'$")
     public void checkURL(String url) throws Exception {
-	
-	if (commonspec.getWebHost() == null) {
-	    throw new Exception("Web host has not been set");
-	}
-	    
-	if (commonspec.getWebPort() == null) {
-	    throw new Exception("Web port has not been set");
-	}
-	    
-	String webURL = "http://" + commonspec.getWebHost() + commonspec.getWebPort();
-	
-	assertThat(this.commonspec, commonspec.getDriver().getCurrentUrl()).as("We are not in the expected url: " + webURL + url)
+
+        if (commonspec.getWebHost() == null) {
+            throw new Exception("Web host has not been set");
+        }
+
+        if (commonspec.getWebPort() == null) {
+            throw new Exception("Web port has not been set");
+        }
+
+        String webURL = "http://" + commonspec.getWebHost() + commonspec.getWebPort();
+
+        assertThat(this.commonspec, commonspec.getDriver().getCurrentUrl()).as("We are not in the expected url: " + webURL + url)
         .isEqualTo(webURL + url);
     }
-    
+
     @Then("^the service response status must be '(.*?)'.$")
     public void assertResponseStatus(Integer expectedStatus) {
         commonspec.getLogger().info("Verifying response message");
         assertThat(commonspec.getResponse()).hasStatusCode(expectedStatus);
     }
-    
+
     @Then("^the service response must contain the text '(.*?)'$")
     public void assertResponseMessage(String expectedText) throws ClassNotFoundException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
         commonspec.getLogger().info("Verifying response message");
@@ -552,11 +552,114 @@ public class ThenGSpec extends BaseGSpec {
         commonspec.getLogger().info("Verifying response status code and message");
         assertThat(commonspec.getResponse()).doesNotHaveStatusCodeNorMessage(unexpectedStatus, unexpectedText);
     }
-        
+
     @Then("^the service response status must be '(.*?)' and its response length must be '(.*?)'$")
     public void assertResponseStatusLength(Integer expectedStatus, Integer expectedLength) {
         commonspec.getLogger().info("Verifying response status code and response length");
         assertThat(commonspec.getResponse()).hasStatusCodeAndLength(expectedStatus, expectedLength);
     }
-    
+
+    /**
+     * Checks the different results of a previous query
+     * 
+     * @param expectedResults: A DataTable Object with all data needed for check the results. The DataTable must contains at least 2 columns:
+     * a) A field column from the result
+     * b) Occurrences column (Integer type)
+     * 
+     * Example:
+     *      |latitude| longitude|place     |occurrences|
+            |12.5    |12.7      |Valencia  |1           |
+            |2.5     | 2.6      |Stratio   |0           |
+            |12.5    |13.7      |Sevilla   |1           |
+     * @throws Exception
+     */
+
+    @Then("^There are results found with:$")
+    public void resultsMustBe(DataTable expectedResults) throws Exception {
+
+        String type=commonspec.getResultsType();
+        assertThat(type).isNotEqualTo("").overridingErrorMessage("It's necessary to define the result type");
+        switch(type){
+
+        case "cassandra":
+            if(commonspec.getResults()!=null){
+
+
+                //Map for query results   
+                ColumnDefinitions columns=commonspec.getResults().getColumnDefinitions();
+                List<Row> rows = commonspec.getResults().all();
+
+                List<Map<String,Object>>resultsListObtained=new ArrayList<Map<String,Object>>();
+                Map<String,Object> results;
+
+                for(int i=0; i<rows.size();i++){
+                    results = new HashMap<String,Object>();
+                    for(int e=0; e<columns.size();e++){
+                        results.put(columns.getName(e), rows.get(i).getObject(e));
+
+                    }
+                    resultsListObtained.add(results);
+
+                }
+
+                //Map for cucumber expected results
+                List<Map<String,Object>>resultsListExpected=new ArrayList<Map<String,Object>>();
+                Map<String,Object> resultsCucumber;
+
+                for(int e=1; e<expectedResults.getGherkinRows().size();e++){
+                    resultsCucumber = new HashMap<String,Object>();
+
+                    for(int i=0; i<expectedResults.getGherkinRows().get(0).getCells().size(); i++){
+                        resultsCucumber.put(expectedResults.getGherkinRows().get(0).getCells().get(i), expectedResults.getGherkinRows().get(e).getCells().get(i));    
+
+                    }
+                    resultsListExpected.add(resultsCucumber);
+                }
+
+                //Comparisons
+                int occurrencesObtained=0;
+                int iterations=0;
+                int occurrencesExpected=0;
+                String nextKey;
+
+                for(int e=0; e<resultsListExpected.size(); e++){
+                    iterations=0;
+                    occurrencesObtained=0;
+
+                    for(int i=0; i<resultsListObtained.size(); i++){
+
+                        occurrencesExpected=Integer.parseInt(resultsListExpected.get(e).get("occurrences").toString());
+                        Iterator<String> it = resultsListExpected.get(0).keySet().iterator();
+
+                        while(it.hasNext()){
+                            nextKey=it.next();
+
+                            if (!nextKey.equals("occurrences")){
+                                if(resultsListObtained.get(i).get(nextKey).toString().equals(resultsListExpected.get(e).get(nextKey).toString())){
+                                    iterations++;
+                                }
+
+                            }
+
+                            if(iterations==resultsListExpected.get(0).keySet().size()-1){
+                                occurrencesObtained++;
+
+                            }
+
+                        }
+
+                        iterations=0;
+                    }
+                    assertThat(occurrencesExpected).isEqualTo(occurrencesObtained).overridingErrorMessage("In row " +e+ " have been found "
+                            +occurrencesObtained+" results and "+ occurrencesExpected +" were expected");
+
+                }
+
+            }else{
+                throw new Exception("You must execute a query before trying to get results");
+            }
+            break;
+        }
+    }
+
 }

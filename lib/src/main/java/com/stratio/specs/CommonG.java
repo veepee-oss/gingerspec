@@ -84,7 +84,8 @@ public class CommonG {
 	private AsyncHttpClient client;
 	//private String URL;
 	private HttpResponse response;
-    private ResultSet results;
+    private ResultSet previousCassandraResults;
+    private String resultsType="";
 
 
 	// CONNECTION DETAILS
@@ -851,11 +852,19 @@ public class CommonG {
 	}
 
     public ResultSet getResults() {
-        return results;
+        return previousCassandraResults;
     }
 
     public void setResults(ResultSet results) {
-        this.results = results;
+        this.previousCassandraResults = results;
+    }
+
+    public String getResultsType() {
+        return resultsType;
+    }
+
+    public void setResultsType(String resultsType) {
+        this.resultsType = resultsType;
     }
 	
 }
