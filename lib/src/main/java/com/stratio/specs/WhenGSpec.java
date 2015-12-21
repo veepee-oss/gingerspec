@@ -6,6 +6,7 @@ import static com.stratio.assertions.Assertions.assertThat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Future;
+import java.util.logging.Logger;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
@@ -296,27 +297,42 @@ public class WhenGSpec extends BaseGSpec {
     }
     
     /**
-     * Execute a query with scheme over a cluster
+     * Execute a query with schema over a cluster
      * 
-     * @param scheme: the file of configuration (.conf) with the options of mappin
-     * @param type: type of the changes in scheme (string or json)
+     * @param fields: columns on which the query is executed. Example: "latitude,longitude" or "*" or "count(*)"
+     * @param schema: the file of configuration (.conf) with the options of mappin
+     * @param type: type of the changes in schema (string or json)
      * @param table: table for create the index
      * @param magic_column: magic column where index will be saved
      * @param keyspace: keyspace used
-     * @param modifications: query fields on scheme
+     * @param modifications: all data in "where" clause (optional)
      * @throws Exception
      */
-    @When("^I execute a query with scheme '(.+?)' of type '(.+?)' with magic_column '(.+?)' from table: '(.+?)' using keyspace: '(.+?)' with:$")
-    public void sendQueryOfType(String scheme, String type, String magic_column, String table, String keyspace, DataTable modifications) throws Exception {
+    @When("^I execute a query over fields '(.+?)' with schema '(.+?)' of type '(json|string)' with magic_column '(.+?)' from table: '(.+?)' using keyspace: '(.+?)' (with:)?$")
+    public void sendQueryOfType( String fields, String schema, String type, String magic_column, String table, String keyspace, DataTable foo,DataTable modifications){
+        try {
         commonspec.setResultsType("cassandra");
         commonspec.getCassandraClient().useKeyspace(keyspace);  
         commonspec.getLogger().info("Starting a query of type "+commonspec.getResultsType(), "");
-        String retrievedData = commonspec.retrieveData(scheme, type);
+        String retrievedData;
+        String query="";
+            retrievedData = commonspec.retrieveData(schema, type);
+    
         String modifiedData = commonspec.modifyData(retrievedData, type, modifications).toString();
-        String query="SELECT * FROM "+table+" WHERE "+magic_column+" = '"+modifiedData+"';";
-        System.out.println("query: "+query);
-        commonspec.setResults(commonspec.getCassandraClient().executeQuery(query));
+        if(modifications==null){
+         query="SELECT "+fields+" FROM "+ table +";";
+        }else{
+            query="SELECT " + fields + " FROM "+ table +" WHERE "+ magic_column +" = '"+ modifiedData +"';";
 
+        }
+         System.out.println("query: "+query);
+        commonspec.setResults(commonspec.getCassandraClient().executeQuery(query));
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            commonspec.getLogger().info("Exception captured");
+            commonspec.getLogger().info(e.toString());
+            commonspec.getExceptions().add(e);
+        }
 
 
     }
@@ -325,19 +341,19 @@ public class WhenGSpec extends BaseGSpec {
      * Create a Cassandra index.
      * 
      * @param index_name: index name
-     * @param scheme: the file of configuration (.conf) with the options of mappin
-     * @param type: type of the changes in scheme (string or json)
+     * @param schema: the file of configuration (.conf) with the options of mappin
+     * @param type: type of the changes in schema (string or json)
      * @param table: table for create the index
      * @param magic_column: magic column where index will be saved
      * @param keyspace: keyspace used
-     * @param modifications: data introduced for query fields defined on scheme
+     * @param modifications: data introduced for query fields defined on schema
      * @throws Exception 
      * 
      */
-    @When("^I create a Cassandra index named '(.+?)' with scheme '(.+?)' of type '(json|string)' in table '(.+?)' using magic_column '(.+?)' using keyspace '(.+?)' with:$")
-    public void createCustomMapping(String index_name, String scheme, String type, String table, String magic_column, String keyspace, DataTable modifications) throws Exception {
+    @When("^I create a Cassandra index named '(.+?)' with schema '(.+?)' of type '(json|string)' in table '(.+?)' using magic_column '(.+?)' using keyspace '(.+?)' with:$")
+    public void createCustomMapping(String index_name, String schema, String type, String table, String magic_column, String keyspace, DataTable modifications) throws Exception {
         commonspec.getLogger().info("Creating a custom mapping");
-        String retrievedData = commonspec.retrieveData(scheme, type);
+        String retrievedData = commonspec.retrieveData(schema, type);
         String modifiedData = commonspec.modifyData(retrievedData, type, modifications).toString();
         String query="CREATE CUSTOM INDEX "+ index_name +" ON "+ keyspace +"."+ table +"("+ magic_column +") "
                 + "USING 'com.stratio.cassandra.lucene.Index' WITH OPTIONS = "+ modifiedData;

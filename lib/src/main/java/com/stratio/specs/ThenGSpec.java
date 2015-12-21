@@ -571,6 +571,7 @@ public class ThenGSpec extends BaseGSpec {
             |12.5    |12.7      |Valencia  |1           |
             |2.5     | 2.6      |Stratio   |0           |
             |12.5    |13.7      |Sevilla   |1           |
+     * IMPORTANT: There no should be no existing columns 
      * @throws Exception
      */
 
@@ -650,8 +651,8 @@ public class ThenGSpec extends BaseGSpec {
 
                         iterations=0;
                     }
-                    assertThat(occurrencesExpected).isEqualTo(occurrencesObtained).overridingErrorMessage("In row " +e+ " have been found "
-                            +occurrencesObtained+" results and "+ occurrencesExpected +" were expected");
+                    assertThat(occurrencesExpected).overridingErrorMessage("In row " +e+ " have been found "
+                            +occurrencesObtained+" results and "+ occurrencesExpected +" were expected").isEqualTo(occurrencesObtained);
 
                 }
 
