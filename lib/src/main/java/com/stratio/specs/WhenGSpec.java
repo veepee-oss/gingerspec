@@ -300,32 +300,33 @@ public class WhenGSpec extends BaseGSpec {
      * Execute a query with schema over a cluster
      * 
      * @param fields: columns on which the query is executed. Example: "latitude,longitude" or "*" or "count(*)"
-     * @param schema: the file of configuration (.conf) with the options of mappin
+     * @param schema: the file of configuration (.conf) with the options of mappin. If schema is the word "empty", method will not add a where clause.
      * @param type: type of the changes in schema (string or json)
      * @param table: table for create the index
      * @param magic_column: magic column where index will be saved
      * @param keyspace: keyspace used
-     * @param modifications: all data in "where" clause (optional)
+     * @param modifications: all data in "where" clause. Where schema is "empty", query has not a where clause. So it is necessary to provide an empty table. Example:  ||.
      * @throws Exception
      */
-    @When("^I execute a query over fields '(.+?)' with schema '(.+?)' of type '(json|string)' with magic_column '(.+?)' from table: '(.+?)' using keyspace: '(.+?)' (with:)?$")
-    public void sendQueryOfType( String fields, String schema, String type, String magic_column, String table, String keyspace, DataTable foo,DataTable modifications){
+    @When("^I execute a query over fields '(.+?)' with schema '(.+?)' of type '(json|string)' with magic_column '(.+?)' from table: '(.+?)' using keyspace: '(.+?)' with:$")
+    public void sendQueryOfType( String fields, String schema, String type, String magic_column, String table, String keyspace, DataTable modifications){
         try {
         commonspec.setResultsType("cassandra");
         commonspec.getCassandraClient().useKeyspace(keyspace);  
-        commonspec.getLogger().info("Starting a query of type "+commonspec.getResultsType(), "");
-        String retrievedData;
+        commonspec.getLogger().info("Starting a query of type "+commonspec.getResultsType());
+       
         String query="";
-            retrievedData = commonspec.retrieveData(schema, type);
     
-        String modifiedData = commonspec.modifyData(retrievedData, type, modifications).toString();
-        if(modifications==null){
+        if(schema.equals("empty")){
+            
          query="SELECT "+fields+" FROM "+ table +";";
         }else{
+            String retrievedData = commonspec.retrieveData(schema, type);
+            String modifiedData = commonspec.modifyData(retrievedData, type, modifications).toString();
             query="SELECT " + fields + " FROM "+ table +" WHERE "+ magic_column +" = '"+ modifiedData +"';";
 
         }
-         System.out.println("query: "+query);
+        commonspec.getLogger().info("query: "+query);
         commonspec.setResults(commonspec.getCassandraClient().executeQuery(query));
         } catch (Exception e) {
             // TODO Auto-generated catch block
