@@ -616,25 +616,22 @@ public class ThenGSpec extends BaseGSpec {
                     }
                     resultsListExpected.add(resultsCucumber);
                 }
-
                 //Comparisons
                 int occurrencesObtained=0;
                 int iterations=0;
                 int occurrencesExpected=0;
                 String nextKey;
-
                 for(int e=0; e<resultsListExpected.size(); e++){
                     iterations=0;
                     occurrencesObtained=0;
+                    occurrencesExpected=Integer.parseInt(resultsListExpected.get(e).get("occurrences").toString());
 
                     for(int i=0; i<resultsListObtained.size(); i++){
 
-                        occurrencesExpected=Integer.parseInt(resultsListExpected.get(e).get("occurrences").toString());
                         Iterator<String> it = resultsListExpected.get(0).keySet().iterator();
 
                         while(it.hasNext()){
                             nextKey=it.next();
-
                             if (!nextKey.equals("occurrences")){
                                 if(resultsListObtained.get(i).get(nextKey).toString().equals(resultsListExpected.get(e).get(nextKey).toString())){
                                     iterations++;
@@ -646,7 +643,6 @@ public class ThenGSpec extends BaseGSpec {
                                 occurrencesObtained++;
 
                             }
-
                         }
 
                         iterations=0;
