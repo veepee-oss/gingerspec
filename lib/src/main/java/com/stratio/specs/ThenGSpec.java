@@ -602,7 +602,7 @@ public class ThenGSpec extends BaseGSpec {
                     resultsListObtained.add(results);
 
                 }
-
+                commonspec.getLogger().info("Results: "+resultsListObtained.toString());
                 //Map for cucumber expected results
                 List<Map<String,Object>>resultsListExpected=new ArrayList<Map<String,Object>>();
                 Map<String,Object> resultsCucumber;
@@ -616,6 +616,8 @@ public class ThenGSpec extends BaseGSpec {
                     }
                     resultsListExpected.add(resultsCucumber);
                 }
+                commonspec.getLogger().info("Expected Results: "+resultsListExpected.toString());
+
                 //Comparisons
                 int occurrencesObtained=0;
                 int iterations=0;
@@ -641,7 +643,7 @@ public class ThenGSpec extends BaseGSpec {
 
                             if(iterations==resultsListExpected.get(0).keySet().size()-1){
                                 occurrencesObtained++;
-
+                                iterations=0;
                             }
                         }
 
