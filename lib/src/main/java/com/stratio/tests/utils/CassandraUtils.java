@@ -299,14 +299,21 @@ public class CassandraUtils {
 	/**
 	 * Drop a table of a keyspace.
 	 * 
-	 * @param keyspace
 	 * @param table
 	 */
-	public void dropTable(String keyspace, String table) {
-		// se elimina la table
+	public void dropTable(String table) {		
 		executeQuery(this.cassandraqueryUtils.dropTableQuery(false, table));
 	}
 
+	 /**
+     * Truncate a table of a keyspace.
+     * 
+     * @param table
+     */
+    public void truncateTable(String table) {       
+        executeQuery(this.cassandraqueryUtils.truncateTableQuery(false, table));
+    }
+	
 	/**
 	 * Load a {@code keyspace} in Cassandra using the CQL sentences in the
 	 * script path. The script is executed if the keyspace does not exists in
