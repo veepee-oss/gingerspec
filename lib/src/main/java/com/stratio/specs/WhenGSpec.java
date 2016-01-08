@@ -6,6 +6,7 @@ import static com.stratio.assertions.Assertions.assertThat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Future;
+import java.util.logging.Logger;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
@@ -293,6 +294,71 @@ public class WhenGSpec extends BaseGSpec {
     @When("^I attempt a logout to '(.+?)'$")
     public void logoutUser(String endPoint) throws Exception {
 	sendRequestNoDataTable("GET", endPoint, null, "", null, "");
-    }    
+    }
+    
+    /**
+     * Execute a query with schema over a cluster
+     * 
+     * @param fields: columns on which the query is executed. Example: "latitude,longitude" or "*" or "count(*)"
+     * @param schema: the file of configuration (.conf) with the options of mappin. If schema is the word "empty", method will not add a where clause.
+     * @param type: type of the changes in schema (string or json)
+     * @param table: table for create the index
+     * @param magic_column: magic column where index will be saved
+     * @param keyspace: keyspace used
+     * @param modifications: all data in "where" clause. Where schema is "empty", query has not a where clause. So it is necessary to provide an empty table. Example:  ||.
+     * @throws Exception
+     */
+    @When("^I execute a query over fields '(.+?)' with schema '(.+?)' of type '(json|string)' with magic_column '(.+?)' from table: '(.+?)' using keyspace: '(.+?)' with:$")
+    public void sendQueryOfType( String fields, String schema, String type, String magic_column, String table, String keyspace, DataTable modifications){
+        try {
+        commonspec.setResultsType("cassandra");
+        commonspec.getCassandraClient().useKeyspace(keyspace);  
+        commonspec.getLogger().info("Starting a query of type "+commonspec.getResultsType());
+       
+        String query="";
+    
+        if(schema.equals("empty")){
+            
+         query="SELECT "+fields+" FROM "+ table +";";
+        }else{
+            String retrievedData = commonspec.retrieveData(schema, type);
+            String modifiedData = commonspec.modifyData(retrievedData, type, modifications).toString();
+            query="SELECT " + fields + " FROM "+ table +" WHERE "+ magic_column +" = '"+ modifiedData +"';";
+
+        }
+        commonspec.getLogger().info("query: "+query);
+        commonspec.setResults(commonspec.getCassandraClient().executeQuery(query));
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            commonspec.getLogger().info("Exception captured");
+            commonspec.getLogger().info(e.toString());
+            commonspec.getExceptions().add(e);
+        }
+
+
+    }
+    
+    /**
+     * Create a Cassandra index.
+     * 
+     * @param index_name: index name
+     * @param schema: the file of configuration (.conf) with the options of mappin
+     * @param type: type of the changes in schema (string or json)
+     * @param table: table for create the index
+     * @param magic_column: magic column where index will be saved
+     * @param keyspace: keyspace used
+     * @param modifications: data introduced for query fields defined on schema
+     * @throws Exception 
+     * 
+     */
+    @When("^I create a Cassandra index named '(.+?)' with schema '(.+?)' of type '(json|string)' in table '(.+?)' using magic_column '(.+?)' using keyspace '(.+?)' with:$")
+    public void createCustomMapping(String index_name, String schema, String type, String table, String magic_column, String keyspace, DataTable modifications) throws Exception {
+        commonspec.getLogger().info("Creating a custom mapping");
+        String retrievedData = commonspec.retrieveData(schema, type);
+        String modifiedData = commonspec.modifyData(retrievedData, type, modifications).toString();
+        String query="CREATE CUSTOM INDEX "+ index_name +" ON "+ keyspace +"."+ table +"("+ magic_column +") "
+                + "USING 'com.stratio.cassandra.lucene.Index' WITH OPTIONS = "+ modifiedData;
+        commonspec.getCassandraClient().executeQuery(query);
+    }
     
 }

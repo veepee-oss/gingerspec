@@ -5,10 +5,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.hjson.JsonValue;
 import org.openqa.selenium.WebElement;
 
+import com.datastax.driver.core.Row;
 import com.jayway.jsonpath.JsonPath;
 
 import cucumber.api.DataTable;
@@ -23,7 +28,7 @@ public class GivenGSpec extends BaseGSpec {
     public static final int PAGE_LOAD_TIMEOUT = 120;
     public static final int IMPLICITLY_WAIT = 10;
     public static final int SCRIPT_TIMEOUT = 30;
-    
+
     /**
      * Generic constructor.
      * 
@@ -31,7 +36,104 @@ public class GivenGSpec extends BaseGSpec {
      */
     public GivenGSpec(CommonG spec) {
         this.commonspec = spec;
+
     }
+
+    /**
+     * Create a basic Index.
+     * 
+     * @param index_name: index name
+     * @param table: the table where index will be created.
+     * @param column: the column where index will be saved
+     * @param keyspace: keyspace used
+     * @throws Exception 
+     * 
+     */
+    @Given("^I create a Cassandra index named '(.+?)' in table '(.+?)' using magic_column '(.+?)' using keyspace '(.+?)'$")
+    public void createBasicMapping(String index_name, String table, String column, String keyspace) throws Exception {
+        commonspec.getLogger().info("Creating a basic index");
+        String query="CREATE INDEX "+ index_name +" ON "+ table +" ("+ column +");";
+        commonspec.getCassandraClient().executeQuery(query);
+    }
+
+    /**
+     * Create a Cassandra Keyspace.
+     * 
+     * @param keyspace
+     */
+    @Given("^I create a Cassandra keyspace named '(.+)'$")
+    public void createCassandraKeyspace(String keyspace) {
+        commonspec.getLogger().info("Creating a Cassandra keyspace");
+        commonspec.getCassandraClient().createKeyspace(keyspace);
+    }
+    /**
+     * Connect to cluster.
+     * 
+     * @param node: number of nodes
+     * @param url: url where is started Cassandra cluster
+     */
+    @Given("^I connect to Cassandra cluster at '(.+)'$")
+    public void connect(String url) {
+        commonspec.getLogger().info("Connecting to cluster", "");
+        commonspec.getCassandraClient().buildCluster();
+        commonspec.getCassandraClient().connect();
+    }
+
+    /**
+     * Create table
+     * 
+     * @param table
+     * @param datatable
+     * @param keyspace
+     * @throws Exception 
+     */
+    @Given("^I create a Cassandra table named '(.+?)' using keyspace '(.+?)' with:$")
+    public void createTableWithData(String table, String keyspace, DataTable datatable) throws Exception {
+
+        commonspec.getCassandraClient().useKeyspace(keyspace);        
+        commonspec.getLogger().info("Starting a table creation", "");
+        int attrLength=datatable.getGherkinRows().get(0).getCells().size();
+        Map<String,String> columns =  new HashMap<String,String>();
+        ArrayList<String> pk=new ArrayList<String>();
+
+        for(int i=0; i<attrLength; i++){
+            columns.put(datatable.getGherkinRows().get(0).getCells().get(i), 
+            datatable.getGherkinRows().get(1).getCells().get(i));    
+            if(datatable.getGherkinRows().get(2).getCells().get(i).equalsIgnoreCase("PK")){
+                pk.add(datatable.getGherkinRows().get(0).getCells().get(i));
+            }
+        } 
+        if(pk.isEmpty()){
+            throw new Exception("A PK is needed");
+        }
+        commonspec.getCassandraClient().createTableWithData(table, columns, pk);
+    }
+
+    /**
+     * Insert Data
+     * 
+     * @param table
+     * @param datatable
+     * @param keyspace
+     * @throws Exception 
+     */
+    @Given("^I insert in keyspace '(.+?)' and table '(.+?)' with:$")
+    public void insertData(String keyspace, String table, DataTable datatable) throws Exception {
+
+        commonspec.getCassandraClient().useKeyspace(keyspace);        
+        commonspec.getLogger().info("Starting a table creation", "");
+        int attrLength=datatable.getGherkinRows().get(0).getCells().size();
+        Map<String, Object> fields =  new HashMap<String,Object>();
+        for(int e=1; e<datatable.getGherkinRows().size();e++){
+            for(int i=0; i<attrLength; i++){
+                fields.put(datatable.getGherkinRows().get(0).getCells().get(i), datatable.getGherkinRows().get(e).getCells().get(i));    
+
+            }
+            commonspec.getCassandraClient().insertData(keyspace+"."+table, fields);
+
+        }
+    }
+
 
     /**
      * Save value for future use
@@ -50,15 +152,15 @@ public class GivenGSpec extends BaseGSpec {
      */
     @Given("^I save element '(.+?)' in attribute '(.+?)'$")
     public void saveElement(String element, String attribute) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, InstantiationException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException {
-	commonspec.getLogger().info("Saving element: {} in attribute: {}", element, attribute);
-	
-	String json = commonspec.getResponse().getResponse();
-	String hjson = JsonValue.readHjson(json).asObject().toString();
-	String value = JsonPath.parse(hjson).read(element);
-	
-	commonspec.setPreviousElement(attribute, value);
+        commonspec.getLogger().info("Saving element: {} in attribute: {}", element, attribute);
+
+        String json = commonspec.getResponse().getResponse();
+        String hjson = JsonValue.readHjson(json).asObject().toString();
+        String value = JsonPath.parse(hjson).read(element);
+
+        commonspec.setPreviousElement(attribute, value);
     }
-        
+
     /**
      * Empty all the indexes of ElasticSearch.
      */
@@ -68,7 +170,7 @@ public class GivenGSpec extends BaseGSpec {
         commonspec.getElasticSearchClient().emptyIndexes();
     }
 
-    
+
     /**
      * Empty a specific index of ElasticSearch.
      * 
@@ -106,7 +208,7 @@ public class GivenGSpec extends BaseGSpec {
      * @param filename
      * @param keyspace
      */
-    @Given("a C* script with name '(.+?)' and default keyspace '(.+?)'$")
+    @Given("a Cassandra script with name '(.+?)' and default keyspace '(.+?)'$")
     public void insertDataOnCassandraFromFile(String filename, String keyspace) {
         commonspec.getLogger().info("Inserting data on cassandra from file");
         commonspec.getCassandraClient().loadTestData(keyspace, "/scripts/" + filename);
@@ -117,12 +219,12 @@ public class GivenGSpec extends BaseGSpec {
      * 
      * @param keyspace
      */
-    @Given("^I drop a C keyspace '(.+)'$")
+    @Given("^I drop a Cassandra keyspace '(.+)'$")
     public void dropCassandraKeyspace(String keyspace) {
-        commonspec.getLogger().info("Dropping a C* keyspace", keyspace);
+        commonspec.getLogger().info("Dropping a Cassandra keyspace", keyspace);
         commonspec.getCassandraClient().dropKeyspace(keyspace);
     }
-    
+
 
     /**
      * Create a AeroSpike namespace, table and the data of the table.
@@ -198,23 +300,23 @@ public class GivenGSpec extends BaseGSpec {
      */
     @Given("^I browse to '(.+?)'$")
     public void seleniumBrowse(String path) throws Exception {
-	assertThat(path).isNotEmpty();
-	
-	if (commonspec.getWebHost() == null) {
-	    throw new Exception("Web host has not been set");
-	}
-	    
-	if (commonspec.getWebPort() == null) {
-	    throw new Exception("Web port has not been set");
-	}
-	    
-	String webURL = "http://" + commonspec.getWebHost() + commonspec.getWebPort();	
-	
-	commonspec.getLogger().info("Browsing to {}{} with {}", webURL, path, commonspec.getBrowserName());
-	commonspec.getDriver().get(webURL + path);
-	commonspec.setParentWindow(commonspec.getDriver().getWindowHandle());
+        assertThat(path).isNotEmpty();
+
+        if (commonspec.getWebHost() == null) {
+            throw new Exception("Web host has not been set");
+        }
+
+        if (commonspec.getWebPort() == null) {
+            throw new Exception("Web port has not been set");
+        }
+
+        String webURL = "http://" + commonspec.getWebHost() + commonspec.getWebPort();	
+
+        commonspec.getLogger().info("Browsing to {}{} with {}", webURL, path, commonspec.getBrowserName());
+        commonspec.getDriver().get(webURL + path);
+        commonspec.setParentWindow(commonspec.getDriver().getWindowHandle());
     }
-    
+
     /**
      * Set app host, port and url {@code host, @code port}
      * 
@@ -224,22 +326,22 @@ public class GivenGSpec extends BaseGSpec {
      */
     @Given("^My app is running in '([^:]+?)(:.+?)?'$")
     public void setupApp(String host, String port) {
-	assertThat(host).isNotEmpty();
+        assertThat(host).isNotEmpty();
         assertThat(port).isNotEmpty();
-        
+
         if (port == null) {
             port = ":80";
         }
-        
+
         commonspec.setWebHost(host);
         commonspec.setWebPort(port);
         commonspec.setRestHost(host);
         commonspec.setRestPort(port);
-        
+
         commonspec.getLogger().info("Set URL to http://{}{}/", host, port);
     }
-    
-    
+
+
     /**
      * Browse to {@code webHost, @code webPort} using the current browser.
      *
@@ -250,17 +352,17 @@ public class GivenGSpec extends BaseGSpec {
     public void setupWeb(String webHost, String webPort) throws MalformedURLException {
         assertThat(webHost).isNotEmpty();
         assertThat(webPort).isNotEmpty();
-        
+
         if (webPort == null) {
             webPort = ":80";
         }
-        
+
         commonspec.setWebHost(webHost);
         commonspec.setWebPort(webPort);
-        
+
         commonspec.getLogger().info("Set web base URL to http://{}{}", webHost, webPort);  
     }
-    
+
     /**
      * Send requests to {@code restHost @code restPort}.
      * 
@@ -271,20 +373,20 @@ public class GivenGSpec extends BaseGSpec {
     public void setupRestClient(String restHost, String restPort) {
         assertThat(restHost).isNotEmpty();
         assertThat(restPort).isNotEmpty();
-        
+
         if (restHost == null) {
             restHost = "localhost";
         }
-        
+
         if (restPort == null) {
             restPort = ":80";
         }
-        
+
         commonspec.setRestHost(restHost);
         commonspec.setRestPort(restPort);
         commonspec.getLogger().info("Sending requests to http://{}{}", restHost, restPort);
     }
-    
+
     /**
      * Maximizes current browser window. Mind the current resolution could break a test.
      * 
@@ -302,7 +404,7 @@ public class GivenGSpec extends BaseGSpec {
     public void seleniumSwitchFrame(Integer index) {
 
         assertThat(commonspec.getPreviousWebElements()).as("There are less found elements than required")
-        	.hasAtLeast(index);
+        .hasAtLeast(index);
 
         WebElement elem = commonspec.getPreviousWebElements().getPreviousWebElements().get(index);
         commonspec.getDriver().switchTo().frame(elem);

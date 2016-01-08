@@ -63,8 +63,7 @@ public class CassandraUtils {
 	 * @return ResultSet
 	 */
 	public ResultSet executeQuery(String query) {
-
-		return this.session.execute(query);
+	    return this.session.execute(query);
 	}
 
 	/**
@@ -96,7 +95,7 @@ public class CassandraUtils {
 	 */
 	public void disconnect() throws DBException {
 		if (this.session == null) {
-			throw new DBException("The C* is null");
+			throw new DBException("The Cassandra is null");
 		}
 		if (this.cluster.isClosed()) {
 			throw new DBException("The cluster has been closed");
@@ -139,35 +138,6 @@ public class CassandraUtils {
 		return this.session;
 	}
 
-	
-	 /**
-     * geoBbox search with Cassandra.
-     * 
-     * @param data
-     * @param min
-     * 
-     */
-    public ResultSet geoBboxSearch(String table, String magic_colum, double min_latitude, double min_longitude, double max_latitude, double max_longitude, String filter_query, String field) {
-        String query=cassandraqueryUtils.searchGeoBbox(table, magic_colum, min_latitude, min_longitude, max_latitude, max_longitude, filter_query, field);
-        LOGGER.info(query);
-        return executeQuery(query);
-       
-    }
-	
-    /**
-    * Create a geoPoint mapper
-    * 
-    * @param magic_column
-    * @param lat
-    * @param lon
-    * @param maxLevels
-    * 
-    */
-   public void geoPointMap(String keyspace, String table,String magic_column, String lat, String lon, String maxLevels) {
-       String query=cassandraqueryUtils.createMapperGeoPoint(keyspace,table,magic_column, lat, lon, maxLevels);
-       LOGGER.info(query);
-      
-   }
     
 	/**
 	 * Create a keyspace in Cassandra.
@@ -198,7 +168,7 @@ public class CassandraUtils {
         executeQuery(query);
     }
     
-    /**
+   /**
    * Insert data in a keyspace.
    * 
    * @param table

@@ -45,6 +45,7 @@ import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.datastax.driver.core.ResultSet;
 import com.jayway.jsonpath.JsonPath;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Response;
@@ -83,6 +84,9 @@ public class CommonG {
 	private AsyncHttpClient client;
 	//private String URL;
 	private HttpResponse response;
+    private ResultSet previousCassandraResults;
+    private String resultsType="";
+
 
 	// CONNECTION DETAILS
 	private String restHost;
@@ -846,5 +850,21 @@ public class CommonG {
 	    ff.setAccessible(true);
 	    ff.set(null, value);
 	}
+
+    public ResultSet getResults() {
+        return previousCassandraResults;
+    }
+
+    public void setResults(ResultSet results) {
+        this.previousCassandraResults = results;
+    }
+
+    public String getResultsType() {
+        return resultsType;
+    }
+
+    public void setResultsType(String resultsType) {
+        this.resultsType = resultsType;
+    }
 	
 }
