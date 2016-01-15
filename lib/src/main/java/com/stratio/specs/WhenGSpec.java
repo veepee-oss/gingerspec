@@ -306,7 +306,7 @@ public class WhenGSpec extends BaseGSpec {
      * @param schema: the file of configuration (.conf) with the options of mappin. If schema is the word "empty", method will not add a where clause.
      * @param type: type of the changes in schema (string or json)
      * @param table: table for create the index
-     * @param magic_column: magic column where index will be saved
+     * @param magic_column: magic column where index will be saved. If you don't need index, you can add the word "empty"
      * @param keyspace: keyspace used
      * @param modifications: all data in "where" clause. Where schema is "empty", query has not a where clause. So it is necessary to provide an empty table. Example:  ||.
      * @throws Exception
@@ -320,10 +320,18 @@ public class WhenGSpec extends BaseGSpec {
        
         String query="";
     
-        if(schema.equals("empty")){
+        if(schema.equals("empty") && magic_column.equals("empty")){
             
          query="SELECT "+fields+" FROM "+ table +";";
-        }else{
+         
+        }else if(!schema.equals("empty") && magic_column.equals("empty")){
+            String retrievedData = commonspec.retrieveData(schema, type);
+            String modifiedData = commonspec.modifyData(retrievedData, type, modifications).toString();
+            query="SELECT "+fields+" FROM "+ table +" WHERE "+modifiedData+";";
+
+
+        }
+        else{
             String retrievedData = commonspec.retrieveData(schema, type);
             String modifiedData = commonspec.modifyData(retrievedData, type, modifications).toString();
             query="SELECT " + fields + " FROM "+ table +" WHERE "+ magic_column +" = '"+ modifiedData +"';";
@@ -406,4 +414,5 @@ public class WhenGSpec extends BaseGSpec {
             commonspec.getExceptions().add(e);
         }
         }
+    
 }
