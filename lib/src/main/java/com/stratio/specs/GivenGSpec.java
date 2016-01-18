@@ -88,8 +88,8 @@ public class GivenGSpec extends BaseGSpec {
      * @throws Exception 
      */
     @Given("^I create a Cassandra table named '(.+?)' using keyspace '(.+?)' with:$")
-    public void createTableWithData(String table, String keyspace, DataTable datatable) throws Exception {
-
+    public void createTableWithData(String table, String keyspace, DataTable datatable){
+        try{
         commonspec.getCassandraClient().useKeyspace(keyspace);        
         commonspec.getLogger().info("Starting a table creation", "");
         int attrLength=datatable.getGherkinRows().get(0).getCells().size();
@@ -107,7 +107,13 @@ public class GivenGSpec extends BaseGSpec {
             throw new Exception("A PK is needed");
         }
         commonspec.getCassandraClient().createTableWithData(table, columns, pk);
-    }
+        }catch (Exception e) {
+            // TODO Auto-generated catch block
+            commonspec.getLogger().info("Exception captured");
+            commonspec.getLogger().info(e.toString());
+            commonspec.getExceptions().add(e);
+        }
+        }
 
     /**
      * Insert Data
@@ -118,8 +124,8 @@ public class GivenGSpec extends BaseGSpec {
      * @throws Exception 
      */
     @Given("^I insert in keyspace '(.+?)' and table '(.+?)' with:$")
-    public void insertData(String keyspace, String table, DataTable datatable) throws Exception {
-
+    public void insertData(String keyspace, String table, DataTable datatable){
+        try{
         commonspec.getCassandraClient().useKeyspace(keyspace);        
         commonspec.getLogger().info("Starting a table creation", "");
         int attrLength=datatable.getGherkinRows().get(0).getCells().size();
@@ -131,6 +137,12 @@ public class GivenGSpec extends BaseGSpec {
             }
             commonspec.getCassandraClient().insertData(keyspace+"."+table, fields);
 
+        }
+        }catch (Exception e) {
+            // TODO Auto-generated catch block
+            commonspec.getLogger().info("Exception captured");
+            commonspec.getLogger().info(e.toString());
+            commonspec.getExceptions().add(e);
         }
     }
 

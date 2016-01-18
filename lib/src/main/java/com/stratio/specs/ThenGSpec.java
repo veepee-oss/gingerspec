@@ -434,7 +434,7 @@ public class ThenGSpec extends BaseGSpec {
         commonspec.getLogger().info("Verifying element visibility");
 
         assertThat(this.commonspec, commonspec.getPreviousWebElements()).as("There are less found elements than required")
-        .hasAtLeast(index);
+            .hasAtLeast(index);
         assertThat(this.commonspec, commonspec.getPreviousWebElements().getPreviousWebElements().get(index).isDisplayed()).as(
                 "Unexpected element display property").isEqualTo(isDisplayed);
     }

@@ -4,7 +4,9 @@ import static com.stratio.assertions.Assertions.assertThat;
 //import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Future;
 import java.util.logging.Logger;
 
@@ -19,6 +21,7 @@ import com.stratio.cucumber.converter.ArrayListConverter;
 
 import cucumber.api.DataTable;
 import cucumber.api.Transform;
+import cucumber.api.java.en.Given;
 import cucumber.api.java.en.When;
 
 public class WhenGSpec extends BaseGSpec {
@@ -303,7 +306,7 @@ public class WhenGSpec extends BaseGSpec {
      * @param schema: the file of configuration (.conf) with the options of mappin. If schema is the word "empty", method will not add a where clause.
      * @param type: type of the changes in schema (string or json)
      * @param table: table for create the index
-     * @param magic_column: magic column where index will be saved
+     * @param magic_column: magic column where index will be saved. If you don't need index, you can add the word "empty"
      * @param keyspace: keyspace used
      * @param modifications: all data in "where" clause. Where schema is "empty", query has not a where clause. So it is necessary to provide an empty table. Example:  ||.
      * @throws Exception
@@ -317,10 +320,18 @@ public class WhenGSpec extends BaseGSpec {
        
         String query="";
     
-        if(schema.equals("empty")){
+        if(schema.equals("empty") && magic_column.equals("empty")){
             
          query="SELECT "+fields+" FROM "+ table +";";
-        }else{
+         
+        }else if(!schema.equals("empty") && magic_column.equals("empty")){
+            String retrievedData = commonspec.retrieveData(schema, type);
+            String modifiedData = commonspec.modifyData(retrievedData, type, modifications).toString();
+            query="SELECT "+fields+" FROM "+ table +" WHERE "+modifiedData+";";
+
+
+        }
+        else{
             String retrievedData = commonspec.retrieveData(schema, type);
             String modifiedData = commonspec.modifyData(retrievedData, type, modifications).toString();
             query="SELECT " + fields + " FROM "+ table +" WHERE "+ magic_column +" = '"+ modifiedData +"';";
@@ -348,7 +359,7 @@ public class WhenGSpec extends BaseGSpec {
      * @param magic_column: magic column where index will be saved
      * @param keyspace: keyspace used
      * @param modifications: data introduced for query fields defined on schema
-     * @throws Exception 
+     * 
      * 
      */
     @When("^I create a Cassandra index named '(.+?)' with schema '(.+?)' of type '(json|string)' in table '(.+?)' using magic_column '(.+?)' using keyspace '(.+?)' with:$")
@@ -358,7 +369,50 @@ public class WhenGSpec extends BaseGSpec {
         String modifiedData = commonspec.modifyData(retrievedData, type, modifications).toString();
         String query="CREATE CUSTOM INDEX "+ index_name +" ON "+ keyspace +"."+ table +"("+ magic_column +") "
                 + "USING 'com.stratio.cassandra.lucene.Index' WITH OPTIONS = "+ modifiedData;
+        System.out.println(query);
         commonspec.getCassandraClient().executeQuery(query);
     }
+    
+    /**
+     * Drop table
+     * 
+     * @param table
+     * @param keyspace
+     *  
+     */
+    @When("^I drop a Cassandra table named '(.+?)' using keyspace '(.+?)'$")
+    public void dropTableWithData(String table, String keyspace){
+        try{
+        commonspec.getCassandraClient().useKeyspace(keyspace);        
+        commonspec.getLogger().info("Starting a table deletion");
+          commonspec.getCassandraClient().dropTable(table);
+        }catch (Exception e) {
+            // TODO Auto-generated catch block
+            commonspec.getLogger().info("Exception captured");
+            commonspec.getLogger().info(e.toString());
+            commonspec.getExceptions().add(e);
+        }
+        }
+
+    /**
+     * Truncate table
+     * 
+     * @param table
+     * @param keyspace
+     *  
+     */
+    @When("^I truncate a Cassandra table named '(.+?)' using keyspace '(.+?)'$")
+    public void truncateTable(String table, String keyspace){
+        try{
+        commonspec.getCassandraClient().useKeyspace(keyspace);        
+        commonspec.getLogger().info("Starting a table truncation");
+          commonspec.getCassandraClient().truncateTable(table);
+        }catch (Exception e) {
+            // TODO Auto-generated catch block
+            commonspec.getLogger().info("Exception captured");
+            commonspec.getLogger().info(e.toString());
+            commonspec.getExceptions().add(e);
+        }
+        }
     
 }

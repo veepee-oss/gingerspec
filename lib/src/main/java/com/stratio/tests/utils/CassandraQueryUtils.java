@@ -104,4 +104,14 @@ public class CassandraQueryUtils {
 		query = query + table + ";";
 		return query;
 	}
+	
+	   public String truncateTableQuery(Boolean ifExists, String table) {
+	        String query = "TRUNCATE TABLE ";
+	        if (ifExists) {
+	            query += "IF EXISTS ";
+	        }
+	        query = query + table + ";";
+	        return query;
+	    }
+	
 }
