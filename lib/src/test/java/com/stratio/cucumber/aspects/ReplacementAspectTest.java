@@ -10,7 +10,7 @@ public class ReplacementAspectTest {
     public void replaceEmptyPlaceholdersTest() {
         ThreadProperty.set("class", this.getClass().getCanonicalName());
         ReplacementAspect repAspect = new ReplacementAspect();
-        assertThat(repAspect.replacePlaceholders("")).as("Replacing an empty placeholded string should not modify it").isEqualTo("");
+        assertThat(repAspect.replaceEnvironmentPlaceholders("")).as("Replacing an empty placeholded string should not modify it").isEqualTo("");
     }
 
     @Test
@@ -20,15 +20,15 @@ public class ReplacementAspectTest {
         System.setProperty("STRATIOBDD_ENV1", "33");
         System.setProperty("STRATIOBDD_ENV2", "aa");
 
-        assertThat(repAspect.replacePlaceholders("${STRATIOBDD_ENV1}"))
+        assertThat(repAspect.replaceEnvironmentPlaceholders("${STRATIOBDD_ENV1}"))
         	.as("Unexpected replacement").isEqualTo("33");
-        assertThat(repAspect.replacePlaceholders("${STRATIOBDD_ENV1}${STRATIOBDD_ENV2}"))
+        assertThat(repAspect.replaceEnvironmentPlaceholders("${STRATIOBDD_ENV1}${STRATIOBDD_ENV2}"))
         	.as("Unexpected replacement").isEqualTo("33aa");
-        assertThat(repAspect.replacePlaceholders("${STRATIOBDD_ENV1}:${STRATIOBDD_ENV2}"))
+        assertThat(repAspect.replaceEnvironmentPlaceholders("${STRATIOBDD_ENV1}:${STRATIOBDD_ENV2}"))
         	.as("Unexpected replacement").isEqualTo("33:aa");
-        assertThat(repAspect.replacePlaceholders("|${STRATIOBDD_ENV1}|:|${STRATIOBDD_ENV2}|"))
+        assertThat(repAspect.replaceEnvironmentPlaceholders("|${STRATIOBDD_ENV1}|:|${STRATIOBDD_ENV2}|"))
         	.as("Unexpected replacement").isEqualTo("|33|:|aa|");
-        assertThat(repAspect.replacePlaceholders("|${STRATIOBDD_ENV}|:|${STRATIOBDD_ENV2}|"))
+        assertThat(repAspect.replaceEnvironmentPlaceholders("|${STRATIOBDD_ENV}|:|${STRATIOBDD_ENV2}|"))
         	.as("Unexpected replacement").isEqualTo("||:|aa|");
     }
 
@@ -39,13 +39,13 @@ public class ReplacementAspectTest {
         System.setProperty("STRATIOBDD_ENV1", "33");
         System.setProperty("STRATIOBDD_ENV2", "aA");
 
-        assertThat(repAspect.replacePlaceholders("${STRATIOBDD_ENV1.toUpper}")).as("Unexpected replacement").isEqualTo("33");
-        assertThat(repAspect.replacePlaceholders("${STRATIOBDD_ENV1.toLower}")).as("Unexpected replacement").isEqualTo("33");
-        assertThat(repAspect.replacePlaceholders("${STRATIOBDD_ENV2.toUpper}")).as("Unexpected replacement").isEqualTo("AA");
-        assertThat(repAspect.replacePlaceholders("${STRATIOBDD_ENV2.toLower}")).as("Unexpected replacement").isEqualTo("aa");
-        assertThat(repAspect.replacePlaceholders("${STRATIOBDD_ENV1}${STRATIOBDD_ENV2.toLower}")).as("Unexpected replacement").isEqualTo("33aa");
-        assertThat(repAspect.replacePlaceholders("${STRATIOBDD_ENV1}:${STRATIOBDD_ENV2.toUpper}")).as("Unexpected replacement").isEqualTo("33:AA");
-        assertThat(repAspect.replacePlaceholders("|${STRATIOBDD_ENV.toUpper}|:|${STRATIOBDD_ENV2}|")).as("Unexpected replacement").isEqualTo("||:|aA|");
-        assertThat(repAspect.replacePlaceholders("|${STRATIOBDD_ENV2}.toUpper")).as("Unexpected replacement").isEqualTo("|aA.toUpper");
+        assertThat(repAspect.replaceEnvironmentPlaceholders("${STRATIOBDD_ENV1.toUpper}")).as("Unexpected replacement").isEqualTo("33");
+        assertThat(repAspect.replaceEnvironmentPlaceholders("${STRATIOBDD_ENV1.toLower}")).as("Unexpected replacement").isEqualTo("33");
+        assertThat(repAspect.replaceEnvironmentPlaceholders("${STRATIOBDD_ENV2.toUpper}")).as("Unexpected replacement").isEqualTo("AA");
+        assertThat(repAspect.replaceEnvironmentPlaceholders("${STRATIOBDD_ENV2.toLower}")).as("Unexpected replacement").isEqualTo("aa");
+        assertThat(repAspect.replaceEnvironmentPlaceholders("${STRATIOBDD_ENV1}${STRATIOBDD_ENV2.toLower}")).as("Unexpected replacement").isEqualTo("33aa");
+        assertThat(repAspect.replaceEnvironmentPlaceholders("${STRATIOBDD_ENV1}:${STRATIOBDD_ENV2.toUpper}")).as("Unexpected replacement").isEqualTo("33:AA");
+        assertThat(repAspect.replaceEnvironmentPlaceholders("|${STRATIOBDD_ENV.toUpper}|:|${STRATIOBDD_ENV2}|")).as("Unexpected replacement").isEqualTo("||:|aA|");
+        assertThat(repAspect.replaceEnvironmentPlaceholders("|${STRATIOBDD_ENV2}.toUpper")).as("Unexpected replacement").isEqualTo("|aA.toUpper");
     }
 }

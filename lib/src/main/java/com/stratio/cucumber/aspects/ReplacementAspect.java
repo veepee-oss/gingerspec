@@ -1,14 +1,11 @@
 package com.stratio.cucumber.aspects;
 
+import com.stratio.specs.CommonG;
+import cucumber.runtime.StepDefinition;
+import cucumber.runtime.xstream.LocalizedXStreams;
 import gherkin.formatter.Argument;
 import gherkin.formatter.model.DataTableRow;
 import gherkin.formatter.model.Step;
-
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -17,10 +14,14 @@ import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.stratio.specs.CommonG;
-
-import cucumber.runtime.StepDefinition;
-import cucumber.runtime.xstream.LocalizedXStreams;
+import java.lang.reflect.Field;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Set;
 
 @Aspect
 public class ReplacementAspect {
@@ -42,10 +43,13 @@ public class ReplacementAspect {
 			if (arg.getVal() != null) {
 			    String value = arg.getVal();
 			    if (value.contains("${")) {
-				value = replacePlaceholders(value);
+				value = replaceEnvironmentPlaceholders(value);
 			    }
 			    if (value.contains("!{")) {
 				value = replaceReflectionPlaceholders(value);
+			    }
+				if (value.contains("@{")) {
+				value = replaceCodePlaceholders(value);
 			    }
 			    Argument myArg = new Argument(arg.getOffset(), value);
 			    myArguments.add(myArg);
@@ -62,10 +66,13 @@ public class ReplacementAspect {
 		    String stepName = step.getName();
 		    
 		    if (stepName.contains("${")) {
-			stepName = replacePlaceholders(stepName);
+			stepName = replaceEnvironmentPlaceholders(stepName);
 		    }
 		    if (stepName.contains("!{")) {
 			stepName = replaceReflectionPlaceholders(stepName);
+		    }
+			if (stepName.contains("@{")) {
+			stepName = replaceCodePlaceholders(stepName);
 		    }
 		    
 		    // Modify datatable
@@ -80,10 +87,13 @@ public class ReplacementAspect {
 			    List<String> myCells = new ArrayList<String>();
 			    for (String cell: cells) {
 				if (cell.contains("${")) {
-				    cell = replacePlaceholders(cell);
+				    cell = replaceEnvironmentPlaceholders(cell);
 				}
 				if (cell.contains("!{")) {
 				    cell = replaceReflectionPlaceholders(cell);
+				}
+				if (cell.contains("@{")) {
+				    cell = replaceCodePlaceholders(cell);
 				}
 				myCells.add(cell);
 			    }
@@ -101,7 +111,59 @@ public class ReplacementAspect {
 	    return pjp.proceed(myArray);
 	}
 
-	
+
+	/**
+	 * Replaces every placeholded element, enclosed in @{} with the
+	 * corresponding attribute value in local Common class
+	 *
+	 * If the element starts with:
+	 * 	- IP: We expect it to be followed by '.' + interface name (i.e. IP.eth0). It can contain other replacements.
+	 *
+	 * @param element
+	 *
+	 * @return String
+	 *
+	 * @throws Exception
+	 */
+	protected String replaceCodePlaceholders(String element) throws Exception {
+		String newVal = element;
+		while (newVal.contains("@{")) {
+			String placeholder = newVal.substring(newVal.indexOf("@{"),
+					newVal.indexOf("}") + 1);
+			String property = placeholder.substring(2, placeholder.length() - 1);
+			String subproperty = "";
+			if (placeholder.contains(".")) {
+				property = placeholder.substring(2, placeholder.indexOf("."));
+				subproperty = placeholder.substring(placeholder.indexOf(".") + 1, placeholder.length() - 1);
+			} else {
+				throw new Exception("Interface not defined");
+			}
+
+			switch (property) {
+				case "IP":
+					boolean found = false;
+					if (!subproperty.isEmpty()) {
+						Enumeration<InetAddress> ifs = NetworkInterface.getByName(subproperty).getInetAddresses();
+						while (ifs.hasMoreElements() && !found) {
+							InetAddress itf = ifs.nextElement();
+							if (itf instanceof Inet4Address) {
+								newVal = itf.getHostAddress();
+								found = true;
+							}
+						}
+					}
+					if (!found) {
+						throw new Exception("Interface " + subproperty + " not available" );
+					}
+					break;
+				default:
+					throw new Exception("Property not defined");
+			}
+		}
+		return newVal;
+	}
+
+
 	/**
 	 * Replaces every placeholded element, enclosed in !{} with the
 	 * corresponding attribute value in local Common class
@@ -150,7 +212,7 @@ public class ReplacementAspect {
 	 * 
 	 * @return String
 	 */
-	protected String replacePlaceholders(String element) {
+	protected String replaceEnvironmentPlaceholders(String element) {
 		String newVal = element;
 		while (newVal.contains("${")) {
 			String placeholder = newVal.substring(newVal.indexOf("${"),
