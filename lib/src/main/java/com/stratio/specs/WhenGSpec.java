@@ -24,6 +24,12 @@ import cucumber.api.Transform;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.When;
 
+import com.mongodb.DBCollection;
+import com.mongodb.DBObject;
+import com.mongodb.DBCursor;
+import com.mongodb.DB;
+import com.mongodb.util.JSON;
+
 public class WhenGSpec extends BaseGSpec {
 
     public static final int DEFAULT_TIMEOUT = 1000;
@@ -338,7 +344,7 @@ public class WhenGSpec extends BaseGSpec {
 
         }
         commonspec.getLogger().info("query: "+query);
-        commonspec.setResults(commonspec.getCassandraClient().executeQuery(query));
+        commonspec.setCassandraResults(commonspec.getCassandraClient().executeQuery(query));
         } catch (Exception e) {
             // TODO Auto-generated catch block
             commonspec.getLogger().info("Exception captured");
@@ -348,7 +354,43 @@ public class WhenGSpec extends BaseGSpec {
 
 
     }
-    
+
+    /**
+     * Execute a query on mongo database
+     *
+     * @param query: path to query
+     * @param type: type of data in query (string or json)
+     * @param database: mongo database name
+     * @param collection: collection in database
+     * @param modifications: modifications to perform in query
+     */
+    @When("^I execute query '(.+?)' of type '(json|string)' in mongo database '(.+?)' using collection '(.+?)' with:$")
+    public void sendQueryOfType(String query, String type, String database, String collection, DataTable modifications) {
+        try {
+            commonspec.setResultsType("mongo");
+            commonspec.getMongoDBClient().connectToMongoDBDataBase(database);
+            DBCollection dbCollection = commonspec.getMongoDBClient().getMongoDBCollection(collection);
+
+            commonspec.getLogger().info("Starting a query of type " + commonspec.getResultsType());
+
+            String retrievedData = commonspec.retrieveData(query, type);
+            String modifiedData = commonspec.modifyData(retrievedData, type, modifications).toString();
+
+            DBObject dbObject = (DBObject) JSON.parse(modifiedData);
+            commonspec.getLogger().info("find: " + modifiedData);
+
+            DBCursor cursor = dbCollection.find(dbObject);
+            commonspec.setMongoResults(cursor);
+
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            commonspec.getLogger().info("Exception captured");
+            commonspec.getLogger().info(e.toString());
+            commonspec.getExceptions().add(e);
+        }
+    }
+
+
     /**
      * Create a Cassandra index.
      * 

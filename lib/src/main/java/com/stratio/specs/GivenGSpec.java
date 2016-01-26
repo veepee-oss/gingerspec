@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.stratio.exceptions.DBException;
 import org.hjson.JsonValue;
 import org.openqa.selenium.WebElement;
 
@@ -69,14 +70,26 @@ public class GivenGSpec extends BaseGSpec {
     /**
      * Connect to cluster.
      * 
-     * @param node: number of nodes
+     * @param clusterType: DB type (Cassandra|Mongo|Elasticsearch)
      * @param url: url where is started Cassandra cluster
      */
-    @Given("^I connect to Cassandra cluster at '(.+)'$")
-    public void connect(String url) {
-        commonspec.getLogger().info("Connecting to cluster", "");
-        commonspec.getCassandraClient().buildCluster();
-        commonspec.getCassandraClient().connect();
+    @Given("^I connect to '(Cassandra|Mongo)' cluster at '(.+)'$")
+    public void connect(String clusterType, String url) throws DBException {
+        commonspec.getLogger().info("Connecting to " + clusterType + " cluster", "");
+        switch (clusterType) {
+            case "Cassandra":
+                commonspec.getCassandraClient().buildCluster();
+                commonspec.getCassandraClient().connect();
+                break;
+            case "Mongo":
+                commonspec.getMongoDBClient().connect();
+                break;
+            case "Elasticsearch":
+                commonspec.getElasticSearchClient().connect();
+                break;
+            default:
+                throw new DBException("Unknown cluster type");
+        }
     }
 
     /**

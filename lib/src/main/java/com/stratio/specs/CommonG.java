@@ -19,10 +19,7 @@ import java.io.Writer;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.Future;
 
 import javax.imageio.ImageIO;
@@ -66,6 +63,11 @@ import com.stratio.tests.utils.MongoDBUtils;
 import com.stratio.tests.utils.PreviousWebElements;
 import com.stratio.tests.utils.ThreadProperty;
 
+import com.mongodb.DBCursor;
+import com.mongodb.DBObject;
+import com.datastax.driver.core.ColumnDefinitions;
+import com.datastax.driver.core.Row;
+
 import cucumber.api.DataTable;
 
 public class CommonG {
@@ -85,6 +87,7 @@ public class CommonG {
 	//private String URL;
 	private HttpResponse response;
     private ResultSet previousCassandraResults;
+	private DBCursor previousMongoResults;
     private String resultsType="";
 
 
@@ -851,13 +854,22 @@ public class CommonG {
 	    ff.set(null, value);
 	}
 
-    public ResultSet getResults() {
+    public ResultSet getCassandraResults() {
         return previousCassandraResults;
     }
 
-    public void setResults(ResultSet results) {
+    public void setCassandraResults(ResultSet results) {
         this.previousCassandraResults = results;
     }
+
+	public DBCursor getMongoResults() {
+		return previousMongoResults;
+	}
+
+	public void setMongoResults(DBCursor results) {
+		this.previousMongoResults = results;
+	}
+
 
     public String getResultsType() {
         return resultsType;
@@ -866,5 +878,182 @@ public class CommonG {
     public void setResultsType(String resultsType) {
         this.resultsType = resultsType;
     }
+
+
+	/**
+     * Checks the different results of a previous query to Cassandra database
+     *
+     * @param expectedResults: A DataTable Object with all data needed for check the results. The DataTable must contains at least 2 columns:
+     * a) A field column from the result
+     * b) Occurrences column (Integer type)
+     *
+     * Example:
+     *      |latitude| longitude|place     |occurrences|
+            |12.5    |12.7      |Valencia  |1           |
+            |2.5     | 2.6      |Stratio   |0           |
+            |12.5    |13.7      |Sevilla   |1           |
+     * IMPORTANT: There no should be no existing columns
+     * @throws Exception
+     */
+	public void resultsMustBeCassandra(DataTable expectedResults) throws Exception {
+		if (getCassandraResults()!=null) {
+			//Map for query results
+			ColumnDefinitions columns=getCassandraResults().getColumnDefinitions();
+			List<Row> rows = getCassandraResults().all();
+
+			List<Map<String,Object>>resultsListObtained=new ArrayList<Map<String,Object>>();
+			Map<String,Object> results;
+
+			for (int i=0; i<rows.size();i++) {
+				results = new HashMap<String,Object>();
+				for (int e=0; e<columns.size();e++) {
+					results.put(columns.getName(e), rows.get(i).getObject(e));
+
+				}
+				resultsListObtained.add(results);
+
+			}
+			getLogger().info("Results: "+resultsListObtained.toString());
+			//Map for cucumber expected results
+			List<Map<String,Object>>resultsListExpected=new ArrayList<Map<String,Object>>();
+			Map<String,Object> resultsCucumber;
+
+			for (int e=1; e<expectedResults.getGherkinRows().size();e++) {
+				resultsCucumber = new HashMap<String,Object>();
+
+				for (int i=0; i<expectedResults.getGherkinRows().get(0).getCells().size(); i++) {
+					resultsCucumber.put(expectedResults.getGherkinRows().get(0).getCells().get(i), expectedResults.getGherkinRows().get(e).getCells().get(i));
+
+				}
+				resultsListExpected.add(resultsCucumber);
+			}
+			getLogger().info("Expected Results: "+resultsListExpected.toString());
+
+			//Comparisons
+			int occurrencesObtained=0;
+			int iterations=0;
+			int occurrencesExpected=0;
+			String nextKey;
+			for (int e=0; e<resultsListExpected.size(); e++) {
+				iterations=0;
+				occurrencesObtained=0;
+				occurrencesExpected=Integer.parseInt(resultsListExpected.get(e).get("occurrences").toString());
+
+				for (int i=0; i<resultsListObtained.size(); i++) {
+
+					Iterator<String> it = resultsListExpected.get(0).keySet().iterator();
+
+					while (it.hasNext()) {
+						nextKey=it.next();
+						if (!nextKey.equals("occurrences")){
+							if (resultsListObtained.get(i).get(nextKey).toString().equals(resultsListExpected.get(e).get(nextKey).toString())) {
+								iterations++;
+							}
+
+						}
+
+						if (iterations==resultsListExpected.get(0).keySet().size()-1) {
+							occurrencesObtained++;
+							iterations=0;
+						}
+					}
+
+					iterations=0;
+				}
+				assertThat(occurrencesExpected).overridingErrorMessage("In row " +e+ " have been found "
+						+occurrencesObtained+" results and "+ occurrencesExpected +" were expected").isEqualTo(occurrencesObtained);
+
+			}
+		} else {
+			throw new Exception("You must execute a query before trying to get results");
+		}
+	}
+
+	
+	/**
+     * Checks the different results of a previous query to Mongo database
+     *
+     * @param expectedResults: A DataTable Object with all data needed for check the results. The DataTable must contains at least 2 columns:
+     * a) A field column from the result
+     * b) Occurrences column (Integer type)
+     *
+     * Example:
+     *      |latitude| longitude|place     |occurrences|
+            |12.5    |12.7      |Valencia  |1           |
+            |2.5     | 2.6      |Stratio   |0           |
+            |12.5    |13.7      |Sevilla   |1           |
+     * IMPORTANT: There no should be no existing columns
+     * @throws Exception
+     */
+	public void resultsMustBeMongo(DataTable expectedResults) throws Exception {
+		if (getMongoResults() != null) {
+			//Map for cucumber expected results
+			List<Map<String,Object>>resultsListExpected=new ArrayList<Map<String,Object>>();
+			Map<String,Object> resultsCucumber;
+
+			for (int e=1; e<expectedResults.getGherkinRows().size();e++) {
+				resultsCucumber = new HashMap<String,Object>();
+
+				for (int i=0; i<expectedResults.getGherkinRows().get(0).getCells().size(); i++) {
+					resultsCucumber.put(expectedResults.getGherkinRows().get(0).getCells().get(i), expectedResults.getGherkinRows().get(e).getCells().get(i));
+
+				}
+				resultsListExpected.add(resultsCucumber);
+			}
+			getLogger().info("Expected Results: "+resultsListExpected.toString());
+
+			//Comparisons
+			int occurrencesObtained=0;
+			int iterations=0;
+			int occurrencesExpected=0;
+			String nextKey;
+			for (int e=0; e<resultsListExpected.size(); e++) {
+				iterations=0;
+				occurrencesObtained=0;
+				occurrencesExpected=Integer.parseInt(resultsListExpected.get(e).get("occurrences").toString());
+
+				String resultsListObtained = "[";
+				DBCursor cursor = getMongoResults();
+				while (cursor.hasNext()) {
+
+					DBObject row = cursor.next();
+
+					resultsListObtained = resultsListObtained + row.toString();
+					if (cursor.hasNext()) {
+						resultsListObtained = ", " + resultsListObtained;
+					}
+
+					Iterator<String> it = resultsListExpected.get(0).keySet().iterator();
+
+					while (it.hasNext()) {
+						nextKey=it.next();
+						if (!nextKey.equals("occurrences")){
+							if (row.get(nextKey).toString().equals(resultsListExpected.get(e).get(nextKey).toString())) {
+								iterations++;
+							}
+						}
+
+						if (iterations == resultsListExpected.get(0).keySet().size() - 1) {
+							occurrencesObtained++;
+							iterations = 0;
+						}
+					}
+					iterations = 0;
+					if (cursor.hasNext()) {
+						resultsListObtained = resultsListObtained + ",";
+					}
+				}
+
+				resultsListObtained = resultsListObtained + "]";
+				getLogger().info("Results: " + resultsListObtained);
+
+				assertThat(occurrencesExpected).overridingErrorMessage("In row " + e + " have been found "
+						+ occurrencesObtained + " results and " + occurrencesExpected + " were expected").isEqualTo(occurrencesObtained);
+			}
+
+		} else {
+			throw new Exception("You must execute a query before trying to get results");
+		}
+	}
 	
 }
