@@ -574,90 +574,19 @@ public class ThenGSpec extends BaseGSpec {
      * IMPORTANT: There no should be no existing columns 
      * @throws Exception
      */
-
     @Then("^There are results found with:$")
     public void resultsMustBe(DataTable expectedResults) throws Exception {
 
         String type=commonspec.getResultsType();
         assertThat(type).isNotEqualTo("").overridingErrorMessage("It's necessary to define the result type");
         switch(type){
+            case "cassandra":
+                commonspec.resultsMustBeCassandra(expectedResults);
+                break;
+            case "mongo":
+                commonspec.resultsMustBeMongo(expectedResults);
+                break;
 
-        case "cassandra":
-            if(commonspec.getResults()!=null){
-
-
-                //Map for query results   
-                ColumnDefinitions columns=commonspec.getResults().getColumnDefinitions();
-                List<Row> rows = commonspec.getResults().all();
-
-                List<Map<String,Object>>resultsListObtained=new ArrayList<Map<String,Object>>();
-                Map<String,Object> results;
-
-                for(int i=0; i<rows.size();i++){
-                    results = new HashMap<String,Object>();
-                    for(int e=0; e<columns.size();e++){
-                        results.put(columns.getName(e), rows.get(i).getObject(e));
-
-                    }
-                    resultsListObtained.add(results);
-
-                }
-                commonspec.getLogger().info("Results: "+resultsListObtained.toString());
-                //Map for cucumber expected results
-                List<Map<String,Object>>resultsListExpected=new ArrayList<Map<String,Object>>();
-                Map<String,Object> resultsCucumber;
-
-                for(int e=1; e<expectedResults.getGherkinRows().size();e++){
-                    resultsCucumber = new HashMap<String,Object>();
-
-                    for(int i=0; i<expectedResults.getGherkinRows().get(0).getCells().size(); i++){
-                        resultsCucumber.put(expectedResults.getGherkinRows().get(0).getCells().get(i), expectedResults.getGherkinRows().get(e).getCells().get(i));    
-
-                    }
-                    resultsListExpected.add(resultsCucumber);
-                }
-                commonspec.getLogger().info("Expected Results: "+resultsListExpected.toString());
-
-                //Comparisons
-                int occurrencesObtained=0;
-                int iterations=0;
-                int occurrencesExpected=0;
-                String nextKey;
-                for(int e=0; e<resultsListExpected.size(); e++){
-                    iterations=0;
-                    occurrencesObtained=0;
-                    occurrencesExpected=Integer.parseInt(resultsListExpected.get(e).get("occurrences").toString());
-
-                    for(int i=0; i<resultsListObtained.size(); i++){
-
-                        Iterator<String> it = resultsListExpected.get(0).keySet().iterator();
-
-                        while(it.hasNext()){
-                            nextKey=it.next();
-                            if (!nextKey.equals("occurrences")){
-                                if(resultsListObtained.get(i).get(nextKey).toString().equals(resultsListExpected.get(e).get(nextKey).toString())){
-                                    iterations++;
-                                }
-
-                            }
-
-                            if(iterations==resultsListExpected.get(0).keySet().size()-1){
-                                occurrencesObtained++;
-                                iterations=0;
-                            }
-                        }
-
-                        iterations=0;
-                    }
-                    assertThat(occurrencesExpected).overridingErrorMessage("In row " +e+ " have been found "
-                            +occurrencesObtained+" results and "+ occurrencesExpected +" were expected").isEqualTo(occurrencesObtained);
-
-                }
-
-            }else{
-                throw new Exception("You must execute a query before trying to get results");
-            }
-            break;
         }
     }
 
