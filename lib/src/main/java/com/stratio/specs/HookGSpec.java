@@ -118,7 +118,6 @@ public class HookGSpec extends BaseGSpec {
             ChromeOptions chromeOptions = new ChromeOptions();
             chromeOptions.addArguments("test-type");
             capabilities = DesiredCapabilities.chrome();
-            capabilities.setCapability(ChromeOptions.CAPABILITY);
         } else if (browser.equalsIgnoreCase("firefox")) {
             capabilities = DesiredCapabilities.firefox();
         } else if (browser.equalsIgnoreCase("phantomjs")) {
