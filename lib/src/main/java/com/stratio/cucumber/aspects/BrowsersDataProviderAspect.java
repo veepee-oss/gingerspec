@@ -39,7 +39,7 @@ public class BrowsersDataProviderAspect extends BaseGSpec {
 		} else {
 			List<String[]> lData = Lists.newArrayList();
 			lData.add(new String[] { System.getProperty("FORCE_BROWSER") });
-			logger.info("Forcing browser to {}",
+			logger.debug("Forcing browser to {}",
 					System.getProperty("FORCE_BROWSER"));
 			return lData.iterator();
 		}
