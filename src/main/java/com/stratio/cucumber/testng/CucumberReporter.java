@@ -354,7 +354,7 @@ public class CucumberReporter implements Formatter, Reporter {
                             //@tillFixed
                             if ((tagNs.getName()).matches("@tillfixed\\(\\w+-\\d+\\)")){
                                 String issueNumb = tagNs.getName().substring(tagNs.getName().lastIndexOf("(") +1);
-                                exceptionmsg = "This scenario was skipped because of <a href=\"https://stratio.atlassian.net/browse/" + (issueNumb.subSequence(0, issueNumb.length() - 1)).toString().toUpperCase()+">"+(issueNumb.subSequence(0, issueNumb.length() - 1))+"</a>";
+                                exceptionmsg = "This scenario was skipped because of https://stratio.atlassian.net/browse/" + (issueNumb.subSequence(0, issueNumb.length() - 1)).toString().toUpperCase()+">"+(issueNumb.subSequence(0, issueNumb.length() - 1));
                                 ignoreReason = true;
                                 break;
                             }
