@@ -29,6 +29,7 @@ import com.mongodb.DBObject;
 import com.mongodb.DBCursor;
 import com.mongodb.DB;
 import com.mongodb.util.JSON;
+import com.stratio.cucumber.converter.NullableStringConverter;
 
 public class WhenGSpec extends BaseGSpec {
 
@@ -117,7 +118,7 @@ public class WhenGSpec extends BaseGSpec {
      * @param index
      */
     @When("^I type '(.+?)' on the element on index '(\\d+?)'$")
-    public void seleniumType(String text, Integer index) {
+    public void seleniumType(@Transform(NullableStringConverter.class) String text, Integer index) {
         commonspec.getLogger().info("Typing on element with index {}", index);
 
         assertThat(this.commonspec, commonspec.getPreviousWebElements()).as("There are less found elements than required")

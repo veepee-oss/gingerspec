@@ -2,6 +2,9 @@
 *.project
 *.settings/*
 */target/*
+target/*
 .idea/*
+*.ipr
+*.iws
 *.swp
 .DS_Store
