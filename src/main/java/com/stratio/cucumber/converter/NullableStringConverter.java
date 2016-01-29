@@ -8,7 +8,7 @@ public class NullableStringConverter extends Transformer<String> {
     public String transform(String input) {
 
         if ("//NONE//".equals(input)) {
-            return null;
+            return "";
         } else if ("//NULL//".equals(input)) {
             return null;
         } else if (input.startsWith("0x")) {
