@@ -93,8 +93,7 @@ public class IncludeTagAspect {
     }
 
     /**
-     * @param s is a full string with the tag line that will be filtered and trimmed to get exactly the name of the feature
-     * @return
+     * @param s A string with the tag line that will be filtered and trimmed to get exactly the name of the feature
      */
     public String getFeatureName(String s) {
 

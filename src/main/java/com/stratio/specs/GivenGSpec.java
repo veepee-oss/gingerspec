@@ -43,10 +43,10 @@ public class GivenGSpec extends BaseGSpec {
     /**
      * Create a basic Index.
      * 
-     * @param index_name: index name
-     * @param table: the table where index will be created.
-     * @param column: the column where index will be saved
-     * @param keyspace: keyspace used
+     * @param index_name index name
+     * @param table the table where index will be created.
+     * @param column the column where index will be saved
+     * @param keyspace keyspace used
      * @throws Exception 
      * 
      */
@@ -70,8 +70,8 @@ public class GivenGSpec extends BaseGSpec {
     /**
      * Connect to cluster.
      * 
-     * @param clusterType: DB type (Cassandra|Mongo|Elasticsearch)
-     * @param url: url where is started Cassandra cluster
+     * @param clusterType DB type (Cassandra|Mongo|Elasticsearch)
+     * @param url url where is started Cassandra cluster
      */
     @Given("^I connect to '(Cassandra|Mongo)' cluster at '(.+)'$")
     public void connect(String clusterType, String url) throws DBException {
@@ -320,7 +320,7 @@ public class GivenGSpec extends BaseGSpec {
     /**
      * Browse to {@code url} using the current browser.
      * 
-     * @param url
+     * @param path
      * @throws Exception 
      */
     @Given("^I browse to '(.+?)'$")
@@ -343,7 +343,7 @@ public class GivenGSpec extends BaseGSpec {
     }
 
     /**
-     * Set app host, port and url {@code host, @code port}
+     * Set app host and port {@code host, @code port}
      * 
      * @param host
      * @param port
@@ -370,8 +370,9 @@ public class GivenGSpec extends BaseGSpec {
     /**
      * Browse to {@code webHost, @code webPort} using the current browser.
      *
-     * @param url
-     * @throws MalformedURLException 
+     * @param webHost
+     * @param webPort
+     * @throws MalformedURLException
      */
     @Given("^I set web base url to '([^:]+?)(:.+?)?'$")
     public void setupWeb(String webHost, String webPort) throws MalformedURLException {

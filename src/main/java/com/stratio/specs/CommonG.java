@@ -883,7 +883,7 @@ public class CommonG {
 	/**
      * Checks the different results of a previous query to Cassandra database
      *
-     * @param expectedResults: A DataTable Object with all data needed for check the results. The DataTable must contains at least 2 columns:
+     * @param expectedResults A DataTable Object with all data needed for check the results. The DataTable must contains at least 2 columns:
      * a) A field column from the result
      * b) Occurrences column (Integer type)
      *
@@ -973,7 +973,7 @@ public class CommonG {
 	/**
      * Checks the different results of a previous query to Mongo database
      *
-     * @param expectedResults: A DataTable Object with all data needed for check the results. The DataTable must contains at least 2 columns:
+     * @param expectedResults A DataTable Object with all data needed for check the results. The DataTable must contains at least 2 columns:
      * a) A field column from the result
      * b) Occurrences column (Integer type)
      *

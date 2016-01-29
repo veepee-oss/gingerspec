@@ -5,12 +5,20 @@ import static org.testng.Assert.fail;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import org.assertj.core.util.Collections;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.remote.CommandInfo;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.HttpCommandExecutor;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.remote.http.HttpClient;
+import org.openqa.selenium.remote.internal.ApacheHttpClient;
+import org.openqa.selenium.remote.internal.HttpClientFactory;
 
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
@@ -130,7 +138,9 @@ public class HookGSpec extends BaseGSpec {
         capabilities.setVersion(version);
 
         grid = "http://" + grid + "/wd/hub";
-        commonspec.setDriver(new RemoteWebDriver(new URL(grid), capabilities));
+        HttpClient.Factory factory = new ApacheHttpClient.Factory(new HttpClientFactory(60000, 60000));
+        HttpCommandExecutor executor = new HttpCommandExecutor(new HashMap<String, CommandInfo>(), new URL(grid), factory);
+        commonspec.setDriver(new RemoteWebDriver(executor, capabilities));
         commonspec.getDriver().manage().timeouts().pageLoadTimeout(PAGE_LOAD_TIMEOUT, TimeUnit.SECONDS);
         commonspec.getDriver().manage().timeouts().implicitlyWait(IMPLICITLY_WAIT, TimeUnit.SECONDS);
         commonspec.getDriver().manage().timeouts().setScriptTimeout(SCRIPT_TIMEOUT, TimeUnit.SECONDS);

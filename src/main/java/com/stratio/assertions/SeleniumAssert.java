@@ -329,7 +329,7 @@ public class SeleniumAssert extends AbstractAssert<SeleniumAssert, Object> {
 	/**
 	 * Checks string matches value.
 	 * 
-	 * @param values
+	 * @param value
 	 * @return SeleniumAssert
 	 */
 	public SeleniumAssert matches(String value) {
