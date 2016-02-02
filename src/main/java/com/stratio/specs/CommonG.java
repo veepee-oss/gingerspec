@@ -28,6 +28,7 @@ import org.apache.commons.io.FileUtils;
 import org.assertj.core.api.Condition;
 import org.hjson.JsonValue;
 import org.json.JSONObject;
+import org.json.JSONArray;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
@@ -88,6 +89,7 @@ public class CommonG {
 	private HttpResponse response;
     private ResultSet previousCassandraResults;
 	private DBCursor previousMongoResults;
+	private JSONObject previousElasticsearchResults;
     private String resultsType="";
 
 
@@ -870,6 +872,14 @@ public class CommonG {
 		this.previousMongoResults = results;
 	}
 
+	public JSONObject getElasticsearchResults() {
+		return previousElasticsearchResults;
+	}
+
+	public void setElasticsearchResults(JSONObject results) {
+		this.previousElasticsearchResults = results;
+	}
+
 
     public String getResultsType() {
         return resultsType;
@@ -969,7 +979,7 @@ public class CommonG {
 		}
 	}
 
-	
+
 	/**
      * Checks the different results of a previous query to Mongo database
      *
@@ -1054,6 +1064,86 @@ public class CommonG {
 		} else {
 			throw new Exception("You must execute a query before trying to get results");
 		}
+	}
+
+	/**
+	 * Checks the different results of a previous query to Elasticsearch database
+	 *
+	 * @param expectedResults: A DataTable Object with all data needed for check the results. The DataTable must contains at least 2 columns:
+	 * a) A field column from the result
+	 * b) Occurrences column (Integer type)
+	 *
+	 * Example:
+	 *      |latitude| longitude|place     |occurrences|
+	|12.5    |12.7      |Valencia  |1           |
+	|2.5     | 2.6      |Stratio   |0           |
+	|12.5    |13.7      |Sevilla   |1           |
+	 * IMPORTANT: There no should be no existing columns
+	 * @throws Exception
+	 */
+	public void resultsMustBeElasticsearch(DataTable expectedResults) throws Exception {
+		if (getElasticsearchResults() != null) {
+			//Map for cucumber expected results
+			List<Map<String,Object>>resultsListExpected=new ArrayList<Map<String,Object>>();
+			Map<String,Object> resultsCucumber;
+
+			for (int e=1; e<expectedResults.getGherkinRows().size();e++) {
+				resultsCucumber = new HashMap<String,Object>();
+
+				for (int i=0; i<expectedResults.getGherkinRows().get(0).getCells().size(); i++) {
+					resultsCucumber.put(expectedResults.getGherkinRows().get(0).getCells().get(i), expectedResults.getGherkinRows().get(e).getCells().get(i));
+
+				}
+				resultsListExpected.add(resultsCucumber);
+			}
+			getLogger().info("Expected Results: "+resultsListExpected.toString());
+
+			getLogger().info("Obtained Results: " + getElasticsearchResults().getJSONArray("hits").toString());
+
+			//Comparisons
+			int occurrencesObtained=0;
+			int iterations=0;
+			int occurrencesExpected=0;
+			String nextKey;
+			for (int e=0; e<resultsListExpected.size(); e++) {
+				iterations=0;
+				occurrencesObtained=0;
+				occurrencesExpected=Integer.parseInt(resultsListExpected.get(e).get("occurrences").toString());
+
+				JSONArray results = getElasticsearchResults().getJSONArray("hits");
+				int i = getElasticsearchResults().getInt("total") - 1;
+				while (i >= 0) {
+
+					JSONObject result = results.getJSONObject(i).getJSONObject("_source");
+
+					Iterator<String> it = resultsListExpected.get(0).keySet().iterator();
+
+					while (it.hasNext()) {
+						nextKey=it.next();
+						if (!nextKey.equals("occurrences")){
+							if (result.get(nextKey).toString().equals(resultsListExpected.get(e).get(nextKey).toString())) {
+								iterations++;
+							}
+						}
+
+						if (iterations == resultsListExpected.get(0).keySet().size() - 1) {
+							occurrencesObtained++;
+							iterations = 0;
+						}
+					}
+					iterations = 0;
+					i--;
+				}
+
+				assertThat(occurrencesExpected).overridingErrorMessage("In row " + e + " have been found "
+						+ occurrencesObtained + " results and " + occurrencesExpected + " were expected").isEqualTo(occurrencesObtained);
+			}
+
+		} else {
+			throw new Exception("You must execute a query before trying to get results");
+		}
+
+
 	}
 	
 }
