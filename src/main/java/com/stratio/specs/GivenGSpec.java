@@ -73,7 +73,7 @@ public class GivenGSpec extends BaseGSpec {
      * @param clusterType DB type (Cassandra|Mongo|Elasticsearch)
      * @param url url where is started Cassandra cluster
      */
-    @Given("^I connect to '(Cassandra|Mongo)' cluster at '(.+)'$")
+    @Given("^I connect to '(Cassandra|Mongo|Elasticsearch)' cluster at '(.+)'$")
     public void connect(String clusterType, String url) throws DBException {
         commonspec.getLogger().info("Connecting to " + clusterType + " cluster", "");
         switch (clusterType) {

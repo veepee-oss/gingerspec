@@ -31,6 +31,9 @@ import com.mongodb.DB;
 import com.mongodb.util.JSON;
 import com.stratio.cucumber.converter.NullableStringConverter;
 
+import org.json.JSONObject;
+import org.json.JSONArray;
+
 public class WhenGSpec extends BaseGSpec {
 
     public static final int DEFAULT_TIMEOUT = 1000;
@@ -357,7 +360,7 @@ public class WhenGSpec extends BaseGSpec {
     }
 
     /**
-     * Execute a query on mongo database
+     * Execute a query on (mongo|elasticsearch) database
      *
      * @param query path to query
      * @param type type of data in query (string or json)
@@ -365,24 +368,35 @@ public class WhenGSpec extends BaseGSpec {
      * @param collection collection in database
      * @param modifications modifications to perform in query
      */
-    @When("^I execute query '(.+?)' of type '(json|string)' in mongo database '(.+?)' using collection '(.+?)' with:$")
-    public void sendQueryOfType(String query, String type, String database, String collection, DataTable modifications) {
+    @When("^I execute query '(.+?)' of type '(json|string)' in '(mongo|elasticsearch)' database '(.+?)' using collection '(.+?)' with:$")
+    public void sendQueryOfType(String query, String type, String dbType,String database, String collection, DataTable modifications) throws Exception {
         try {
-            commonspec.setResultsType("mongo");
-            commonspec.getMongoDBClient().connectToMongoDBDataBase(database);
-            DBCollection dbCollection = commonspec.getMongoDBClient().getMongoDBCollection(collection);
-
-            commonspec.getLogger().info("Starting a query of type " + commonspec.getResultsType());
+            commonspec.setResultsType(dbType);
 
             String retrievedData = commonspec.retrieveData(query, type);
             String modifiedData = commonspec.modifyData(retrievedData, type, modifications).toString();
 
-            DBObject dbObject = (DBObject) JSON.parse(modifiedData);
-            commonspec.getLogger().info("find: " + modifiedData);
+            switch (dbType) {
+                case "mongo":
+                    commonspec.getMongoDBClient().connectToMongoDBDataBase(database);
+                    DBCollection dbCollection = commonspec.getMongoDBClient().getMongoDBCollection(collection);
 
-            DBCursor cursor = dbCollection.find(dbObject);
-            commonspec.setMongoResults(cursor);
+                    commonspec.getLogger().info("Starting a query of type " + commonspec.getResultsType());
 
+                    DBObject dbObject = (DBObject) JSON.parse(modifiedData);
+                    commonspec.getLogger().info("find: " + modifiedData);
+
+                    DBCursor cursor = dbCollection.find(dbObject);
+                    commonspec.setMongoResults(cursor);
+                    break;
+                case "elasticsearch":
+                    String results = commonspec.getElasticSearchClient().queryIndex(database, collection, modifiedData);
+                    JSONObject resultsJSON = new JSONObject(results).getJSONObject("hits");
+                    commonspec.setElasticsearchResults(resultsJSON);
+                    break;
+                default:
+                     throw new Exception("Invalid database type: " + dbType);
+            }
         } catch (Exception e) {
             // TODO Auto-generated catch block
             commonspec.getLogger().info("Exception captured");
