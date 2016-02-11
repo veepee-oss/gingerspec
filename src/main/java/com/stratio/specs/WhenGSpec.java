@@ -34,6 +34,8 @@ import com.stratio.cucumber.converter.NullableStringConverter;
 import org.json.JSONObject;
 import org.json.JSONArray;
 
+import com.csvreader.CsvReader;
+
 public class WhenGSpec extends BaseGSpec {
 
     public static final int DEFAULT_TIMEOUT = 1000;
@@ -470,6 +472,36 @@ public class WhenGSpec extends BaseGSpec {
             commonspec.getLogger().info(e.toString());
             commonspec.getExceptions().add(e);
         }
+    }
+
+    /**
+     * Read csv file and store result in list of maps
+     *
+     *  @param csvFile
+     *
+     */
+    @When("^I read info from csv file '(.+?)'$")
+    public void readFromCSV(String csvFile) throws Exception {
+        CsvReader rows = new CsvReader(csvFile);
+
+        String[] columns = null;
+        if (rows.readRecord()) {
+            columns = rows.getValues();
+            rows.setHeaders(columns);
         }
-    
+
+        List<Map<String,String>> results = new ArrayList<Map<String,String>>();
+        while (rows.readRecord()) {
+            Map<String,String> row = new HashMap<String, String>();
+            for (String column: columns) {
+                row.put(column, rows.get(rows.getIndex(column)));
+            }
+            results.add(row);
+        }
+
+        rows.close();
+
+        commonspec.setResultsType("csv");
+        commonspec.setCSVResults(results);
+    }
 }

@@ -63,6 +63,7 @@ import com.stratio.tests.utils.MongoDBUtil;
 import com.stratio.tests.utils.MongoDBUtils;
 import com.stratio.tests.utils.PreviousWebElements;
 import com.stratio.tests.utils.ThreadProperty;
+import com.stratio.tests.utils.RemoteSSHConnection;
 
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
@@ -90,6 +91,7 @@ public class CommonG {
     private ResultSet previousCassandraResults;
 	private DBCursor previousMongoResults;
 	private JSONObject previousElasticsearchResults;
+	private List<Map<String,String>> previousCSVResults;
     private String resultsType="";
 
 
@@ -98,7 +100,20 @@ public class CommonG {
 	private String restPort;
 	private String webHost;
 	private String webPort;
-	
+
+	// REMOTE CONNECTION
+	private RemoteSSHConnection remoteSSHConnection;
+
+
+	/**
+	 * Get the common remote connection.
+	 *
+	 * @return RemoteConnection
+	 */
+	public RemoteSSHConnection getRemoteSSHConnection() {
+		return remoteSSHConnection;
+	}
+
 	/**
 	 * Get the common REST host.
 	 * 
@@ -206,7 +221,16 @@ public class CommonG {
 	public RemoteWebDriver getDriver() {
 		return driver;
 	}
-	
+
+	/**
+	 * Set the remote connection.
+	 *
+	 * @param remoteConnection
+	 */
+	public void setRemoteSSHConnection(RemoteSSHConnection remoteSSHConnection) {
+		this.remoteSSHConnection = remoteSSHConnection;
+	}
+
 	/**
 	 * Set the REST host.
 	 * 
@@ -880,6 +904,9 @@ public class CommonG {
 		this.previousElasticsearchResults = results;
 	}
 
+	public List<Map<String,String>> getCSVResults() { return previousCSVResults; }
+
+	public void setCSVResults(List<Map<String,String>> results) {	this.previousCSVResults = results; }
 
     public String getResultsType() {
         return resultsType;
@@ -888,6 +915,81 @@ public class CommonG {
     public void setResultsType(String resultsType) {
         this.resultsType = resultsType;
     }
+
+
+	/**
+     * Checks the different results of a previous query to CSV file
+     *
+     * @param expectedResults A DataTable Object with all data needed for check the results. The DataTable must contains at least 2 columns:
+     * a) A field column from the result
+     * b) Occurrences column (Integer type)
+     *
+     * Example:
+     *      |latitude| longitude|place     |occurrences|
+            |12.5    |12.7      |Valencia  |1           |
+            |2.5     | 2.6      |Stratio   |0           |
+            |12.5    |13.7      |Sevilla   |1           |
+     * IMPORTANT: There no should be no existing columns
+     * @throws Exception
+     */
+	public void resultsMustBeCSV(DataTable expectedResults) throws Exception {
+		if (getCSVResults() != null) {
+			//Map for cucumber expected results
+			List<Map<String,Object>>resultsListExpected=new ArrayList<Map<String,Object>>();
+			Map<String,Object> resultsCucumber;
+
+			for (int e=1; e<expectedResults.getGherkinRows().size();e++) {
+				resultsCucumber = new HashMap<String,Object>();
+
+				for (int i=0; i<expectedResults.getGherkinRows().get(0).getCells().size(); i++) {
+					resultsCucumber.put(expectedResults.getGherkinRows().get(0).getCells().get(i), expectedResults.getGherkinRows().get(e).getCells().get(i));
+
+				}
+				resultsListExpected.add(resultsCucumber);
+			}
+			getLogger().info("Expected Results: " + resultsListExpected.toString());
+
+			getLogger().info("Obtained Results: " + getCSVResults().toString());
+
+			//Comparisons
+			int occurrencesObtained=0;
+			int iterations=0;
+			int occurrencesExpected=0;
+			String nextKey;
+			for (int e=0; e<resultsListExpected.size(); e++) {
+				iterations=0;
+				occurrencesObtained=0;
+				occurrencesExpected=Integer.parseInt(resultsListExpected.get(e).get("occurrences").toString());
+
+				List<Map<String,String>> results = getCSVResults();
+				for (Map<String,String> result : results) {
+					Iterator<String> it = resultsListExpected.get(0).keySet().iterator();
+
+					while (it.hasNext()) {
+						nextKey = it.next();
+						if (!nextKey.equals("occurrences")){
+							if (result.get(nextKey).toString().equals(resultsListExpected.get(e).get(nextKey).toString())) {
+								iterations++;
+							}
+						}
+
+						if (iterations == resultsListExpected.get(0).keySet().size() - 1) {
+							occurrencesObtained++;
+							iterations = 0;
+						}
+					}
+					iterations = 0;
+				}
+
+				assertThat(occurrencesExpected).overridingErrorMessage("In row " + e + " have been found "
+						+ occurrencesObtained + " results and " + occurrencesExpected + " were expected").isEqualTo(occurrencesObtained);
+			}
+
+		} else {
+			throw new Exception("You must execute a query before trying to get results");
+		}
+	}
+
 
 
 	/**

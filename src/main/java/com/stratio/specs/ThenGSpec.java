@@ -589,6 +589,9 @@ public class ThenGSpec extends BaseGSpec {
             case "elasticsearch":
                 commonspec.resultsMustBeElasticsearch(expectedResults);
                 break;
+            case "csv":
+                commonspec.resultsMustBeCSV(expectedResults);
+                break;
         }
     }
 

@@ -20,6 +20,9 @@ import com.jayway.jsonpath.JsonPath;
 import cucumber.api.DataTable;
 import cucumber.api.java.en.Given;
 
+import com.stratio.tests.utils.RemoteSSHConnection;
+import java.io.File;
+
 /**
  * Generic Given Specs.
  * 
@@ -453,4 +456,75 @@ public class GivenGSpec extends BaseGSpec {
     public void seleniumSwitchParentFrame() {
         commonspec.getDriver().switchTo().frame(commonspec.getParentWindow());
     }
+
+
+    /*
+     * Opens a ssh connection to remote host
+     *
+     * @param remoteHost
+     * @param user
+     * @param password
+     *
+     */
+    @Given("^I open remote ssh connection to host '(.+?)' with user '(.+?)'( and password '(.+?)')?( using pem file '(.+?)')?$")
+    public void openSSHConnection(String remoteHost, String user, String foo, String password, String bar, String pemFile) throws Exception {
+        if (pemFile == null) {
+            if (password == null) {
+                throw new Exception("You have to provide a password or a pem file to be used for connection");
+            }
+            commonspec.getLogger().info("Openning remote ssh connection to " + remoteHost + " with user " + user +
+                    " and password " + password);
+        } else {
+            File pem = new File(pemFile);
+            if (!pem.exists()) {
+                throw new Exception("Pem file: " + pemFile + " does not exist");
+            }
+            commonspec.getLogger().info("Openning remote ssh connection to " + remoteHost + " with user " + user +
+                    " using pem file " + pemFile);
+        }
+        commonspec.setRemoteSSHConnection(new RemoteSSHConnection(user, password, remoteHost, pemFile));
+
+    }
+
+
+    /*
+     * Copies file/s from remote system into local system
+     *
+     * @param remotePath
+     * @param localPath
+     *
+     */
+    @Given("^I copy '(.+?)' from remote ssh connection and store it in '(.+?)'$")
+    public void copyFromRemoteFile(String remotePath, String localPath) throws Exception {
+        commonspec.getLogger().info("Copy remote " + remotePath + " to local " + localPath);
+        commonspec.getRemoteSSHConnection().copyFrom(remotePath, localPath);
+    }
+
+
+    /*
+     * Copies file/s from local system to remote system
+     *
+     * @param localPath
+     * @param remotePath
+     *
+     */
+    @Given("^I copy '(.+?)' to remote ssh connection in '(.+?)'$")
+    public void copyToRemoteFile(String localPath, String remotePath) throws Exception {
+        commonspec.getLogger().info("Copy local " + localPath + " to remote " + remotePath);
+        commonspec.getRemoteSSHConnection().copyTo(localPath, remotePath);
+    }
+
+
+    /*
+     * Executes the command specified in remote system
+     *
+     * @param command
+     *
+     */
+    @Given("^I execute command '(.+?)' in remote ssh connection$")
+    public void executeCommand(String command) throws Exception {
+        commonspec.getLogger().info("Executing command '" + command + "'");
+        commonspec.getRemoteSSHConnection().runCommand(command);
+    }
+
 }

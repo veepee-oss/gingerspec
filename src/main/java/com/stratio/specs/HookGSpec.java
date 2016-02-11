@@ -24,6 +24,7 @@ import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
 import com.stratio.exceptions.DBException;
 import com.stratio.tests.utils.ThreadProperty;
+import com.stratio.tests.utils.RemoteSSHConnection;
 import com.thoughtworks.selenium.SeleniumException;
 
 import cucumber.api.java.After;
@@ -231,5 +232,13 @@ public class HookGSpec extends BaseGSpec {
     public void restClientTeardown() throws IOException {
         commonspec.getLogger().info("Shutting down REST client");
         commonspec.getClient().close();
+    }
+
+    @After(order = 10)
+    public void remoteSSHConnectionTeardown() throws Exception {
+        commonspec.getLogger().info("Closing SSH remote connection");
+        if (commonspec.getRemoteSSHConnection() != null) {
+            commonspec.getRemoteSSHConnection().getSession().disconnect();
+        }
     }
 }
