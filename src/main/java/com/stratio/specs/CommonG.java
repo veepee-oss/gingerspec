@@ -929,7 +929,7 @@ public class CommonG {
             |12.5    |12.7      |Valencia  |1           |
             |2.5     | 2.6      |Stratio   |0           |
             |12.5    |13.7      |Sevilla   |1           |
-     * IMPORTANT: There no should be no existing columns
+     * IMPORTANT: All columns must exist
      * @throws Exception
      */
 	public void resultsMustBeCSV(DataTable expectedResults) throws Exception {
@@ -1004,7 +1004,7 @@ public class CommonG {
             |12.5    |12.7      |Valencia  |1           |
             |2.5     | 2.6      |Stratio   |0           |
             |12.5    |13.7      |Sevilla   |1           |
-     * IMPORTANT: There no should be no existing columns
+     * IMPORTANT: All columns must exist
      * @throws Exception
      */
 	public void resultsMustBeCassandra(DataTable expectedResults) throws Exception {
@@ -1094,7 +1094,7 @@ public class CommonG {
             |12.5    |12.7      |Valencia  |1           |
             |2.5     | 2.6      |Stratio   |0           |
             |12.5    |13.7      |Sevilla   |1           |
-     * IMPORTANT: There no should be no existing columns
+     * IMPORTANT: All columns must exist
      * @throws Exception
      */
 	public void resultsMustBeMongo(DataTable expectedResults) throws Exception {
@@ -1180,7 +1180,7 @@ public class CommonG {
 	|12.5    |12.7      |Valencia  |1           |
 	|2.5     | 2.6      |Stratio   |0           |
 	|12.5    |13.7      |Sevilla   |1           |
-	 * IMPORTANT: There no should be no existing columns
+	 * IMPORTANT: All columns must exist
 	 * @throws Exception
 	 */
 	public void resultsMustBeElasticsearch(DataTable expectedResults) throws Exception {
