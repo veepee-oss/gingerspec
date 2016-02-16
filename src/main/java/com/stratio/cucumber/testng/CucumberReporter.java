@@ -334,7 +334,14 @@ public class CucumberReporter implements Formatter, Reporter {
 
             StringBuilder stringBuilder = new StringBuilder();
 
-            addStepAndResultListing(stringBuilder);
+            List<Step> mergedsteps = new ArrayList<Step>();
+            if (stepsbg != null) {
+                mergedsteps.addAll(stepsbg);
+                mergedsteps.addAll(steps);
+            } else {
+                mergedsteps.addAll(steps);
+            }
+            addStepAndResultListing(stringBuilder, mergedsteps);
 
             Result skipped = null;
             Result failed = null;
@@ -464,17 +471,9 @@ public class CucumberReporter implements Formatter, Reporter {
             return totalDurationNanos / DURATION_STRING;
         }
 
-        private void addStepAndResultListing(StringBuilder sb) {
+        public void addStepAndResultListing(StringBuilder sb, List<Step> mergedsteps) {
 
-            if (stepsbg != null) {
-                List<Step> mergedsteps = new ArrayList<Step>();
-                mergedsteps.addAll(stepsbg);
-                mergedsteps.addAll(steps);
-                steps.clear();
-                steps.addAll(mergedsteps);
-            }
-
-            for (int i = 0; i < steps.size(); i++) {
+            for (int i = 0; i < mergedsteps.size(); i++) {
                 String resultStatus = "not executed";
                 String resultStatusWarn = "*";
                 if (i < results.size()) {
@@ -482,12 +481,12 @@ public class CucumberReporter implements Formatter, Reporter {
                     resultStatusWarn = ((results.get(i).getError() != null) && (results.get(i).getStatus()
                             .equals("passed"))) ? "(W)" : "";
                 }
-                sb.append(steps.get(i).getKeyword());
-                sb.append(steps.get(i).getName());
+                sb.append(mergedsteps.get(i).getKeyword());
+                sb.append(mergedsteps.get(i).getName());
                 int len = 0;
-                len = steps.get(i).getKeyword().length() + steps.get(i).getName().length();
-                if (steps.get(i).getRows() != null) {
-                    for (DataTableRow row : steps.get(i).getRows()) {
+                len = mergedsteps.get(i).getKeyword().length() + mergedsteps.get(i).getName().length();
+                if (mergedsteps.get(i).getRows() != null) {
+                    for (DataTableRow row : mergedsteps.get(i).getRows()) {
                         StringBuilder strrowBuilder = new StringBuilder();
                         strrowBuilder.append("| ");
                         for (String cell : row.getCells()) {

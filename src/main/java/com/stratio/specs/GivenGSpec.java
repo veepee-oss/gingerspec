@@ -3,6 +3,7 @@ package com.stratio.specs;
 import static com.stratio.assertions.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.lang.ThreadLocal;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
@@ -22,6 +23,8 @@ import cucumber.api.java.en.Given;
 
 import com.stratio.tests.utils.RemoteSSHConnection;
 import java.io.File;
+
+import com.stratio.tests.utils.ThreadProperty;
 
 /**
  * Generic Given Specs.
@@ -163,31 +166,24 @@ public class GivenGSpec extends BaseGSpec {
     }
 
 
-    /**
+     /**
      * Save value for future use
-     * 
+     *
      * @param element key in the json response to be saved (i.e. $.fragments[0].id)
-     * @param attribute STATIC attribute in the class where to store the value
-     * 
-     * @throws IllegalAccessException 
-     * @throws IllegalArgumentException 
-     * @throws SecurityException 
-     * @throws NoSuchFieldException 
-     * @throws ClassNotFoundException 
-     * @throws InstantiationException 
-     * @throws InvocationTargetException 
-     * @throws NoSuchMethodException 
+     * @param envVar thread environment variable where to store the value
+     *
      */
-    @Given("^I save element '(.+?)' in attribute '(.+?)'$")
-    public void saveElement(String element, String attribute) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, InstantiationException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException {
-        commonspec.getLogger().info("Saving element: {} in attribute: {}", element, attribute);
-
+    @Given("^I save element '(.+?)' in environment variable '(.+?)'$")
+    public void saveElementEnvironment(String element, String envVar) {
         String json = commonspec.getResponse().getResponse();
         String hjson = JsonValue.readHjson(json).asObject().toString();
         String value = JsonPath.parse(hjson).read(element);
 
-        commonspec.setPreviousElement(attribute, value);
+        commonspec.getLogger().info("Saving element: {} with value: {} in environment variable: {}", element, value, envVar);
+
+        ThreadProperty.set(envVar, value);
     }
+
 
     /**
      * Empty all the indexes of ElasticSearch.
