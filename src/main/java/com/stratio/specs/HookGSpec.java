@@ -131,6 +131,22 @@ public class HookGSpec extends BaseGSpec {
             capabilities = DesiredCapabilities.firefox();
         } else if (browser.equalsIgnoreCase("phantomjs")) {
             capabilities = DesiredCapabilities.phantomjs();
+        } else if (browser.equalsIgnoreCase("iphone")) {
+            capabilities = DesiredCapabilities.iphone();
+            capabilities.setCapability("platformName", "iOS");
+            capabilities.setCapability("platformVersion", "8.1");
+            capabilities.setCapability("deviceName", "iPhone Simulator");
+        } else if (browser.equalsIgnoreCase("Safari")) {
+            capabilities = DesiredCapabilities.safari();
+            capabilities.setCapability("platformName", "iOS");
+            capabilities.setCapability("platformVersion", "8.1");
+            capabilities.setCapability("deviceName", "iPhone Simulator");
+        } else if (browser.equalsIgnoreCase("Android")) {
+            capabilities = DesiredCapabilities.android();
+            capabilities.setCapability("platformName", "Android");
+            capabilities.setCapability("platformVersion", "6.0");
+            capabilities.setCapability("deviceName", "Android Emulator");
+            capabilities.setCapability("app", "Browser");
         } else {
             commonspec.getLogger().error("Unknown browser: " + browser);
             throw new SeleniumException("Unknown browser: " + browser);
@@ -147,7 +163,9 @@ public class HookGSpec extends BaseGSpec {
         commonspec.getDriver().manage().timeouts().setScriptTimeout(SCRIPT_TIMEOUT, TimeUnit.SECONDS);
 
         commonspec.getDriver().manage().deleteAllCookies();
-        commonspec.getDriver().manage().window().setSize(new Dimension(1440, 900));
+        if (capabilities.getCapability("deviceName") == null) {
+            commonspec.getDriver().manage().window().setSize(new Dimension(1440, 900));
+        }
         // commonspec.getDriver().manage().window().maximize();
 
     }
