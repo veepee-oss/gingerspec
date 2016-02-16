@@ -124,7 +124,7 @@ public class HookGSpec extends BaseGSpec {
 
         DesiredCapabilities capabilities = null;
 
-        switch (browser){
+        switch (browser.toLowerCase()){
         case "chrome":
             ChromeOptions chromeOptions = new ChromeOptions();
             chromeOptions.addArguments("test-type");
@@ -142,13 +142,13 @@ public class HookGSpec extends BaseGSpec {
             capabilities.setCapability("platformVersion", "8.1");
             capabilities.setCapability("deviceName", "iPhone Simulator");
             break;
-        case "Safari":
+        case "safari":
             capabilities = DesiredCapabilities.safari();
             capabilities.setCapability("platformName", "iOS");
             capabilities.setCapability("platformVersion", "8.1");
             capabilities.setCapability("deviceName", "iPhone Simulator");
             break;
-        case "Android":
+        case "android":
             capabilities = DesiredCapabilities.android();
             capabilities.setCapability("platformName", "Android");
             capabilities.setCapability("platformVersion", "6.0");
