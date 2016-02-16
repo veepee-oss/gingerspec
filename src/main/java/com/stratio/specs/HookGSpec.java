@@ -123,15 +123,39 @@ public class HookGSpec extends BaseGSpec {
         commonspec.getLogger().info("Setting up selenium for {}", browser);
 
         DesiredCapabilities capabilities = null;
-        if (browser.equalsIgnoreCase("chrome")) {
+
+        switch (browser.toLowerCase()){
+        case "chrome":
             ChromeOptions chromeOptions = new ChromeOptions();
             chromeOptions.addArguments("test-type");
             capabilities = DesiredCapabilities.chrome();
-        } else if (browser.equalsIgnoreCase("firefox")) {
+            break;
+        case "firefox":
             capabilities = DesiredCapabilities.firefox();
-        } else if (browser.equalsIgnoreCase("phantomjs")) {
+            break;
+        case "phantomjs":
             capabilities = DesiredCapabilities.phantomjs();
-        } else {
+            break;
+        case "iphone":
+            capabilities = DesiredCapabilities.iphone();
+            capabilities.setCapability("platformName", "iOS");
+            capabilities.setCapability("platformVersion", "8.1");
+            capabilities.setCapability("deviceName", "iPhone Simulator");
+            break;
+        case "safari":
+            capabilities = DesiredCapabilities.safari();
+            capabilities.setCapability("platformName", "iOS");
+            capabilities.setCapability("platformVersion", "8.1");
+            capabilities.setCapability("deviceName", "iPhone Simulator");
+            break;
+        case "android":
+            capabilities = DesiredCapabilities.android();
+            capabilities.setCapability("platformName", "Android");
+            capabilities.setCapability("platformVersion", "6.0");
+            capabilities.setCapability("deviceName", "Android Emulator");
+            capabilities.setCapability("app", "Browser");
+            break;
+        default:
             commonspec.getLogger().error("Unknown browser: " + browser);
             throw new SeleniumException("Unknown browser: " + browser);
         }
@@ -147,7 +171,9 @@ public class HookGSpec extends BaseGSpec {
         commonspec.getDriver().manage().timeouts().setScriptTimeout(SCRIPT_TIMEOUT, TimeUnit.SECONDS);
 
         commonspec.getDriver().manage().deleteAllCookies();
-        commonspec.getDriver().manage().window().setSize(new Dimension(1440, 900));
+        if (capabilities.getCapability("deviceName") == null) {
+            commonspec.getDriver().manage().window().setSize(new Dimension(1440, 900));
+        }
         // commonspec.getDriver().manage().window().maximize();
 
     }
