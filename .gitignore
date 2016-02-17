@@ -8,3 +8,4 @@ target/*
 *.iws
 *.swp
 .DS_Store
+*.iml
