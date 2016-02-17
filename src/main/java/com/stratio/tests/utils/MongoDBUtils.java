@@ -135,6 +135,15 @@ public class MongoDBUtils {
 	}
 
 	/**
+	 * Create a MongoDB collection without options.
+	 *
+	 * @param colectionName
+	 */
+	public void createMongoDBCollection(String colectionName) {
+		dataBase.createCollection(colectionName, null);
+	}
+
+	/**
 	 * Drop a MongoDB DataBase.
 	 * 
 	 * @param dataBaseName
