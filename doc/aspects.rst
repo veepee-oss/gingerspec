@@ -74,7 +74,7 @@ It is compulsory to define one of these extra tags.
 ReplacementAspect
 -----------------
 
-This aspect is used to replace environment variables and variables defined in classes extending CommonG class with their assigned values.
+This aspect is used to replace environment variables, variables stored by the user in local thread environment and variables which need special code execution to obtain their value with their assigned values.
 This replacement is completely transparent to the user. User does not have to care about making replacements in the implementation of their features.
 Implemented steps will always receive the replaced values.
 
@@ -90,7 +90,7 @@ Given we launch the execution of the tests with:
 
 SPARKTA_HOST and SPARKTA_API_PORT will be replaced by their defined value, localhost and 9091 respectively.
 
-* Example for variables defined in class extended from CommonG
+* Example for variables stored by the user in local thread environment
 
 If we have the following steps:
 ::
@@ -112,18 +112,7 @@ If we have the following steps:
 		| id | DELETE | N/A |
 		| input | DELETE | N/A |
 
-And we have implemented the following class:
-::
-	import com.stratio.specs.CommonG;
-
-	public class Common extends CommonG {
-    	public static String previousFragmentID = "";
-    	public static String previousFragmentID_2 = "";
-    	public static String previousPolicyID = "";
-    	public static String previousPolicyID_2 = "";
-	}
-
-When we execute the code, we will store the parameter '$.id' returned by the execution of the 'POST' operation in the attribute 'previousFragmentID' defined in class Common.
+When we execute the code, we will store the parameter '$.id' returned by the execution of the 'POST' operation in the environment variable 'previousFragmentID'.
 Later on, in the datatable modification:
 ::
 	| fragments[0].id | UPDATE | !{previousFragmentID} |
@@ -137,7 +126,7 @@ The output of the execution of the steps above will look like this:
 	I       Delete 11:19:17 (  WhenGSpec.java:238) - Generating request POST to /fragment with data {"element":{"name":"elementName","configuration":{"consumerKey":"*****","accessToken":"*****","accessTokenSecret":"*****","consumerSecret":"*****"},"type":"elementType"},"shortDescription":"shortDescription","description":"description","name":"inputfragment1","fragmentType":"input"} as json
 	I       Delete 11:19:17 (  WhenGSpec.java:242) - Saving response
 	I       Delete 11:19:17 (  ThenGSpec.java:547) - Verifying response message
-	I       Delete 11:19:17 ( GivenGSpec.java: 54) - Saving element: $.id in attribute: previousFragmentID
+	I       Delete 11:19:17 ( GivenGSpec.java: 54) - Saving element: $.id with value: cd45c082-ec68-4bff-baba-390816f89da4 in environment variable: previousFragmentID
 	I  Reflections 11:19:17 (Reflections.java:224) - Reflections took 36 ms to scan 2 urls, producing 22 keys and 139 values 
 	I  Reflections 11:19:17 (Reflections.java:224) - Reflections took 15 ms to scan 2 urls, producing 22 keys and 139 values 
 	I       Delete 11:19:17 (  WhenGSpec.java:230) - Retrieving data based on schemas/policies/policy.conf as json
@@ -145,6 +134,18 @@ The output of the execution of the steps above will look like this:
 	I       Delete 11:19:17 (  WhenGSpec.java:238) - Generating request POST to /policy with data {"sparkStreamingWindow":6000,"description":"description","rawData":{"enabled":"false","partitionFormat":"day","path":"myTestParquetPath"},"fragments":[{"id":"4936d05c-d37e-4d4d-9288-de1b5f2b0906","element":null,"shortDescription":"short description","description":"description","fragmentType":"input","name":"inputfragment1"}],"name":"name","checkpointPath":"checkpoint","cubes":[{"checkpointConfig":{"interval":30000,"timeAvailability":60000,"granularity":"minute","timeDimension":"minute"},"name":"testCube","dimensions":[{"field":"status","precision":"hashtags","name":"hashtags","type":"TwitterStatus"}],"operators":[{"name":"countoperator","type":"Count","configuration":{}}]}],"outputs":[{"name":"name","type":"output","configuration":{"delimiter":",","path":"/home/jcgarcia/yeah/","isAutoCalculateId":"false","header":"false"}},{"name":"name2","type":"output","configuration":{"delimiter":",","path":"/home/jcgarcia/yeah/","isAutoCalculateId":"false","header":"false"}}],"transformations":[{"order":1,"outputFields":["f"],"name":"f","inputField":"_attachment_body","type":"Morphlines","configuration":{"morphline":{"id":"morphline1","commands":[{"readJson":{}},{"extractJsonPaths":{"paths":{"field2":"/field-in-json2","field1":"/field-in-json1"}}},{"removeFields":{"blacklist":["literal:_attachment_body","literal:message"]}}],"importCommands":["org.kitesdk.**"]}}}]} as json
 
 We can see in the line saying 'Generating request POST to /policy', that the value '"fragments":[{"id":"id"' has been replaced by '"fragments":[{"id":"cd45c082-ec68-4bff-baba-390816f89da4"'
+
+* Example for variables which need special code execution
+
+If we have the following step:
+::
+	Given I start a socket in '@{IP.${IFACE}}:10666'
+
+Given we launch the execution of the tests with:
+::
+	mvn verify -DSPARTA_HOST=sp.demo.stratio.com -DSPARTA_PORT=9090 -DSPARTA_API_PORT=9090 -DCSV_PATH=/tmp/sparta/csv -DIFACE=eth0 -Dit.test=com.stratio.sparta.testsAT.automated.endtoend.ISocketOCSV
+
+'@{IP.${IFACE}} will be replaced with the ip of the interface specified in ${IFACE}
 
 SeleniumAspect
 --------------

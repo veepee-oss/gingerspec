@@ -16,6 +16,7 @@ import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.lang.ThreadLocal;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Timestamp;
@@ -103,7 +104,6 @@ public class CommonG {
 
 	// REMOTE CONNECTION
 	private RemoteSSHConnection remoteSSHConnection;
-
 
 	/**
 	 * Get the common remote connection.
