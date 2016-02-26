@@ -91,7 +91,7 @@ public class CommonG {
 	private HttpResponse response;
     private ResultSet previousCassandraResults;
 	private DBCursor previousMongoResults;
-	private JSONObject previousElasticsearchResults;
+	private ArrayList<JSONObject> previousElasticsearchResults;
 	private List<Map<String,String>> previousCSVResults;
     private String resultsType="";
 
@@ -225,7 +225,6 @@ public class CommonG {
 	/**
 	 * Set the remote connection.
 	 *
-	 * @param remoteConnection
 	 */
 	public void setRemoteSSHConnection(RemoteSSHConnection remoteSSHConnection) {
 		this.remoteSSHConnection = remoteSSHConnection;
@@ -896,11 +895,11 @@ public class CommonG {
 		this.previousMongoResults = results;
 	}
 
-	public JSONObject getElasticsearchResults() {
+	public ArrayList<JSONObject> getElasticsearchResults() {
 		return previousElasticsearchResults;
 	}
 
-	public void setElasticsearchResults(JSONObject results) {
+	public void setElasticsearchResults(ArrayList<JSONObject> results) {
 		this.previousElasticsearchResults = results;
 	}
 
@@ -1177,70 +1176,32 @@ public class CommonG {
 	 *
 	 * Example:
 	 *      |latitude| longitude|place     |occurrences|
-	|12.5    |12.7      |Valencia  |1           |
-	|2.5     | 2.6      |Stratio   |0           |
-	|12.5    |13.7      |Sevilla   |1           |
+			|12.5    |12.7      |Valencia  |1           |
+			|2.5     | 2.6      |Stratio   |0           |
+			|12.5    |13.7      |Sevilla   |1           |
 	 * IMPORTANT: All columns must exist
 	 * @throws Exception
 	 */
 	public void resultsMustBeElasticsearch(DataTable expectedResults) throws Exception {
 		if (getElasticsearchResults() != null) {
-			//Map for cucumber expected results
-			List<Map<String,Object>>resultsListExpected=new ArrayList<Map<String,Object>>();
-			Map<String,Object> resultsCucumber;
-
-			for (int e=1; e<expectedResults.getGherkinRows().size();e++) {
-				resultsCucumber = new HashMap<String,Object>();
-
-				for (int i=0; i<expectedResults.getGherkinRows().get(0).getCells().size(); i++) {
-					resultsCucumber.put(expectedResults.getGherkinRows().get(0).getCells().get(i), expectedResults.getGherkinRows().get(e).getCells().get(i));
-
+			List<List<String>> expectedResultList = expectedResults.raw();
+			//Check size
+			assertThat(expectedResultList.size()-1).overridingErrorMessage(
+						"Expected number of columns to be" + (expectedResultList.size()-1)
+						+ "but was " + previousElasticsearchResults.size())
+						.isEqualTo(previousElasticsearchResults.size());
+			List<String> columnNames = expectedResultList.get(0);
+			for(int i = 0; i< previousElasticsearchResults.size(); i++){
+				for(int j =0; j < columnNames.size(); j++){
+					assertThat(expectedResultList.get(i+1).get(j)).overridingErrorMessage("In row " + i + "and "
+							+ "column " + j
+							+ "have "
+							+ "been "
+							+ "found "
+							+ expectedResultList.get(i+1).get(j) + " results and " + previousElasticsearchResults.get(i).get(columnNames.get(j)).toString() + " were "
+							+ "expected").isEqualTo(previousElasticsearchResults.get(i).get(columnNames.get(j)).toString());
 				}
-				resultsListExpected.add(resultsCucumber);
 			}
-			getLogger().info("Expected Results: "+resultsListExpected.toString());
-
-			getLogger().info("Obtained Results: " + getElasticsearchResults().getJSONArray("hits").toString());
-
-			//Comparisons
-			int occurrencesObtained=0;
-			int iterations=0;
-			int occurrencesExpected=0;
-			String nextKey;
-			for (int e=0; e<resultsListExpected.size(); e++) {
-				iterations=0;
-				occurrencesObtained=0;
-				occurrencesExpected=Integer.parseInt(resultsListExpected.get(e).get("occurrences").toString());
-
-				JSONArray results = getElasticsearchResults().getJSONArray("hits");
-				int i = getElasticsearchResults().getInt("total") - 1;
-				while (i >= 0) {
-
-					JSONObject result = results.getJSONObject(i).getJSONObject("_source");
-
-					Iterator<String> it = resultsListExpected.get(0).keySet().iterator();
-
-					while (it.hasNext()) {
-						nextKey=it.next();
-						if (!nextKey.equals("occurrences")){
-							if (result.get(nextKey).toString().equals(resultsListExpected.get(e).get(nextKey).toString())) {
-								iterations++;
-							}
-						}
-
-						if (iterations == resultsListExpected.get(0).keySet().size() - 1) {
-							occurrencesObtained++;
-							iterations = 0;
-						}
-					}
-					iterations = 0;
-					i--;
-				}
-
-				assertThat(occurrencesExpected).overridingErrorMessage("In row " + e + " have been found "
-						+ occurrencesObtained + " results and " + occurrencesExpected + " were expected").isEqualTo(occurrencesObtained);
-			}
-
 		} else {
 			throw new Exception("You must execute a query before trying to get results");
 		}

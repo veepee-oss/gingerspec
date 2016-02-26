@@ -6,8 +6,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.lang.ThreadLocal;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,7 +30,7 @@ import com.stratio.tests.utils.ThreadProperty;
 
 /**
  * Generic Given Specs.
- * 
+ *
  */
 public class GivenGSpec extends BaseGSpec {
 
@@ -38,7 +40,7 @@ public class GivenGSpec extends BaseGSpec {
 
     /**
      * Generic constructor.
-     * 
+     *
      * @param spec
      */
     public GivenGSpec(CommonG spec) {
@@ -48,13 +50,13 @@ public class GivenGSpec extends BaseGSpec {
 
     /**
      * Create a basic Index.
-     * 
+     *
      * @param index_name index name
      * @param table the table where index will be created.
      * @param column the column where index will be saved
      * @param keyspace keyspace used
-     * @throws Exception 
-     * 
+     * @throws Exception
+     *
      */
     @Given("^I create a Cassandra index named '(.+?)' in table '(.+?)' using magic_column '(.+?)' using keyspace '(.+?)'$")
     public void createBasicMapping(String index_name, String table, String column, String keyspace) throws Exception {
@@ -65,7 +67,7 @@ public class GivenGSpec extends BaseGSpec {
 
     /**
      * Create a Cassandra Keyspace.
-     * 
+     *
      * @param keyspace
      */
     @Given("^I create a Cassandra keyspace named '(.+)'$")
@@ -75,12 +77,12 @@ public class GivenGSpec extends BaseGSpec {
     }
     /**
      * Connect to cluster.
-     * 
+     *
      * @param clusterType DB type (Cassandra|Mongo|Elasticsearch)
      * @param url url where is started Cassandra cluster
      */
     @Given("^I connect to '(Cassandra|Mongo|Elasticsearch)' cluster at '(.+)'$")
-    public void connect(String clusterType, String url) throws DBException {
+    public void connect(String clusterType, String url) throws DBException, UnknownHostException {
         commonspec.getLogger().info("Connecting to " + clusterType + " cluster", "");
         switch (clusterType) {
             case "Cassandra":
@@ -91,6 +93,9 @@ public class GivenGSpec extends BaseGSpec {
                 commonspec.getMongoDBClient().connect();
                 break;
             case "Elasticsearch":
+                LinkedHashMap<String,Object> settings_map = new LinkedHashMap<String,Object>();
+                settings_map.put("cluster.name",System.getProperty("ES_CLUSTER", "elasticsearch"));
+                commonspec.getElasticSearchClient().setSettings(settings_map);
                 commonspec.getElasticSearchClient().connect();
                 break;
             default:
@@ -100,28 +105,28 @@ public class GivenGSpec extends BaseGSpec {
 
     /**
      * Create table
-     * 
+     *
      * @param table
      * @param datatable
      * @param keyspace
-     * @throws Exception 
+     * @throws Exception
      */
     @Given("^I create a Cassandra table named '(.+?)' using keyspace '(.+?)' with:$")
     public void createTableWithData(String table, String keyspace, DataTable datatable){
         try{
-        commonspec.getCassandraClient().useKeyspace(keyspace);        
+        commonspec.getCassandraClient().useKeyspace(keyspace);
         commonspec.getLogger().info("Starting a table creation", "");
         int attrLength=datatable.getGherkinRows().get(0).getCells().size();
         Map<String,String> columns =  new HashMap<String,String>();
         ArrayList<String> pk=new ArrayList<String>();
 
         for(int i=0; i<attrLength; i++){
-            columns.put(datatable.getGherkinRows().get(0).getCells().get(i), 
-            datatable.getGherkinRows().get(1).getCells().get(i));    
+            columns.put(datatable.getGherkinRows().get(0).getCells().get(i),
+            datatable.getGherkinRows().get(1).getCells().get(i));
             if(datatable.getGherkinRows().get(2).getCells().get(i).equalsIgnoreCase("PK")){
                 pk.add(datatable.getGherkinRows().get(0).getCells().get(i));
             }
-        } 
+        }
         if(pk.isEmpty()){
             throw new Exception("A PK is needed");
         }
@@ -136,22 +141,22 @@ public class GivenGSpec extends BaseGSpec {
 
     /**
      * Insert Data
-     * 
+     *
      * @param table
      * @param datatable
      * @param keyspace
-     * @throws Exception 
+     * @throws Exception
      */
     @Given("^I insert in keyspace '(.+?)' and table '(.+?)' with:$")
     public void insertData(String keyspace, String table, DataTable datatable){
         try{
-        commonspec.getCassandraClient().useKeyspace(keyspace);        
+        commonspec.getCassandraClient().useKeyspace(keyspace);
         commonspec.getLogger().info("Starting a table creation", "");
         int attrLength=datatable.getGherkinRows().get(0).getCells().size();
         Map<String, Object> fields =  new HashMap<String,Object>();
         for(int e=1; e<datatable.getGherkinRows().size();e++){
             for(int i=0; i<attrLength; i++){
-                fields.put(datatable.getGherkinRows().get(0).getCells().get(i), datatable.getGherkinRows().get(e).getCells().get(i));    
+                fields.put(datatable.getGherkinRows().get(0).getCells().get(i), datatable.getGherkinRows().get(e).getCells().get(i));
 
             }
             commonspec.getCassandraClient().insertData(keyspace+"."+table, fields);
@@ -172,6 +177,14 @@ public class GivenGSpec extends BaseGSpec {
      * @param element key in the json response to be saved (i.e. $.fragments[0].id)
      * @param envVar thread environment variable where to store the value
      *
+     * @throws IllegalAccessException
+     * @throws IllegalArgumentException
+     * @throws SecurityException
+     * @throws NoSuchFieldException
+     * @throws ClassNotFoundException
+     * @throws InstantiationException
+     * @throws InvocationTargetException
+     * @throws NoSuchMethodException
      */
     @Given("^I save element '(.+?)' in environment variable '(.+?)'$")
     public void saveElementEnvironment(String element, String envVar) {
@@ -184,51 +197,29 @@ public class GivenGSpec extends BaseGSpec {
         ThreadProperty.set(envVar, value);
     }
 
-
-    /**
-     * Empty all the indexes of ElasticSearch.
-     */
-    @Given("^I empty every existing elasticsearch index$")
-    public void emptyElasticsearchIndexes() {
-        commonspec.getLogger().info("Emptying es indexes");
-        commonspec.getElasticSearchClient().emptyIndexes();
-    }
-
-
-    /**
-     * Empty a specific index of ElasticSearch.
-     * 
-     * @param index
-     */
-    @Given("^I empty an elasticsearch index named '(.+?)'$")
-    public void emptyElasticsearchIndex(String index) {
-        commonspec.getLogger().info("Emptying an es index: {}", index);
-        commonspec.getElasticSearchClient().emptyIndex(index);
-    }
-
     /**
      * Drop all the ElasticSearch indexes.
      */
     @Given("^I drop every existing elasticsearch index$")
     public void dropElasticsearchIndexes() {
         commonspec.getLogger().info("Dropping es indexes");
-        commonspec.getElasticSearchClient().dropIndexes();
+        commonspec.getElasticSearchClient().dropAllIndexes();
     }
 
     /**
      * Drop an specific index of ElasticSearch.
-     * 
+     *
      * @param index
      */
     @Given("^I drop an elasticsearch index named '(.+?)'$")
     public void dropElasticsearchIndex(String index) {
         commonspec.getLogger().info("Dropping an es index: {}", index);
-        commonspec.getElasticSearchClient().dropIndex(index);
+        commonspec.getElasticSearchClient().dropSingleIndex(index);
     }
 
     /**
      * Execute a cql file over a Cassandra keyspace.
-     * 
+     *
      * @param filename
      * @param keyspace
      */
@@ -240,7 +231,7 @@ public class GivenGSpec extends BaseGSpec {
 
     /**
      * Drop a Cassandra Keyspace.
-     * 
+     *
      * @param keyspace
      */
     @Given("^I drop a Cassandra keyspace '(.+)'$")
@@ -252,7 +243,7 @@ public class GivenGSpec extends BaseGSpec {
 
     /**
      * Create a AeroSpike namespace, table and the data of the table.
-     * 
+     *
      * @param nameSpace
      * @param tableName
      * @param tab
@@ -268,7 +259,7 @@ public class GivenGSpec extends BaseGSpec {
 
     /**
      * Create a MongoDB dataBase.
-     * 
+     *
      * @param databaseName
      */
     @Given("^I create a MongoDB dataBase '(.+?)'$")
@@ -280,7 +271,7 @@ public class GivenGSpec extends BaseGSpec {
 
     /**
      * Drop MongoDB Database.
-     * 
+     *
      * @param databaseName
      */
     @Given("^I drop a MongoDB database '(.+?)'$")
@@ -291,7 +282,7 @@ public class GivenGSpec extends BaseGSpec {
 
     /**
      * Insert data in a MongoDB table.
-     * 
+     *
      * @param dataBase
      * @param tabName
      * @param table
@@ -305,7 +296,7 @@ public class GivenGSpec extends BaseGSpec {
 
     /**
      * Truncate table in MongoDB.
-     * 
+     *
      * @param database
      * @param table
      */
@@ -318,9 +309,9 @@ public class GivenGSpec extends BaseGSpec {
 
     /**
      * Browse to {@code url} using the current browser.
-     * 
+     *
      * @param path
-     * @throws Exception 
+     * @throws Exception
      */
     @Given("^I browse to '(.+?)'$")
     public void seleniumBrowse(String path) throws Exception {
@@ -334,7 +325,7 @@ public class GivenGSpec extends BaseGSpec {
             throw new Exception("Web port has not been set");
         }
 
-        String webURL = "http://" + commonspec.getWebHost() + commonspec.getWebPort();	
+        String webURL = "http://" + commonspec.getWebHost() + commonspec.getWebPort();
 
         commonspec.getLogger().info("Browsing to {}{} with {}", webURL, path, commonspec.getBrowserName());
         commonspec.getDriver().get(webURL + path);
@@ -343,10 +334,10 @@ public class GivenGSpec extends BaseGSpec {
 
     /**
      * Set app host and port {@code host, @code port}
-     * 
+     *
      * @param host
      * @param port
-     * 
+     *
      */
     @Given("^My app is running in '([^:]+?)(:.+?)?'$")
     public void setupApp(String host, String port) {
@@ -385,12 +376,12 @@ public class GivenGSpec extends BaseGSpec {
         commonspec.setWebHost(webHost);
         commonspec.setWebPort(webPort);
 
-        commonspec.getLogger().info("Set web base URL to http://{}{}", webHost, webPort);  
+        commonspec.getLogger().info("Set web base URL to http://{}{}", webHost, webPort);
     }
 
     /**
      * Send requests to {@code restHost @code restPort}.
-     * 
+     *
      * @param restHost
      * @param restPort
      */
@@ -414,7 +405,7 @@ public class GivenGSpec extends BaseGSpec {
 
     /**
      * Maximizes current browser window. Mind the current resolution could break a test.
-     * 
+     *
      */
     @Given("^I maximize the browser$")
     public void seleniumMaximize(String url) {
@@ -423,7 +414,7 @@ public class GivenGSpec extends BaseGSpec {
 
     /**
      * Switches to a frame/ iframe.
-     * 
+     *
      */
     @Given("^I switch to the iframe on index '(\\d+?)' $")
     public void seleniumSwitchFrame(Integer index) {
@@ -437,7 +428,7 @@ public class GivenGSpec extends BaseGSpec {
 
     /**
      * Switches to a parent frame/ iframe.
-     * 
+     *
      */
     @Given("^I switch to a parent frame$")
     public void seleniumSwitchAParentFrame() {
@@ -446,7 +437,7 @@ public class GivenGSpec extends BaseGSpec {
 
     /**
      * Switches to the frames main container.
-     * 
+     *
      */
     @Given("^I switch to the main frame container$")
     public void seleniumSwitchParentFrame() {
