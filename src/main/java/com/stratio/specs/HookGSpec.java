@@ -127,8 +127,9 @@ public class HookGSpec extends BaseGSpec {
         switch (browser.toLowerCase()){
         case "chrome":
             ChromeOptions chromeOptions = new ChromeOptions();
-            chromeOptions.addArguments("test-type");
+            chromeOptions.addArguments("--no-sandbox");
             capabilities = DesiredCapabilities.chrome();
+            capabilities.setCapability(ChromeOptions.CAPABILITY, chromeOptions);
             break;
         case "firefox":
             capabilities = DesiredCapabilities.firefox();
