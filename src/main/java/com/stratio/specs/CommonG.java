@@ -899,7 +899,7 @@ public class CommonG {
 		return previousElasticsearchResults;
 	}
 
-	public void setElasticsearchResults(ArrayList<JSONObject> results) {
+	public void setElasticsearchResults(List<JSONObject> results) {
 		this.previousElasticsearchResults = results;
 	}
 
