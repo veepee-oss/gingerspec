@@ -46,7 +46,7 @@ public class ThenGSpec extends BaseGSpec {
 
     /**
      * Class constructor.
-     * 
+     *
      * @param spec
      */
     public ThenGSpec(CommonG spec) {
@@ -55,7 +55,7 @@ public class ThenGSpec extends BaseGSpec {
 
     /**
      * Checks if an exception has been thrown.
-     * 
+     *
      * @param exception
      *            : "IS NOT" | "IS"
      * @param foo
@@ -92,7 +92,7 @@ public class ThenGSpec extends BaseGSpec {
 
     /**
      * Checks if a keyspaces exists in Cassandra.
-     * 
+     *
      * @param keyspace
      */
     @Then("^a Cassandra keyspace '(.+?)' exists$")
@@ -104,7 +104,7 @@ public class ThenGSpec extends BaseGSpec {
 
     /**
      * Checks if a cassandra keyspace contains a table.
-     * 
+     *
      * @param keyspace
      * @param tableName
      */
@@ -117,7 +117,7 @@ public class ThenGSpec extends BaseGSpec {
 
     /**
      * Checks the number of rows in a cassandra table.
-     * 
+     *
      * @param keyspace
      * @param tableName
      * @param numberRows
@@ -134,7 +134,7 @@ public class ThenGSpec extends BaseGSpec {
 
     /**
      * Checks if a cassandra table contains the values of a DataTable.
-     * 
+     *
      * @param keyspace
      * @param tableName
      * @param data
@@ -234,45 +234,8 @@ public class ThenGSpec extends BaseGSpec {
     }
 
     /**
-     * Checks if the index has a specific content.
-     * 
-     * @param indexName
-     * @param type
-     * @param data
-     */
-    @Then("^the '(.+?)' index has a type '(.+?)' with content \\(key and value\\): '(.+?)'$")
-    public void assertIndexHasContent(String indexName, String type, String data) {
-        commonspec.getLogger().info("Verifying elasticseach content existance");
-
-        List<String> responseList = new ArrayList<String>();
-        List<String> cleanResponseList = new ArrayList<String>();
-        for (String query : data.split(",")) {
-            String response = commonspec.getElasticSearchClient().queryIndex(indexName, type, query);
-
-            Pattern pat = Pattern.compile(".*?source.*?\\{(.+?)\\}.*?");
-            Matcher m = pat.matcher(response);
-            while (m.find()) {
-                responseList.add(m.group(1).replaceAll("\"", ""));
-            }
-        }
-        // drop dupe results
-        HashSet<String> hs = new HashSet<String>();
-        hs.addAll(responseList);
-        responseList.clear();
-        responseList.addAll(hs);
-        Collections.sort(responseList);
-        // cleanup results, dropping timestamp
-        for (String el : responseList) {
-            cleanResponseList.add(el.replaceAll(",@timestamp.*", ""));
-        }
-
-        org.hamcrest.MatcherAssert.assertThat("Event not found at elastic search index", cleanResponseList,
-                hasItem(data));
-    }
-
-    /**
      * Checks the values of a Aerospike table.
-     * 
+     *
      * @param nameSpace
      * @param tableName
      * @param data
@@ -288,7 +251,7 @@ public class ThenGSpec extends BaseGSpec {
 
     /**
      * Checks the values of a MongoDB table.
-     * 
+     *
      * @param dataBase
      * @param tableName
      * @param data
@@ -307,7 +270,7 @@ public class ThenGSpec extends BaseGSpec {
 
     /**
      * Checks if a MongoDB database contains a table.
-     * 
+     *
      * @param database
      * @param tableName
      */
@@ -322,7 +285,7 @@ public class ThenGSpec extends BaseGSpec {
 
     /**
      * Checks if a text exists in the source of an already loaded URL.
-     * 
+     *
      * @param text
      */
     @Then("^a text '(.+?)' exists$")
@@ -334,7 +297,7 @@ public class ThenGSpec extends BaseGSpec {
 
     /**
      * Verifies that a webelement previously found has {@code text} as text
-     * 
+     *
      * @param index
      * @param text
      */
@@ -349,15 +312,15 @@ public class ThenGSpec extends BaseGSpec {
 
     /**
      * Checks if {@code expectedCount} webelements are found, with a location {@code method}.
-     * 
+     *
      * @param expectedCount
      * @param method
      * @param element
-     * @throws IllegalAccessException 
-     * @throws IllegalArgumentException 
-     * @throws SecurityException 
-     * @throws NoSuchFieldException 
-     * @throws ClassNotFoundException 
+     * @throws IllegalAccessException
+     * @throws IllegalArgumentException
+     * @throws SecurityException
+     * @throws NoSuchFieldException
+     * @throws ClassNotFoundException
      */
     @Then("^'(\\d+?)' elements? exists? with '([^:]*?):([^:]*?)'$")
     public void assertSeleniumNElementExists(Integer expectedCount, String method, String element) throws ClassNotFoundException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
@@ -370,7 +333,7 @@ public class ThenGSpec extends BaseGSpec {
 
     //    /**
     //     * Checks if an unknown number of webelements are found, with a location {@code method}.
-    //     * 
+    //     *
     //     * @param method
     //     * @param element
     //     */
@@ -388,18 +351,18 @@ public class ThenGSpec extends BaseGSpec {
      * Checks if {@code expectedCount} webelements are found, whithin a {@code timeout} and with a location
      * {@code method}. Each negative lookup is followed by a wait of {@code wait} seconds. Selenium times are not
      * accounted for the mentioned timeout.
-     * 
+     *
      * @param timeout
      * @param wait
      * @param expectedCount
      * @param method
      * @param element
      * @throws InterruptedException
-     * @throws IllegalAccessException 
-     * @throws IllegalArgumentException 
-     * @throws SecurityException 
-     * @throws NoSuchFieldException 
-     * @throws ClassNotFoundException 
+     * @throws IllegalAccessException
+     * @throws IllegalArgumentException
+     * @throws SecurityException
+     * @throws NoSuchFieldException
+     * @throws ClassNotFoundException
      */
     @Then("^in less than '(\\d+?)' seconds, checking each '(\\d+?)' seconds, '(\\d+?)' elements exists with '([^:]*?):([^:]*?)'$")
     public void assertSeleniumNElementExistsOnTimeOut(Integer timeout, Integer wait, Integer expectedCount,
@@ -425,7 +388,7 @@ public class ThenGSpec extends BaseGSpec {
 
     /**
      * Verifies that a webelement previously found {@code isDisplayed}
-     * 
+     *
      * @param index
      * @param isDisplayed
      */
@@ -441,7 +404,7 @@ public class ThenGSpec extends BaseGSpec {
 
     /**
      * Verifies that a webelement previously found {@code isEnabled}
-     * 
+     *
      * @param index
      * @param isEnabled
      */
@@ -457,7 +420,7 @@ public class ThenGSpec extends BaseGSpec {
 
     /**
      * Verifies that a webelement previously found {@code isSelected}
-     * 
+     *
      * @param index
      * @param isSelected
      */
@@ -473,7 +436,7 @@ public class ThenGSpec extends BaseGSpec {
 
     /**
      * Verifies that a webelement previously found has {@code attribute} with {@code value} (as a regexp)
-     * 
+     *
      * @param index
      * @param attribute
      * @param value
@@ -491,7 +454,7 @@ public class ThenGSpec extends BaseGSpec {
 
     /**
      * Takes an snapshot of the current page
-     * 
+     *
      * @throws Exception
      */
     @Then("^I take a snapshot$")
@@ -502,9 +465,9 @@ public class ThenGSpec extends BaseGSpec {
 
     /**
      * Checks that we are in the URL passed
-     * 
+     *
      * @param url
-     * @throws Exception 
+     * @throws Exception
      */
     @Then("^we are in page '(.+?)'$")
     public void checkURL(String url) throws Exception {
@@ -561,17 +524,17 @@ public class ThenGSpec extends BaseGSpec {
 
     /**
      * Checks the different results of a previous query
-     * 
+     *
      * @param expectedResults A DataTable Object with all data needed for check the results. The DataTable must contains at least 2 columns:
      * a) A field column from the result
      * b) Occurrences column (Integer type)
-     * 
+     *
      * Example:
      *      |latitude| longitude|place     |occurrences|
             |12.5    |12.7      |Valencia  |1           |
             |2.5     | 2.6      |Stratio   |0           |
             |12.5    |13.7      |Sevilla   |1           |
-     * IMPORTANT: There no should be no existing columns 
+     * IMPORTANT: There no should be no existing columns
      * @throws Exception
      */
     @Then("^There are results found with:$")

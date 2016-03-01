@@ -5,11 +5,14 @@ import static org.testng.Assert.fail;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.assertj.core.util.Collections;
+import org.elasticsearch.ElasticsearchException;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.CommandInfo;
@@ -44,7 +47,7 @@ public class HookGSpec extends BaseGSpec {
 
     /**
      * Default constructor.
-     * 
+     *
      * @param spec
      */
     public HookGSpec(CommonG spec) {
@@ -88,7 +91,14 @@ public class HookGSpec extends BaseGSpec {
     @Before(order = ORDER_10, value = "@elasticsearch")
     public void elasticsearchSetup() {
         commonspec.getLogger().info("Setting up elasticsearch client");
-        commonspec.getElasticSearchClient().connect();
+        LinkedHashMap<String,Object> settings_map = new LinkedHashMap<String,Object>();
+        settings_map.put("cluster.name",System.getProperty("ES_CLUSTER", "elasticsearch"));
+        commonspec.getElasticSearchClient().setSettings(settings_map);
+        try {
+            commonspec.getElasticSearchClient().connect();
+        }catch(UnknownHostException e){
+            fail(e.toString());
+        }
     }
 
     /**
@@ -102,7 +112,7 @@ public class HookGSpec extends BaseGSpec {
 
     /**
      * Connect to selenium.
-     * 
+     *
      * @throws MalformedURLException
      */
     @Before(order = ORDER_10, value = "@web")
@@ -111,12 +121,12 @@ public class HookGSpec extends BaseGSpec {
         if (grid == null) {
             fail("Selenium grid not available");
         }
-        
+
 	String b = ThreadProperty.get("browser");
         if ("".equals(b)) {
             fail("Non available browsers");
         }
-        
+
         String browser = b.split("_")[0];
         String version = b.split("_")[1];
         commonspec.setBrowserName(browser);
@@ -220,8 +230,8 @@ public class HookGSpec extends BaseGSpec {
     public void elasticsearchTeardown() {
         commonspec.getLogger().info("Shutdown elasticsearch client");
         try {
-            commonspec.getElasticSearchClient().disconnect();
-        } catch (DBException e) {
+            commonspec.getElasticSearchClient().getClient().close();
+        } catch (ElasticsearchException e) {
             fail(e.toString());
         }
     }
@@ -246,15 +256,15 @@ public class HookGSpec extends BaseGSpec {
     public void teardown() {
         commonspec.getLogger().info("Ended running hooks");
     }
-    
+
     @Before(order = 10, value = "@rest")
     public void restClientSetup() throws Exception {
         commonspec.getLogger().info("Starting a REST client");
 
         commonspec.setClient(new AsyncHttpClient(new AsyncHttpClientConfig.Builder().setAllowPoolingConnections(false)
-                .build()));        
+                .build()));
     }
- 
+
     @After(order = 10, value = "@rest")
     public void restClientTeardown() throws IOException {
         commonspec.getLogger().info("Shutting down REST client");

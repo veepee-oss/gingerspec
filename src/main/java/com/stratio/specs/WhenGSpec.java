@@ -1,6 +1,7 @@
 package com.stratio.specs;
 
 import static com.stratio.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.filter;
 //import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
@@ -42,7 +43,7 @@ public class WhenGSpec extends BaseGSpec {
 
     /**
      * Default constructor.
-     * 
+     *
      * @param spec
      */
     public WhenGSpec(CommonG spec) {
@@ -51,7 +52,7 @@ public class WhenGSpec extends BaseGSpec {
 
     /**
      * Wait seconds.
-     * 
+     *
      * @param seconds
      * @throws InterruptedException
      */
@@ -63,14 +64,14 @@ public class WhenGSpec extends BaseGSpec {
 
     /**
      * Searchs for two webelements dragging the first one to the second
-     * 
+     *
      * @param source
      * @param destination
-     * @throws IllegalAccessException 
-     * @throws IllegalArgumentException 
-     * @throws SecurityException 
-     * @throws NoSuchFieldException 
-     * @throws ClassNotFoundException 
+     * @throws IllegalAccessException
+     * @throws IllegalArgumentException
+     * @throws SecurityException
+     * @throws NoSuchFieldException
+     * @throws ClassNotFoundException
      */
     @When("^I drag '([^:]*?):([^:]*?)' and drop it to '([^:]*?):([^:]*?)'$")
     public void seleniumDrag(String smethod, String source, String dmethod, String destination) throws ClassNotFoundException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
@@ -86,7 +87,7 @@ public class WhenGSpec extends BaseGSpec {
 
     /**
      * Click on an numbered {@code url} previously found element.
-     * 
+     *
      * @param index
      */
     @When("^I click on the element on index '(\\d+?)'$")
@@ -97,28 +98,28 @@ public class WhenGSpec extends BaseGSpec {
         	.hasAtLeast(index);
         commonspec.getPreviousWebElements().getPreviousWebElements().get(index).click();
     }
-  
+
     /**
      * Clear the text on a numbered {@code index} previously found element.
-     * 
+     *
      * @param index
      */
     @When("^I clear the content on text input at index '(\\d+?)'$")
     public void seleniumClear(Integer index) {
 	commonspec.getLogger().info("Clearing text on element with index {}", index);
-	
+
 	assertThat(this.commonspec, commonspec.getPreviousWebElements()).as("There are less found elements than required")
         	.hasAtLeast(index);
-	
+
 	assertThat(this.commonspec, commonspec.getPreviousWebElements().getPreviousWebElements().get(index)).isTextField(commonspec.getTextFieldCondition());
-	
-	commonspec.getPreviousWebElements().getPreviousWebElements().get(index).clear();	
+
+	commonspec.getPreviousWebElements().getPreviousWebElements().get(index).clear();
     }
-    
-    
+
+
     /**
      * Type a {@code text} on an numbered {@code index} previously found element.
-     * 
+     *
      * @param text
      * @param index
      */
@@ -149,7 +150,7 @@ public class WhenGSpec extends BaseGSpec {
      * NUMPAD3, NUMPAD4, NUMPAD5, NUMPAD6, NUMPAD7, NUMPAD8, NUMPAD9, MULTIPLY, ADD, SEPARATOR, SUBTRACT, DECIMAL,
      * DIVIDE, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, META, COMMAND, ZENKAKU_HANKAKU) , a plus sign (+), a
      * comma (,) or spaces ( )
-     * 
+     *
      * @param strokes
      * @param foo
      * @param index
@@ -165,13 +166,13 @@ public class WhenGSpec extends BaseGSpec {
 	    	.hasAtLeast(index);
 	}
 	assertThat(strokes).isNotEmpty();
-	
+
 	for (String stroke : strokes) {
 	    if (stroke.contains("+")) {
 		List<Keys> csl = new ArrayList<Keys>();
 		for (String strokeInChord : stroke.split("\\+")) {
 		    csl.add(Keys.valueOf(strokeInChord.trim()));
-		}                                
+		}
 		Keys[] csa = csl.toArray(new Keys[csl.size()]);
 		if (index == null) {
 		    new Actions(commonspec.getDriver()).sendKeys(commonspec.getDriver().findElement(By.tagName("body")), csa).perform();
@@ -187,10 +188,10 @@ public class WhenGSpec extends BaseGSpec {
 	    }
 	}
     }
-    
+
     /**
      * Choose an @{code option} from a select webelement found previously
-     * 
+     *
      * @param option
      * @param index
      */
@@ -206,7 +207,7 @@ public class WhenGSpec extends BaseGSpec {
 
     /**
      * Choose no option from a select webelement found previously
-     * 
+     *
      * @param index
      */
     @When("^I de-select every item on the element on index '(\\d+?)'$")
@@ -220,10 +221,10 @@ public class WhenGSpec extends BaseGSpec {
             sel.deselectAll();
         }
     }
-    
+
     /**
-     * Send a request of the type specified 
-     * 
+     * Send a request of the type specified
+     *
      * @param requestType type of request to be sent. Possible values:
      * GET|DELETE|POST|PUT|CONNECT|PATCH|HEAD|OPTIONS|REQUEST|TRACE
      * @param endPoint end point to be used
@@ -236,14 +237,14 @@ public class WhenGSpec extends BaseGSpec {
      * where:
      *     key path: path to the key to be modified
      *     type of modification: DELETE|ADD|UPDATE
-     *     new value: in case of UPDATE or ADD, new value to be used 
+     *     new value: in case of UPDATE or ADD, new value to be used
      * for example:
      * if the element read is {"key1": "value1", "key2": {"key3": "value3"}}
      * and we want to modify the value in "key3" with "new value3"
      * the modification will be:
      *  	| key2.key3 | UPDATE | "new value3" |
      * being the result of the modification: {"key1": "value1", "key2": {"key3": "new value3"}}
-     * @throws Exception 
+     * @throws Exception
      */
     @When("^I send a '(.+?)' request to '(.+?)' based on '([^:]+?)'( as '(json|string)')? with:$")
     public void sendRequest(String requestType, String endPoint, String baseData, String foo, String type, DataTable modifications) throws Exception {
@@ -258,7 +259,7 @@ public class WhenGSpec extends BaseGSpec {
 
 	commonspec.getLogger().info("Generating request {} to {} with data {} as {}", requestType, endPoint, modifiedData, type);
 	Future<Response> response = commonspec.generateRequest(requestType, endPoint, modifiedData, type);
-			
+
 	// Save response
 	commonspec.getLogger().info("Saving response");
 	commonspec.setResponse(requestType, response.get());
@@ -268,20 +269,20 @@ public class WhenGSpec extends BaseGSpec {
      * Same sendRequest, but in this case, we do not receive a data table with modifications.
      * Besides, the data and request header are optional as well.
      * In case we want to simulate sending a json request with empty data, we just to avoid baseData
-     * 
+     *
      * @param requestType
      * @param endPoint
      * @param foo
      * @param baseData
      * @param bar
      * @param type
-     * 
+     *
      * @throws Exception
      */
     @When("^I send a '(.+?)' request to '(.+?)'( based on '([^:]+?)')?( as '(json|string)')?$")
     public void sendRequestNoDataTable (String requestType, String endPoint, String foo, String baseData, String bar, String type) throws Exception {
 	Future<Response> response;
-	
+
 	if (baseData != null) {
 	    // Retrieve data
 	    String retrievedData = commonspec.retrieveData(baseData, type);
@@ -291,29 +292,29 @@ public class WhenGSpec extends BaseGSpec {
 	    // Generate request
 	    response = commonspec.generateRequest(requestType, endPoint, "", type);
 	}
-			
+
 	// Save response
 	commonspec.setResponse(requestType, response.get());
     }
-    
+
     @When("^I attempt a login to '(.+?)' based on '([^:]+?)' as '(json|string)'$")
     public void loginUser(String endPoint, String baseData, String type) throws Exception {
 	sendRequestNoDataTable("POST", endPoint, null, baseData, null, type);
     }
-    
+
     @When("^I attempt a login to '(.+?)' based on '([^:]+?)' as '(json|string)' with:$")
     public void loginUser(String endPoint, String baseData, String type, DataTable modifications) throws Exception {
 	sendRequest("POST", endPoint, baseData, "", type, modifications);
     }
-    
+
     @When("^I attempt a logout to '(.+?)'$")
     public void logoutUser(String endPoint) throws Exception {
 	sendRequestNoDataTable("GET", endPoint, null, "", null, "");
     }
-    
+
     /**
      * Execute a query with schema over a cluster
-     * 
+     *
      * @param fields columns on which the query is executed. Example: "latitude,longitude" or "*" or "count(*)"
      * @param schema the file of configuration (.conf) with the options of mappin. If schema is the word "empty", method will not add a where clause.
      * @param type type of the changes in schema (string or json)
@@ -327,15 +328,15 @@ public class WhenGSpec extends BaseGSpec {
     public void sendQueryOfType( String fields, String schema, String type, String magic_column, String table, String keyspace, DataTable modifications){
         try {
         commonspec.setResultsType("cassandra");
-        commonspec.getCassandraClient().useKeyspace(keyspace);  
+        commonspec.getCassandraClient().useKeyspace(keyspace);
         commonspec.getLogger().info("Starting a query of type "+commonspec.getResultsType());
-       
+
         String query="";
-    
+
         if(schema.equals("empty") && magic_column.equals("empty")){
-            
+
          query="SELECT "+fields+" FROM "+ table +";";
-         
+
         }else if(!schema.equals("empty") && magic_column.equals("empty")){
             String retrievedData = commonspec.retrieveData(schema, type);
             String modifiedData = commonspec.modifyData(retrievedData, type, modifications).toString();
@@ -370,7 +371,7 @@ public class WhenGSpec extends BaseGSpec {
      * @param collection collection in database
      * @param modifications modifications to perform in query
      */
-    @When("^I execute query '(.+?)' of type '(json|string)' in '(mongo|elasticsearch)' database '(.+?)' using collection '(.+?)' with:$")
+    @When("^I execute query '(.+?)' of type '(json|string)' in '(mongo)' database '(.+?)' using collection '(.+?)' with:$")
     public void sendQueryOfType(String query, String type, String dbType,String database, String collection, DataTable modifications) throws Exception {
         try {
             commonspec.setResultsType(dbType);
@@ -391,11 +392,6 @@ public class WhenGSpec extends BaseGSpec {
                     DBCursor cursor = dbCollection.find(dbObject);
                     commonspec.setMongoResults(cursor);
                     break;
-                case "elasticsearch":
-                    String results = commonspec.getElasticSearchClient().queryIndex(database, collection, modifiedData);
-                    JSONObject resultsJSON = new JSONObject(results).getJSONObject("hits");
-                    commonspec.setElasticsearchResults(resultsJSON);
-                    break;
                 default:
                      throw new Exception("Invalid database type: " + dbType);
             }
@@ -407,10 +403,38 @@ public class WhenGSpec extends BaseGSpec {
         }
     }
 
+    /**
+     * Execute query with filter over elasticsearch
+     * @param indexName
+     * @param mappingName
+     * @param columnName
+     * @param filterType it could be equals, gt, gte, lt and lte.
+     * @param value value of the column to be filtered.
+     */
+    @When("^I execute an elasticsearch query over index '(.*?)' and mapping '(.*?)' and column '(.*?)' with value '("
+            + ".*?)' to '(.*?)'$")
+    public void elasticSearchQueryWithFilter(String indexName, String mappingName, String
+            columnName ,String filterType, String value){
+        commonspec.getLogger().info("Executing query over " + indexName + "/" + mappingName + " over column " +
+                columnName);
+        try {
+            commonspec.setElasticsearchResults(
+                    commonspec.getElasticSearchClient()
+                            .searchSimpleFilterElasticsearchQuery(indexName, mappingName, columnName,
+                                    value, filterType)
+            );
+        }catch(Exception e){
+            commonspec.getLogger().info("Exception captured");
+            commonspec.getLogger().info(e.toString());
+            commonspec.getExceptions().add(e);
+        }
+    }
+
+
 
     /**
      * Create a Cassandra index.
-     * 
+     *
      * @param index_name index name
      * @param schema the file of configuration (.conf) with the options of mappin
      * @param type type of the changes in schema (string or json)
@@ -418,8 +442,8 @@ public class WhenGSpec extends BaseGSpec {
      * @param magic_column magic column where index will be saved
      * @param keyspace keyspace used
      * @param modifications data introduced for query fields defined on schema
-     * 
-     * 
+     *
+     *
      */
     @When("^I create a Cassandra index named '(.+?)' with schema '(.+?)' of type '(json|string)' in table '(.+?)' using magic_column '(.+?)' using keyspace '(.+?)' with:$")
     public void createCustomMapping(String index_name, String schema, String type, String table, String magic_column, String keyspace, DataTable modifications) throws Exception {
@@ -431,18 +455,18 @@ public class WhenGSpec extends BaseGSpec {
         System.out.println(query);
         commonspec.getCassandraClient().executeQuery(query);
     }
-    
+
     /**
      * Drop table
-     * 
+     *
      * @param table
      * @param keyspace
-     *  
+     *
      */
     @When("^I drop a Cassandra table named '(.+?)' using keyspace '(.+?)'$")
     public void dropTableWithData(String table, String keyspace){
         try{
-        commonspec.getCassandraClient().useKeyspace(keyspace);        
+        commonspec.getCassandraClient().useKeyspace(keyspace);
         commonspec.getLogger().info("Starting a table deletion");
           commonspec.getCassandraClient().dropTable(table);
         }catch (Exception e) {
@@ -455,15 +479,15 @@ public class WhenGSpec extends BaseGSpec {
 
     /**
      * Truncate table
-     * 
+     *
      * @param table
      * @param keyspace
-     *  
+     *
      */
     @When("^I truncate a Cassandra table named '(.+?)' using keyspace '(.+?)'$")
     public void truncateTable(String table, String keyspace){
         try{
-        commonspec.getCassandraClient().useKeyspace(keyspace);        
+        commonspec.getCassandraClient().useKeyspace(keyspace);
         commonspec.getLogger().info("Starting a table truncation");
           commonspec.getCassandraClient().truncateTable(table);
         }catch (Exception e) {
