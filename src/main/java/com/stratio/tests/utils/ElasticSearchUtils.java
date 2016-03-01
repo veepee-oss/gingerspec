@@ -6,6 +6,7 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.elasticsearch.index.query.RangeFilterBuilder;
@@ -242,10 +243,10 @@ public class ElasticSearchUtils {
      * @return ArrayList with all the rows(One element of the ArrayList is a JSON document)
      * @throws Exception
      */
-    public ArrayList<JSONObject> searchSimpleFilterElasticsearchQuery(String indexName, String mappingName, String
+    public List<JSONObject> searchSimpleFilterElasticsearchQuery(String indexName, String mappingName, String
             columnName,
             Object value, String filterType) throws Exception {
-        ArrayList<JSONObject> resultsJSON = new ArrayList<JSONObject>();
+        List<JSONObject> resultsJSON = new ArrayList<JSONObject>();
         org.elasticsearch.index.query.RangeFilterBuilder range;
         QueryBuilder query;
         switch (filterType){

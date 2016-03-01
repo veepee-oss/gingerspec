@@ -91,7 +91,7 @@ public class CommonG {
 	private HttpResponse response;
     private ResultSet previousCassandraResults;
 	private DBCursor previousMongoResults;
-	private ArrayList<JSONObject> previousElasticsearchResults;
+	private List<JSONObject> previousElasticsearchResults;
 	private List<Map<String,String>> previousCSVResults;
     private String resultsType="";
 
@@ -895,7 +895,7 @@ public class CommonG {
 		this.previousMongoResults = results;
 	}
 
-	public ArrayList<JSONObject> getElasticsearchResults() {
+	public List<JSONObject> getElasticsearchResults() {
 		return previousElasticsearchResults;
 	}
 

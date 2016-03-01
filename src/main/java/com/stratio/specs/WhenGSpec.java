@@ -424,8 +424,8 @@ public class WhenGSpec extends BaseGSpec {
                                     value, filterType)
             );
         }catch(Exception e){
-            commonspec.getLogger().error("Exception captured");
-            commonspec.getLogger().error(e.toString());
+            commonspec.getLogger().info("Exception captured");
+            commonspec.getLogger().info(e.toString());
             commonspec.getExceptions().add(e);
         }
     }

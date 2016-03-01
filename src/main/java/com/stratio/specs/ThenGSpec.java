@@ -233,43 +233,6 @@ public class ThenGSpec extends BaseGSpec {
         return columns;
     }
 
-//    /**
-//     * Checks if the index has a specific content.
-//     *
-//     * @param indexName
-//     * @param type
-//     * @param data
-//     */
-//    @Then("^the '(.+?)' index has a type '(.+?)' with content \\(key and value\\): '(.+?)'$")
-//    public void assertIndexHasContent(String indexName, String type, String data) {
-//        commonspec.getLogger().info("Verifying elasticseach content existance");
-//
-//        List<String> responseList = new ArrayList<String>();
-//        List<String> cleanResponseList = new ArrayList<String>();
-//        for (String query : data.split(",")) {
-//            String response = commonspec.getElasticSearchClient().queryIndex(indexName, type, query);
-//
-//            Pattern pat = Pattern.compile(".*?source.*?\\{(.+?)\\}.*?");
-//            Matcher m = pat.matcher(response);
-//            while (m.find()) {
-//                responseList.add(m.group(1).replaceAll("\"", ""));
-//            }
-//        }
-//        // drop dupe results
-//        HashSet<String> hs = new HashSet<String>();
-//        hs.addAll(responseList);
-//        responseList.clear();
-//        responseList.addAll(hs);
-//        Collections.sort(responseList);
-//        // cleanup results, dropping timestamp
-//        for (String el : responseList) {
-//            cleanResponseList.add(el.replaceAll(",@timestamp.*", ""));
-//        }
-//
-//        org.hamcrest.MatcherAssert.assertThat("Event not found at elastic search index", cleanResponseList,
-//                hasItem(data));
-//    }
-
     /**
      * Checks the values of a Aerospike table.
      *
