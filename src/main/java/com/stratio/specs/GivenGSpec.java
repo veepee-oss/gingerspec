@@ -333,31 +333,6 @@ public class GivenGSpec extends BaseGSpec {
     }
 
     /**
-     * Browse to {@code url} using https protocol and the current browser.
-     *
-     * @param path
-     * @throws Exception
-     */
-    @Given("^I securely browse to '(.+?)'$")
-    public void seleniumSecureBrowse(String path) throws Exception {
-        assertThat(path).isNotEmpty();
-
-        if (commonspec.getWebHost() == null) {
-            throw new Exception("Web host has not been set");
-        }
-
-        if (commonspec.getWebPort() == null) {
-            throw new Exception("Web port has not been set");
-        }
-
-        String webURL = "https://" + commonspec.getWebHost() + commonspec.getWebPort();
-
-        commonspec.getLogger().info("Browsing securely to {}{} with {}", webURL, path, commonspec.getBrowserName());
-        commonspec.getDriver().get(webURL + path);
-        commonspec.setParentWindow(commonspec.getDriver().getWindowHandle());
-    }
-
-    /**
      * Set app host and port {@code host, @code port}
      *
      * @param host
