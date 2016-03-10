@@ -418,6 +418,7 @@ public class WhenGSpec extends BaseGSpec {
         commonspec.getLogger().info("Executing query over " + indexName + "/" + mappingName + " over column " +
                 columnName);
         try {
+            commonspec.setResultsType("elasticsearch");
             commonspec.setElasticsearchResults(
                     commonspec.getElasticSearchClient()
                             .searchSimpleFilterElasticsearchQuery(indexName, mappingName, columnName,
