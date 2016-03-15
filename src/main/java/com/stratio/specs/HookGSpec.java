@@ -11,7 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import org.assertj.core.util.Collections;
+//import org.assertj.core.util.Collections;
 import org.elasticsearch.ElasticsearchException;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.chrome.ChromeOptions;
