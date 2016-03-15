@@ -73,7 +73,7 @@ public class ElasticSearchUtils {
 	 * Default constructor.
 	 */
 	public ElasticSearchUtils() {
-		this.es_host = System.getProperty("ES_NODE", "172.17.0.2");
+		this.es_host = System.getProperty("ES_NODE", "127.0.0.1");
 		this.es_port = Integer.valueOf(System.getProperty("ES_PORT", "9200"));
 		this.es_native_port = Integer.valueOf(System.getProperty("ES_NATIVE_PORT", "9300"));
 		this.cluster = System.getProperty("ES_CLUSTER", "elasticsearch");
@@ -269,7 +269,7 @@ public class ElasticSearchUtils {
             throw new Exception("Filter not implemented in the library");
         }
 
-        SearchResponse response = client.prepareSearch(indexName)
+        SearchResponse response = this.client.prepareSearch(indexName)
                 .setTypes(mappingName)
                 .setSearchType(SearchType.QUERY_AND_FETCH)
                 .setQuery(query)
