@@ -58,7 +58,7 @@ public class WhenGSpec extends BaseGSpec {
      */
     @When("^I wait '(\\d+?)' seconds?$")
     public void idleWait(Integer seconds) throws InterruptedException {
-        commonspec.getLogger().info("Idling a while");
+        commonspec.getLogger().debug("Idling a while");
         Thread.sleep(seconds * DEFAULT_TIMEOUT);
     }
 
@@ -75,7 +75,7 @@ public class WhenGSpec extends BaseGSpec {
      */
     @When("^I drag '([^:]*?):([^:]*?)' and drop it to '([^:]*?):([^:]*?)'$")
     public void seleniumDrag(String smethod, String source, String dmethod, String destination) throws ClassNotFoundException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
-        commonspec.getLogger().info("Dragging element");
+        commonspec.getLogger().debug("Dragging element");
 
         Actions builder = new Actions(commonspec.getDriver());
 
@@ -92,7 +92,7 @@ public class WhenGSpec extends BaseGSpec {
      */
     @When("^I click on the element on index '(\\d+?)'$")
     public void seleniumClick(Integer index) {
-        commonspec.getLogger().info("Clicking on element with index {}", index);
+        commonspec.getLogger().debug("Clicking on element with index {}", index);
 
         assertThat(this.commonspec, commonspec.getPreviousWebElements()).as("There are less found elements than required")
         	.hasAtLeast(index);
@@ -106,7 +106,7 @@ public class WhenGSpec extends BaseGSpec {
      */
     @When("^I clear the content on text input at index '(\\d+?)'$")
     public void seleniumClear(Integer index) {
-	commonspec.getLogger().info("Clearing text on element with index {}", index);
+	commonspec.getLogger().debug("Clearing text on element with index {}", index);
 
 	assertThat(this.commonspec, commonspec.getPreviousWebElements()).as("There are less found elements than required")
         	.hasAtLeast(index);
@@ -125,7 +125,7 @@ public class WhenGSpec extends BaseGSpec {
      */
     @When("^I type '(.+?)' on the element on index '(\\d+?)'$")
     public void seleniumType(@Transform(NullableStringConverter.class) String text, Integer index) {
-        commonspec.getLogger().info("Typing on element with index {}", index);
+        commonspec.getLogger().debug("Typing on element with index {}", index);
 
         assertThat(this.commonspec, commonspec.getPreviousWebElements()).as("There are less found elements than required")
 		.hasAtLeast(index);
@@ -158,9 +158,9 @@ public class WhenGSpec extends BaseGSpec {
     @When("^I send '(.+?)'( on the element on index '(\\d+?)')?$")
     public void seleniumKeys(@Transform(ArrayListConverter.class) List<String> strokes, String foo, Integer index) {
 	if (index == null) {
-	    commonspec.getLogger().info("Sending keys to driver");
+	    commonspec.getLogger().debug("Sending keys to driver");
 	} else {
-	    commonspec.getLogger().info("Sending keys on element with index {}", index);
+	    commonspec.getLogger().debug("Sending keys on element with index {}", index);
 
 	    assertThat(this.commonspec, commonspec.getPreviousWebElements()).as("There are less found elements than required")
 	    	.hasAtLeast(index);
@@ -197,7 +197,7 @@ public class WhenGSpec extends BaseGSpec {
      */
     @When("^I select '(.+?)' on the element on index '(\\d+?)'$")
     public void elementSelect(String option, Integer index) {
-        commonspec.getLogger().info("Choosing option on select");
+        commonspec.getLogger().debug("Choosing option on select");
 
         Select sel = null;
         sel = new Select(commonspec.getPreviousWebElements().getPreviousWebElements().get(index));
@@ -212,7 +212,7 @@ public class WhenGSpec extends BaseGSpec {
      */
     @When("^I de-select every item on the element on index '(\\d+?)'$")
     public void elementDeSelect(Integer index) {
-        commonspec.getLogger().info("Unselecting everything");
+        commonspec.getLogger().debug("Unselecting everything");
 
         Select sel = null;
         sel = new Select(commonspec.getPreviousWebElements().getPreviousWebElements().get(index));
@@ -249,19 +249,19 @@ public class WhenGSpec extends BaseGSpec {
     @When("^I send a '(.+?)' request to '(.+?)' based on '([^:]+?)'( as '(json|string)')? with:$")
     public void sendRequest(String requestType, String endPoint, String baseData, String foo, String type, DataTable modifications) throws Exception {
 	// Retrieve data
-	commonspec.getLogger().info("Retrieving data based on {} as {}", baseData, type);
+	commonspec.getLogger().debug("Retrieving data based on {} as {}", baseData, type);
 	String retrievedData = commonspec.retrieveData(baseData, type);
 
 	// Modify data
-	commonspec.getLogger().info("Modifying data {} as {}", retrievedData, type);
+	commonspec.getLogger().debug("Modifying data {} as {}", retrievedData, type);
 	String modifiedData;
 	modifiedData = commonspec.modifyData(retrievedData, type, modifications).toString();
 
-	commonspec.getLogger().info("Generating request {} to {} with data {} as {}", requestType, endPoint, modifiedData, type);
+	commonspec.getLogger().debug("Generating request {} to {} with data {} as {}", requestType, endPoint, modifiedData, type);
 	Future<Response> response = commonspec.generateRequest(requestType, endPoint, modifiedData, type);
 
 	// Save response
-	commonspec.getLogger().info("Saving response");
+	commonspec.getLogger().debug("Saving response");
 	commonspec.setResponse(requestType, response.get());
     }
 
@@ -329,7 +329,7 @@ public class WhenGSpec extends BaseGSpec {
         try {
         commonspec.setResultsType("cassandra");
         commonspec.getCassandraClient().useKeyspace(keyspace);
-        commonspec.getLogger().info("Starting a query of type "+commonspec.getResultsType());
+        commonspec.getLogger().debug("Starting a query of type "+commonspec.getResultsType());
 
         String query="";
 
@@ -350,12 +350,12 @@ public class WhenGSpec extends BaseGSpec {
             query="SELECT " + fields + " FROM "+ table +" WHERE "+ magic_column +" = '"+ modifiedData +"';";
 
         }
-        commonspec.getLogger().info("query: "+query);
+        commonspec.getLogger().debug("query: "+query);
         commonspec.setCassandraResults(commonspec.getCassandraClient().executeQuery(query));
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            commonspec.getLogger().info("Exception captured");
-            commonspec.getLogger().info(e.toString());
+            commonspec.getLogger().debug("Exception captured");
+            commonspec.getLogger().debug(e.toString());
             commonspec.getExceptions().add(e);
         }
 
@@ -384,10 +384,10 @@ public class WhenGSpec extends BaseGSpec {
                     commonspec.getMongoDBClient().connectToMongoDBDataBase(database);
                     DBCollection dbCollection = commonspec.getMongoDBClient().getMongoDBCollection(collection);
 
-                    commonspec.getLogger().info("Starting a query of type " + commonspec.getResultsType());
+                    commonspec.getLogger().debug("Starting a query of type " + commonspec.getResultsType());
 
                     DBObject dbObject = (DBObject) JSON.parse(modifiedData);
-                    commonspec.getLogger().info("find: " + modifiedData);
+                    commonspec.getLogger().debug("find: " + modifiedData);
 
                     DBCursor cursor = dbCollection.find(dbObject);
                     commonspec.setMongoResults(cursor);
@@ -397,8 +397,8 @@ public class WhenGSpec extends BaseGSpec {
             }
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            commonspec.getLogger().info("Exception captured");
-            commonspec.getLogger().info(e.toString());
+            commonspec.getLogger().debug("Exception captured");
+            commonspec.getLogger().debug(e.toString());
             commonspec.getExceptions().add(e);
         }
     }
@@ -415,7 +415,7 @@ public class WhenGSpec extends BaseGSpec {
             + ".*?)' to '(.*?)'$")
     public void elasticSearchQueryWithFilter(String indexName, String mappingName, String
             columnName ,String filterType, String value){
-        commonspec.getLogger().info("Executing query over " + indexName + "/" + mappingName + " over column " +
+        commonspec.getLogger().debug("Executing query over " + indexName + "/" + mappingName + " over column " +
                 columnName);
         try {
             commonspec.setResultsType("elasticsearch");
@@ -425,8 +425,8 @@ public class WhenGSpec extends BaseGSpec {
                                     value, filterType)
             );
         }catch(Exception e){
-            commonspec.getLogger().info("Exception captured");
-            commonspec.getLogger().info(e.toString());
+            commonspec.getLogger().debug("Exception captured");
+            commonspec.getLogger().debug(e.toString());
             commonspec.getExceptions().add(e);
         }
     }
@@ -448,7 +448,7 @@ public class WhenGSpec extends BaseGSpec {
      */
     @When("^I create a Cassandra index named '(.+?)' with schema '(.+?)' of type '(json|string)' in table '(.+?)' using magic_column '(.+?)' using keyspace '(.+?)' with:$")
     public void createCustomMapping(String index_name, String schema, String type, String table, String magic_column, String keyspace, DataTable modifications) throws Exception {
-        commonspec.getLogger().info("Creating a custom mapping");
+        commonspec.getLogger().debug("Creating a custom mapping");
         String retrievedData = commonspec.retrieveData(schema, type);
         String modifiedData = commonspec.modifyData(retrievedData, type, modifications).toString();
         String query="CREATE CUSTOM INDEX "+ index_name +" ON "+ keyspace +"."+ table +"("+ magic_column +") "
@@ -468,12 +468,12 @@ public class WhenGSpec extends BaseGSpec {
     public void dropTableWithData(String table, String keyspace){
         try{
         commonspec.getCassandraClient().useKeyspace(keyspace);
-        commonspec.getLogger().info("Starting a table deletion");
+        commonspec.getLogger().debug("Starting a table deletion");
           commonspec.getCassandraClient().dropTable(table);
         }catch (Exception e) {
             // TODO Auto-generated catch block
-            commonspec.getLogger().info("Exception captured");
-            commonspec.getLogger().info(e.toString());
+            commonspec.getLogger().debug("Exception captured");
+            commonspec.getLogger().debug(e.toString());
             commonspec.getExceptions().add(e);
         }
         }
@@ -489,12 +489,12 @@ public class WhenGSpec extends BaseGSpec {
     public void truncateTable(String table, String keyspace){
         try{
         commonspec.getCassandraClient().useKeyspace(keyspace);
-        commonspec.getLogger().info("Starting a table truncation");
+        commonspec.getLogger().debug("Starting a table truncation");
           commonspec.getCassandraClient().truncateTable(table);
         }catch (Exception e) {
             // TODO Auto-generated catch block
-            commonspec.getLogger().info("Exception captured");
-            commonspec.getLogger().info(e.toString());
+            commonspec.getLogger().debug("Exception captured");
+            commonspec.getLogger().debug(e.toString());
             commonspec.getExceptions().add(e);
         }
     }

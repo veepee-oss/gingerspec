@@ -66,7 +66,7 @@ public class ThenGSpec extends BaseGSpec {
     @Then("^an exception '(.+?)' thrown( with class '(.+?)'( and message like '(.+?)')?)?")
     public void assertExceptionNotThrown(String exception, String foo, String clazz, String bar, String exceptionMsg)
             throws ClassNotFoundException {
-        commonspec.getLogger().info("Verifying thrown exceptions existance");
+        commonspec.getLogger().debug("Verifying thrown exceptions existance");
 
         List<Exception> exceptions = commonspec.getExceptions();
         if ("IS NOT".equals(exception)) {
@@ -97,7 +97,7 @@ public class ThenGSpec extends BaseGSpec {
      */
     @Then("^a Cassandra keyspace '(.+?)' exists$")
     public void assertKeyspaceOnCassandraExists(String keyspace) {
-        commonspec.getLogger().info("Verifying if the keyspace {} exists", keyspace);
+        commonspec.getLogger().debug("Verifying if the keyspace {} exists", keyspace);
         org.hamcrest.MatcherAssert.assertThat("The keyspace " + keyspace + "exists on cassandra", commonspec
                 .getCassandraClient().getKeyspaces(), hasItem(keyspace));
     }
@@ -110,7 +110,7 @@ public class ThenGSpec extends BaseGSpec {
      */
     @Then("^a Casandra keyspace '(.+?)' contains a table '(.+?)'$")
     public void assertTableExistsOnCassandraKeyspace(String keyspace, String tableName) {
-        commonspec.getLogger().info("Verifying if the table {} exists in the keyspace {}", tableName, keyspace);
+        commonspec.getLogger().debug("Verifying if the table {} exists in the keyspace {}", tableName, keyspace);
         org.hamcrest.MatcherAssert.assertThat("The table " + tableName + "exists on cassandra", commonspec
                 .getCassandraClient().getTables(keyspace), hasItem(tableName));
     }
@@ -125,7 +125,7 @@ public class ThenGSpec extends BaseGSpec {
     @Then("^a Casandra keyspace '(.+?)' contains a table '(.+?)' with '(.+?)' rows$")
     public void assertRowNumberOfTableOnCassandraKeyspace(String keyspace, String tableName, String numberRows) {
         Long numberRowsLong = Long.parseLong(numberRows);
-        commonspec.getLogger().info("Verifying if the keyspace {} exists", keyspace);
+        commonspec.getLogger().debug("Verifying if the keyspace {} exists", keyspace);
         commonspec.getCassandraClient().useKeyspace(keyspace);
         org.hamcrest.MatcherAssert.assertThat("The table " + tableName + "exists on cassandra", commonspec
                 .getCassandraClient().executeQuery("SELECT COUNT(*) FROM " + tableName + ";").all().get(0).getLong(0),
@@ -143,7 +143,7 @@ public class ThenGSpec extends BaseGSpec {
     @Then("^a Casandra keyspace '(.+?)' contains a table '(.+?)' with values:$")
     public void assertValuesOfTable(String keyspace, String tableName, DataTable data) throws InterruptedException {
         // Primero hacemos USE del Keyspace
-        commonspec.getLogger().info("Verifying if the keyspace {} exists", keyspace);
+        commonspec.getLogger().debug("Verifying if the keyspace {} exists", keyspace);
         commonspec.getCassandraClient().useKeyspace(keyspace);
         // Obtenemos los tipos y los nombres de las columnas del datatable y los
         // devolvemos en un hashmap
@@ -242,7 +242,7 @@ public class ThenGSpec extends BaseGSpec {
      */
     @Then("^checking if a Aerospike namespace '(.+?)' with table '(.+?)' and data exists:$")
     public void assertValuesOfTableAeroSpike(String nameSpace, String tableName, DataTable data) {
-        commonspec.getLogger().info("Verifying if the nameSpace {} exists and tableName {} exists on Aerospike",
+        commonspec.getLogger().debug("Verifying if the nameSpace {} exists and tableName {} exists on Aerospike",
                 nameSpace, tableName);
         RecordSet rs = commonspec.getAerospikeClient().readTable(nameSpace, tableName);
         org.hamcrest.MatcherAssert.assertThat("The table does not contains the data required.", rs,
@@ -258,7 +258,7 @@ public class ThenGSpec extends BaseGSpec {
      */
     @Then("^a Mongo dataBase '(.+?)' contains a table '(.+?)' with values:")
     public void assertValuesOfTableMongo(String dataBase, String tableName, DataTable data) {
-        commonspec.getLogger().info("Verifying if the dataBase {} exists and tableName {} exists on MongoDB", dataBase,
+        commonspec.getLogger().debug("Verifying if the dataBase {} exists and tableName {} exists on MongoDB", dataBase,
                 tableName);
         commonspec.getMongoDBClient().connectToMongoDBDataBase(dataBase);
         ArrayList<DBObject> result = (ArrayList<DBObject>) commonspec.getMongoDBClient().readFromMongoDBCollection(
@@ -276,7 +276,7 @@ public class ThenGSpec extends BaseGSpec {
      */
     @Then("^a Mongo dataBase '(.+?)' doesnt contains a table '(.+?)'$")
     public void aMongoDataBaseContainsaTable(String database, String tableName) {
-        commonspec.getLogger().info("Verifying if the dataBase {} contains the table {}", database, tableName);
+        commonspec.getLogger().debug("Verifying if the dataBase {} contains the table {}", database, tableName);
         commonspec.getMongoDBClient().connectToMongoDBDataBase(database);
         Set<String> collectionsNames = commonspec.getMongoDBClient().getMongoDBCollections();
         org.hamcrest.MatcherAssert.assertThat("The Mongo dataBase contains the table", collectionsNames,
@@ -291,7 +291,7 @@ public class ThenGSpec extends BaseGSpec {
     @Then("^a text '(.+?)' exists$")
     public void assertSeleniumTextInSource(String text) {
 
-        commonspec.getLogger().info("Verifying if our current page contains the text {}", text);
+        commonspec.getLogger().debug("Verifying if our current page contains the text {}", text);
         assertThat(this.commonspec, commonspec.getDriver()).as("Expected text not found at page").contains(text);
     }
 
@@ -303,7 +303,7 @@ public class ThenGSpec extends BaseGSpec {
      */
     @Then("^the element on index '(\\d+?)' has '(.*?)' as text$")
     public void assertSeleniumTextOnElementPresent(Integer index, String text) {
-        commonspec.getLogger().info("Verifying text existance");
+        commonspec.getLogger().debug("Verifying text existance");
 
         assertThat(commonspec.getPreviousWebElements()).as("There are less found elements than required")
         .hasAtLeast(index);
@@ -324,7 +324,7 @@ public class ThenGSpec extends BaseGSpec {
      */
     @Then("^'(\\d+?)' elements? exists? with '([^:]*?):([^:]*?)'$")
     public void assertSeleniumNElementExists(Integer expectedCount, String method, String element) throws ClassNotFoundException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
-        commonspec.getLogger().info("Verifying {} existance", element);
+        commonspec.getLogger().debug("Verifying {} existance", element);
 
         List<WebElement> wel = commonspec.locateElement(method, element, expectedCount);
         PreviousWebElements pwel = new PreviousWebElements(wel);
@@ -339,7 +339,7 @@ public class ThenGSpec extends BaseGSpec {
     //     */
     //    @Then("^an unknown number of elements exists with '([^:]*?):([^:]*?)'$")
     //    public void assertSeleniumNElementsExists(String method, String element) {
-    //        commonspec.getLogger().info("Verifying {} existance", element);
+    //        commonspec.getLogger().debug("Verifying {} existance", element);
     //
     //        List<WebElement> wel = commonspec.locateElements(method, element);
     //        PreviousWebElements pwel = new PreviousWebElements(wel);
@@ -367,7 +367,7 @@ public class ThenGSpec extends BaseGSpec {
     @Then("^in less than '(\\d+?)' seconds, checking each '(\\d+?)' seconds, '(\\d+?)' elements exists with '([^:]*?):([^:]*?)'$")
     public void assertSeleniumNElementExistsOnTimeOut(Integer timeout, Integer wait, Integer expectedCount,
             String method, String element) throws InterruptedException, ClassNotFoundException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
-        commonspec.getLogger().info("Verifying {} existance", element);
+        commonspec.getLogger().debug("Verifying {} existance", element);
 
         List<WebElement> wel = null;
         for (int i = 0; i < timeout; i += wait) {
@@ -394,7 +394,7 @@ public class ThenGSpec extends BaseGSpec {
      */
     @Then("^the element on index '(\\d+?)' (IS|IS NOT) displayed$")
     public void assertSeleniumIsDisplayed(Integer index, Boolean isDisplayed) {
-        commonspec.getLogger().info("Verifying element visibility");
+        commonspec.getLogger().debug("Verifying element visibility");
 
         assertThat(this.commonspec, commonspec.getPreviousWebElements()).as("There are less found elements than required")
             .hasAtLeast(index);
@@ -410,7 +410,7 @@ public class ThenGSpec extends BaseGSpec {
      */
     @Then("^the element on index '(\\d+?)' (IS|IS NOT) enabled$")
     public void assertSeleniumIsEnabled(Integer index, Boolean isEnabled) {
-        commonspec.getLogger().info("Verifying element enableness");
+        commonspec.getLogger().debug("Verifying element enableness");
 
         assertThat(this.commonspec, commonspec.getPreviousWebElements()).as("There are less found elements than required")
         .hasAtLeast(index);
@@ -426,7 +426,7 @@ public class ThenGSpec extends BaseGSpec {
      */
     @Then("^the element on index '(\\d+?)' (IS|IS NOT) selected$")
     public void assertSeleniumIsSelected(Integer index, Boolean isSelected) {
-        commonspec.getLogger().info("Verifying element enableness");
+        commonspec.getLogger().debug("Verifying element enableness");
 
         assertThat(this.commonspec, commonspec.getPreviousWebElements()).as("There are less found elements than required")
         .hasAtLeast(index);
@@ -443,7 +443,7 @@ public class ThenGSpec extends BaseGSpec {
      */
     @Then("^the element on index '(\\d+?)' has '(.+?)' as '(.+?)'$")
     public void assertSeleniumHasAttributeValue(Integer index, String attribute, String value) {
-        commonspec.getLogger().info("Verifying element attribute");
+        commonspec.getLogger().debug("Verifying element attribute");
 
         assertThat(this.commonspec, commonspec.getPreviousWebElements()).as("There are less found elements than required")
         .hasAtLeast(index);
@@ -488,37 +488,37 @@ public class ThenGSpec extends BaseGSpec {
 
     @Then("^the service response status must be '(.*?)'.$")
     public void assertResponseStatus(Integer expectedStatus) {
-        commonspec.getLogger().info("Verifying response message");
+        commonspec.getLogger().debug("Verifying response message");
         assertThat(commonspec.getResponse()).hasStatusCode(expectedStatus);
     }
 
     @Then("^the service response must contain the text '(.*?)'$")
     public void assertResponseMessage(String expectedText) throws ClassNotFoundException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
-        commonspec.getLogger().info("Verifying response message");
+        commonspec.getLogger().debug("Verifying response message");
         assertThat(commonspec.getResponse()).hasMessage(expectedText);
     }
 
     @Then("^the service response must NOT contain the text '(.*?)'$")
     public void assertNegativeResponseMessage(String expectedText) throws ClassNotFoundException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
-        commonspec.getLogger().info("Verifying response message");
+        commonspec.getLogger().debug("Verifying response message");
         assertThat(commonspec.getResponse()).doesNotHaveMessage(expectedText);
     }
 
     @Then("^the service response status must be '(.*?)' and its response must contain the text '(.*?)'$")
     public void assertResponseStatusMessage(Integer expectedStatus, String expectedText) throws ClassNotFoundException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
-        commonspec.getLogger().info("Verifying response status code and message");
+        commonspec.getLogger().debug("Verifying response status code and message");
         assertThat(commonspec.getResponse()).hasStatusCodeAndMessage(expectedStatus, expectedText);
     }
 
     @Then("^the service response status must NOT be '(.*?)' and its response must NOT contain the text '(.*?)'$")
     public void assertNegativeResponseStatusMessage(Integer unexpectedStatus, String unexpectedText) throws ClassNotFoundException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
-        commonspec.getLogger().info("Verifying response status code and message");
+        commonspec.getLogger().debug("Verifying response status code and message");
         assertThat(commonspec.getResponse()).doesNotHaveStatusCodeNorMessage(unexpectedStatus, unexpectedText);
     }
 
     @Then("^the service response status must be '(.*?)' and its response length must be '(.*?)'$")
     public void assertResponseStatusLength(Integer expectedStatus, Integer expectedLength) {
-        commonspec.getLogger().info("Verifying response status code and response length");
+        commonspec.getLogger().debug("Verifying response status code and response length");
         assertThat(commonspec.getResponse()).hasStatusCodeAndLength(expectedStatus, expectedLength);
     }
 

@@ -807,7 +807,7 @@ public class CommonG {
 		    if ("json".equals(type)) {
 			request = request.setHeader("Content-Type","application/json");
 		    } else if ("string".equals(type)){
-			this.getLogger().info("Sending request as: {}", type);
+			this.getLogger().debug("Sending request as: {}", type);
 			request = request.setHeader("Content-Type", "application/x-www-form-urlencoded");
 		    }
 
@@ -946,9 +946,9 @@ public class CommonG {
 				}
 				resultsListExpected.add(resultsCucumber);
 			}
-			getLogger().info("Expected Results: " + resultsListExpected.toString());
+			getLogger().debug("Expected Results: " + resultsListExpected.toString());
 
-			getLogger().info("Obtained Results: " + getCSVResults().toString());
+			getLogger().debug("Obtained Results: " + getCSVResults().toString());
 
 			//Comparisons
 			int occurrencesObtained=0;
@@ -1024,7 +1024,7 @@ public class CommonG {
 				resultsListObtained.add(results);
 
 			}
-			getLogger().info("Results: "+resultsListObtained.toString());
+			getLogger().debug("Results: "+resultsListObtained.toString());
 			//Map for cucumber expected results
 			List<Map<String,Object>>resultsListExpected=new ArrayList<Map<String,Object>>();
 			Map<String,Object> resultsCucumber;
@@ -1038,7 +1038,7 @@ public class CommonG {
 				}
 				resultsListExpected.add(resultsCucumber);
 			}
-			getLogger().info("Expected Results: "+resultsListExpected.toString());
+			getLogger().debug("Expected Results: "+resultsListExpected.toString());
 
 			//Comparisons
 			int occurrencesObtained=0;
@@ -1111,7 +1111,7 @@ public class CommonG {
 				}
 				resultsListExpected.add(resultsCucumber);
 			}
-			getLogger().info("Expected Results: "+resultsListExpected.toString());
+			getLogger().debug("Expected Results: "+resultsListExpected.toString());
 
 			//Comparisons
 			int occurrencesObtained=0;
@@ -1156,7 +1156,7 @@ public class CommonG {
 				}
 
 				resultsListObtained = resultsListObtained + "]";
-				getLogger().info("Results: " + resultsListObtained);
+				getLogger().debug("Results: " + resultsListObtained);
 
 				assertThat(occurrencesExpected).overridingErrorMessage("In row " + e + " have been found "
 						+ occurrencesObtained + " results and " + occurrencesExpected + " were expected").isEqualTo(occurrencesObtained);
