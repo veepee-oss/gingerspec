@@ -57,6 +57,8 @@ public class DBObjectsMatcher extends TypeSafeMatcher<ArrayList<DBObject>> {
         for (int i = 0; i < item.size() && !res; i++) {
             DBObject aux = item.get(i);
             aux.removeField("_id");
+            aux.removeField("timestamp");
+
             if (aux.keySet().equals(doc.keySet())) {
                 res = true;
             }
