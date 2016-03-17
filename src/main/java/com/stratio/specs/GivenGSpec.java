@@ -60,7 +60,7 @@ public class GivenGSpec extends BaseGSpec {
      */
     @Given("^I create a Cassandra index named '(.+?)' in table '(.+?)' using magic_column '(.+?)' using keyspace '(.+?)'$")
     public void createBasicMapping(String index_name, String table, String column, String keyspace) throws Exception {
-        commonspec.getLogger().info("Creating a basic index");
+        commonspec.getLogger().debug("Creating a basic index");
         String query="CREATE INDEX "+ index_name +" ON "+ table +" ("+ column +");";
         commonspec.getCassandraClient().executeQuery(query);
     }
@@ -72,7 +72,7 @@ public class GivenGSpec extends BaseGSpec {
      */
     @Given("^I create a Cassandra keyspace named '(.+)'$")
     public void createCassandraKeyspace(String keyspace) {
-        commonspec.getLogger().info("Creating a Cassandra keyspace");
+        commonspec.getLogger().debug("Creating a Cassandra keyspace");
         commonspec.getCassandraClient().createKeyspace(keyspace);
     }
     /**
@@ -83,7 +83,7 @@ public class GivenGSpec extends BaseGSpec {
      */
     @Given("^I connect to '(Cassandra|Mongo|Elasticsearch)' cluster at '(.+)'$")
     public void connect(String clusterType, String url) throws DBException, UnknownHostException {
-        commonspec.getLogger().info("Connecting to " + clusterType + " cluster", "");
+        commonspec.getLogger().debug("Connecting to " + clusterType + " cluster", "");
         switch (clusterType) {
             case "Cassandra":
                 commonspec.getCassandraClient().buildCluster();
@@ -115,7 +115,7 @@ public class GivenGSpec extends BaseGSpec {
     public void createTableWithData(String table, String keyspace, DataTable datatable){
         try{
         commonspec.getCassandraClient().useKeyspace(keyspace);
-        commonspec.getLogger().info("Starting a table creation", "");
+        commonspec.getLogger().debug("Starting a table creation", "");
         int attrLength=datatable.getGherkinRows().get(0).getCells().size();
         Map<String,String> columns =  new HashMap<String,String>();
         ArrayList<String> pk=new ArrayList<String>();
@@ -133,8 +133,8 @@ public class GivenGSpec extends BaseGSpec {
         commonspec.getCassandraClient().createTableWithData(table, columns, pk);
         }catch (Exception e) {
             // TODO Auto-generated catch block
-            commonspec.getLogger().info("Exception captured");
-            commonspec.getLogger().info(e.toString());
+            commonspec.getLogger().debug("Exception captured");
+            commonspec.getLogger().debug(e.toString());
             commonspec.getExceptions().add(e);
         }
         }
@@ -151,7 +151,7 @@ public class GivenGSpec extends BaseGSpec {
     public void insertData(String keyspace, String table, DataTable datatable){
         try{
         commonspec.getCassandraClient().useKeyspace(keyspace);
-        commonspec.getLogger().info("Starting a table creation", "");
+        commonspec.getLogger().debug("Starting a table creation", "");
         int attrLength=datatable.getGherkinRows().get(0).getCells().size();
         Map<String, Object> fields =  new HashMap<String,Object>();
         for(int e=1; e<datatable.getGherkinRows().size();e++){
@@ -164,8 +164,8 @@ public class GivenGSpec extends BaseGSpec {
         }
         }catch (Exception e) {
             // TODO Auto-generated catch block
-            commonspec.getLogger().info("Exception captured");
-            commonspec.getLogger().info(e.toString());
+            commonspec.getLogger().debug("Exception captured");
+            commonspec.getLogger().debug(e.toString());
             commonspec.getExceptions().add(e);
         }
     }
@@ -192,7 +192,7 @@ public class GivenGSpec extends BaseGSpec {
         String hjson = JsonValue.readHjson(json).asObject().toString();
         String value = JsonPath.parse(hjson).read(element);
 
-        commonspec.getLogger().info("Saving element: {} with value: {} in environment variable: {}", element, value, envVar);
+        commonspec.getLogger().debug("Saving element: {} with value: {} in environment variable: {}", element, value, envVar);
 
         ThreadProperty.set(envVar, value);
     }
@@ -202,7 +202,7 @@ public class GivenGSpec extends BaseGSpec {
      */
     @Given("^I drop every existing elasticsearch index$")
     public void dropElasticsearchIndexes() {
-        commonspec.getLogger().info("Dropping es indexes");
+        commonspec.getLogger().debug("Dropping es indexes");
         commonspec.getElasticSearchClient().dropAllIndexes();
     }
 
@@ -213,7 +213,7 @@ public class GivenGSpec extends BaseGSpec {
      */
     @Given("^I drop an elasticsearch index named '(.+?)'$")
     public void dropElasticsearchIndex(String index) {
-        commonspec.getLogger().info("Dropping an es index: {}", index);
+        commonspec.getLogger().debug("Dropping an es index: {}", index);
         commonspec.getElasticSearchClient().dropSingleIndex(index);
     }
 
@@ -225,7 +225,7 @@ public class GivenGSpec extends BaseGSpec {
      */
     @Given("a Cassandra script with name '(.+?)' and default keyspace '(.+?)'$")
     public void insertDataOnCassandraFromFile(String filename, String keyspace) {
-        commonspec.getLogger().info("Inserting data on cassandra from file");
+        commonspec.getLogger().debug("Inserting data on cassandra from file");
         commonspec.getCassandraClient().loadTestData(keyspace, "/scripts/" + filename);
     }
 
@@ -236,7 +236,7 @@ public class GivenGSpec extends BaseGSpec {
      */
     @Given("^I drop a Cassandra keyspace '(.+)'$")
     public void dropCassandraKeyspace(String keyspace) {
-        commonspec.getLogger().info("Dropping a Cassandra keyspace", keyspace);
+        commonspec.getLogger().debug("Dropping a Cassandra keyspace", keyspace);
         commonspec.getCassandraClient().dropKeyspace(keyspace);
     }
 
@@ -250,9 +250,9 @@ public class GivenGSpec extends BaseGSpec {
      */
     @Given("^I create an AeroSpike namespace '(.+?)' with table '(.+?)':$")
     public void createAeroSpikeTable(String nameSpace, String tableName, DataTable tab) {
-        commonspec.getLogger().info("Creating a table on AeroSpike");
+        commonspec.getLogger().debug("Creating a table on AeroSpike");
         if (commonspec.getAerospikeClient().isConnected()) {
-            commonspec.getLogger().info("Creating a table on AeroSpike");
+            commonspec.getLogger().debug("Creating a table on AeroSpike");
         }
         commonspec.getAerospikeClient().insertFromDataTable(nameSpace, tableName, tab);
     }
@@ -264,7 +264,7 @@ public class GivenGSpec extends BaseGSpec {
      */
     @Given("^I create a MongoDB dataBase '(.+?)'$")
     public void createMongoDBDataBase(String databaseName) {
-        commonspec.getLogger().info("Creating a database on MongoDB");
+        commonspec.getLogger().debug("Creating a database on MongoDB");
         commonspec.getMongoDBClient().connectToMongoDBDataBase(databaseName);
 
     }
@@ -276,7 +276,7 @@ public class GivenGSpec extends BaseGSpec {
      */
     @Given("^I drop a MongoDB database '(.+?)'$")
     public void dropMongoDBDataBase(String databaseName) {
-        commonspec.getLogger().info("Creating a database on MongoDB");
+        commonspec.getLogger().debug("Creating a database on MongoDB");
         commonspec.getMongoDBClient().dropMongoDBDataBase(databaseName);
     }
 
@@ -289,7 +289,7 @@ public class GivenGSpec extends BaseGSpec {
      */
     @Given("^I insert into a MongoDB database '(.+?)' and table '(.+?)' this values:$")
     public void insertOnMongoTable(String dataBase, String tabName, DataTable table) {
-        commonspec.getLogger().info("Inserting data in a database on MongoDB");
+        commonspec.getLogger().debug("Inserting data in a database on MongoDB");
         commonspec.getMongoDBClient().connectToMongoDBDataBase(dataBase);
         commonspec.getMongoDBClient().insertIntoMongoDBCollection(tabName, table);
     }
@@ -302,7 +302,7 @@ public class GivenGSpec extends BaseGSpec {
      */
     @Given("^I drop every document at a MongoDB database '(.+?)' and table '(.+?)'")
     public void truncateTableInMongo(String database, String table) {
-        commonspec.getLogger().info("Truncating a table in MongoDB");
+        commonspec.getLogger().debug("Truncating a table in MongoDB");
         commonspec.getMongoDBClient().connectToMongoDBDataBase(database);
         commonspec.getMongoDBClient().dropAllDataMongoDBCollection(table);
     }
@@ -327,7 +327,7 @@ public class GivenGSpec extends BaseGSpec {
 
         String webURL = "http://" + commonspec.getWebHost() + commonspec.getWebPort();
 
-        commonspec.getLogger().info("Browsing to {}{} with {}", webURL, path, commonspec.getBrowserName());
+        commonspec.getLogger().debug("Browsing to {}{} with {}", webURL, path, commonspec.getBrowserName());
         commonspec.getDriver().get(webURL + path);
         commonspec.setParentWindow(commonspec.getDriver().getWindowHandle());
     }
@@ -353,7 +353,7 @@ public class GivenGSpec extends BaseGSpec {
         commonspec.setRestHost(host);
         commonspec.setRestPort(port);
 
-        commonspec.getLogger().info("Set URL to http://{}{}/", host, port);
+        commonspec.getLogger().debug("Set URL to http://{}{}/", host, port);
     }
 
 
@@ -376,7 +376,7 @@ public class GivenGSpec extends BaseGSpec {
         commonspec.setWebHost(webHost);
         commonspec.setWebPort(webPort);
 
-        commonspec.getLogger().info("Set web base URL to http://{}{}", webHost, webPort);
+        commonspec.getLogger().debug("Set web base URL to http://{}{}", webHost, webPort);
     }
 
     /**
@@ -400,7 +400,7 @@ public class GivenGSpec extends BaseGSpec {
 
         commonspec.setRestHost(restHost);
         commonspec.setRestPort(restPort);
-        commonspec.getLogger().info("Sending requests to http://{}{}", restHost, restPort);
+        commonspec.getLogger().debug("Sending requests to http://{}{}", restHost, restPort);
     }
 
     /**
@@ -459,14 +459,14 @@ public class GivenGSpec extends BaseGSpec {
             if (password == null) {
                 throw new Exception("You have to provide a password or a pem file to be used for connection");
             }
-            commonspec.getLogger().info("Openning remote ssh connection to " + remoteHost + " with user " + user +
+            commonspec.getLogger().debug("Openning remote ssh connection to " + remoteHost + " with user " + user +
                     " and password " + password);
         } else {
             File pem = new File(pemFile);
             if (!pem.exists()) {
                 throw new Exception("Pem file: " + pemFile + " does not exist");
             }
-            commonspec.getLogger().info("Openning remote ssh connection to " + remoteHost + " with user " + user +
+            commonspec.getLogger().debug("Openning remote ssh connection to " + remoteHost + " with user " + user +
                     " using pem file " + pemFile);
         }
         commonspec.setRemoteSSHConnection(new RemoteSSHConnection(user, password, remoteHost, pemFile));
@@ -483,7 +483,7 @@ public class GivenGSpec extends BaseGSpec {
      */
     @Given("^I copy '(.+?)' from remote ssh connection and store it in '(.+?)'$")
     public void copyFromRemoteFile(String remotePath, String localPath) throws Exception {
-        commonspec.getLogger().info("Copy remote " + remotePath + " to local " + localPath);
+        commonspec.getLogger().debug("Copy remote " + remotePath + " to local " + localPath);
         commonspec.getRemoteSSHConnection().copyFrom(remotePath, localPath);
     }
 
@@ -497,7 +497,7 @@ public class GivenGSpec extends BaseGSpec {
      */
     @Given("^I copy '(.+?)' to remote ssh connection in '(.+?)'$")
     public void copyToRemoteFile(String localPath, String remotePath) throws Exception {
-        commonspec.getLogger().info("Copy local " + localPath + " to remote " + remotePath);
+        commonspec.getLogger().debug("Copy local " + localPath + " to remote " + remotePath);
         commonspec.getRemoteSSHConnection().copyTo(localPath, remotePath);
     }
 
@@ -510,7 +510,7 @@ public class GivenGSpec extends BaseGSpec {
      */
     @Given("^I execute command '(.+?)' in remote ssh connection$")
     public void executeCommand(String command) throws Exception {
-        commonspec.getLogger().info("Executing command '" + command + "'");
+        commonspec.getLogger().debug("Executing command '" + command + "'");
         commonspec.getRemoteSSHConnection().runCommand(command);
     }
 

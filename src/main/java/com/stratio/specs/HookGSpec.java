@@ -58,7 +58,7 @@ public class HookGSpec extends BaseGSpec {
      */
     @Before(order = 0)
     public void globalSetup() {
-        commonspec.getLogger().info("Clearing exception list");
+        commonspec.getLogger().debug("Clearing exception list");
         commonspec.getExceptions().clear();
     }
 
@@ -67,7 +67,7 @@ public class HookGSpec extends BaseGSpec {
      */
     @Before(order = ORDER_10, value = "@C*")
     public void cassandraSetup() {
-        commonspec.getLogger().info("Setting up C* client");
+        commonspec.getLogger().debug("Setting up C* client");
         commonspec.getCassandraClient().connect();
     }
 
@@ -76,7 +76,7 @@ public class HookGSpec extends BaseGSpec {
      */
     @Before(order = ORDER_10, value = "@MongoDB")
     public void mongoSetup() {
-        commonspec.getLogger().info("Setting up MongoDB client");
+        commonspec.getLogger().debug("Setting up MongoDB client");
         try {
             commonspec.getMongoDBClient().connect();
         } catch (DBException e) {
@@ -89,7 +89,7 @@ public class HookGSpec extends BaseGSpec {
      */
     @Before(order = ORDER_10, value = "@elasticsearch")
     public void elasticsearchSetup() {
-        commonspec.getLogger().info("Setting up elasticsearch client");
+        commonspec.getLogger().debug("Setting up elasticsearch client");
         LinkedHashMap<String,Object> settings_map = new LinkedHashMap<String,Object>();
         settings_map.put("cluster.name",System.getProperty("ES_CLUSTER", "elasticsearch"));
         commonspec.getElasticSearchClient().setSettings(settings_map);
@@ -105,7 +105,7 @@ public class HookGSpec extends BaseGSpec {
      */
     @Before(order = ORDER_10, value = "@Aerospike")
     public void aerospikeSetup() {
-        commonspec.getLogger().info("Setting up Aerospike client");
+        commonspec.getLogger().debug("Setting up Aerospike client");
         commonspec.getAerospikeClient().connect();
     }
 
@@ -129,7 +129,7 @@ public class HookGSpec extends BaseGSpec {
         String browser = b.split("_")[0];
         String version = b.split("_")[1];
         commonspec.setBrowserName(browser);
-        commonspec.getLogger().info("Setting up selenium for {}", browser);
+        commonspec.getLogger().debug("Setting up selenium for {}", browser);
 
         DesiredCapabilities capabilities = null;
 
@@ -194,7 +194,7 @@ public class HookGSpec extends BaseGSpec {
     @After(order = ORDER_20, value = "@web")
     public void seleniumTeardown() {
         if (commonspec.getDriver() != null) {
-            commonspec.getLogger().info("Shutdown Selenium client");
+            commonspec.getLogger().debug("Shutdown Selenium client");
             commonspec.getDriver().close();
             commonspec.getDriver().quit();
         }
@@ -205,7 +205,7 @@ public class HookGSpec extends BaseGSpec {
      */
     @After(order = ORDER_20, value = "@C*")
     public void cassandraTeardown() {
-        commonspec.getLogger().info("Shutdown  C* client");
+        commonspec.getLogger().debug("Shutdown  C* client");
         try {
             commonspec.getCassandraClient().disconnect();
         } catch (DBException e) {
@@ -218,7 +218,7 @@ public class HookGSpec extends BaseGSpec {
      */
     @After(order = ORDER_20, value = "@MongoDB")
     public void mongoTeardown() {
-        commonspec.getLogger().info("Shutdown MongoDB client");
+        commonspec.getLogger().debug("Shutdown MongoDB client");
         commonspec.getMongoDBClient().disconnect();
     }
 
@@ -227,7 +227,7 @@ public class HookGSpec extends BaseGSpec {
      */
     @After(order = ORDER_20, value = "@elasticsearch")
     public void elasticsearchTeardown() {
-        commonspec.getLogger().info("Shutdown elasticsearch client");
+        commonspec.getLogger().debug("Shutdown elasticsearch client");
         try {
             commonspec.getElasticSearchClient().getClient().close();
         } catch (ElasticsearchException e) {
@@ -240,7 +240,7 @@ public class HookGSpec extends BaseGSpec {
      */
     @After(order = ORDER_20, value = "@Aerospike")
     public void aerospikeTeardown() {
-        commonspec.getLogger().info("Shutdown Aerospike client");
+        commonspec.getLogger().debug("Shutdown Aerospike client");
         try {
             commonspec.getAerospikeClient().disconnect();
         } catch (DBException e) {
@@ -253,12 +253,12 @@ public class HookGSpec extends BaseGSpec {
      */
     @After(order = 0)
     public void teardown() {
-        commonspec.getLogger().info("Ended running hooks");
+        commonspec.getLogger().debug("Ended running hooks");
     }
 
     @Before(order = 10, value = "@rest")
     public void restClientSetup() throws Exception {
-        commonspec.getLogger().info("Starting a REST client");
+        commonspec.getLogger().debug("Starting a REST client");
 
         commonspec.setClient(new AsyncHttpClient(new AsyncHttpClientConfig.Builder().setAllowPoolingConnections(false)
                 .build()));
@@ -266,13 +266,13 @@ public class HookGSpec extends BaseGSpec {
 
     @After(order = 10, value = "@rest")
     public void restClientTeardown() throws IOException {
-        commonspec.getLogger().info("Shutting down REST client");
+        commonspec.getLogger().debug("Shutting down REST client");
         commonspec.getClient().close();
     }
 
     @After(order = 10)
     public void remoteSSHConnectionTeardown() throws Exception {
-        commonspec.getLogger().info("Closing SSH remote connection");
+        commonspec.getLogger().debug("Closing SSH remote connection");
         if (commonspec.getRemoteSSHConnection() != null) {
             commonspec.getRemoteSSHConnection().getSession().disconnect();
         }

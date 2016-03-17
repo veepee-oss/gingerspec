@@ -9,3 +9,4 @@ target/*
 *.swp
 .DS_Store
 *.iml
+*.log
