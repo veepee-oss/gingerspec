@@ -9,6 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.elasticsearch.cluster.metadata.IndexMetaData;
 import org.elasticsearch.index.query.RangeFilterBuilder;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.admin.cluster.state.ClusterStateResponse;
@@ -161,13 +162,19 @@ public class ElasticSearchUtils {
     }
 
     public boolean dropAllIndexes(){
-        ImmutableOpenMap<String, ImmutableOpenMap<String, AliasMetaData>> indexes =  this.client.admin().cluster()
+
+        boolean result = true;
+        ImmutableOpenMap<String, IndexMetaData> indexes =  this.client.admin().cluster()
                 .prepareState()
                 .execute().actionGet()
-                .getState().getMetaData().aliases();
-        return false;
+                .getState().getMetaData().getIndices();
 
-
+        for (String indexName : indexes.keys().toArray(String.class)) {
+            DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest(indexName);
+            DeleteIndexResponse res = this.client.admin().indices().delete(deleteIndexRequest).actionGet();
+            result = indexExists(indexName);
+        }
+        return result;
     }
 
     /**
