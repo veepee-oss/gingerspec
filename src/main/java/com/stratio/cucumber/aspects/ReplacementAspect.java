@@ -42,6 +42,30 @@ public class ReplacementAspect {
 	protected void replacementTestngCallPointcut(StringBuilder sb, List<Step> mergedsteps) {
 	}
 
+	@Pointcut("execution (public String com.stratio.cucumber.testng.CucumberReporter.TestMethod.obtainOutlineScenariosExamples(..)) && "
+			+ "args (examplesData)")
+	protected void replacementOutlineScenariosCallPointcut(String examplesData) {
+	}
+
+	@Around(value = "replacementOutlineScenariosCallPointcut(examplesData)")
+	public Object aroundReplacementOutlineScenariosCalls(ProceedingJoinPoint pjp, String examplesData) throws Throwable {
+		String newExamplesData = examplesData;
+
+		if (newExamplesData.contains("${")) {
+			newExamplesData = replaceEnvironmentPlaceholders(newExamplesData);
+		}
+		if (newExamplesData.contains("!{")) {
+			newExamplesData = replaceReflectionPlaceholders(newExamplesData);
+		}
+		if (newExamplesData.contains("@{")) {
+			newExamplesData = replaceCodePlaceholders(newExamplesData);
+		}
+
+		Object[] myArray = {newExamplesData};
+		return pjp.proceed(myArray);
+	}
+
+
 
 	@Around(value = "replacementTestngCallPointcut(sb, mergedsteps)")
 	public Object aroundReplacementTestngCalls(ProceedingJoinPoint pjp, StringBuilder sb, List<Step> mergedsteps) throws Throwable {
@@ -173,7 +197,8 @@ public class ReplacementAspect {
 						while (ifs.hasMoreElements() && !found) {
 							InetAddress itf = ifs.nextElement();
 							if (itf instanceof Inet4Address) {
-								newVal = itf.getHostAddress();
+								String ip = itf.getHostAddress();
+								newVal = newVal.replace(placeholder, ip);
 								found = true;
 							}
 						}
