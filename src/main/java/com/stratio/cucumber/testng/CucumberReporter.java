@@ -307,13 +307,17 @@ public class CucumberReporter implements Formatter, Reporter {
                 JunitElement.setAttribute("name", scenario.getName());
                 ThreadProperty.set("dataSet", "");
             } else {
-                String data = examplesData.getRows().get(iteration).getCells().toString();
-                data = data.replaceAll("\"", "¨");
+                String data = obtainOutlineScenariosExamples(examplesData.getRows().get(iteration).getCells().toString());
                 element.setAttribute("name", scenario.getName() + " " + data);
                 JunitElement.setAttribute("name", scenario.getName() + " " + data);
                 ThreadProperty.set("dataSet", data);
             }
             element.setAttribute("started-at", DATE_FORMAT.format(new Date()));
+        }
+
+        public String obtainOutlineScenariosExamples(String examplesData) {
+            String data = examplesData.replaceAll("\"", "¨");
+            return data;
         }
 
         /**
