@@ -213,8 +213,10 @@ public class ReplacementAspect {
 
 			// we want to use value previously saved
 			String prop = ThreadProperty.get(attribute);
-
-			newVal = newVal.replace(placeholder, prop);
+			
+			if (prop != null) {
+				newVal = newVal.replace(placeholder, prop);
+			}
 		}
 
 		return newVal;
