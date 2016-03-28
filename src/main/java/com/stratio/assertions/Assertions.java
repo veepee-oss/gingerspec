@@ -1,25 +1,13 @@
 package com.stratio.assertions;
 
-import java.util.List;
-
+import com.stratio.specs.CommonG;
+import com.stratio.tests.utils.PreviousWebElements;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-import com.stratio.specs.CommonG;
-import com.stratio.tests.utils.HttpResponse;
-import com.stratio.tests.utils.PreviousWebElements;
+import java.util.List;
 
 public class Assertions extends org.assertj.core.api.Assertions {
-	/**
-	 * Check if two HttpResponse are equals.
-	 * 
-	 * @param actual
-	 * @return HttpResponseAssert
-	 */
-	public static HttpResponseAssert assertThat(HttpResponse actual) {
-		return new HttpResponseAssert(actual);
-	}
-
 	/**
 	 * Check if two WebElements are equals.
 	 * 

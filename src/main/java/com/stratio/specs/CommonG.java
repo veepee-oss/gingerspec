@@ -1,42 +1,23 @@
 package com.stratio.specs;
 
-import static com.stratio.assertions.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.testng.Assert.fail;
-
-import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.Reader;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.lang.ThreadLocal;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.sql.Timestamp;
-import java.util.*;
-import java.util.concurrent.Future;
-
-import javax.imageio.ImageIO;
-
+import com.datastax.driver.core.ColumnDefinitions;
+import com.datastax.driver.core.ResultSet;
+import com.datastax.driver.core.Row;
+import com.jayway.jsonpath.JsonPath;
+import com.mongodb.DBCursor;
+import com.mongodb.DBObject;
+import com.ning.http.client.AsyncHttpClient;
+import com.ning.http.client.AsyncHttpClient.BoundRequestBuilder;
+import com.ning.http.client.Response;
+import com.ning.http.client.cookie.Cookie;
+import com.stratio.conditions.Conditions;
+import com.stratio.tests.utils.*;
+import cucumber.api.DataTable;
 import org.apache.commons.io.FileUtils;
 import org.assertj.core.api.Condition;
 import org.hjson.JsonValue;
 import org.json.JSONObject;
-import org.json.JSONArray;
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.TakesScreenshot;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.internal.Locatable;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -44,34 +25,18 @@ import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.datastax.driver.core.ResultSet;
-import com.jayway.jsonpath.JsonPath;
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.Response;
-import com.ning.http.client.AsyncHttpClient.BoundRequestBuilder;
-import com.ning.http.client.cookie.Cookie;
-import com.stratio.conditions.Conditions;
-import com.stratio.tests.utils.AerospikeUtil;
-import com.stratio.tests.utils.AerospikeUtils;
-import com.stratio.tests.utils.CassandraUtil;
-import com.stratio.tests.utils.CassandraUtils;
-import com.stratio.tests.utils.ElasticSearchUtil;
-import com.stratio.tests.utils.ElasticSearchUtils;
-import com.stratio.tests.utils.ExceptionList;
-import com.stratio.tests.utils.HashUtils;
-import com.stratio.tests.utils.HttpResponse;
-import com.stratio.tests.utils.MongoDBUtil;
-import com.stratio.tests.utils.MongoDBUtils;
-import com.stratio.tests.utils.PreviousWebElements;
-import com.stratio.tests.utils.ThreadProperty;
-import com.stratio.tests.utils.RemoteSSHConnection;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.sql.Timestamp;
+import java.util.*;
+import java.util.concurrent.Future;
+import java.util.regex.Pattern;
 
-import com.mongodb.DBCursor;
-import com.mongodb.DBObject;
-import com.datastax.driver.core.ColumnDefinitions;
-import com.datastax.driver.core.Row;
-
-import cucumber.api.DataTable;
+import static com.stratio.assertions.Assertions.assertThat;
+import static org.testng.Assert.fail;
 
 public class CommonG {
 
@@ -1205,8 +1170,23 @@ public class CommonG {
 		} else {
 			throw new Exception("You must execute a query before trying to get results");
 		}
-
-
 	}
-	
+
+	/**
+	 * Checks if a given string matches a regular expression or contains a string
+	 *
+	 * @param expectedMessage
+	 * @return boolean
+	 */
+	public static Pattern matchesOrContains(String expectedMessage) {
+		Pattern pattern;
+		if (expectedMessage.startsWith("regex:")) {
+			String regex = expectedMessage.substring(expectedMessage.indexOf("regex:") + 6,	expectedMessage.length());
+			pattern = Pattern.compile(regex);
+		} else {
+			pattern = Pattern.compile(expectedMessage);
+		}
+		return pattern;
+	}
+
 }
