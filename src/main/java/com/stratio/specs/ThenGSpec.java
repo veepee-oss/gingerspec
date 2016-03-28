@@ -1,33 +1,5 @@
 package com.stratio.specs;
 
-import static com.stratio.assertions.Assertions.assertThat;
-import static com.stratio.tests.utils.matchers.ColumnDefinitionsMatcher.containsColumn;
-import static com.stratio.tests.utils.matchers.DBObjectsMatcher.containedInMongoDBResult;
-import static com.stratio.tests.utils.matchers.ExceptionMatcher.hasClassAndMessage;
-import static com.stratio.tests.utils.matchers.ListLastElementExceptionMatcher.lastElementHasClassAndMessage;
-import static com.stratio.tests.utils.matchers.RecordSetMatcher.containedInRecordSet;
-import static org.assertj.core.api.Assertions.assertThat;
-//import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.anyOf;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.not;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.openqa.selenium.WebElement;
-
 import com.aerospike.client.query.RecordSet;
 import com.datastax.driver.core.ColumnDefinitions;
 import com.datastax.driver.core.DataType;
@@ -35,10 +7,22 @@ import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.mongodb.DBObject;
 import com.stratio.tests.utils.PreviousWebElements;
-
 import cucumber.api.DataTable;
 import cucumber.api.java.en.Then;
+import org.assertj.core.api.WritableAssertionInfo;
+import org.json.JSONArray;
+import org.openqa.selenium.WebElement;
 
+import java.util.*;
+import java.util.regex.Pattern;
+
+import static com.stratio.assertions.Assertions.assertThat;
+import static com.stratio.tests.utils.matchers.ColumnDefinitionsMatcher.containsColumn;
+import static com.stratio.tests.utils.matchers.DBObjectsMatcher.containedInMongoDBResult;
+import static com.stratio.tests.utils.matchers.ExceptionMatcher.hasClassAndMessage;
+import static com.stratio.tests.utils.matchers.ListLastElementExceptionMatcher.lastElementHasClassAndMessage;
+import static com.stratio.tests.utils.matchers.RecordSetMatcher.containedInRecordSet;
+import static org.hamcrest.Matchers.*;
 
 public class ThenGSpec extends BaseGSpec {
 
@@ -489,37 +473,34 @@ public class ThenGSpec extends BaseGSpec {
     @Then("^the service response status must be '(.*?)'.$")
     public void assertResponseStatus(Integer expectedStatus) {
         commonspec.getLogger().debug("Verifying response message");
-        assertThat(commonspec.getResponse()).hasStatusCode(expectedStatus);
+        assertThat(commonspec.getResponse().getStatusCode()).isEqualTo(expectedStatus);
     }
 
     @Then("^the service response must contain the text '(.*?)'$")
     public void assertResponseMessage(String expectedText) throws ClassNotFoundException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
         commonspec.getLogger().debug("Verifying response message");
-        assertThat(commonspec.getResponse()).hasMessage(expectedText);
-    }
-
-    @Then("^the service response must NOT contain the text '(.*?)'$")
-    public void assertNegativeResponseMessage(String expectedText) throws ClassNotFoundException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
-        commonspec.getLogger().debug("Verifying response message");
-        assertThat(commonspec.getResponse()).doesNotHaveMessage(expectedText);
+        Pattern pattern = CommonG.matchesOrContains(expectedText);
+        assertThat(commonspec.getResponse().getResponse()).containsPattern(pattern);
     }
 
     @Then("^the service response status must be '(.*?)' and its response must contain the text '(.*?)'$")
     public void assertResponseStatusMessage(Integer expectedStatus, String expectedText) throws ClassNotFoundException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
         commonspec.getLogger().debug("Verifying response status code and message");
-        assertThat(commonspec.getResponse()).hasStatusCodeAndMessage(expectedStatus, expectedText);
-    }
-
-    @Then("^the service response status must NOT be '(.*?)' and its response must NOT contain the text '(.*?)'$")
-    public void assertNegativeResponseStatusMessage(Integer unexpectedStatus, String unexpectedText) throws ClassNotFoundException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
-        commonspec.getLogger().debug("Verifying response status code and message");
-        assertThat(commonspec.getResponse()).doesNotHaveStatusCodeNorMessage(unexpectedStatus, unexpectedText);
+        WritableAssertionInfo assertionInfo = new WritableAssertionInfo();
+        Pattern pattern = CommonG.matchesOrContains(expectedText);
+        assertThat(Optional.of(commonspec.getResponse())).hasValueSatisfying(r -> {
+            assertThat(r.getStatusCode()).isEqualTo(expectedStatus);
+            assertThat(r.getResponse()).containsPattern(pattern);
+        });
     }
 
     @Then("^the service response status must be '(.*?)' and its response length must be '(.*?)'$")
     public void assertResponseStatusLength(Integer expectedStatus, Integer expectedLength) {
         commonspec.getLogger().debug("Verifying response status code and response length");
-        assertThat(commonspec.getResponse()).hasStatusCodeAndLength(expectedStatus, expectedLength);
+        assertThat(Optional.of(commonspec.getResponse())).hasValueSatisfying(r -> {
+            assertThat(r.getStatusCode()).isEqualTo(expectedStatus);
+            assertThat((new JSONArray(r.getResponse())).length()).isEqualTo(expectedLength);
+        });
     }
 
     /**
