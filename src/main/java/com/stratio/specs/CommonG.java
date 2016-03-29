@@ -1184,7 +1184,7 @@ public class CommonG {
 			String regex = expectedMessage.substring(expectedMessage.indexOf("regex:") + 6,	expectedMessage.length());
 			pattern = Pattern.compile(regex);
 		} else {
-			pattern = Pattern.compile(expectedMessage);
+			pattern = Pattern.compile(Pattern.quote(expectedMessage));
 		}
 		return pattern;
 	}
