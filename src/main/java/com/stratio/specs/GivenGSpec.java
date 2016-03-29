@@ -123,7 +123,7 @@ public class GivenGSpec extends BaseGSpec {
         for(int i=0; i<attrLength; i++){
             columns.put(datatable.getGherkinRows().get(0).getCells().get(i),
             datatable.getGherkinRows().get(1).getCells().get(i));
-            if(datatable.getGherkinRows().get(2).getCells().get(i).equalsIgnoreCase("PK")){
+            if((datatable.getGherkinRows().size() == 3) && datatable.getGherkinRows().get(2).getCells().get(i).equalsIgnoreCase("PK")){
                 pk.add(datatable.getGherkinRows().get(0).getCells().get(i));
             }
         }
