@@ -5,7 +5,6 @@ import com.stratio.tests.utils.PreviousWebElements;
 import java.util.ArrayList;
 import java.util.List;
 import com.mongodb.DBObject;
-import com.stratio.tests.utils.matchers.DBObjectsAssert;
 import cucumber.api.DataTable;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;

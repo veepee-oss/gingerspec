@@ -1,4 +1,4 @@
-package com.stratio.tests.utils.matchers;
+package com.stratio.assertions;
 
 
 import java.sql.Timestamp;
@@ -10,7 +10,6 @@ import com.mongodb.DBObject;
 import cucumber.api.DataTable;
 
 import org.assertj.core.api.AbstractAssert;
-import static com.stratio.assertions.Assertions.*;
 
 
 public class DBObjectsAssert extends AbstractAssert<DBObjectsAssert, ArrayList<DBObject>> {

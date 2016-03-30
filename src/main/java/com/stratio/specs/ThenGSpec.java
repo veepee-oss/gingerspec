@@ -1,8 +1,6 @@
 package com.stratio.specs;
 
 
-import static com.stratio.assertions.Assertions.*;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -11,7 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import com.stratio.tests.utils.matchers.DBObjectsAssert;
+import com.stratio.assertions.DBObjectsAssert;
 import org.openqa.selenium.WebElement;
 
 import com.datastax.driver.core.ColumnDefinitions;
@@ -24,19 +22,11 @@ import cucumber.api.DataTable;
 import cucumber.api.java.en.Then;
 import org.assertj.core.api.WritableAssertionInfo;
 import org.json.JSONArray;
-import org.openqa.selenium.WebElement;
 
 import java.sql.Timestamp;
 import java.util.*;
-import java.util.regex.Pattern;
 
 import static com.stratio.assertions.Assertions.assertThat;
-import static com.stratio.tests.utils.matchers.ColumnDefinitionsMatcher.containsColumn;
-import static com.stratio.tests.utils.matchers.DBObjectsMatcher.containedInMongoDBResult;
-import static com.stratio.tests.utils.matchers.ExceptionMatcher.hasClassAndMessage;
-import static com.stratio.tests.utils.matchers.ListLastElementExceptionMatcher.lastElementHasClassAndMessage;
-import static com.stratio.tests.utils.matchers.RecordSetMatcher.containedInRecordSet;
-import static org.hamcrest.Matchers.*;
 
 public class ThenGSpec extends BaseGSpec {
 
