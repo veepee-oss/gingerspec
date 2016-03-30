@@ -1,9 +1,7 @@
 package com.stratio.cucumber.converter;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.hasSize;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.testng.annotations.Test;
 
@@ -12,40 +10,37 @@ public class ArrayListConverterTest {
 
     @Test
     public void test() {
-        assertThat("Empty input converter", converter.transform(""), hasSize(1));
+        assertThat(converter.transform("")).as("Empty input converter").hasSize(1);
     }
 
     @Test
     public void test_1() {
-        assertThat("Single string input converter", converter.transform("foo"), hasSize(1));
+        assertThat(converter.transform("foo")).as("Single string input converter").hasSize(1);
     }
 
     @Test
     public void test_2() {
-        assertThat("Single string input converter", converter.transform("foo"), hasItem("foo"));
+        assertThat(converter.transform("foo")).as("Single string input converter").contains("foo");
     }
 
     @Test
     public void test_3() {
-        assertThat("Complex string input converter", converter.transform("foo,bar"), hasSize(2));
+        assertThat(converter.transform("foo,bar")).as("Complex string input converter").hasSize(2);
     }
 
     @Test
     public void test_4() {
-        assertThat("Single string input converter", converter.transform("foo , bar"),
-                allOf(hasItem("foo"), hasItem("bar")));
+        assertThat(converter.transform("foo , bar")).as("Single string input converter").contains("foo","bar");
     }
 
     @Test
     public void test_5() {
-        assertThat("Single string input converter", converter.transform("foo , , bar"),
-                allOf(hasItem("foo"), hasItem(" "), hasItem("bar")));
+        assertThat(converter.transform("foo , , bar")).as("Single string input converter").contains("foo", " ", "bar");
     }
 
     @Test
     public void test_6() {
-        assertThat("Single string input converter", converter.transform("foo ,   , bar"),
-                allOf(hasItem("foo"), hasItem("   "), hasItem("bar")));
+        assertThat(converter.transform("foo ,   , bar")).as("Single string input converter").contains("foo", "   ", "bar");
     }
 
 }

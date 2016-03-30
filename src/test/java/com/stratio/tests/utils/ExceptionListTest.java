@@ -1,7 +1,5 @@
 package com.stratio.tests.utils;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasSize;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.testng.annotations.Test;
 
@@ -9,7 +7,6 @@ public class ExceptionListTest {
 
     @Test
     public void test() {
-        assertThat("Non empty Exception list on boot", ExceptionList.INSTANCE.getExceptions(), hasSize(0));
+        assertThat( ExceptionList.INSTANCE.getExceptions()).as("Non empty Exception list on boot").hasSize(0);
     }
-
 }
