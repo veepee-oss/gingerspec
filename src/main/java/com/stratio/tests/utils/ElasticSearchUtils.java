@@ -97,14 +97,19 @@ public class ElasticSearchUtils {
         return this.settings;
     }
 
+    public void setHost(String host){
+        this.es_host = host;
+    }
+
     /**
      * Connect to ES.
      */
     public void connect() throws java.net.UnknownHostException{
-        this.client = new TransportClient(settings)
+        this.client = new TransportClient(this.settings)
                 .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(this.es_host),
                         this.es_native_port));
     }
+
 
     /**
      * Get ES client(Connected previously).
