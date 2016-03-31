@@ -62,8 +62,8 @@ public class ThenGSpec extends BaseGSpec {
             assertThat(exceptions).as("Captured exception list is empty").isNotEmpty();
             Exception ex = exceptions.get(exceptions.size() - 1);
             if ((clazz != null) && (exceptionMsg != null)) {
-                assertThat(ex.toString()).as("Unexpected last exception class or message").contains(clazz);
-                assertThat(ex.toString()).as("Unexpected last exception class or message").contains(exceptionMsg);
+                assertThat(ex.toString()).as("Unexpected last exception class").contains(clazz);
+                assertThat(ex.toString()).as("Unexpected last exception message").contains(exceptionMsg);
 
             } else if (clazz != null) {
                 assertThat(exceptions.get(exceptions.size() - 1).getClass().getSimpleName()).as("Unexpected last exception class").isEqualTo(clazz);
