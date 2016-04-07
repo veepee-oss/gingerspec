@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.stratio.specs.ThenGSpec;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -80,11 +81,20 @@ public class SeleniumAspect extends BaseGSpec {
 				}
 			}
 			if (driver != null) {
-			    logger.info("Trying to capture screenshots...");
-			    ((CommonG) ((SeleniumAssert) pjp.getTarget()).getCommonspec()).captureEvidence(driver, "framehtmlSource");
-			    ((CommonG) ((SeleniumAssert) pjp.getTarget()).getCommonspec()).captureEvidence(driver, "htmlSource");
-			    ((CommonG) ((SeleniumAssert) pjp.getTarget()).getCommonspec()).captureEvidence(driver, "screenCapture");
-			    logger.info("Screenshots are available at target/executions");
+				logger.info("Trying to capture screenshots...");
+				CommonG common = null;
+				if ((pjp.getThis() instanceof ThenGSpec) && (((ThenGSpec)pjp.getThis()).getCommonSpec() != null)) {
+					common = ((ThenGSpec)pjp.getThis()).getCommonSpec();
+				} else if ((pjp.getTarget() instanceof SeleniumAssert) && ((SeleniumAssert) pjp.getTarget()).getCommonspec() != null) {
+					common = ((CommonG) ((SeleniumAssert) pjp.getTarget()).getCommonspec());
+				} else {
+					logger.info("Got no Selenium driver to capture a screen");
+					throw ex;
+				}
+				common.captureEvidence(driver, "framehtmlSource");
+				common.captureEvidence(driver, "htmlSource");
+				common.captureEvidence(driver, "screenCapture");
+				logger.info("Screenshots are available at target/executions");
 			} else {
 				logger.info("Got no Selenium driver to capture a screen");
 			}
