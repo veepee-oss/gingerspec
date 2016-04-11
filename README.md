@@ -1,4 +1,5 @@
 stratio-test-bdd
 ================
 
-Stratio Test BDD.
+Stratio Test BDD
+
