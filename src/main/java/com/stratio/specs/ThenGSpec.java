@@ -40,8 +40,7 @@ public class ThenGSpec extends BaseGSpec {
     /**
      * Checks if an exception has been thrown.
      *
-     * @param exception
-     *            : "IS NOT" | "IS"
+     * @param exception    : "IS NOT" | "IS"
      * @param foo
      * @param clazz
      * @param bar
@@ -112,7 +111,7 @@ public class ThenGSpec extends BaseGSpec {
         commonspec.getLogger().debug("Verifying if the keyspace {} exists", keyspace);
         commonspec.getCassandraClient().useKeyspace(keyspace);
         org.hamcrest.MatcherAssert.assertThat("The table " + tableName + "exists on cassandra", commonspec
-                .getCassandraClient().executeQuery("SELECT COUNT(*) FROM " + tableName + ";").all().get(0).getLong(0),
+                        .getCassandraClient().executeQuery("SELECT COUNT(*) FROM " + tableName + ";").all().get(0).getLong(0),
                 equalTo(numberRowsLong));
     }
 
@@ -290,7 +289,7 @@ public class ThenGSpec extends BaseGSpec {
         commonspec.getLogger().debug("Verifying text existance");
 
         assertThat(commonspec.getPreviousWebElements()).as("There are less found elements than required")
-        .hasAtLeast(index);
+                .hasAtLeast(index);
         assertThat(commonspec.getPreviousWebElements().getPreviousWebElements().get(index)).contains(text);
     }
 
@@ -350,7 +349,7 @@ public class ThenGSpec extends BaseGSpec {
      */
     @Then("^in less than '(\\d+?)' seconds, checking each '(\\d+?)' seconds, '(\\d+?)' elements exists with '([^:]*?):([^:]*?)'$")
     public void assertSeleniumNElementExistsOnTimeOut(Integer timeout, Integer wait, Integer expectedCount,
-            String method, String element) throws InterruptedException, ClassNotFoundException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+                                                      String method, String element) throws InterruptedException, ClassNotFoundException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
         commonspec.getLogger().debug("Verifying {} existance", element);
 
         List<WebElement> wel = null;
@@ -381,7 +380,7 @@ public class ThenGSpec extends BaseGSpec {
         commonspec.getLogger().debug("Verifying element visibility");
 
         assertThat(this.commonspec, commonspec.getPreviousWebElements()).as("There are less found elements than required")
-            .hasAtLeast(index);
+                .hasAtLeast(index);
         assertThat(this.commonspec, commonspec.getPreviousWebElements().getPreviousWebElements().get(index).isDisplayed()).as(
                 "Unexpected element display property").isEqualTo(isDisplayed);
     }
@@ -397,9 +396,9 @@ public class ThenGSpec extends BaseGSpec {
         commonspec.getLogger().debug("Verifying element enableness");
 
         assertThat(this.commonspec, commonspec.getPreviousWebElements()).as("There are less found elements than required")
-        .hasAtLeast(index);
+                .hasAtLeast(index);
         assertThat(this.commonspec, commonspec.getPreviousWebElements().getPreviousWebElements().get(index).isEnabled())
-        .as("Unexpected element enabled property").isEqualTo(isEnabled);
+                .as("Unexpected element enabled property").isEqualTo(isEnabled);
     }
 
     /**
@@ -413,7 +412,7 @@ public class ThenGSpec extends BaseGSpec {
         commonspec.getLogger().debug("Verifying element enableness");
 
         assertThat(this.commonspec, commonspec.getPreviousWebElements()).as("There are less found elements than required")
-        .hasAtLeast(index);
+                .hasAtLeast(index);
         assertThat(this.commonspec, commonspec.getPreviousWebElements().getPreviousWebElements().get(index).isSelected()).as(
                 "Unexpected element selected property").isEqualTo(isSelected);
     }
@@ -430,7 +429,7 @@ public class ThenGSpec extends BaseGSpec {
         commonspec.getLogger().debug("Verifying element attribute");
 
         assertThat(this.commonspec, commonspec.getPreviousWebElements()).as("There are less found elements than required")
-        .hasAtLeast(index);
+                .hasAtLeast(index);
         String val = commonspec.getPreviousWebElements().getPreviousWebElements().get(index).getAttribute(attribute);
         assertThat(this.commonspec, val).as("Attribute not found").isNotNull();
         assertThat(this.commonspec, val).as("Unexpected value for specified attribute").matches(value);
@@ -467,7 +466,7 @@ public class ThenGSpec extends BaseGSpec {
         String webURL = "http://" + commonspec.getWebHost() + commonspec.getWebPort();
 
         assertThat(this.commonspec, commonspec.getDriver().getCurrentUrl()).as("We are not in the expected url: " + webURL + url)
-        .isEqualTo(webURL + url);
+                .isEqualTo(webURL + url);
     }
 
     @Then("^the service response status must be '(.*?)'.$")
@@ -507,23 +506,23 @@ public class ThenGSpec extends BaseGSpec {
      * Checks the different results of a previous query
      *
      * @param expectedResults A DataTable Object with all data needed for check the results. The DataTable must contains at least 2 columns:
-     * a) A field column from the result
-     * b) Occurrences column (Integer type)
-     *
-     * Example:
-     *      |latitude| longitude|place     |occurrences|
-            |12.5    |12.7      |Valencia  |1           |
-            |2.5     | 2.6      |Stratio   |0           |
-            |12.5    |13.7      |Sevilla   |1           |
-     * IMPORTANT: There no should be no existing columns
+     *                        a) A field column from the result
+     *                        b) Occurrences column (Integer type)
+     *                        <p>
+     *                        Example:
+     *                        |latitude| longitude|place     |occurrences|
+     *                        |12.5    |12.7      |Valencia  |1           |
+     *                        |2.5     | 2.6      |Stratio   |0           |
+     *                        |12.5    |13.7      |Sevilla   |1           |
+     *                        IMPORTANT: There no should be no existing columns
      * @throws Exception
      */
     @Then("^There are results found with:$")
     public void resultsMustBe(DataTable expectedResults) throws Exception {
 
-        String type=commonspec.getResultsType();
+        String type = commonspec.getResultsType();
         assertThat(type).isNotEqualTo("").overridingErrorMessage("It's necessary to define the result type");
-        switch(type){
+        switch (type) {
             case "cassandra":
                 commonspec.resultsMustBeCassandra(expectedResults);
                 break;
@@ -539,4 +538,16 @@ public class ThenGSpec extends BaseGSpec {
         }
     }
 
+    /*
+   * Check the existence of a text at a command output
+   *
+   * @param search
+   *
+   */
+    @Then("^the command output contains '(.+?)'$")
+    public void findShellOutput(String search) throws Exception {
+        commonspec.getLogger().debug("Searching for '" + search + "'");
+        assertThat(commonspec.getRemoteSSHConnection().getResult()).as("Contains " + search + ".").contains(search);
+    }
 }
+
