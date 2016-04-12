@@ -406,12 +406,12 @@ public class CucumberReporter implements Formatter, Reporter {
                 Junit.appendChild(systemOut);
             } else if (ignored && !ignoreReason) {
                 element.setAttribute(STATUS, "FAIL");
-                Element exception = createException(doc, "failed",
-                        "Nonexistent ignore reason", " ");
+                Element exception = createException(doc, "The scenario has no valid reason for being ignored",
+                        "The scenario has no valid reason for being ignored", "The scenario has no valid reason for being ignored. <p>Valid values: @tillfixed(ISSUE-007) @unimplemented @manual @toocomplex</p>");
                 element.appendChild(exception);
-                Element skippedElementJunit = docJunit.createElement("failed");
-                Junit.appendChild(skippedElementJunit);
-                Element systemOut = systemOutPrintJunit(docJunit, "Nonexistent ignore reason");
+                Element systemOut = createExceptionJunit(docJunit,
+                        "The scenario has no valid reason for being ignored", "The scenario has no valid reason for being ignored." ,
+                        "<p>The scenario has no valid reason for being ignored. Valid values: @tillfixed(ISSUE-007) @unimplemented @manual @toocomplex</p>");
                 Junit.appendChild(systemOut);
             } else {
                 for (Result result : results) {
