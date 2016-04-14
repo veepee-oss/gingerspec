@@ -347,6 +347,19 @@ public class CommonG {
 	 * @return String
 	 */
 	public String captureEvidence(WebDriver driver, String type) {
+		return captureEvidence(driver, type, "");
+	}
+
+	/**
+	 * Capture a snapshot or an evidence in the driver
+	 *
+	 * @param driver
+	 * @param type
+	 * @param suffix
+	 *
+	 * @return String
+	 */
+	public String captureEvidence(WebDriver driver, String type, String suffix) {
 
 		String dir = "./target/executions/";
 
@@ -359,9 +372,14 @@ public class CommonG {
 					.replaceAll("[\\\\|\\/|\\|\\s|:|\\*]", "_");
 		}
 
-		currentData = HashUtils.doHash(currentData);
-		String outputFile = dir + clazz + "/" + currentBrowser + "-"
-				+ currentData + new Timestamp(new java.util.Date().getTime());
+		if (!("".equals(currentData))) {
+			currentData = "-" + HashUtils.doHash(currentData);
+		}
+
+		Timestamp ts = new Timestamp(new java.util.Date().getTime());
+		String outputFile = dir + clazz  + "/"
+				+ ThreadProperty.get("feature") + "." + ThreadProperty.get("scenario") + "/"+ currentBrowser +
+				currentData + ts.toString() + suffix;
 
 		outputFile = outputFile.replaceAll(" ", "_");
 
@@ -1188,5 +1206,4 @@ public class CommonG {
 		}
 		return pattern;
 	}
-
 }

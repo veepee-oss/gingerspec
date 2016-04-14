@@ -13,6 +13,7 @@ import org.assertj.core.api.WritableAssertionInfo;
 import org.json.JSONArray;
 import org.openqa.selenium.WebElement;
 
+import java.sql.Timestamp;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -442,7 +443,6 @@ public class ThenGSpec extends BaseGSpec {
      */
     @Then("^I take a snapshot$")
     public void seleniumSnapshot() throws Exception {
-
         commonspec.captureEvidence(commonspec.getDriver(), "screenCapture");
     }
 

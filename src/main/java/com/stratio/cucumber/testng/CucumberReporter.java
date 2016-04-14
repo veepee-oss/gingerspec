@@ -8,6 +8,8 @@ import cucumber.runtime.io.UTF8OutputStreamWriter;
 import gherkin.formatter.Formatter;
 import gherkin.formatter.Reporter;
 import gherkin.formatter.model.*;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.w3c.dom.*;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -18,12 +20,10 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.Writer;
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -121,7 +121,7 @@ public class CucumberReporter implements Formatter, Reporter {
         jUnitRoot = jUnitDocument.createElement("testcase");
         jUnitSuite.appendChild(jUnitRoot);
         clazz.appendChild(root);
-        testMethod = new TestMethod(scenario);
+        testMethod = new TestMethod(featureName, scenario);
         testMethod.hooks = tmpHooks;
         tmpStepsBG.clear();
         if (tmpExamples == null) {
@@ -288,6 +288,7 @@ public class CucumberReporter implements Formatter, Reporter {
     private static final class TestMethod {
 
         private Scenario scenario = null;
+        private String featureName;
         private Examples examplesData;
         private static boolean treatSkippedAsFailure = false;
         private List<Step> steps;
@@ -296,7 +297,8 @@ public class CucumberReporter implements Formatter, Reporter {
         private List<Result> hooks;
         private Integer iteration = 1;
 
-        private TestMethod(Scenario scenario) {
+        private TestMethod(String feature, Scenario scenario) {
+            this.featureName = feature;
             this.scenario = scenario;
         }
 
@@ -505,10 +507,30 @@ public class CucumberReporter implements Formatter, Reporter {
                 for (int j = 0; j + len < DEFAULT_MAX_LENGTH; j++) {
                     sb.append(".");
                 }
+
                 sb.append(resultStatus);
                 sb.append(resultStatusWarn);
                 sb.append("\n");
             }
+            String cap = "";
+            if (!("".equals(cap = hasCapture(featureName, scenario.getName())))) {
+                sb.append("evidence @ http://../../../../../artifact/testsAT/"+ cap.replaceAll("",""));
+            }
+        }
+
+        private String hasCapture(String feat, String scen) {
+
+            File dir =new File("./target/executions/");
+            final String[] imgext = {"png"};
+            Collection<File> files = FileUtils.listFiles(dir, imgext, true);
+
+            for (File file: files) {
+                if (file.getPath().contains(featureName.replaceAll(" ", "_") + "." + scenario.getName().replaceAll(" ", "_")) &&
+                        file.getName().contains("assert")) {
+                    return file.toString();
+                }
+            }
+            return "";
         }
 
         private Element createException(Document doc, String clazz, String message, String stacktrace) {

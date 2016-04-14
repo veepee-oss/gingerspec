@@ -1,5 +1,6 @@
 package com.stratio.tests.utils;
 
+import com.stratio.specs.BaseGSpec;
 import gherkin.formatter.model.Background;
 import gherkin.formatter.model.Examples;
 import gherkin.formatter.model.Feature;
@@ -17,7 +18,7 @@ import org.slf4j.LoggerFactory;
 import com.stratio.cucumber.testng.ICucumberFormatter;
 import com.stratio.cucumber.testng.ICucumberReporter;
 
-public class CukesGHooks implements ICucumberReporter, ICucumberFormatter {
+public class CukesGHooks extends BaseGSpec implements ICucumberReporter, ICucumberFormatter {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
 
@@ -62,12 +63,14 @@ public class CukesGHooks implements ICucumberReporter, ICucumberFormatter {
     @Override
     public void feature(Feature feature) {
         this.feature = feature;
+        ThreadProperty.set("feature", feature.getName());
     }
 
     @Override
     public void scenario(Scenario scenario) {
         this.scenario = scenario;
         logger.info("Got to {}/{} ", feature.getName(), scenario.getName());
+        ThreadProperty.set("scenario", scenario.getName());
     }
 
     @Override

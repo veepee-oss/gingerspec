@@ -91,9 +91,9 @@ public class SeleniumAspect extends BaseGSpec {
 					logger.info("Got no Selenium driver to capture a screen");
 					throw ex;
 				}
-				common.captureEvidence(driver, "framehtmlSource");
-				common.captureEvidence(driver, "htmlSource");
-				common.captureEvidence(driver, "screenCapture");
+				common.captureEvidence(driver, "framehtmlSource", "assert");
+				common.captureEvidence(driver, "htmlSource", "assert");
+				common.captureEvidence(driver, "screenCapture", "assert");
 				logger.info("Screenshots are available at target/executions");
 			} else {
 				logger.info("Got no Selenium driver to capture a screen");
