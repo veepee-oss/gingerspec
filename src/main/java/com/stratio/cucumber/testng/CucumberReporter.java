@@ -514,7 +514,7 @@ public class CucumberReporter implements Formatter, Reporter {
             }
             String cap = "";
             if (!("".equals(cap = hasCapture(featureName, scenario.getName())))) {
-                sb.append("evidence @ http://../../../../../artifact/testsAT/"+ cap.replaceAll("",""));
+                sb.append("evidence @ " + System.getProperty("BUILD_URL", "") + "/artifact/testsAT/"+ cap.replaceAll("",""));
             }
         }
 
