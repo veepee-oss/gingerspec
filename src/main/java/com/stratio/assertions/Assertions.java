@@ -2,10 +2,12 @@ package com.stratio.assertions;
 
 import com.stratio.specs.CommonG;
 import com.stratio.tests.utils.PreviousWebElements;
+import java.util.ArrayList;
+import java.util.List;
+import com.mongodb.DBObject;
+import cucumber.api.DataTable;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-
-import java.util.List;
 
 public class Assertions extends org.assertj.core.api.Assertions {
 	/**
@@ -56,6 +58,10 @@ public class Assertions extends org.assertj.core.api.Assertions {
 	
 	public static SeleniumAssert assertThat(CommonG common, String actual) {
 	    return new SeleniumAssert(common, actual);
+	}
+
+	public static DBObjectsAssert assertThat(DataTable data,ArrayList<DBObject> actual)  {
+		return new DBObjectsAssert(actual);
 	}
 	
 }

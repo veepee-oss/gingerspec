@@ -1,39 +1,37 @@
-package com.stratio.tests.utils.matchers;
+package com.stratio.assertions;
+
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hamcrest.Description;
-import org.hamcrest.Factory;
-import org.hamcrest.TypeSafeMatcher;
-
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
-
 import cucumber.api.DataTable;
 
-public class DBObjectsMatcher extends TypeSafeMatcher<ArrayList<DBObject>> {
+import org.assertj.core.api.AbstractAssert;
 
-    private final DataTable table;
 
-    public DBObjectsMatcher(DataTable table) {
-        this.table = table;
+public class DBObjectsAssert extends AbstractAssert<DBObjectsAssert, ArrayList<DBObject>> {
+
+
+    public DBObjectsAssert(ArrayList<DBObject> actual) {
+        super(actual, DBObjectsAssert.class);
     }
 
-    @Factory
-    public static DBObjectsMatcher containedInMongoDBResult(DataTable table) {
-        return new DBObjectsMatcher(table);
+    public static DBObjectsAssert assertThat(ArrayList<DBObject> actual) {
+        return new DBObjectsAssert(actual);
     }
 
-    @Override
-    public void describeTo(Description description) {
-        description.appendText("The result obtained is not equals from expected in DataTable");
-
+    public   DBObjectsAssert containedInMongoDBResult(DataTable table) {
+        boolean resultado = matchesSafely(actual,table);
+        if(resultado==false) {
+            failWithMessage("The table does not contains the data required.");
+        }
+        return new DBObjectsAssert(actual);
     }
 
-    @Override
-    protected boolean matchesSafely(ArrayList<DBObject> item) {
+    protected boolean matchesSafely(ArrayList<DBObject> item,DataTable table) {
         List<String[]> colRel = coltoArrayList(table);
 
         for (int i = 1; i < table.raw().size(); i++) {
@@ -75,6 +73,7 @@ public class DBObjectsMatcher extends TypeSafeMatcher<ArrayList<DBObject>> {
         return res;
     }
 
+
     private List<String[]> coltoArrayList(DataTable table) {
         List<String[]> res = new ArrayList<String[]>();
         // Primero se obiente la primera fila del datatable
@@ -86,20 +85,23 @@ public class DBObjectsMatcher extends TypeSafeMatcher<ArrayList<DBObject>> {
         return res;
     }
 
+
     private Object castSTringTo(String dataType, String data) {
         switch (dataType) {
-        case "String":
-            return data;
-        case "Integer":
-            return Integer.parseInt(data);
-        case "Double":
-            return Double.parseDouble(dataType);
-        case "Boolean":
-            return Boolean.parseBoolean(dataType);
-        case "Timestamp":
-            return Timestamp.valueOf(dataType);
-        default:
-            return null;
+            case "String":
+                return data;
+            case "Integer":
+                return Integer.parseInt(data);
+            case "Double":
+                return Double.parseDouble(dataType);
+            case "Boolean":
+                return Boolean.parseBoolean(dataType);
+            case "Timestamp":
+                return Timestamp.valueOf(dataType);
+            default:
+                return null;
         }
     }
+
+
 }

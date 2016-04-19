@@ -97,14 +97,19 @@ public class ElasticSearchUtils {
         return this.settings;
     }
 
+    public void setHost(String host){
+        this.es_host = host;
+    }
+
     /**
      * Connect to ES.
      */
     public void connect() throws java.net.UnknownHostException{
-        this.client = new TransportClient(settings)
+        this.client = new TransportClient(this.settings)
                 .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(this.es_host),
                         this.es_native_port));
     }
+
 
     /**
      * Get ES client(Connected previously).
@@ -150,7 +155,7 @@ public class ElasticSearchUtils {
     /**
      * Drop an ES Index
      * @param indexName
-     * @return
+     * @return true if the index exists
      * @throws ElasticsearchException
      */
     public boolean dropSingleIndex(String indexName) throws
@@ -229,11 +234,16 @@ public class ElasticSearchUtils {
      * Check if a mapping exists in an expecific index.
      * @param indexName
      * @param mappingName
-     * @return
+     * @return true if the mapping exists and false in other case
      */
     public boolean existsMapping(String indexName, String mappingName){
         ClusterStateResponse resp = this.client.admin().cluster().prepareState().execute().actionGet();
+
+        if (resp.getState().getMetaData().index(indexName) == null){
+            return false;
+        }
         ImmutableOpenMap<String, MappingMetaData> mappings = resp.getState().getMetaData().index(indexName).getMappings();
+
         if(mappings.get(mappingName) != null){
             return true;
         }
