@@ -1,6 +1,19 @@
 package com.stratio.specs;
 
-import com.aerospike.client.query.RecordSet;
+
+import static com.stratio.assertions.Assertions.*;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Pattern;
+
+import com.stratio.tests.utils.matchers.DBObjectsAssert;
+import org.openqa.selenium.WebElement;
+
 import com.datastax.driver.core.ColumnDefinitions;
 import com.datastax.driver.core.DataType;
 import com.datastax.driver.core.ResultSet;
@@ -54,20 +67,15 @@ public class ThenGSpec extends BaseGSpec {
 
         List<Exception> exceptions = commonspec.getExceptions();
         if ("IS NOT".equals(exception)) {
-            org.hamcrest.MatcherAssert.assertThat("Captured exception list is not empty", exceptions,
-                    anyOf(hasSize(0), lastElementHasClassAndMessage("", "")));
+            assertThat(exceptions).as("Captured exception list is not empty").isEmpty();
         } else {
-            org.hamcrest.MatcherAssert.assertThat("Captured exception list is empty", exceptions,
-                    hasSize(greaterThan((0))));
+            assertThat(exceptions).as("Captured exception list is empty").isNotEmpty();
             Exception ex = exceptions.get(exceptions.size() - 1);
             if ((clazz != null) && (exceptionMsg != null)) {
-
-                org.hamcrest.MatcherAssert.assertThat("Unexpected last exception class or message", ex,
-                        hasClassAndMessage(clazz, exceptionMsg));
+                assertThat(ex).as("Unexpected last exception class or message").hasSameClassAs(clazz).hasMessage(exceptionMsg);
 
             } else if (clazz != null) {
-                org.hamcrest.MatcherAssert.assertThat("Unexpected last exception class",
-                        exceptions.get(exceptions.size() - 1).getClass().getSimpleName(), equalTo(clazz));
+                assertThat(exceptions.get(exceptions.size() - 1).getClass().getSimpleName()).as("Unexpected last exception class").isEqualTo(clazz);
             }
 
             commonspec.getExceptions().clear();
@@ -82,8 +90,7 @@ public class ThenGSpec extends BaseGSpec {
     @Then("^a Cassandra keyspace '(.+?)' exists$")
     public void assertKeyspaceOnCassandraExists(String keyspace) {
         commonspec.getLogger().debug("Verifying if the keyspace {} exists", keyspace);
-        org.hamcrest.MatcherAssert.assertThat("The keyspace " + keyspace + "exists on cassandra", commonspec
-                .getCassandraClient().getKeyspaces(), hasItem(keyspace));
+        assertThat(commonspec.getCassandraClient().getKeyspaces()).as("The keyspace " + keyspace + "exists on cassandra").contains(keyspace);
     }
 
     /**
@@ -95,8 +102,7 @@ public class ThenGSpec extends BaseGSpec {
     @Then("^a Casandra keyspace '(.+?)' contains a table '(.+?)'$")
     public void assertTableExistsOnCassandraKeyspace(String keyspace, String tableName) {
         commonspec.getLogger().debug("Verifying if the table {} exists in the keyspace {}", tableName, keyspace);
-        org.hamcrest.MatcherAssert.assertThat("The table " + tableName + "exists on cassandra", commonspec
-                .getCassandraClient().getTables(keyspace), hasItem(tableName));
+        assertThat(commonspec.getCassandraClient().getTables(keyspace)).as("The table " + tableName + "exists on cassandra").contains(tableName);
     }
 
     /**
@@ -111,9 +117,8 @@ public class ThenGSpec extends BaseGSpec {
         Long numberRowsLong = Long.parseLong(numberRows);
         commonspec.getLogger().debug("Verifying if the keyspace {} exists", keyspace);
         commonspec.getCassandraClient().useKeyspace(keyspace);
-        org.hamcrest.MatcherAssert.assertThat("The table " + tableName + "exists on cassandra", commonspec
-                        .getCassandraClient().executeQuery("SELECT COUNT(*) FROM " + tableName + ";").all().get(0).getLong(0),
-                equalTo(numberRowsLong));
+        assertThat(commonspec.getCassandraClient().executeQuery("SELECT COUNT(*) FROM " + tableName + ";").all().get(0).getLong(0)).as("The table " + tableName + "exists on cassandra").
+                isEqualTo(numberRowsLong);
     }
 
     /**
@@ -126,28 +131,27 @@ public class ThenGSpec extends BaseGSpec {
      */
     @Then("^a Casandra keyspace '(.+?)' contains a table '(.+?)' with values:$")
     public void assertValuesOfTable(String keyspace, String tableName, DataTable data) throws InterruptedException {
-        // Primero hacemos USE del Keyspace
+        //  USE of Keyspace
         commonspec.getLogger().debug("Verifying if the keyspace {} exists", keyspace);
         commonspec.getCassandraClient().useKeyspace(keyspace);
-        // Obtenemos los tipos y los nombres de las columnas del datatable y los
-        // devolvemos en un hashmap
+        // Obtain the types and column names of the datatable
+        // to return in a hashmap,
         Map<String, String> dataTableColumns = extractColumnNamesAndTypes(data.raw().get(0));
-        // Comprobamos que la tabla tenga las columnas
+        // check if the table has columns
         String query = "SELECT * FROM " + tableName + " LIMIT 1;";
         ResultSet res = commonspec.getCassandraClient().executeQuery(query);
         equalsColumns(res.getColumnDefinitions(), dataTableColumns);
-        // Obtenemos la cadena de la parte del select con las columnas
-        // pertenecientes al dataTable
+        //receiving the string from the select with the columns
+        // that belong to the dataTable
         List<String> selectQueries = giveQueriesList(data, tableName, columnNames(data.raw().get(0)));
-        // Pasamos a comprobar los datos de cassandra con las distintas queries
+        //Check the data  of cassandra with different queries
         int index = 1;
         for (String execQuery : selectQueries) {
             res = commonspec.getCassandraClient().executeQuery(execQuery);
             List<Row> resAsList = res.all();
-            org.hamcrest.MatcherAssert.assertThat("The query " + execQuery + " not return any result on Cassandra",
-                    resAsList.size(), greaterThan(0));
-            org.hamcrest.MatcherAssert.assertThat("The resultSet is not as expected", resAsList.get(0).toString()
-                    .substring(VALUE_SUBSTRING), equalTo(data.raw().get(index).toString()));
+            assertThat(resAsList.size()).as("The query " + execQuery + " not return any result on Cassandra").isGreaterThan(0);
+            assertThat(resAsList.get(0).toString()
+                    .substring(VALUE_SUBSTRING)).as("The resultSet is not as expected").isEqualTo(data.raw().get(index).toString());
             index++;
         }
     }
@@ -157,11 +161,9 @@ public class ThenGSpec extends BaseGSpec {
         Iterator it = dataTableColumns.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry e = (Map.Entry) it.next();
-            org.hamcrest.MatcherAssert.assertThat("The table not contains the column.", resCols.toString(),
-                    containsColumn(e.getKey().toString()));
+            assertThat(resCols.toString()).as("The table not contains the column.").contains(e.getKey().toString());
             DataType type = resCols.getType(e.getKey().toString());
-            org.hamcrest.MatcherAssert.assertThat("The column type is not equals.", type.getName().toString(),
-                    equalTo(e.getValue().toString()));
+            assertThat(type.getName().toString()).as("The column type is not equals.").isEqualTo(e.getValue().toString());
         }
     }
 
@@ -217,21 +219,7 @@ public class ThenGSpec extends BaseGSpec {
         return columns;
     }
 
-    /**
-     * Checks the values of a Aerospike table.
-     *
-     * @param nameSpace
-     * @param tableName
-     * @param data
-     */
-    @Then("^checking if a Aerospike namespace '(.+?)' with table '(.+?)' and data exists:$")
-    public void assertValuesOfTableAeroSpike(String nameSpace, String tableName, DataTable data) {
-        commonspec.getLogger().debug("Verifying if the nameSpace {} exists and tableName {} exists on Aerospike",
-                nameSpace, tableName);
-        RecordSet rs = commonspec.getAerospikeClient().readTable(nameSpace, tableName);
-        org.hamcrest.MatcherAssert.assertThat("The table does not contains the data required.", rs,
-                containedInRecordSet(data));
-    }
+
 
     /**
      * Checks the values of a MongoDB table.
@@ -247,8 +235,7 @@ public class ThenGSpec extends BaseGSpec {
         commonspec.getMongoDBClient().connectToMongoDBDataBase(dataBase);
         ArrayList<DBObject> result = (ArrayList<DBObject>) commonspec.getMongoDBClient().readFromMongoDBCollection(
                 tableName, data);
-        org.hamcrest.MatcherAssert.assertThat("The table does not contains the data required.", result,
-                containedInMongoDBResult(data));
+        DBObjectsAssert.assertThat(result).containedInMongoDBResult(data);
 
     }
 
@@ -263,8 +250,7 @@ public class ThenGSpec extends BaseGSpec {
         commonspec.getLogger().debug("Verifying if the dataBase {} contains the table {}", database, tableName);
         commonspec.getMongoDBClient().connectToMongoDBDataBase(database);
         Set<String> collectionsNames = commonspec.getMongoDBClient().getMongoDBCollections();
-        org.hamcrest.MatcherAssert.assertThat("The Mongo dataBase contains the table", collectionsNames,
-                not(hasItem(tableName)));
+        assertThat(collectionsNames).as("The Mongo dataBase contains the table").doesNotContain(tableName);
     }
 
     /**
