@@ -514,4 +514,19 @@ public class GivenGSpec extends BaseGSpec {
         commonspec.getRemoteSSHConnection().runCommand(command);
     }
 
+    /**
+     * Insert document in a MongoDB table.
+     *
+     * @param dataBase
+     * @param collection
+     * @param document
+     */
+    @Given("^I insert into MongoDB database '(.+?)' and collection '(.+?)' the document from schema '(.+?)'$")
+    public void insertOnMongoTable(String dataBase, String collection, String document) throws Exception {
+        commonspec.getLogger().debug("Inserting data at {}.{} on MongoDB", dataBase, collection);
+        String retrievedDoc = commonspec.retrieveData(document, "json");
+        commonspec.getMongoDBClient().connectToMongoDBDataBase(dataBase);
+        commonspec.getMongoDBClient().insertDocIntoMongoDBCollection(collection, retrievedDoc);
+    }
+
 }
