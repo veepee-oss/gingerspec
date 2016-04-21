@@ -515,7 +515,7 @@ public class ThenGSpec extends BaseGSpec {
         }
     }
 
-    /*
+   /*
    * Check the existence of a text at a command output
    *
    * @param search
@@ -526,5 +526,18 @@ public class ThenGSpec extends BaseGSpec {
         commonspec.getLogger().debug("Searching for '" + search + "'");
         assertThat(commonspec.getRemoteSSHConnection().getResult()).as("Contains " + search + ".").contains(search);
     }
+
+   /*
+   * Check the exitStatus of previous call matches the expected one
+   *
+   * @param expectedExitStatus
+   *
+   */
+    @Then("^the command exit status is '(.+?)'$")
+    public void checkShellExitStatus(String expectedExitStatus) throws Exception {
+        commonspec.getLogger().debug("Expecting exit status: " + expectedExitStatus);
+        assertThat(commonspec.getRemoteSSHConnection().getExitStatus()).as("Is equal to " + expectedExitStatus + ".").isEqualTo(Integer.parseInt(expectedExitStatus));
+    }
+
 }
 
