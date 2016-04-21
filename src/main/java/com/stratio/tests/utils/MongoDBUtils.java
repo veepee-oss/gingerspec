@@ -6,15 +6,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import com.mongodb.*;
+import com.mongodb.util.JSON;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
-import com.mongodb.DBObject;
-import com.mongodb.MongoClient;
 import com.stratio.exceptions.DBException;
 
 import cucumber.api.DataTable;
@@ -199,6 +195,19 @@ public class MongoDBUtils {
 			}
 			this.dataBase.getCollection(collection).insert(doc);
 		}
+	}
+
+	/**
+	 * Insert document in a MongoDB Collection.
+	 *
+	 * @param collection
+	 * @param document
+	 */
+	public void insertDocIntoMongoDBCollection(String collection, String document) {
+
+		DBObject dbObject = (DBObject) JSON.parse(document);
+		this.dataBase.getCollection(collection).insert(dbObject);
+
 	}
 
 	/**
