@@ -1,32 +1,24 @@
 package com.stratio.specs;
 
-import static com.stratio.assertions.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThat;
+import com.jayway.jsonpath.JsonPath;
+import com.stratio.exceptions.DBException;
+import com.stratio.tests.utils.RemoteSSHConnection;
+import com.stratio.tests.utils.ThreadProperty;
+import cucumber.api.DataTable;
+import cucumber.api.java.en.Given;
+import org.hjson.JsonValue;
+import org.openqa.selenium.WebElement;
 
-import java.lang.ThreadLocal;
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
-import com.stratio.exceptions.DBException;
-import org.hjson.JsonValue;
-import org.openqa.selenium.WebElement;
-
-import com.datastax.driver.core.Row;
-import com.jayway.jsonpath.JsonPath;
-
-import cucumber.api.DataTable;
-import cucumber.api.java.en.Given;
-
-import com.stratio.tests.utils.RemoteSSHConnection;
-import java.io.File;
-
-import com.stratio.tests.utils.ThreadProperty;
+import static com.stratio.assertions.Assertions.assertThat;
 
 /**
  * Generic Given Specs.
@@ -187,13 +179,16 @@ public class GivenGSpec extends BaseGSpec {
      * @throws NoSuchMethodException
      */
     @Given("^I save element '(.+?)' in environment variable '(.+?)'$")
-    public void saveElementEnvironment(String element, String envVar) {
+    public void saveElementEnvironment(String element, String envVar) throws Exception{
         String json = commonspec.getResponse().getResponse();
         String hjson = JsonValue.readHjson(json).asObject().toString();
         String value = JsonPath.parse(hjson).read(element);
 
-        commonspec.getLogger().debug("Saving element: {} with value: {} in environment variable: {}", element, value, envVar);
+        if (value == null) {
+            throw new Exception("Element to be saved: " + element + " is null");
+        }
 
+        commonspec.getLogger().debug("Saving element: {} with value: {} in environment variable: {}", element, value, envVar);
         ThreadProperty.set(envVar, value);
     }
 
