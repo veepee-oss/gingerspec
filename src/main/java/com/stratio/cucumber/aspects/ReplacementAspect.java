@@ -1,5 +1,6 @@
 package com.stratio.cucumber.aspects;
 
+import com.stratio.tests.utils.ThreadProperty;
 import cucumber.runtime.StepDefinition;
 import cucumber.runtime.xstream.LocalizedXStreams;
 import gherkin.formatter.Argument;
@@ -9,22 +10,15 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
-import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Field;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.Set;
-import java.util.Map;
-
-import com.stratio.cucumber.testng.CucumberReporter;
-import com.stratio.tests.utils.ThreadProperty;
 
 @Aspect
 public class ReplacementAspect {
@@ -229,7 +223,7 @@ public class ReplacementAspect {
 	 * @throws IllegalArgumentException
 	 * @throws IllegalAccessException
 	 */
-	protected String replaceReflectionPlaceholders(String element) throws ClassNotFoundException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+	protected String replaceReflectionPlaceholders(String element) throws Exception {
 		String newVal = element;
 		while (newVal.contains("!{")) {
 			String placeholder = newVal.substring(newVal.indexOf("!{"),
@@ -238,10 +232,11 @@ public class ReplacementAspect {
 
 			// we want to use value previously saved
 			String prop = ThreadProperty.get(attribute);
-			
-			if (prop != null) {
-				newVal = newVal.replace(placeholder, prop);
+
+			if (prop == null) {
+				throw new Exception("Element: " + attribute + " has not been saved correctly previously.");
 			}
+			newVal = newVal.replace(placeholder, prop);
 		}
 
 		return newVal;
