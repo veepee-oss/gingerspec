@@ -1,5 +1,15 @@
 package com.stratio.cucumber.testng;
 
+import cucumber.api.CucumberOptions;
+import cucumber.runtime.ClassFinder;
+import cucumber.runtime.CucumberException;
+import cucumber.runtime.RuntimeOptions;
+import cucumber.runtime.RuntimeOptionsFactory;
+import cucumber.runtime.io.MultiLoader;
+import cucumber.runtime.io.ResourceLoader;
+import cucumber.runtime.io.ResourceLoaderClassFinder;
+import org.reflections.Reflections;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -7,16 +17,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-
-import org.reflections.Reflections;
-
-import cucumber.api.CucumberOptions;
-import cucumber.runtime.ClassFinder;
-import cucumber.runtime.RuntimeOptions;
-import cucumber.runtime.RuntimeOptionsFactory;
-import cucumber.runtime.io.MultiLoader;
-import cucumber.runtime.io.ResourceLoader;
-import cucumber.runtime.io.ResourceLoaderClassFinder;
 
 
 public class CucumberRunner {
@@ -97,5 +97,9 @@ public class CucumberRunner {
      */
     public void runCukes() throws IOException {
         runtime.run();
+
+        if (!runtime.getErrors().isEmpty()) {
+            throw new CucumberException(runtime.getErrors().get(0));
+        }
     }
 }
