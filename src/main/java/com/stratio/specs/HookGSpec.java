@@ -1,19 +1,5 @@
 package com.stratio.specs;
 
-<<<<<<< HEAD
-import static org.testng.Assert.fail;
-
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.UnknownHostException;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
-import org.elasticsearch.ElasticsearchException;
-=======
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
 import com.stratio.exceptions.DBException;
@@ -21,7 +7,6 @@ import com.stratio.tests.utils.ThreadProperty;
 import com.thoughtworks.selenium.SeleniumException;
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
->>>>>>> a3554f0... basic funcionality for mobile test
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.CommandInfo;
@@ -35,11 +20,12 @@ import org.openqa.selenium.remote.internal.HttpClientFactory;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.concurrent.TimeUnit;
 
 import static org.testng.Assert.fail;
-
 
 /**
  * @author Javier Delgado
@@ -129,7 +115,6 @@ public class HookGSpec extends BaseGSpec {
         if (grid == null) {
             fail("Selenium grid not available");
         }
-
 	    String b = ThreadProperty.get("browser");
 
         if ("".equals(b)) {
@@ -240,7 +225,7 @@ public class HookGSpec extends BaseGSpec {
         commonspec.getLogger().debug("Shutdown elasticsearch client");
         try {
             commonspec.getElasticSearchClient().getClient().close();
-        } catch (ElasticsearchException e) {
+        } catch (Exception e) {
             fail(e.toString());
         }
     }
