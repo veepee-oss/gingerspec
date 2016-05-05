@@ -35,17 +35,22 @@ public class BrowsersDataProviderAspect extends BaseGSpec {
 	public Object availableBrowsersCalls(ProceedingJoinPoint pjp)
 			throws Throwable {
 
-		if (Arrays.asList(((ITestContext)pjp.getArgs()[0]).getIncludedGroups()).contains("mobile")) {
-			return pjp.proceed();
-		}else if ("".equals(System.getProperty("FORCE_BROWSER", ""))) {
-			return pjp.proceed();
-		} else {
-			List<String[]> lData = Lists.newArrayList();
-			lData.add(new String[] { System.getProperty("FORCE_BROWSER") });
-			logger.debug("Forcing browser to {}",
-					System.getProperty("FORCE_BROWSER"));
-			return lData.iterator();
+		if (pjp.getArgs().length > 0) {
+			if (pjp.getArgs()[0] instanceof ITestContext) {
+				if (Arrays.asList(((ITestContext) pjp.getArgs()[0]).getIncludedGroups()).contains("mobile")) {
+					return pjp.proceed();
+				}
+			}
 		}
 
+		if (!"".equals(System.getProperty("FORCE_BROWSER", ""))) {
+					List<String[]> lData = Lists.newArrayList();
+					lData.add(new String[]{System.getProperty("FORCE_BROWSER")});
+					logger.debug("Forcing browser to {}",
+							System.getProperty("FORCE_BROWSER"));
+					return lData.iterator();
+		}
+		return pjp.proceed();
 	}
 }
+
