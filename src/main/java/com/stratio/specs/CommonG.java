@@ -737,100 +737,135 @@ public class CommonG {
 	    }
 	    return modifiedData;
 	}
-	
+
+	/**
+	 * Generates the request based on the type of request, the end point, the data and type passed
+	 * @param requestType type of request to be sent
+ 	 * @param secure type of protocol
+	 * @param endPoint end point to sent the request to
+	 * @param data to be sent for PUT/POST requests
+	 * @param type type of data to be sent (json|string)
+	 *
+	 * @throws Exception
+	 *
+	 */
+	public Future<Response> generateRequest(String requestType, boolean secure, String endPoint, String data, String type, String codeBase64) throws Exception {
+
+		String protocol = "http";
+		if (secure) {
+			protocol = "https";
+		}
+
+		Future<Response> response = null;
+		BoundRequestBuilder request;
+
+		if (this.getRestHost() == null) {
+			throw new Exception("Rest host has not been set");
+		}
+
+		if (this.getRestPort() == null) {
+			throw new Exception("Rest port has not been set");
+		}
+
+		String restURL = protocol + "://" + this.getRestHost() + this.getRestPort();
+
+		switch(requestType.toUpperCase()) {
+			case "GET":
+				request = this.getClient().prepareGet(restURL + endPoint);
+
+				if ("json".equals(type)) {
+					request = request.setHeader("Content-Type","application/json");
+				} else if ("string".equals(type)){
+					this.getLogger().debug("Sending request as: {}", type);
+					request = request.setHeader("Content-Type", "application/x-www-form-urlencoded");
+				}
+
+				if (!codeBase64.isEmpty()) {
+					request = request.setHeader("Authorization", "Basic b3RhcmFzeXVrOjM2MGNvbW9kb3Jl");
+				}
+
+				if (this.getResponse() != null) {
+					this.getLogger().debug("Reusing coookies: {}", this.getResponse().getCookies());
+					request = request.setCookies(this.getResponse().getCookies());
+				}
+
+				response = request.execute();
+				break;
+			case "DELETE":
+				request = this.getClient().prepareDelete(restURL + endPoint);
+
+				if (this.getResponse() != null) {
+					request = request.setCookies(this.getResponse().getCookies());
+				}
+
+				response = request.execute();
+				break;
+			case "POST":
+				if (data == null) {
+					Exception missingFields = new Exception("Missing fields in request.");
+					throw missingFields;
+				} else {
+					request = this.getClient().preparePost(restURL + endPoint).setBody(data);
+					if ("json".equals(type)) {
+						request = request.setHeader("Content-Type","application/json");
+					} else if ("string".equals(type)){
+						this.getLogger().debug("Sending request as: {}", type);
+						request = request.setHeader("Content-Type", "application/x-www-form-urlencoded");
+					}
+
+					if (this.getResponse() != null) {
+						request = request.setCookies(this.getResponse().getCookies());
+					}
+
+					response = this.getClient().executeRequest(request.build());
+					break;
+				}
+			case "PUT":
+				if (data == null) {
+					Exception missingFields = new Exception("Missing fields in request.");
+					throw missingFields;
+				} else {
+					request = this.getClient().preparePut(restURL + endPoint).setBody(data);
+					if ("json".equals(type)) {
+						request = request.setHeader("Content-Type","application/json");
+					} else if ("string".equals(type)){
+						request = request.setHeader("Content-Type", "application/x-www-form-urlencoded");
+					}
+
+					if (this.getResponse() != null) {
+						request = request.setCookies(this.getResponse().getCookies());
+					}
+
+					response = this.getClient().executeRequest(request.build());
+					break;
+				}
+			case "CONNECT":
+			case "PATCH":
+			case "HEAD":
+			case "OPTIONS":
+			case "REQUEST":
+			case "TRACE":
+				throw new Exception("Operation not implemented: " + requestType);
+			default:
+				throw new Exception("Operation not valid: " + requestType);
+		}
+		return response;
+	}
+
 	/**
 	 * Generates the request based on the type of request, the end point, the data and type passed
 	 * @param requestType type of request to be sent
 	 * @param endPoint end point to sent the request to
 	 * @param data to be sent for PUT/POST requests
 	 * @param type type of data to be sent (json|string)
-	 * 
-	 * @throws Exception 
-	 * 
+	 *
+	 * @deprecated  Improved with  {@link #generateRequest(String, boolean, String, String, String, String)}.
+	 * @throws Exception
+	 *
 	 */
+	@Deprecated
 	public Future<Response> generateRequest(String requestType, String endPoint, String data, String type) throws Exception {
-	    Future<Response> response = null;
-	    BoundRequestBuilder request;
-
-	    if (this.getRestHost() == null) {
-		throw new Exception("Rest host has not been set");
-	    }
-	    
-	    if (this.getRestPort() == null) {
-		throw new Exception("Rest port has not been set");
-	    }
-	    
-	    String restURL = "http://" + this.getRestHost() + this.getRestPort();
-	    
-	    switch(requestType.toUpperCase()) {
-	    case "GET":
-		request = this.getClient().prepareGet(restURL + endPoint);
-
-		if (this.getResponse() != null) {
-		    request = request.setCookies(this.getResponse().getCookies());
-		}
-
-		response = request.execute();
-		break;
-	    case "DELETE":
-		request = this.getClient().prepareDelete(restURL + endPoint);
-
-		if (this.getResponse() != null) {
-		    request = request.setCookies(this.getResponse().getCookies());
-		}
-
-		response = request.execute();
-		break;
-	    case "POST":
-		if (data == null) {
-		    Exception missingFields = new Exception("Missing fields in request.");
-		    throw missingFields;
-		} else {
-		    request = this.getClient().preparePost(restURL + endPoint).setBody(data);
-		    if ("json".equals(type)) {
-			request = request.setHeader("Content-Type","application/json");
-		    } else if ("string".equals(type)){
-			this.getLogger().debug("Sending request as: {}", type);
-			request = request.setHeader("Content-Type", "application/x-www-form-urlencoded");
-		    }
-
-		    if (this.getResponse() != null) {
-			request = request.setCookies(this.getResponse().getCookies());
-		    }
-
-		    response = this.getClient().executeRequest(request.build());
-		    break;
-		}
-	    case "PUT":
-		if (data == null) {
-		    Exception missingFields = new Exception("Missing fields in request.");
-		    throw missingFields;
-		} else {
-		    request = this.getClient().preparePut(restURL + endPoint).setBody(data);
-		    if ("json".equals(type)) {
-			request = request.setHeader("Content-Type","application/json");
-		    } else if ("string".equals(type)){
-			request = request.setHeader("Content-Type", "application/x-www-form-urlencoded");
-		    }
-
-		    if (this.getResponse() != null) {
-			request = request.setCookies(this.getResponse().getCookies());
-		    }
-
-		    response = this.getClient().executeRequest(request.build());
-		    break;
-		}
-	    case "CONNECT":
-	    case "PATCH":
-	    case "HEAD":
-	    case "OPTIONS":
-	    case "REQUEST":
-	    case "TRACE":
-		throw new Exception("Operation not implemented: " + requestType);
-	    default:
-		throw new Exception("Operation not valid: " + requestType);
-	    }
-	    return response;
+	    return generateRequest(requestType, false, endPoint, data, type,"");
 	}
 	
 	/**
