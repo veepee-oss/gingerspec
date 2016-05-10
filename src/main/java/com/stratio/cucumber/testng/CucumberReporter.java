@@ -415,7 +415,7 @@ public class CucumberReporter implements Formatter, Reporter {
                                         comm.setResponse(endpoint, response.get());
                                         logger.debug(comm.getResponse().getResponse());
                                         logger.debug(String.valueOf(comm.getResponse().getCookies()));
-                                        logger.info(String.valueOf(comm.getResponse().getStatusCode()));
+                                        logger.debug(String.valueOf(comm.getResponse().getStatusCode()));
                                     } catch (Exception e) {
                                         e.printStackTrace();
                                     }
