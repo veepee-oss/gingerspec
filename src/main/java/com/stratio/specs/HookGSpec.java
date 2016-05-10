@@ -1,17 +1,12 @@
 package com.stratio.specs;
 
-import static org.testng.Assert.fail;
-
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.UnknownHostException;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
-import org.elasticsearch.ElasticsearchException;
+import com.ning.http.client.AsyncHttpClient;
+import com.ning.http.client.AsyncHttpClientConfig;
+import com.stratio.exceptions.DBException;
+import com.stratio.tests.utils.ThreadProperty;
+import com.thoughtworks.selenium.SeleniumException;
+import cucumber.api.java.After;
+import cucumber.api.java.Before;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.CommandInfo;
@@ -22,15 +17,15 @@ import org.openqa.selenium.remote.http.HttpClient;
 import org.openqa.selenium.remote.internal.ApacheHttpClient;
 import org.openqa.selenium.remote.internal.HttpClientFactory;
 
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.AsyncHttpClientConfig;
-import com.stratio.exceptions.DBException;
-import com.stratio.tests.utils.ThreadProperty;
-import com.stratio.tests.utils.RemoteSSHConnection;
-import com.thoughtworks.selenium.SeleniumException;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.UnknownHostException;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.concurrent.TimeUnit;
 
-import cucumber.api.java.After;
-import cucumber.api.java.Before;
+import static org.testng.Assert.fail;
 
 /**
  * @author Javier Delgado
@@ -114,14 +109,14 @@ public class HookGSpec extends BaseGSpec {
      *
      * @throws MalformedURLException
      */
-    @Before(order = ORDER_10, value = "@web")
+    @Before(order = ORDER_10, value = {"@mobile,@web"})
     public void seleniumSetup() throws MalformedURLException {
         String grid = System.getProperty("SELENIUM_GRID");
         if (grid == null) {
             fail("Selenium grid not available");
         }
+	    String b = ThreadProperty.get("browser");
 
-	String b = ThreadProperty.get("browser");
         if ("".equals(b)) {
             fail("Non available browsers");
         }
@@ -191,7 +186,7 @@ public class HookGSpec extends BaseGSpec {
     /**
      * Close selenium web driver.
      */
-    @After(order = ORDER_20, value = "@web")
+    @After(order = ORDER_20, value = {"@mobile,@web"})
     public void seleniumTeardown() {
         if (commonspec.getDriver() != null) {
             commonspec.getLogger().debug("Shutdown Selenium client");
@@ -230,7 +225,7 @@ public class HookGSpec extends BaseGSpec {
         commonspec.getLogger().debug("Shutdown elasticsearch client");
         try {
             commonspec.getElasticSearchClient().getClient().close();
-        } catch (ElasticsearchException e) {
+        } catch (Exception e) {
             fail(e.toString());
         }
     }

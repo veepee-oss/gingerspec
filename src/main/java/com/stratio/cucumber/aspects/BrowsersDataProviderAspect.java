@@ -1,17 +1,17 @@
 package com.stratio.cucumber.aspects;
 
-import java.util.Iterator;
-import java.util.List;
-
+import com.google.common.collect.Lists;
+import com.stratio.specs.BaseGSpec;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.ITestContext;
 
-import com.google.common.collect.Lists;
-import com.stratio.specs.BaseGSpec;
+import java.util.Arrays;
+import java.util.List;
 
 @Aspect
 public class BrowsersDataProviderAspect extends BaseGSpec {
@@ -34,15 +34,23 @@ public class BrowsersDataProviderAspect extends BaseGSpec {
 	@Around(value = "availableBrowsersCallPointcut()")
 	public Object availableBrowsersCalls(ProceedingJoinPoint pjp)
 			throws Throwable {
-		if ("".equals(System.getProperty("FORCE_BROWSER", ""))) {
-			return pjp.proceed();
-		} else {
-			List<String[]> lData = Lists.newArrayList();
-			lData.add(new String[] { System.getProperty("FORCE_BROWSER") });
-			logger.debug("Forcing browser to {}",
-					System.getProperty("FORCE_BROWSER"));
-			return lData.iterator();
+
+		if (pjp.getArgs().length > 0) {
+			if (pjp.getArgs()[0] instanceof ITestContext) {
+				if (Arrays.asList(((ITestContext) pjp.getArgs()[0]).getIncludedGroups()).contains("mobile")) {
+					return pjp.proceed();
+				}
+			}
 		}
 
+		if (!"".equals(System.getProperty("FORCE_BROWSER", ""))) {
+					List<String[]> lData = Lists.newArrayList();
+					lData.add(new String[]{System.getProperty("FORCE_BROWSER")});
+					logger.debug("Forcing browser to {}",
+							System.getProperty("FORCE_BROWSER"));
+					return lData.iterator();
+		}
+		return pjp.proceed();
 	}
 }
+
