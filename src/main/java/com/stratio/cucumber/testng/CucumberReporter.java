@@ -385,10 +385,6 @@ public class CucumberReporter implements Formatter, Reporter {
             String userJira = System.getProperty("usernamejira");
             String passJira = System.getProperty("passwordjira");
 
-            if (userJira != null || passJira != null) {
-                byte[] encodedBytes = Base64.encodeBase64(userJira.getBytes());
-                byte[] encodedBytes2 = Base64.encodeBase64(passJira.getBytes());
-                String codeBase64 = "Basic " + encodedBytes + ":" + encodedBytes2;
                 Logger logger = LoggerFactory.getLogger(ThreadProperty.get("class"));
                 String value = "";
 
@@ -399,43 +395,47 @@ public class CucumberReporter implements Formatter, Reporter {
                             if (!(tagNs.getName().equals("@ignore"))) {
                                 //@tillFixed
                                 if ((tagNs.getName()).matches("@tillfixed\\(\\w+-\\d+\\)")) {
-                                    comm.setRestHost("stratio.atlassian.net");
-                                    comm.setRestPort("");
-                                    comm.setClient(client);
-                                    String endpoint = "";
-                                        int lengthIssue = tagNs.getName().length() - 1;
-                                        endpoint = "/rest/api/2/issue/" + tagNs.getName().substring(11, lengthIssue);
-                                        try {
-                                            response = comm.generateRequest("GET", true, endpoint, "", "json", codeBase64);
-                                            comm.setResponse(endpoint, response.get());
-                                        } catch (Exception e) {
-                                            logger.debug("Rest API Jira connection error" + String.valueOf(comm.getResponse().getStatusCode()));
-                                        }
-
-                                        String json = comm.getResponse().getResponse();
-                                        if (!json.equals("{\"errorMessages\":[\"Issue Does Not Exist\"],\"errors\":{}}")) {
-                                            value = JsonPath.parse(json).read("fields.status.name");
-                                        }
-
-                                        //if ticket exists
-                                        if (!value.equals("")) {
-                                            if ("done".equals(value.toLowerCase()) || "finalizado".equals(value.toLowerCase())) {
-                                                isJiraTicketDone = true;
+                                    if (userJira != null || passJira != null) {
+                                        byte[] encodedBytes = Base64.encodeBase64(userJira.getBytes());
+                                        byte[] encodedBytes2 = Base64.encodeBase64(passJira.getBytes());
+                                        String codeBase64 = "Basic " + encodedBytes + ":" + encodedBytes2;
+                                        comm.setRestHost("stratio.atlassian.net");
+                                        comm.setRestPort("");
+                                        comm.setClient(client);
+                                        String endpoint = "";
+                                            int lengthIssue = tagNs.getName().length() - 1;
+                                            endpoint = "/rest/api/2/issue/" + tagNs.getName().substring(11, lengthIssue);
+                                            try {
+                                                response = comm.generateRequest("GET", true, endpoint, "", "json", codeBase64);
+                                                comm.setResponse(endpoint, response.get());
+                                            } catch (Exception e) {
+                                                logger.debug("Rest API Jira connection error" + String.valueOf(comm.getResponse().getStatusCode()));
                                             }
-                                        } else if (!value.equals("")) {
-                                            isJiraTicketDone = false;
-                                            isValidJiraTicket = false;
-                                        } else {  //ticket doensn't exist
-                                            isValidJiraTicket = true;
-                                        }
 
+                                            String json = comm.getResponse().getResponse();
+                                            if (!json.equals("{\"errorMessages\":[\"Issue Does Not Exist\"],\"errors\":{}}")) {
+                                                value = JsonPath.parse(json).read("fields.status.name");
+                                            }
+
+                                            //if ticket exists
+                                            if (!value.equals("")) {
+                                                if ("done".equals(value.toLowerCase()) || "finalizado".equals(value.toLowerCase())) {
+                                                    isJiraTicketDone = true;
+                                                }
+                                            } else if (!value.equals("")) {
+                                                isJiraTicketDone = false;
+                                                isValidJiraTicket = false;
+                                            } else {  //ticket doensn't exist
+                                                isValidJiraTicket = true;
+                                            }
+                                    }
 
                                     String issueNumb = tagNs.getName().substring(tagNs.getName().lastIndexOf("(") + 1);
                                     exceptionmsg = "This scenario was skipped because of https://stratio.atlassian.net/browse/" + (issueNumb.subSequence(0, issueNumb.length() - 1)).toString().toUpperCase();
                                     ignoreReason = true;
                                     break;
                                 }
-                            }
+
 
                                 //@unimplemented
                                 if (tagNs.getName().matches("@unimplemented")) {
