@@ -377,91 +377,64 @@ public class CucumberReporter implements Formatter, Reporter {
             Boolean ignoreReason = false;
             String exceptionmsg = "Failed";
 
-            List<Cookie> cookies = null;
-            Cookie cookie = null;
             AsyncHttpClient client = new AsyncHttpClient();
             Future<Response> response = null;
-            AsyncHttpClient.BoundRequestBuilder request;
             Boolean isJiraTicketDone = false;
             Boolean isValidJiraTicket = false;
             CommonG comm = new CommonG();
             String userJira = System.getProperty("usernamejira");
             String passJira = System.getProperty("passwordjira");
-            String data = "{\"username\":\""+userJira+"\",\"password\":\""+ passJira +"\"}";
 
-            byte[] encodedBytes = Base64.encodeBase64(userJira.getBytes());
-            byte[] encodedBytes2 = Base64.encodeBase64(passJira.getBytes());
-            String codeBase64 = "Basic " + encodedBytes + ":" + encodedBytes2;
-            Logger logger = LoggerFactory.getLogger(ThreadProperty.get("class"));
-            String value = "";
+            if (userJira != null || passJira != null) {
+                byte[] encodedBytes = Base64.encodeBase64(userJira.getBytes());
+                byte[] encodedBytes2 = Base64.encodeBase64(passJira.getBytes());
+                String codeBase64 = "Basic " + encodedBytes + ":" + encodedBytes2;
+                Logger logger = LoggerFactory.getLogger(ThreadProperty.get("class"));
+                String value = "";
 
-            for (Tag tag : tags) {
-                if ("@ignore".equals(tag.getName())) {
-                    ignored = true;
-                    for (Tag tagNs : tags) {
-                        if (!(tagNs.getName().equals("@ignore"))) {
-                            //@tillFixed
-                            if ((tagNs.getName()).matches("@tillfixed\\(\\w+-\\d+\\)")) {
-                                comm.setRestHost("stratio.atlassian.net");
-                                comm.setRestPort("");
-                                comm.setClient(client);
-                                String endpoint = "";
-                                if (ThreadProperty.get("JIRACOOKIE1") == null) {
-                                    endpoint = "/rest/auth/1/session";
-                                    try {
-                                        response = comm.generateRequest("DELETE", true, endpoint, "", "json", "");
-                                        logger.debug(String.valueOf(response.get().getStatusCode()));
-                                        response = comm.generateRequest("POST", true, endpoint, data, "json", "");
-                                        comm.setResponse(endpoint, response.get());
-                                        logger.debug(comm.getResponse().getResponse());
-                                        logger.debug(String.valueOf(comm.getResponse().getCookies()));
-                                        logger.debug(String.valueOf(comm.getResponse().getStatusCode()));
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
-                                    }
-                                    cookies = comm.getResponse().getCookies();
-                                    int longCookies = cookies.size();
-                                    for (int i = 0; i < longCookies; i++) {
-                                        cookie = cookies.get(i);
-                                        ThreadProperty.set("JIRACOOKIE" + i, cookie.toString());
-                                    }
-                                }
-
-                                if (ThreadProperty.get("JIRACOOKIE1") != null) {
-                                    int lengthIssue = tagNs.getName().length() - 1;
-                                    endpoint = "/rest/api/2/issue/" + tagNs.getName().substring(11, lengthIssue);
-                                    try {
-                                        response = comm.generateRequest("GET", true, endpoint, data, "json", codeBase64);
-                                        comm.setResponse(endpoint, response.get());
-                                        logger.debug(comm.getResponse().getResponse());
-                                        logger.debug(String.valueOf(comm.getResponse().getCookies()));
-                                        logger.debug(String.valueOf(comm.getResponse().getStatusCode()));
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
-                                    }
-
-                                    String json = comm.getResponse().getResponse();
-                                    if (!json.equals("{\"errorMessages\":[\"Issue Does Not Exist\"],\"errors\":{}}")) {
-                                        value = JsonPath.parse(json).read("fields.status.name");
-                                    }
-
-                                    //if ticket exists
-                                    if (!value.equals("")) {
-                                        if ("done".equals(value.toLowerCase()) || "finalizado".equals(value.toLowerCase())) {
-                                            isJiraTicketDone = true;
+                for (Tag tag : tags) {
+                    if ("@ignore".equals(tag.getName())) {
+                        ignored = true;
+                        for (Tag tagNs : tags) {
+                            if (!(tagNs.getName().equals("@ignore"))) {
+                                //@tillFixed
+                                if ((tagNs.getName()).matches("@tillfixed\\(\\w+-\\d+\\)")) {
+                                    comm.setRestHost("stratio.atlassian.net");
+                                    comm.setRestPort("");
+                                    comm.setClient(client);
+                                    String endpoint = "";
+                                        int lengthIssue = tagNs.getName().length() - 1;
+                                        endpoint = "/rest/api/2/issue/" + tagNs.getName().substring(11, lengthIssue);
+                                        try {
+                                            response = comm.generateRequest("GET", true, endpoint, "", "json", codeBase64);
+                                            comm.setResponse(endpoint, response.get());
+                                        } catch (Exception e) {
+                                            logger.debug("Rest API Jira connection error" + String.valueOf(comm.getResponse().getStatusCode()));
                                         }
-                                    } else if (!value.equals("")) {
-                                        isJiraTicketDone = false;
-                                        isValidJiraTicket = false;
-                                    } else {  //ticket doensn't exist
-                                        isValidJiraTicket = true;
-                                    }
-                                }
 
-                                String issueNumb = tagNs.getName().substring(tagNs.getName().lastIndexOf("(") + 1);
-                                exceptionmsg = "This scenario was skipped because of https://stratio.atlassian.net/browse/" + (issueNumb.subSequence(0, issueNumb.length() - 1)).toString().toUpperCase();
-                                ignoreReason = true;
-                                break;
+                                        String json = comm.getResponse().getResponse();
+                                        if (!json.equals("{\"errorMessages\":[\"Issue Does Not Exist\"],\"errors\":{}}")) {
+                                            value = JsonPath.parse(json).read("fields.status.name");
+                                        }
+
+                                        //if ticket exists
+                                        if (!value.equals("")) {
+                                            if ("done".equals(value.toLowerCase()) || "finalizado".equals(value.toLowerCase())) {
+                                                isJiraTicketDone = true;
+                                            }
+                                        } else if (!value.equals("")) {
+                                            isJiraTicketDone = false;
+                                            isValidJiraTicket = false;
+                                        } else {  //ticket doensn't exist
+                                            isValidJiraTicket = true;
+                                        }
+
+
+                                    String issueNumb = tagNs.getName().substring(tagNs.getName().lastIndexOf("(") + 1);
+                                    exceptionmsg = "This scenario was skipped because of https://stratio.atlassian.net/browse/" + (issueNumb.subSequence(0, issueNumb.length() - 1)).toString().toUpperCase();
+                                    ignoreReason = true;
+                                    break;
+                                }
                             }
 
                                 //@unimplemented
