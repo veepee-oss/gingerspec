@@ -1,6 +1,7 @@
 package com.stratio.cucumber.testng;
 
 import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.PathNotFoundException;
 import com.ning.http.client.*;
 import com.ning.http.client.cookie.Cookie;
 import com.stratio.specs.CommonG;
@@ -38,6 +39,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import com.stratio.specs.*;
 
 import org.apache.commons.codec.binary.Base64;
@@ -377,21 +381,14 @@ public class CucumberReporter implements Formatter, Reporter {
             Boolean ignoreReason = false;
             String exceptionmsg = "Failed";
 
-            List<Cookie> cookies = null;
-            Cookie cookie = null;
             AsyncHttpClient client = new AsyncHttpClient();
             Future<Response> response = null;
-            AsyncHttpClient.BoundRequestBuilder request;
             Boolean isJiraTicketDone = false;
-            Boolean isValidJiraTicket = false;
+            Boolean isWrongTicket = false;
             CommonG comm = new CommonG();
             String userJira = System.getProperty("usernamejira");
             String passJira = System.getProperty("passwordjira");
-            String data = "{\"username\":\""+userJira+"\",\"password\":\""+ passJira +"\"}";
 
-            byte[] encodedBytes = Base64.encodeBase64(userJira.getBytes());
-            byte[] encodedBytes2 = Base64.encodeBase64(passJira.getBytes());
-            String codeBase64 = "Basic " + encodedBytes + ":" + encodedBytes2;
             Logger logger = LoggerFactory.getLogger(ThreadProperty.get("class"));
             String value = "";
 
@@ -400,111 +397,90 @@ public class CucumberReporter implements Formatter, Reporter {
                     ignored = true;
                     for (Tag tagNs : tags) {
                         if (!(tagNs.getName().equals("@ignore"))) {
-                            //@tillFixed
-                            if ((tagNs.getName()).matches("@tillfixed\\(\\w+-\\d+\\)")) {
-                                comm.setRestHost("stratio.atlassian.net");
-                                comm.setRestPort("");
-                                comm.setClient(client);
-                                String endpoint = "";
-                                if (ThreadProperty.get("JIRACOOKIE1") == null) {
-                                    endpoint = "/rest/auth/1/session";
-                                    try {
-                                        response = comm.generateRequest("DELETE", true, endpoint, "", "json", "");
-                                        logger.debug(String.valueOf(response.get().getStatusCode()));
-                                        response = comm.generateRequest("POST", true, endpoint, data, "json", "");
-                                        comm.setResponse(endpoint, response.get());
-                                        logger.debug(comm.getResponse().getResponse());
-                                        logger.debug(String.valueOf(comm.getResponse().getCookies()));
-                                        logger.debug(String.valueOf(comm.getResponse().getStatusCode()));
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
-                                    }
-                                    cookies = comm.getResponse().getCookies();
-                                    int longCookies = cookies.size();
-                                    for (int i = 0; i < longCookies; i++) {
-                                        cookie = cookies.get(i);
-                                        ThreadProperty.set("JIRACOOKIE" + i, cookie.toString());
-                                    }
+                            String tillFix = tagNs.getName();
+                            if (tillFix.startsWith("@tillfixed")) {
+                                Pattern pattern = Pattern.compile("@(.*?)\\((.*?)\\)");
+                                Matcher matcher = pattern.matcher(tillFix);
+                                String issue = "";
+                                if (matcher.find()) {
+                                    issue = matcher.group(2);
+                                } else {
+                                    isWrongTicket = true;
                                 }
-
-                                if (ThreadProperty.get("JIRACOOKIE1") != null) {
-                                    int lengthIssue = tagNs.getName().length() - 1;
-                                    endpoint = "/rest/api/2/issue/" + tagNs.getName().substring(11, lengthIssue);
+                                if (((userJira != null) || (passJira != null)) && (issue != "")) {
+                                    byte[] encodedBytes = Base64.encodeBase64(userJira.getBytes());
+                                    byte[] encodedBytes2 = Base64.encodeBase64(passJira.getBytes());
+                                    String codeBase64 = "Basic " + encodedBytes + ":" + encodedBytes2;
+                                    comm.setRestHost("stratio.atlassian.net");
+                                    comm.setRestPort("");
+                                    comm.setClient(client);
+                                    String  endpoint = "/rest/api/2/issue/" + issue;
                                     try {
-                                        response = comm.generateRequest("GET", true, endpoint, data, "json", codeBase64);
+                                        response = comm.generateRequest("GET", true, endpoint, "", "json", codeBase64);
                                         comm.setResponse(endpoint, response.get());
-                                        logger.debug(comm.getResponse().getResponse());
-                                        logger.debug(String.valueOf(comm.getResponse().getCookies()));
-                                        logger.debug(String.valueOf(comm.getResponse().getStatusCode()));
                                     } catch (Exception e) {
-                                        e.printStackTrace();
+                                        logger.error("Rest API Jira connection error " + String.valueOf(comm.getResponse().getStatusCode()));
                                     }
 
                                     String json = comm.getResponse().getResponse();
-                                    if (!json.equals("{\"errorMessages\":[\"Issue Does Not Exist\"],\"errors\":{}}")) {
-                                        value = JsonPath.parse(json).read("fields.status.name");
+                                    try {
+                                        value = JsonPath.read(json, "$.fields.status.name");
+                                    } catch (PathNotFoundException pe) {
+                                        logger.error("Json Path $.fields.status.name not found");
                                     }
 
-                                    //if ticket exists
-                                    if (!value.equals("")) {
-                                        if ("done".equals(value.toLowerCase()) || "finalizado".equals(value.toLowerCase())) {
-                                            isJiraTicketDone = true;
-                                        }
-                                    } else if (!value.equals("")) {
-                                        isJiraTicketDone = false;
-                                        isValidJiraTicket = false;
-                                    } else {  //ticket doensn't exist
-                                        isValidJiraTicket = true;
+                                    if (value.equals("")) {
+                                        isWrongTicket = true;
+                                    } else if ("done".equals(value.toLowerCase()) || "finalizado".equals(value.toLowerCase())) {
+                                        isJiraTicketDone = true;
                                     }
+
                                 }
-
-                                String issueNumb = tagNs.getName().substring(tagNs.getName().lastIndexOf("(") + 1);
-                                exceptionmsg = "This scenario was skipped because of https://stratio.atlassian.net/browse/" + (issueNumb.subSequence(0, issueNumb.length() - 1)).toString().toUpperCase();
+                                exceptionmsg = "This scenario was skipped because of https://stratio.atlassian.net/browse/" + issue;
                                 ignoreReason = true;
                                 break;
                             }
 
-                                //@unimplemented
-                                if (tagNs.getName().matches("@unimplemented")) {
-                                    exceptionmsg = "This scenario was skipped because of it is not yet implemented";
-                                    ignoreReason = true;
-                                    break;
-                                }
+                            //@unimplemented
+                            if (tagNs.getName().matches("@unimplemented")) {
+                                exceptionmsg = "This scenario was skipped because of it is not yet implemented";
+                                ignoreReason = true;
+                                break;
+                            }
 
-                                //@manual
-                                if (tagNs.getName().matches("@manual")) {
-                                    ignoreReason = true;
-                                    exceptionmsg = "This scenario was skipped because it is marked as manual.";
-                                    break;
-                                }
+                            //@manual
+                            if (tagNs.getName().matches("@manual")) {
+                                ignoreReason = true;
+                                exceptionmsg = "This scenario was skipped because it is marked as manual.";
+                                break;
+                            }
 
-                                //@toocomplex
-                                if (tagNs.getName().matches("@toocomplex")) {
-                                    exceptionmsg = "This scenario was skipped because of being too complex to test";
-                                    ignoreReason = true;
-                                    break;
-                                }
+                            //@toocomplex
+                            if (tagNs.getName().matches("@toocomplex")) {
+                                exceptionmsg = "This scenario was skipped because of being too complex to test";
+                                ignoreReason = true;
+                                break;
                             }
                         }
+                    }
 
                 }
 
                 String msg1 = null;
                 String msg2 = null;
 
-                if (ignored && (!ignoreReason || (ignoreReason && isJiraTicketDone) || (ignoreReason && isValidJiraTicket))) {
+                if (ignored && (!ignoreReason || (ignoreReason && isJiraTicketDone) || (ignoreReason && isWrongTicket))) {
                     element.setAttribute(STATUS, "FAIL");
                     if (isJiraTicketDone) {
                         msg1 = "The scenario was ignored due an already done ticket.";
                         msg2 = "The scenario was ignored due an already done ticket.";
-                    } else if (isValidJiraTicket) {
+                    } else if (isWrongTicket) {
                         msg1 = "The scenario was ignored due to unexistant ticket.";
                         msg2 = "The scenario was ignored due to unexistant ticket.";
                     } else {
                         msg1 = "The scenario has no valid reason for being ignored.";
                         msg2 = "The scenario has no valid reason for being ignored. <p>Valid values: @tillfixed(ISSUE-007) @unimplemented @manual @toocomplex</p>";
                     }
-
 
                     Element exception = createException(doc,  msg1, msg1, msg2);
                     element.appendChild(exception);
