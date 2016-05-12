@@ -38,6 +38,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.regex.Pattern;
+
 import com.stratio.specs.*;
 
 import org.apache.commons.codec.binary.Base64;
@@ -393,27 +395,32 @@ public class CucumberReporter implements Formatter, Reporter {
                         ignored = true;
                         for (Tag tagNs : tags) {
                             if (!(tagNs.getName().equals("@ignore"))) {
+                                Pattern p = Pattern.compile(tagNs.getName());
+                                Pattern p2 = Pattern.compile("\\W");
+                                String issues[] = p2.split(tagNs.getName());
+                                String issue = issues[2] + "-" +  issues[3];
                                 //@tillFixed
-                                if ((tagNs.getName()).matches("@tillfixed\\(\\w+-\\d+\\)")) {
-                                    if (userJira != null || passJira != null) {
+                                if (p.pattern().contains("@tillfixed")) {
+                                    if ((userJira != null) || (passJira != null)) {
                                         byte[] encodedBytes = Base64.encodeBase64(userJira.getBytes());
                                         byte[] encodedBytes2 = Base64.encodeBase64(passJira.getBytes());
                                         String codeBase64 = "Basic " + encodedBytes + ":" + encodedBytes2;
                                         comm.setRestHost("stratio.atlassian.net");
                                         comm.setRestPort("");
                                         comm.setClient(client);
-                                        String endpoint = "";
                                             int lengthIssue = tagNs.getName().length() - 1;
-                                            endpoint = "/rest/api/2/issue/" + tagNs.getName().substring(11, lengthIssue);
+                                            String  endpoint = "/rest/api/2/issue/" + issue;
                                             try {
                                                 response = comm.generateRequest("GET", true, endpoint, "", "json", codeBase64);
                                                 comm.setResponse(endpoint, response.get());
                                             } catch (Exception e) {
-                                                logger.debug("Rest API Jira connection error" + String.valueOf(comm.getResponse().getStatusCode()));
+                                                logger.error("Rest API Jira connection error " + String.valueOf(comm.getResponse().getStatusCode()));
                                             }
 
                                             String json = comm.getResponse().getResponse();
-                                            if (!json.equals("{\"errorMessages\":[\"Issue Does Not Exist\"],\"errors\":{}}")) {
+                                            JSONObject jsonObject = new JSONObject(json);
+                                            if (jsonObject.has("fields") && jsonObject.getJSONObject("fields").has("status")
+                                                    && jsonObject.getJSONObject("fields").getJSONObject("status").has("name")) {
                                                 value = JsonPath.parse(json).read("fields.status.name");
                                             }
 
@@ -422,9 +429,6 @@ public class CucumberReporter implements Formatter, Reporter {
                                                 if ("done".equals(value.toLowerCase()) || "finalizado".equals(value.toLowerCase())) {
                                                     isJiraTicketDone = true;
                                                 }
-                                            } else if (!value.equals("")) {
-                                                isJiraTicketDone = false;
-                                                isValidJiraTicket = false;
                                             } else {  //ticket doensn't exist
                                                 isValidJiraTicket = true;
                                             }
