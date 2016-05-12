@@ -780,8 +780,8 @@ public class CommonG {
 					request = request.setHeader("Content-Type", "application/x-www-form-urlencoded");
 				}
 
-				if (!codeBase64.isEmpty()) {
-					request = request.setHeader("Authorization", "Basic b3RhcmFzeXVrOjM2MGNvbW9kb3Jl");
+				if (!codeBase64.equals("")) {
+					request = request.setHeader("Authorization", codeBase64);
 				}
 
 				if (this.getResponse() != null) {

@@ -408,9 +408,10 @@ public class CucumberReporter implements Formatter, Reporter {
                                     isWrongTicket = true;
                                 }
                                 if (((userJira != null) || (passJira != null)) && (issue != "")) {
-                                    byte[] encodedBytes = Base64.encodeBase64(userJira.getBytes());
-                                    byte[] encodedBytes2 = Base64.encodeBase64(passJira.getBytes());
-                                    String codeBase64 = "Basic " + encodedBytes + ":" + encodedBytes2;
+                                    String data = userJira + ":" + passJira;
+                                    byte[] encodedBytes = Base64.encodeBase64(data.getBytes());
+                                    String encodedString = new String(encodedBytes);
+                                    String codeBase64 = "Basic " + encodedString;
                                     comm.setRestHost("stratio.atlassian.net");
                                     comm.setRestPort("");
                                     comm.setClient(client);
