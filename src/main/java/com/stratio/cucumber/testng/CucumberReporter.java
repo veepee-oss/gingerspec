@@ -1,6 +1,7 @@
 package com.stratio.cucumber.testng;
 
 import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.PathNotFoundException;
 import com.ning.http.client.*;
 import com.ning.http.client.cookie.Cookie;
 import com.stratio.specs.CommonG;
@@ -38,6 +39,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.stratio.specs.*;
@@ -382,106 +384,103 @@ public class CucumberReporter implements Formatter, Reporter {
             AsyncHttpClient client = new AsyncHttpClient();
             Future<Response> response = null;
             Boolean isJiraTicketDone = false;
-            Boolean isValidJiraTicket = false;
+            Boolean isWrongTicket = false;
             CommonG comm = new CommonG();
             String userJira = System.getProperty("usernamejira");
             String passJira = System.getProperty("passwordjira");
 
-                Logger logger = LoggerFactory.getLogger(ThreadProperty.get("class"));
-                String value = "";
+            Logger logger = LoggerFactory.getLogger(ThreadProperty.get("class"));
+            String value = "";
 
-                for (Tag tag : tags) {
-                    if ("@ignore".equals(tag.getName())) {
-                        ignored = true;
-                        for (Tag tagNs : tags) {
-                            if (!(tagNs.getName().equals("@ignore"))) {
-                                Pattern p = Pattern.compile(tagNs.getName());
-                                Pattern p2 = Pattern.compile("\\W");
-                                String issues[] = p2.split(tagNs.getName());
-                                String issue = issues[2] + "-" +  issues[3];
-                                //@tillFixed
-                                if (p.pattern().contains("@tillfixed")) {
-                                    if ((userJira != null) || (passJira != null)) {
-                                        byte[] encodedBytes = Base64.encodeBase64(userJira.getBytes());
-                                        byte[] encodedBytes2 = Base64.encodeBase64(passJira.getBytes());
-                                        String codeBase64 = "Basic " + encodedBytes + ":" + encodedBytes2;
-                                        comm.setRestHost("stratio.atlassian.net");
-                                        comm.setRestPort("");
-                                        comm.setClient(client);
-                                            int lengthIssue = tagNs.getName().length() - 1;
-                                            String  endpoint = "/rest/api/2/issue/" + issue;
-                                            try {
-                                                response = comm.generateRequest("GET", true, endpoint, "", "json", codeBase64);
-                                                comm.setResponse(endpoint, response.get());
-                                            } catch (Exception e) {
-                                                logger.error("Rest API Jira connection error " + String.valueOf(comm.getResponse().getStatusCode()));
-                                            }
-
-                                            String json = comm.getResponse().getResponse();
-                                            JSONObject jsonObject = new JSONObject(json);
-                                            if (jsonObject.has("fields") && jsonObject.getJSONObject("fields").has("status")
-                                                    && jsonObject.getJSONObject("fields").getJSONObject("status").has("name")) {
-                                                value = JsonPath.parse(json).read("fields.status.name");
-                                            }
-
-                                            //if ticket exists
-                                            if (!value.equals("")) {
-                                                if ("done".equals(value.toLowerCase()) || "finalizado".equals(value.toLowerCase())) {
-                                                    isJiraTicketDone = true;
-                                                }
-                                            } else {  //ticket doensn't exist
-                                                isValidJiraTicket = true;
-                                            }
+            for (Tag tag : tags) {
+                if ("@ignore".equals(tag.getName())) {
+                    ignored = true;
+                    for (Tag tagNs : tags) {
+                        if (!(tagNs.getName().equals("@ignore"))) {
+                            String tillFix = tagNs.getName();
+                            if (tillFix.startsWith("@tillfixed")) {
+                                Pattern pattern = Pattern.compile("@(.*?)\\((.*?)\\)");
+                                Matcher matcher = pattern.matcher(tillFix);
+                                String issue = "";
+                                if (matcher.find()) {
+                                    issue = matcher.group(2);
+                                } else {
+                                    isWrongTicket = true;
+                                }
+                                if (((userJira != null) || (passJira != null)) && (issue != "")) {
+                                    byte[] encodedBytes = Base64.encodeBase64(userJira.getBytes());
+                                    byte[] encodedBytes2 = Base64.encodeBase64(passJira.getBytes());
+                                    String codeBase64 = "Basic " + encodedBytes + ":" + encodedBytes2;
+                                    comm.setRestHost("stratio.atlassian.net");
+                                    comm.setRestPort("");
+                                    comm.setClient(client);
+                                    String  endpoint = "/rest/api/2/issue/" + issue;
+                                    try {
+                                        response = comm.generateRequest("GET", true, endpoint, "", "json", codeBase64);
+                                        comm.setResponse(endpoint, response.get());
+                                    } catch (Exception e) {
+                                        logger.error("Rest API Jira connection error " + String.valueOf(comm.getResponse().getStatusCode()));
                                     }
 
-                                    String issueNumb = tagNs.getName().substring(tagNs.getName().lastIndexOf("(") + 1);
-                                    exceptionmsg = "This scenario was skipped because of https://stratio.atlassian.net/browse/" + (issueNumb.subSequence(0, issueNumb.length() - 1)).toString().toUpperCase();
-                                    ignoreReason = true;
-                                    break;
-                                }
+                                    String json = comm.getResponse().getResponse();
+                                    try {
+                                        value = JsonPath.read(json, "$.fields.status.name");
+                                    } catch (PathNotFoundException pe) {
+                                        logger.error("Json Path $.fields.status.name not found");
+                                    }
 
+                                    if (value.equals("")) {
+                                        isWrongTicket = true;
+                                    } else if ("done".equals(value.toLowerCase()) || "finalizado".equals(value.toLowerCase())) {
+                                        isJiraTicketDone = true;
+                                    }
 
-                                //@unimplemented
-                                if (tagNs.getName().matches("@unimplemented")) {
-                                    exceptionmsg = "This scenario was skipped because of it is not yet implemented";
-                                    ignoreReason = true;
-                                    break;
                                 }
+                                exceptionmsg = "This scenario was skipped because of https://stratio.atlassian.net/browse/" + issue;
+                                ignoreReason = true;
+                                break;
+                            }
 
-                                //@manual
-                                if (tagNs.getName().matches("@manual")) {
-                                    ignoreReason = true;
-                                    exceptionmsg = "This scenario was skipped because it is marked as manual.";
-                                    break;
-                                }
+                            //@unimplemented
+                            if (tagNs.getName().matches("@unimplemented")) {
+                                exceptionmsg = "This scenario was skipped because of it is not yet implemented";
+                                ignoreReason = true;
+                                break;
+                            }
 
-                                //@toocomplex
-                                if (tagNs.getName().matches("@toocomplex")) {
-                                    exceptionmsg = "This scenario was skipped because of being too complex to test";
-                                    ignoreReason = true;
-                                    break;
-                                }
+                            //@manual
+                            if (tagNs.getName().matches("@manual")) {
+                                ignoreReason = true;
+                                exceptionmsg = "This scenario was skipped because it is marked as manual.";
+                                break;
+                            }
+
+                            //@toocomplex
+                            if (tagNs.getName().matches("@toocomplex")) {
+                                exceptionmsg = "This scenario was skipped because of being too complex to test";
+                                ignoreReason = true;
+                                break;
                             }
                         }
+                    }
 
                 }
 
                 String msg1 = null;
                 String msg2 = null;
 
-                if (ignored && (!ignoreReason || (ignoreReason && isJiraTicketDone) || (ignoreReason && isValidJiraTicket))) {
+                if (ignored && (!ignoreReason || (ignoreReason && isJiraTicketDone) || (ignoreReason && isWrongTicket))) {
                     element.setAttribute(STATUS, "FAIL");
                     if (isJiraTicketDone) {
                         msg1 = "The scenario was ignored due an already done ticket.";
                         msg2 = "The scenario was ignored due an already done ticket.";
-                    } else if (isValidJiraTicket) {
+                    } else if (isWrongTicket) {
                         msg1 = "The scenario was ignored due to unexistant ticket.";
                         msg2 = "The scenario was ignored due to unexistant ticket.";
                     } else {
                         msg1 = "The scenario has no valid reason for being ignored.";
                         msg2 = "The scenario has no valid reason for being ignored. <p>Valid values: @tillfixed(ISSUE-007) @unimplemented @manual @toocomplex</p>";
                     }
-
 
                     Element exception = createException(doc,  msg1, msg1, msg2);
                     element.appendChild(exception);
