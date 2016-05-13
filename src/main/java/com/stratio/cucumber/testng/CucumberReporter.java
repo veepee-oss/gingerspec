@@ -415,7 +415,7 @@ public class CucumberReporter implements Formatter, Reporter {
                                     comm.setRestHost("stratio.atlassian.net");
                                     comm.setRestPort("");
                                     comm.setClient(client);
-                                    String  endpoint = "/rest/api/2/issue/" + issue;
+                                    String endpoint = "/rest/api/2/issue/" + issue;
                                     try {
                                         response = comm.generateRequest("GET", true, endpoint, "", "json", codeBase64);
                                         comm.setResponse(endpoint, response.get());
@@ -466,89 +466,90 @@ public class CucumberReporter implements Formatter, Reporter {
                     }
 
                 }
+            }
 
-                String msg1 = null;
-                String msg2 = null;
+            String msg1 = null;
+            String msg2 = null;
 
-                if (ignored && (!ignoreReason || (ignoreReason && isJiraTicketDone) || (ignoreReason && isWrongTicket))) {
-                    element.setAttribute(STATUS, "FAIL");
-                    if (isJiraTicketDone) {
-                        msg1 = "The scenario was ignored due an already done ticket.";
-                        msg2 = "The scenario was ignored due an already done ticket.";
-                    } else if (isWrongTicket) {
-                        msg1 = "The scenario was ignored due to unexistant ticket.";
-                        msg2 = "The scenario was ignored due to unexistant ticket.";
-                    } else {
-                        msg1 = "The scenario has no valid reason for being ignored.";
-                        msg2 = "The scenario has no valid reason for being ignored. <p>Valid values: @tillfixed(ISSUE-007) @unimplemented @manual @toocomplex</p>";
-                    }
-
-                    Element exception = createException(doc,  msg1, msg1, msg2);
-                    element.appendChild(exception);
-                    Element systemOut = createExceptionJunit(docJunit, msg1, msg1, msg2);
-                    Junit.appendChild(systemOut);
-
-                } else if (ignored && ignoreReason) {
-                    element.setAttribute(STATUS, "SKIP");
-                    Element exception = createException(doc, "skipped",
-                            exceptionmsg, " ");
-                    element.appendChild(exception);
-                    Element skippedElementJunit = docJunit.createElement("skipped");
-                    Junit.appendChild(skippedElementJunit);
-                    Element systemOut = systemOutPrintJunit(docJunit, exceptionmsg);
-                    Junit.appendChild(systemOut);
-
+            if (ignored && (!ignoreReason || (ignoreReason && isJiraTicketDone) || (ignoreReason && isWrongTicket))) {
+                element.setAttribute(STATUS, "FAIL");
+                if (isJiraTicketDone) {
+                    msg1 = "The scenario was ignored due an already done ticket.";
+                    msg2 = "The scenario was ignored due an already done ticket.";
+                } else if (isWrongTicket) {
+                    msg1 = "The scenario was ignored due to unexistant ticket.";
+                    msg2 = "The scenario was ignored due to unexistant ticket.";
                 } else {
-                    for (Result result : results) {
-                        if ("failed".equals(result.getStatus())) {
-                            failed = result;
-                        } else if ("undefined".equals(result.getStatus()) || "pending".equals(result.getStatus())) {
-                            skipped = result;
-                        }
-                    }
-                    for (Result result : hooks) {
-                        if (failed == null && "failed".equals(result.getStatus())) {
-                            failed = result;
-                        }
-                    }
-                    if (failed != null) {
-                        element.setAttribute(STATUS, "FAIL");
-                        StringWriter stringWriter = new StringWriter();
-                        failed.getError().printStackTrace(new PrintWriter(stringWriter));
-                        Element exception = createException(doc, failed.getError().getClass().getName(),
-                                stringBuilder.toString(), stringWriter.toString());
-                        element.appendChild(exception);
-                        Element exceptionJunit = createExceptionJunit(docJunit, failed.getError().getClass().getName(),
-                                stringBuilder.toString(), stringWriter.toString());
-                        Junit.appendChild(exceptionJunit);
-                    } else if (skipped != null) {
-                        if (treatSkippedAsFailure) {
-                            element.setAttribute(STATUS, "FAIL");
-                            Element exception = createException(doc, "The scenario has pending or undefined step(s)",
-                                    stringBuilder.toString(), "The scenario has pending or undefined step(s)");
-                            element.appendChild(exception);
-                            Element exceptionJunit = createExceptionJunit(docJunit,
-                                    "The scenario has pending or undefined step(s)", stringBuilder.toString(),
-                                    "The scenario has pending or undefined step(s)");
-                            Junit.appendChild(exceptionJunit);
-                        } else {
-                            element.setAttribute(STATUS, "SKIP");
-                            Element skippedElementJunit = docJunit.createElement("skipped");
-                            Junit.appendChild(skippedElementJunit);
-                            Element systemOut = systemOutPrintJunit(docJunit, stringBuilder.toString());
-                            Junit.appendChild(systemOut);
-                        }
+                    msg1 = "The scenario has no valid reason for being ignored.";
+                    msg2 = "The scenario has no valid reason for being ignored. <p>Valid values: @tillfixed(ISSUE-007) @unimplemented @manual @toocomplex</p>";
+                }
 
-                    } else {
-                        element.setAttribute(STATUS, "PASS");
-                        Element exception = createException(doc, "NonRealException", stringBuilder.toString(), " ");
+                Element exception = createException(doc,  msg1, msg1, msg2);
+                element.appendChild(exception);
+                Element systemOut = createExceptionJunit(docJunit, msg1, msg1, msg2);
+                Junit.appendChild(systemOut);
+
+            } else if (ignored && ignoreReason) {
+                element.setAttribute(STATUS, "SKIP");
+                Element exception = createException(doc, "skipped",
+                        exceptionmsg, " ");
+                element.appendChild(exception);
+                Element skippedElementJunit = docJunit.createElement("skipped");
+                Junit.appendChild(skippedElementJunit);
+                Element systemOut = systemOutPrintJunit(docJunit, exceptionmsg);
+                Junit.appendChild(systemOut);
+
+            } else {
+                for (Result result : results) {
+                    if ("failed".equals(result.getStatus())) {
+                        failed = result;
+                    } else if ("undefined".equals(result.getStatus()) || "pending".equals(result.getStatus())) {
+                        skipped = result;
+                    }
+                }
+                for (Result result : hooks) {
+                    if (failed == null && "failed".equals(result.getStatus())) {
+                        failed = result;
+                    }
+                }
+                if (failed != null) {
+                    element.setAttribute(STATUS, "FAIL");
+                    StringWriter stringWriter = new StringWriter();
+                    failed.getError().printStackTrace(new PrintWriter(stringWriter));
+                    Element exception = createException(doc, failed.getError().getClass().getName(),
+                            stringBuilder.toString(), stringWriter.toString());
+                    element.appendChild(exception);
+                    Element exceptionJunit = createExceptionJunit(docJunit, failed.getError().getClass().getName(),
+                            stringBuilder.toString(), stringWriter.toString());
+                    Junit.appendChild(exceptionJunit);
+                } else if (skipped != null) {
+                    if (treatSkippedAsFailure) {
+                        element.setAttribute(STATUS, "FAIL");
+                        Element exception = createException(doc, "The scenario has pending or undefined step(s)",
+                                stringBuilder.toString(), "The scenario has pending or undefined step(s)");
                         element.appendChild(exception);
+                        Element exceptionJunit = createExceptionJunit(docJunit,
+                                "The scenario has pending or undefined step(s)", stringBuilder.toString(),
+                                "The scenario has pending or undefined step(s)");
+                        Junit.appendChild(exceptionJunit);
+                    } else {
+                        element.setAttribute(STATUS, "SKIP");
+                        Element skippedElementJunit = docJunit.createElement("skipped");
+                        Junit.appendChild(skippedElementJunit);
                         Element systemOut = systemOutPrintJunit(docJunit, stringBuilder.toString());
                         Junit.appendChild(systemOut);
                     }
+
+                } else {
+                    element.setAttribute(STATUS, "PASS");
+                    Element exception = createException(doc, "NonRealException", stringBuilder.toString(), " ");
+                    element.appendChild(exception);
+                    Element systemOut = systemOutPrintJunit(docJunit, stringBuilder.toString());
+                    Junit.appendChild(systemOut);
                 }
             }
         }
+
 
         private double calculateTotalDurationString() {
             double totalDurationNanos = 0;
