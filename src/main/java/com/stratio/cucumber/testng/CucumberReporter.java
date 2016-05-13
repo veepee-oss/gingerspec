@@ -391,6 +391,7 @@ public class CucumberReporter implements Formatter, Reporter {
 
             Logger logger = LoggerFactory.getLogger(ThreadProperty.get("class"));
             String value = "";
+            String issue = "";
 
             for (Tag tag : tags) {
                 if ("@ignore".equals(tag.getName())) {
@@ -401,7 +402,6 @@ public class CucumberReporter implements Formatter, Reporter {
                             if (tillFix.startsWith("@tillfixed")) {
                                 Pattern pattern = Pattern.compile("@(.*?)\\((.*?)\\)");
                                 Matcher matcher = pattern.matcher(tillFix);
-                                String issue = "";
                                 if (matcher.find()) {
                                     issue = matcher.group(2);
                                 } else {
@@ -475,7 +475,7 @@ public class CucumberReporter implements Formatter, Reporter {
                 element.setAttribute(STATUS, "FAIL");
                 if (isJiraTicketDone) {
                     msg1 = "The scenario was ignored due an already done ticket.";
-                    msg2 = "The scenario was ignored due an already done ticket.";
+                    msg2 =  "https://stratio.atlassian.net/browse/" + issue;;
                 } else if (isWrongTicket) {
                     msg1 = "The scenario was ignored due to unexistant ticket.";
                     msg2 = "The scenario was ignored due to unexistant ticket.";
