@@ -391,6 +391,7 @@ public class CucumberReporter implements Formatter, Reporter {
 
             Logger logger = LoggerFactory.getLogger(ThreadProperty.get("class"));
             String value = "";
+            String issue = "";
 
             for (Tag tag : tags) {
                 if ("@ignore".equals(tag.getName())) {
@@ -401,7 +402,6 @@ public class CucumberReporter implements Formatter, Reporter {
                             if (tillFix.startsWith("@tillfixed")) {
                                 Pattern pattern = Pattern.compile("@(.*?)\\((.*?)\\)");
                                 Matcher matcher = pattern.matcher(tillFix);
-                                String issue = "";
                                 if (matcher.find()) {
                                     issue = matcher.group(2);
                                 } else {
@@ -474,14 +474,14 @@ public class CucumberReporter implements Formatter, Reporter {
             if (ignored && (!ignoreReason || (ignoreReason && isJiraTicketDone) || (ignoreReason && isWrongTicket))) {
                 element.setAttribute(STATUS, "FAIL");
                 if (isJiraTicketDone) {
-                    msg1 = "The scenario was ignored due an already done ticket.";
-                    msg2 = "The scenario was ignored due an already done ticket.";
+                    msg1 = "The scenario was ignored due an already done ticket. " + "https://stratio.atlassian.net/browse/" + issue;;
+                    msg2 =  " ";
                 } else if (isWrongTicket) {
                     msg1 = "The scenario was ignored due to unexistant ticket.";
-                    msg2 = "The scenario was ignored due to unexistant ticket.";
+                    msg2 = " ";
                 } else {
-                    msg1 = "The scenario has no valid reason for being ignored.";
-                    msg2 = "The scenario has no valid reason for being ignored. <p>Valid values: @tillfixed(ISSUE-007) @unimplemented @manual @toocomplex</p>";
+                    msg1 = "The scenario has no valid reason for being ignored. <p>Valid values: @tillfixed(ISSUE-007) @unimplemented @manual @toocomplex</p>";
+                    msg2 = " ";
                 }
 
                 Element exception = createException(doc,  msg1, msg1, msg2);
