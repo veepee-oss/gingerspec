@@ -72,6 +72,7 @@ public class CucumberRunner {
         uniqueGlue.add("classpath:com/stratio/manager/testsAT/specs");
         uniqueGlue.add("classpath:com/stratio/viewer/testsAT/specs");
         uniqueGlue.add("classpath:com/stratio/decision/testsAT/specs");
+	uniqueGlue.add("classpath:com/stratio/paas/testsAT/specs");
         uniqueGlue.add("classpath:com/stratio/cassandra/lucene/testsAT/specs");                                  
         runtimeOptions.getGlue().clear();
         runtimeOptions.getGlue().addAll(uniqueGlue);

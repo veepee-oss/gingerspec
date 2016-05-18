@@ -189,7 +189,7 @@ public class RemoteSSHConnection {
             }
             this.result = result;
             if (channel.isClosed()) {
-                if (in.available() >0) continue;
+                if (in.available() > 0) continue;
                 this.exitStatus = channel.getExitStatus();
                 break;
             }
@@ -297,6 +297,12 @@ public class RemoteSSHConnection {
         channel.disconnect();
     }
 
+    /**
+     * Close connection
+     */
+    public void closeConnection() throws Exception {
+        session.disconnect();
+    }
 
     /**
      * UTILS
