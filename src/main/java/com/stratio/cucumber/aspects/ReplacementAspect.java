@@ -234,9 +234,11 @@ public class ReplacementAspect {
 			String prop = ThreadProperty.get(attribute);
 
 			if (prop == null) {
-				throw new Exception("Element: " + attribute + " has not been saved correctly previously.");
+				logger.error("Element: " + attribute + " has not been saved correctly previously.");
+				newVal = "ERR: UNREPLACEABLE_PLACEHOLDER";
+			} else {
+				newVal = newVal.replace(placeholder, prop);
 			}
-			newVal = newVal.replace(placeholder, prop);
 		}
 
 		return newVal;
