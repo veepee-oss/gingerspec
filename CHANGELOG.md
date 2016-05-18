@@ -4,6 +4,7 @@ Only listing significant user-visible, not internal code cleanups and minor bug 
 
 ## 0.2.0 (upcoming)
 
+* Ignored scenarios will fail if ignore cause was an already done jira ticket
 * No more a submodule project
 * Added new aspect to force the browser name and version in tests development ,using FORCE_BROWSER (even availableUniqueBrowsers factory is defined).
 
