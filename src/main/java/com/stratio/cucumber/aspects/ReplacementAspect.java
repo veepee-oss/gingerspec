@@ -250,19 +250,15 @@ public class ReplacementAspect {
 			String placeholder = newVal.substring(newVal.indexOf("!{"),
 					newVal.indexOf("}") + 1);
 			String attribute = placeholder.substring(2, placeholder.length() - 1);
-
 			// we want to use value previously saved
 			String prop = ThreadProperty.get(attribute);
-
 			if (prop == null) {
 				logger.error("Element: " + attribute + " has not been saved correctly previously.");
-				newVal = "ERR: UNREPLACEABLE_PLACEHOLDER";
 				throw new NonReplaceableException("Unreplaceable placeholder: " + placeholder);
 			} else {
 				newVal = newVal.replace(placeholder, prop);
 			}
 		}
-
 		return newVal;
 	}
 	
