@@ -98,7 +98,9 @@ public class ReplacementAspect {
 							value = replaceEnvironmentPlaceholders(value);
 						}
 						if (value.contains("!{")) {
-							value = replaceReflectionPlaceholders(value);
+							try {
+								value = replaceReflectionPlaceholders(value);
+							} catch (NonReplaceableException e) {}
 						}
 						if (value.contains("@{")) {
 							value = replaceCodePlaceholders(value);
