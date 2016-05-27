@@ -1,9 +1,12 @@
 package com.stratio.cucumber.aspects;
 
+import com.stratio.exceptions.NonReplaceableException;
 import com.stratio.tests.utils.ThreadProperty;
-import cucumber.runtime.StepDefinition;
+import cucumber.runtime.*;
 import cucumber.runtime.xstream.LocalizedXStreams;
+import gherkin.I18n;
 import gherkin.formatter.Argument;
+import gherkin.formatter.Reporter;
 import gherkin.formatter.model.DataTableRow;
 import gherkin.formatter.model.Step;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -16,9 +19,7 @@ import org.slf4j.LoggerFactory;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
+import java.util.*;
 
 @Aspect
 public class ReplacementAspect {
@@ -39,6 +40,18 @@ public class ReplacementAspect {
 	@Pointcut("execution (public String com.stratio.cucumber.testng.CucumberReporter.TestMethod.obtainOutlineScenariosExamples(..)) && "
 			+ "args (examplesData)")
 	protected void replacementOutlineScenariosCallPointcut(String examplesData) {
+	}
+
+	@Pointcut("call(void cucumber.runtime.Runtime.runStep(..)) && "
+			+ "args (featurePath, step, reporter, i18n)")
+	protected void replacementDataError(String featurePath, Step step, Reporter reporter, I18n i18n) {
+	}
+
+	@Around(value = "replacementDataError(featurePath, step, reporter, i18n)")
+	public void aroundReplacementException(ProceedingJoinPoint pjp, String featurePath, Step step, Reporter reporter, I18n i18n) throws Throwable {
+		try {
+			pjp.proceed();
+		} catch (NonReplaceableException e) {}
 	}
 
 	@Around(value = "replacementOutlineScenariosCallPointcut(examplesData)")
@@ -75,33 +88,33 @@ public class ReplacementAspect {
 
 	@Around(value = "replacementCallPointcut(arguments, stepDefinition, featurePath, step, localizedXStreams)")
 	public Object aroundReplacementCalls(ProceedingJoinPoint pjp, List<Argument> arguments, StepDefinition stepDefinition, String featurePath, Step step, LocalizedXStreams localizedXStreams) throws Throwable {
-	    if (arguments.size() > 0) {
+		if (arguments.size() > 0) {
 			List<Argument> myArguments = new ArrayList<Argument>();
 			if (arguments != null) {
-		    	for (Argument arg: arguments) {
+				for (Argument arg : arguments) {
 					if (arg.getVal() != null) {
-			    		String value = arg.getVal();
-			    		if (value.contains("${")) {
+						String value = arg.getVal();
+						if (value.contains("${")) {
 							value = replaceEnvironmentPlaceholders(value);
-			    		}
-			    		if (value.contains("!{")) {
+						}
+						if (value.contains("!{")) {
 							value = replaceReflectionPlaceholders(value);
-			    		}
+						}
 						if (value.contains("@{")) {
 							value = replaceCodePlaceholders(value);
-			    		}
-			    		Argument myArg = new Argument(arg.getOffset(), value);
-			    		myArguments.add(myArg);
+						}
+						Argument myArg = new Argument(arg.getOffset(), value);
+						myArguments.add(myArg);
 					} else {
-			    		myArguments.add(arg);
+						myArguments.add(arg);
 					}
-		    	}
-		    	arguments = myArguments;
+				}
+				arguments = myArguments;
 			}
-	    }
+		}
 	    // Proceed with new modified params
-	    Object[] myArray = {arguments, stepDefinition, featurePath, modifyStep(step), localizedXStreams};
-	    return pjp.proceed(myArray);
+		Object[] myArray = {arguments, stepDefinition, featurePath, modifyStep(step), localizedXStreams};
+		return pjp.proceed(myArray);
 	}
 
 
@@ -116,7 +129,11 @@ public class ReplacementAspect {
 			stepName = replaceEnvironmentPlaceholders(stepName);
 		    }
 		    if (stepName.contains("!{")) {
-			stepName = replaceReflectionPlaceholders(stepName);
+				try {
+					stepName = replaceReflectionPlaceholders(stepName);
+				} catch (NonReplaceableException e) {
+					logger.error("Unreplaceable elements at {}", stepName);
+				}
 		    }
 			if (stepName.contains("@{")) {
 			stepName = replaceCodePlaceholders(stepName);
@@ -137,7 +154,11 @@ public class ReplacementAspect {
 				    		cell = replaceEnvironmentPlaceholders(cell);
 						}
 						if (cell.contains("!{")) {
-				    		cell = replaceReflectionPlaceholders(cell);
+							try {
+								cell = replaceReflectionPlaceholders(cell);
+							} catch (NonReplaceableException e) {
+								logger.error("Unreplaceable elements at {}", cell);
+							}
 						}
 						if (cell.contains("@{")) {
 				    		cell = replaceCodePlaceholders(cell);
@@ -229,18 +250,15 @@ public class ReplacementAspect {
 			String placeholder = newVal.substring(newVal.indexOf("!{"),
 					newVal.indexOf("}") + 1);
 			String attribute = placeholder.substring(2, placeholder.length() - 1);
-
 			// we want to use value previously saved
 			String prop = ThreadProperty.get(attribute);
-
 			if (prop == null) {
 				logger.error("Element: " + attribute + " has not been saved correctly previously.");
-				newVal = "ERR: UNREPLACEABLE_PLACEHOLDER";
+				throw new NonReplaceableException("Unreplaceable placeholder: " + placeholder);
 			} else {
 				newVal = newVal.replace(placeholder, prop);
 			}
 		}
-
 		return newVal;
 	}
 	
