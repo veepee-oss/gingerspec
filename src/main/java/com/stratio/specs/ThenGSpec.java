@@ -23,7 +23,6 @@ import cucumber.api.java.en.Then;
 import org.assertj.core.api.WritableAssertionInfo;
 import org.json.JSONArray;
 
-import java.sql.Timestamp;
 import java.util.*;
 
 import static com.stratio.assertions.Assertions.assertThat;
@@ -515,28 +514,28 @@ public class ThenGSpec extends BaseGSpec {
         }
     }
 
-   /*
+   /**
    * Check the existence of a text at a command output
    *
    * @param search
    *
-   */
+   **/
     @Then("^the command output contains '(.+?)'$")
     public void findShellOutput(String search) throws Exception {
-        commonspec.getLogger().debug("Searching for '" + search + "'");
-        assertThat(commonspec.getRemoteSSHConnection().getResult()).as("Contains " + search + ".").contains(search);
+        commonspec.getLogger().debug("Expecting exit status: " + search);
+        assertThat(commonspec.getCommandResult()).as("Contains "+search+".").contains(search);
     }
 
-   /*
-   * Check the exitStatus of previous call matches the expected one
-   *
-   * @param expectedExitStatus
-   *
-   */
+    /**
+     * Check the exitStatus of previous command execution matches the expected one
+     *
+     * @param expectedExitStatus
+     *
+     **/
     @Then("^the command exit status is '(.+?)'$")
-    public void checkShellExitStatus(String expectedExitStatus) throws Exception {
+    public void checkShellExitStatus(int expectedExitStatus) throws Exception {
         commonspec.getLogger().debug("Expecting exit status: " + expectedExitStatus);
-        assertThat(commonspec.getRemoteSSHConnection().getExitStatus()).as("Is equal to " + expectedExitStatus + ".").isEqualTo(Integer.parseInt(expectedExitStatus));
+        assertThat(commonspec.getCommandExitStatus()).as("Is equal to "+ expectedExitStatus + ".").isEqualTo(expectedExitStatus);
     }
 
 }

@@ -497,17 +497,33 @@ public class GivenGSpec extends BaseGSpec {
     }
 
 
-    /*
-     * Executes the command specified in remote system
+    /**
+     * Executes the command specified in local system
      *
      * @param command
      *
-     */
+     **/
+    @Given("^I execute command '(.+?)' locally$")
+    public void executeLocalCommand(String command) throws Exception {
+        commonspec.getLogger().debug("Executing command '" + command + "'");
+        commonspec.runLocalCommand(command);
+    }
+
+    /**
+    * Executes the command specified in remote system
+    *
+    * @param command
+    *
+    **/
     @Given("^I execute command '(.+?)' in remote ssh connection$")
     public void executeCommand(String command) throws Exception {
         commonspec.getLogger().debug("Executing command '" + command + "'");
         commonspec.getRemoteSSHConnection().runCommand(command);
+        commonspec.setCommandExitStatus(commonspec.getRemoteSSHConnection().getExitStatus());
+        commonspec.setCommandResult(commonspec.getRemoteSSHConnection().getResult());
     }
+
+
 
     /**
      * Insert document in a MongoDB table.

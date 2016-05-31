@@ -346,20 +346,47 @@ public class CommonGTest {
     
     @Test
     public void generateRequestDataNullPOSTTest() throws Exception {
-	ThreadProperty.set("class", this.getClass().getCanonicalName());
-	CommonG commong = new CommonG();
-	String requestType = "POST";
-	String endPoint = "endpoint";
-	String type = "string";
+		ThreadProperty.set("class", this.getClass().getCanonicalName());
+		CommonG commong = new CommonG();
+		String requestType = "POST";
+		String endPoint = "endpoint";
+		String type = "string";
 	
-	try {
-	    commong.setRestHost("localhost");
-	    commong.setRestPort("80");
-	    commong.generateRequest(requestType, endPoint, null, type);
-	    fail("Expected Exception");
-	} catch (Exception e) {
-	    assertThat(e.getClass().toString()).as("Unexpected exception").isEqualTo(Exception.class.toString());
-	    assertThat(e.getMessage()).as("Unexpected exception message").isEqualTo("Missing fields in request.");
-	}
+		try {
+			commong.setRestHost("localhost");
+			commong.setRestPort("80");
+			commong.generateRequest(requestType, endPoint, null, type);
+			fail("Expected Exception");
+		} catch (Exception e) {
+			assertThat(e.getClass().toString()).as("Unexpected exception").isEqualTo(Exception.class.toString());
+			assertThat(e.getMessage()).as("Unexpected exception message").isEqualTo("Missing fields in request.");
+		}
     }
+
+	@Test
+	public void testRunLocalCommand() throws Exception {
+		ThreadProperty.set("class", this.getClass().getCanonicalName());
+		CommonG commong = new CommonG();
+		String command = "echo hey";
+		commong.runLocalCommand(command);
+		int exitstatus = commong.getCommandExitStatus();
+		String response = commong.getCommandResult();
+
+		assertThat(exitstatus).as("Running command echo locally").isEqualTo(0);
+		assertThat(response).as("Running command echo locally").isEqualTo("hey");
+
+	}
+
+	@Test
+	public void testNonexistentLocalCommandExitStatus() throws Exception {
+		ThreadProperty.set("class", this.getClass().getCanonicalName());
+		CommonG commong = new CommonG();
+		String command = "shur";
+		commong.runLocalCommand(command);
+		int exitstatus = commong.getCommandExitStatus();
+
+		assertThat(exitstatus).as("Running nonexistent command 'shur' locally").isEqualTo(1);
+	}
+
+
 }

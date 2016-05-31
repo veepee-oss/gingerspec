@@ -69,6 +69,8 @@ public class CommonG {
 
 	// REMOTE CONNECTION
 	private RemoteSSHConnection remoteSSHConnection;
+	private int commandExitStatus;
+	private String commandResult;
 
 	/**
 	 * Get the common remote connection.
@@ -1240,5 +1242,60 @@ public class CommonG {
 			pattern = Pattern.compile(Pattern.quote(expectedMessage));
 		}
 		return pattern;
+	}
+
+	/**
+	 * Runs a command locally
+	 *
+	 * @param command
+	 * 
+	 */
+	public void runLocalCommand(String command) throws Exception {
+
+		String result = "", line;
+		Process p;
+
+		try {
+			p = Runtime.getRuntime().exec(command);
+			p.waitFor();
+		} catch (java.io.IOException e) {
+			this.commandExitStatus = 1;
+			this.commandResult = "Error";
+			return;
+		}
+
+
+
+		BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
+		while ((line = input.readLine()) != null) {
+			result += line;
+		}
+
+		input.close();
+		this.commandResult = result;
+		this.commandExitStatus = p.exitValue();
+
+		p.destroy();
+
+		if (p.isAlive()) {
+			p.destroyForcibly();
+		}
+
+	}
+
+	public int getCommandExitStatus() {
+		return commandExitStatus;
+	}
+
+	public String getCommandResult() {
+		return commandResult;
+	}
+
+	public void setCommandResult(String commandResult) {
+		this.commandResult = commandResult;
+	}
+
+	public void setCommandExitStatus(int commandExitStatus) {
+		this.commandExitStatus = commandExitStatus;
 	}
 }

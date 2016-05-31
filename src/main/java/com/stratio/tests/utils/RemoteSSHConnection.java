@@ -188,6 +188,8 @@ public class RemoteSSHConnection {
                 result = result + new String(tmp, 0, i);
             }
             this.result = result;
+            this.setResult(result);
+
             if (channel.isClosed()) {
                 if (in.available() > 0) continue;
                 this.exitStatus = channel.getExitStatus();
