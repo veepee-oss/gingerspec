@@ -3,6 +3,8 @@ package com.stratio.specs;
 import com.datastax.driver.core.ColumnDefinitions;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
+import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonBooleanFormatVisitor;
+import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonNumberFormatVisitor;
 import com.jayway.jsonpath.JsonPath;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
@@ -16,6 +18,7 @@ import cucumber.api.DataTable;
 import org.apache.commons.io.FileUtils;
 import org.assertj.core.api.Condition;
 import org.hjson.JsonValue;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
@@ -651,27 +654,67 @@ public class CommonG {
 	 * 
 	 * @param data string containing the information
 	 * @param type type of information, it can be: json|string
-	 * @param modifications changes to make
-	 * 
+	 * @param modifications modifications to apply with a format:
+	 * WHERE,ACTION,VALUE
+	 * in case of delete action modifications is ("key1", "DELETE", "N/A"),
+	 * and with json {"key1":"value1","key2":{"key3":null}}
+	 * returns {"key2":{"key3":null}}
+	 * DELETE deletes json's key:value
+	 *
+	 * in case of add action is  ("N/A", "ADD", "&config=config"),
+	 * and with data  username=username&password=password
+	 * returns username=username&password=password&config=config
+	 *
+	 * in case of update action is ("username=username", "UPDATE", "username=NEWusername"),
+	 * and with data username=username&password=password
+	 * returns username=NEWusername&password=password
+	 *
+	 * in case of prepend action is ("username=username", "PREPEND", "key1=value1&"),
+	 * and with data username=username&password=password
+	 * returns key1=value1&username=username&password=password
+	 *
+	 * in case of replace action is ("key2.key3", "REPLACE", "lu->REPLACE")
+	 * and with json {"key1":"value1","key2":{"key3":"value3"}}
+	 * returns {"key1":"value1","key2":{"key3":"vaREPLACEe3"}}
+	 * the  format is (WHERE,  ACTION,  CHANGE FROM -> TO).
+	 * REPLACE replaces a string or its part per other string
+	 *
+	 * if modifications has fourth argument, the replacement is effected per special json object
+	 * the format is:
+	 * (WHERE,   ACTION,    CHANGE_TO, JSON_TYPE),
+	 * for example: "key2.key3", "REPLACE", "{}", "object")
+	 * with json  {"key1":"value1","key2":{"key3":"value3"}}
+	 * returns  {"key1":"value1","key2":{"key3":{}}}
+	 * in this case it replaces per empty json object
+	 *
+	 * there are 5 special cases of json objects replacements:
+	 * array|object|number|boolean|null
+	 *
 	 * @return String
 	 * @throws Exception 
 	 */
 	public String modifyData(String data, String type, DataTable modifications) throws Exception {
 	    String modifiedData = data;
+		String typeJsonObject = "";
+		String nullValue = "";
 	    
 	    if ("json".equals(type)) {
-		LinkedHashMap linkedHashMap;
+		LinkedHashMap jsonAsMap = new LinkedHashMap();
 		for (int i = 0; i < modifications.raw().size(); i ++) {
 		    String composeKey = modifications.raw().get(i).get(0);
 		    String operation =  modifications.raw().get(i).get(1);
 		    String newValue =  modifications.raw().get(i).get(2);
+
+			if (modifications.raw().get(0).size()==4){
+				typeJsonObject =  modifications.raw().get(i).get(3);
+			}
 	    
 		    modifiedData = JsonValue.readHjson(modifiedData).asObject().toString();
 		    
 		    modifiedData = modifiedData.replaceAll("null", "\"TO_BE_NULL\"");
 		    switch(operation.toUpperCase()) {
 	    		case "DELETE":
-	    		    linkedHashMap = JsonPath.parse(modifiedData).delete(composeKey).json();
+					jsonAsMap = JsonPath.parse(modifiedData).delete(composeKey).json();
 	    		    break;
 	    		case "ADD":
 	    		    // Get the last key
@@ -684,31 +727,65 @@ public class CommonG {
 	    			newKey = composeKey;
 	    			newComposeKey = "$";
 	    		    }
-	    		    linkedHashMap = JsonPath.parse(modifiedData).put(newComposeKey, newKey, newValue).json();
+					jsonAsMap = JsonPath.parse(modifiedData).put(newComposeKey, newKey, newValue).json();
 	    		    break;
 	    		case "UPDATE":
-	    		    linkedHashMap = JsonPath.parse(modifiedData).set(composeKey, newValue).json();
+					jsonAsMap = JsonPath.parse(modifiedData).set(composeKey, newValue).json();
 	    		    break;
 	    		case "APPEND":
 	    		    String appendValue = JsonPath.parse(modifiedData).read(composeKey);
-	    		    linkedHashMap = JsonPath.parse(modifiedData).set(composeKey, appendValue + newValue).json();
+					jsonAsMap = JsonPath.parse(modifiedData).set(composeKey, appendValue + newValue).json();
 	    		    break;
 	    		case "PREPEND":
 	    		    String prependValue = JsonPath.parse(modifiedData).read(composeKey);
-	    		    linkedHashMap = JsonPath.parse(modifiedData).set(composeKey, newValue + prependValue).json();
+					jsonAsMap = JsonPath.parse(modifiedData).set(composeKey, newValue + prependValue).json();
 	    		    break;
 	    		case "REPLACE":
 	    		    String replaceValue = JsonPath.parse(modifiedData).read(composeKey);
-	    		    String toBeReplaced = newValue.split("->")[0];
-	    		    String replacement = newValue.split("->")[1];
-	    		    newValue = replaceValue.replace(toBeReplaced, replacement);
-	    		    linkedHashMap = JsonPath.parse(modifiedData).set(composeKey, newValue).json();	    		    
-	    		    break;
+					if ("array".equals(typeJsonObject)) {
+						JSONArray ja = new JSONArray();
+						if (newValue != "[]") {
+							ja = new JSONArray(newValue);
+						}
+						jsonAsMap = JsonPath.parse(modifiedData).set(composeKey, ja).json();
+						break;
+					} else if ("object".equals(typeJsonObject)) {
+						JSONObject jo = new JSONObject();
+						if (newValue != "{}") {
+							jo = new JSONObject(newValue);
+						}
+						jsonAsMap = JsonPath.parse(modifiedData).set(composeKey, jo).json();
+						break;
+
+					} else if ("number".equals(typeJsonObject)) {
+						Double numD = new Double(newValue);
+						jsonAsMap = JsonPath.parse(modifiedData).set(composeKey, numD).json();
+						break;
+
+					} else if ("boolean".equals(typeJsonObject)) {
+						Boolean jsonB = new Boolean(newValue);
+						jsonAsMap = JsonPath.parse(modifiedData).set(composeKey,jsonB).json();
+						break;
+
+					} else if ("null".equals(typeJsonObject)) {
+						nullValue = JsonPath.parse(modifiedData).set(composeKey,null).jsonString();
+						break;
+
+					}else {
+						String toBeReplaced = newValue.split("->")[0];
+						String replacement = newValue.split("->")[1];
+						newValue = replaceValue.replace(toBeReplaced, replacement);
+						jsonAsMap = JsonPath.parse(modifiedData).set(composeKey, newValue).json();
+						break;
+					}
 	    		default:
 	    		    throw new Exception("Modification type does not exist: " + operation);
 		    }
 		    
-		    modifiedData = new JSONObject(linkedHashMap).toString();
+		    modifiedData = new JSONObject(jsonAsMap).toString();
+			if (!"".equals(nullValue)) {
+				modifiedData = nullValue;
+			}
 		    modifiedData = modifiedData.replaceAll("\"TO_BE_NULL\"", "null");
 		}
 	    } else {
