@@ -444,7 +444,7 @@ public class ThenGSpec extends BaseGSpec {
                 .isEqualTo(webURL + url);
     }
 
-    @Then("^the service response status must be '(.*?)'$")
+    @Then("^the service response status must be '(.*?)'.$")
     public void assertResponseStatus(Integer expectedStatus) {
         commonspec.getLogger().debug("Verifying response message");
         assertThat(commonspec.getResponse().getStatusCode()).isEqualTo(expectedStatus);
