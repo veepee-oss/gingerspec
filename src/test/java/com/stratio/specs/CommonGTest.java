@@ -1,29 +1,21 @@
 package com.stratio.specs;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
-
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-
+import com.stratio.tests.utils.ThreadProperty;
+import cucumber.api.DataTable;
 import org.hjson.ParseException;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.mockito.Mockito;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
-import com.stratio.tests.utils.ThreadProperty;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
 
-import cucumber.api.DataTable;
-import static org.mockito.Mockito.*;
-
-import com.ning.http.client.Response;
-
-import java.util.concurrent.Future;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 public class CommonGTest {
 
@@ -672,5 +664,155 @@ public class CommonGTest {
 		assertThat(exitstatus).as("Running nonexistent command 'shur' locally").isEqualTo(1);
 	}
 
+	@Test
+	public void testValueEqualInJSON() throws Exception{
+		String baseData = "consulMesosJSON.conf";
+		String envVar = "consulMesos";
+		ThreadProperty.set("class", this.getClass().getCanonicalName());
+		CommonG commong = new CommonG();
+		ThenGSpec theng = new ThenGSpec(commong);
+
+		String result = new String(Files.readAllBytes(
+				Paths.get(getClass().getClassLoader().getResource(baseData).getFile())));
+
+		ThreadProperty.set(envVar,result);
+
+		List<String> row1 = Arrays.asList("$.[0].Node","==","paaslab31.stratio.com");
+		List<String> row2 = Arrays.asList("[0].Node","==","paaslab31.stratio.com");
+
+		List<List<String>> rawData = Arrays.asList(row1,row2);
+
+		DataTable table = DataTable.create(rawData);
+
+		theng.matchWithExpresion(envVar,table);
+
+	}
+
+
+	@Test
+	public void testValueNotEqualInJSON() throws Exception{
+		String baseData = "consulMesosJSON.conf";
+		String envVar = "consulMesos";
+		ThreadProperty.set("class", this.getClass().getCanonicalName());
+		CommonG commong = new CommonG();
+		ThenGSpec theng = new ThenGSpec(commong);
+
+		String result = new String(Files.readAllBytes(
+				Paths.get(getClass().getClassLoader().getResource(baseData).getFile())));
+
+		ThreadProperty.set(envVar,result);
+
+		List<String> row1 = Arrays.asList("$.[1].Node","!=","paaslab31.stratio.com");
+		List<String> row2 = Arrays.asList("[2].Node","!=","paaslab32.stratio.com");
+
+		List<List<String>> rawData = Arrays.asList(row1,row2);
+
+		DataTable table = DataTable.create(rawData);
+
+		theng.matchWithExpresion(envVar,table);
+
+	}
+
+
+	@Test
+	public void testValueContainsInJSON() throws Exception{
+		String baseData = "consulMesosJSON.conf";
+		String envVar = "consulMesos";
+		ThreadProperty.set("class", this.getClass().getCanonicalName());
+		CommonG commong = new CommonG();
+		ThenGSpec theng = new ThenGSpec(commong);
+
+		String result = new String(Files.readAllBytes(
+				Paths.get(getClass().getClassLoader().getResource(baseData).getFile())));
+
+		ThreadProperty.set(envVar,result);
+
+		List<String> row1 = Arrays.asList("$.[0].ServiceTags","contains","leader");
+		List<String> row2 = Arrays.asList("[1].ServiceTags","contains","master");
+
+		List<List<String>> rawData = Arrays.asList(row1,row2);
+
+		DataTable table = DataTable.create(rawData);
+
+		theng.matchWithExpresion(envVar,table);
+
+	}
+
+	@Test
+	public void testValueDoesNotContainInJSON() throws Exception{
+		String baseData = "consulMesosJSON.conf";
+		String envVar = "consulMesos";
+		ThreadProperty.set("class", this.getClass().getCanonicalName());
+		CommonG commong = new CommonG();
+		ThenGSpec theng = new ThenGSpec(commong);
+
+		String result = new String(Files.readAllBytes(
+				Paths.get(getClass().getClassLoader().getResource(baseData).getFile())));
+
+		ThreadProperty.set(envVar,result);
+
+		List<String> row1 = Arrays.asList("$.[0].ServiceTags","does not contain","adsads");
+		List<String> row2 = Arrays.asList("[1].Node","does not contain","rgrerg");
+
+		List<List<String>> rawData = Arrays.asList(row1,row2);
+
+		DataTable table = DataTable.create(rawData);
+
+		theng.matchWithExpresion(envVar,table);
+
+	}
+
+	@Test
+	public void testWrongOperatorInJSON() throws Exception{
+		String baseData = "consulMesosJSON.conf";
+		String envVar = "consulMesos";
+		ThreadProperty.set("class", this.getClass().getCanonicalName());
+		CommonG commong = new CommonG();
+		ThenGSpec theng = new ThenGSpec(commong);
+
+		String result = new String(Files.readAllBytes(
+				Paths.get(getClass().getClassLoader().getResource(baseData).getFile())));
+
+		ThreadProperty.set(envVar,result);
+
+		List<String> row1 = Arrays.asList("$.[0].ServiceTags","&&","leader");
+		List<String> row2 = Arrays.asList("[1].Node","||","paaslab32.stratio.com");
+
+		List<List<String>> rawData = Arrays.asList(row1,row2);
+
+		DataTable table = DataTable.create(rawData);
+
+		try {
+			theng.matchWithExpresion(envVar, table);
+			fail("Operation is implemented but it shouldn't");
+		} catch(AssertionError e) {
+			assertThat(true).as("Unknown error").isTrue();
+		}
+
+	}
+
+	@Test
+	public void testKeysContainsInJSON() throws Exception {
+		String baseData = "exampleJSON.conf";
+		String envVar = "exampleEnvVar";
+		ThreadProperty.set("class", this.getClass().getCanonicalName());
+		CommonG commong = new CommonG();
+		ThenGSpec theng = new ThenGSpec(commong);
+
+		String result = new String(Files.readAllBytes(
+				Paths.get(getClass().getClassLoader().getResource(baseData).getFile())));
+
+		ThreadProperty.set(envVar, result);
+
+		List<String> row1 = Arrays.asList("$.glossary.~[0]", "contains", "title");
+		List<String> row2 = Arrays.asList("$.glossary.GlossDiv.~", "contains", "GlossList");
+
+		List<List<String>> rawData = Arrays.asList(row1, row2);
+
+		DataTable table = DataTable.create(rawData);
+
+		theng.matchWithExpresion(envVar, table);
+
+	}
 
 }

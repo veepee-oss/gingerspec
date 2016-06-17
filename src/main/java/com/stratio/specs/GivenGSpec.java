@@ -6,6 +6,7 @@ import com.stratio.tests.utils.RemoteSSHConnection;
 import com.stratio.tests.utils.ThreadProperty;
 import cucumber.api.DataTable;
 import cucumber.api.java.en.Given;
+import org.assertj.core.api.Assertions;
 import org.hjson.JsonValue;
 import org.openqa.selenium.WebElement;
 
@@ -13,10 +14,7 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 import static com.stratio.assertions.Assertions.assertThat;
 
@@ -538,6 +536,18 @@ public class GivenGSpec extends BaseGSpec {
         String retrievedDoc = commonspec.retrieveData(document, "json");
         commonspec.getMongoDBClient().connectToMongoDBDataBase(dataBase);
         commonspec.getMongoDBClient().insertDocIntoMongoDBCollection(collection, retrievedDoc);
+    }
+
+    /**
+     * Get all opened windows and store it.
+     *
+     */
+    @Given("^new window is opened$")
+    public void seleniumGetwindows() {
+        commonspec.getLogger().debug("Getting number of opened windows");
+        Set<String> wel = commonspec.getDriver().getWindowHandles();
+
+        Assertions.assertThat(wel).as("Element count doesnt match").hasSize(2);
     }
 
 }

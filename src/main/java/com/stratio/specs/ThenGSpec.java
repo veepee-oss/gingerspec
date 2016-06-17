@@ -1,31 +1,30 @@
 package com.stratio.specs;
 
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.regex.Pattern;
-
-import com.stratio.assertions.DBObjectsAssert;
-import org.openqa.selenium.WebElement;
-
 import com.datastax.driver.core.ColumnDefinitions;
 import com.datastax.driver.core.DataType;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
+import com.jayway.jsonpath.JsonPath;
 import com.mongodb.DBObject;
+import com.stratio.assertions.DBObjectsAssert;
 import com.stratio.tests.utils.PreviousWebElements;
+import com.stratio.tests.utils.ThreadProperty;
 import cucumber.api.DataTable;
 import cucumber.api.java.en.Then;
+import gherkin.formatter.model.DataTableRow;
+import org.apache.commons.collections.IteratorUtils;
 import org.assertj.core.api.WritableAssertionInfo;
 import org.json.JSONArray;
+import org.json.JSONObject;
+import org.openqa.selenium.WebElement;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.stratio.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Fail.fail;
 
 public class ThenGSpec extends BaseGSpec {
 
@@ -445,7 +444,7 @@ public class ThenGSpec extends BaseGSpec {
                 .isEqualTo(webURL + url);
     }
 
-    @Then("^the service response status must be '(.*?)'.$")
+    @Then("^the service response status must be '(.*?)'$")
     public void assertResponseStatus(Integer expectedStatus) {
         commonspec.getLogger().debug("Verifying response message");
         assertThat(commonspec.getResponse().getStatusCode()).isEqualTo(expectedStatus);
@@ -536,6 +535,106 @@ public class ThenGSpec extends BaseGSpec {
     public void checkShellExitStatus(int expectedExitStatus) throws Exception {
         commonspec.getLogger().debug("Expecting exit status: " + expectedExitStatus);
         assertThat(commonspec.getCommandExitStatus()).as("Is equal to "+ expectedExitStatus + ".").isEqualTo(expectedExitStatus);
+    }
+
+    /**
+     * Save cookie in context for future references
+     *
+     **/
+    @Then("^I save selenium cookies in context$")
+    public void saveSeleniumCookies() throws Exception {
+        commonspec.getLogger().debug("Getting all cookies");
+        //Save Cookies
+        commonspec.setSeleniumCookies(commonspec.getDriver().manage().getCookies());
+    }
+
+    /**
+     * Check if expression defined by JSOPath (http://goessner.net/articles/JsonPath/index.html)
+     * match in JSON stored in a environment variable.
+     *
+     * @param envVar environment variable where JSON ias stored
+     * @param table data table in which each row stores one expression
+     *
+     */
+    @Then("^'(.+?)' matches the following cases:$")
+    public void matchWithExpresion(String envVar, DataTable table) throws Exception{
+        String jsonString = ThreadProperty.get(envVar);
+
+        for(DataTableRow row:table.getGherkinRows()){
+            String expression = row.getCells().get(0);
+            String condition = row.getCells().get(1);
+            String result = row.getCells().get(2);
+
+            if(expression.contains(".~")) {
+                commonspec.getLogger().debug("Expression refered to json keys");
+                Pattern pattern = Pattern.compile("^(.*?).~(.*?)$");
+                Matcher matcher = pattern.matcher(expression);
+                String aux = null;
+                String op = null;
+                if (matcher.find()) {
+                    aux = matcher.group(1);
+                    op = matcher.group(2);
+                }
+                LinkedHashMap data = JsonPath.parse(jsonString).read(aux);
+                JSONObject json = new JSONObject(data);
+                List<String> keys = IteratorUtils.toList(json.keys());
+                if(op.equals("")) {
+                    this.evaluateJSONElementOperation(keys,condition,result);
+                } else {
+                    Pattern patternOp = Pattern.compile("^\\[(\\d+)\\]$");
+                    Matcher matcherOp = patternOp.matcher(op);
+                    Integer index = null;
+                    if (matcherOp.find()) {
+                        String a = matcherOp.group(1);
+                        index = Integer.parseInt(matcherOp.group(1));
+                    }
+                    String value = keys.get(index).toString();
+                    this.evaluateJSONElementOperation(value,condition,result);
+                }
+            } else {
+                String value = JsonPath.read(jsonString, expression).toString();
+                this.evaluateJSONElementOperation(value,condition,result);
+            }
+        }
+
+    }
+
+    public void evaluateJSONElementOperation(Object o,String condition,String result) {
+
+        if(o instanceof String){
+            String value = (String)o;
+            switch (condition) {
+                case "==":
+                    assertThat(value).as("Evaluate JSONPath does not match with proposed value").isEqualTo(result);
+                    break;
+                case "!=":
+                    assertThat(value).as("Evaluate JSONPath match with proposed value").isNotEqualTo(result);
+                    break;
+                case "contains":
+                    assertThat(value).as("Evaluate JSONPath does not contain proposed value").contains(result);
+                    break;
+                case "does not contain":
+                    assertThat(value).as("Evaluate JSONPath contain proposed value").doesNotContain(result);
+                    break;
+                default:
+                    fail("Not implemented condition");
+                    break;
+            }
+        }else if (o instanceof List){
+            List<String> keys = (List<String>)o;
+            switch (condition) {
+                case "contains":
+                    assertThat(keys).as("Keys does not contain that name").contains(result);
+                    break;
+                case "size":
+                    assertThat(keys).as("Keys size does not match").hasSize(Integer.parseInt(result));
+                    break;
+                default:
+                    fail("Operation not implemented for JSON keys");
+                    break;
+            }
+        }
+
     }
 
 }

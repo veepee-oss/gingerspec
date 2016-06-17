@@ -3,8 +3,6 @@ package com.stratio.specs;
 import com.datastax.driver.core.ColumnDefinitions;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
-import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonBooleanFormatVisitor;
-import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonNumberFormatVisitor;
 import com.jayway.jsonpath.JsonPath;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
@@ -62,6 +60,7 @@ public class CommonG {
 	private List<JSONObject> previousElasticsearchResults;
 	private List<Map<String,String>> previousCSVResults;
     private String resultsType="";
+	private Set<org.openqa.selenium.Cookie> seleniumCookies = new HashSet<org.openqa.selenium.Cookie>();
 
 
 	// CONNECTION DETAILS
@@ -868,6 +867,13 @@ public class CommonG {
 					request = request.setCookies(this.getResponse().getCookies());
 				}
 
+				if (this.getSeleniumCookies().size()>0) {
+					for(org.openqa.selenium.Cookie cookie:this.getSeleniumCookies()) {
+						request.addCookie(new Cookie(cookie.getName(), cookie.getValue(),
+								false, cookie.getDomain(), cookie.getPath(), 99, false, false));
+					}
+				}
+
 				response = request.execute();
 				break;
 			case "DELETE":
@@ -875,6 +881,13 @@ public class CommonG {
 
 				if (this.getResponse() != null) {
 					request = request.setCookies(this.getResponse().getCookies());
+				}
+
+				if (this.getSeleniumCookies().size()>0) {
+					for(org.openqa.selenium.Cookie cookie:this.getSeleniumCookies()) {
+						request.addCookie(new Cookie(cookie.getName(), cookie.getValue(),
+								false, cookie.getDomain(), cookie.getPath(), 99, false, false));
+					}
 				}
 
 				response = request.execute();
@@ -896,6 +909,13 @@ public class CommonG {
 						request = request.setCookies(this.getResponse().getCookies());
 					}
 
+					if (this.getSeleniumCookies().size()>0) {
+						for(org.openqa.selenium.Cookie cookie:this.getSeleniumCookies()) {
+							request.addCookie(new Cookie(cookie.getName(), cookie.getValue(),
+									false, cookie.getDomain(), cookie.getPath(), 99, false, false));
+						}
+					}
+
 					response = this.getClient().executeRequest(request.build());
 					break;
 				}
@@ -913,6 +933,13 @@ public class CommonG {
 
 					if (this.getResponse() != null) {
 						request = request.setCookies(this.getResponse().getCookies());
+					}
+
+					if (this.getSeleniumCookies().size()>0) {
+						for(org.openqa.selenium.Cookie cookie:this.getSeleniumCookies()) {
+							request.addCookie(new Cookie(cookie.getName(), cookie.getValue(),
+									false, cookie.getDomain(), cookie.getPath(), 99, false, false));
+						}
 					}
 
 					response = this.getClient().executeRequest(request.build());
@@ -1012,6 +1039,9 @@ public class CommonG {
         this.resultsType = resultsType;
     }
 
+	public Set<org.openqa.selenium.Cookie> getSeleniumCookies() { return seleniumCookies; }
+
+	public void setSeleniumCookies(Set<org.openqa.selenium.Cookie> cookies) { this.seleniumCookies = cookies; }
 
 	/**
      * Checks the different results of a previous query to CSV file

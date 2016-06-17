@@ -4,10 +4,7 @@ import static com.stratio.assertions.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.filter;
 //import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Future;
 import java.util.logging.Logger;
 
@@ -528,5 +525,23 @@ public class WhenGSpec extends BaseGSpec {
 
         commonspec.setResultsType("csv");
         commonspec.setCSVResults(results);
+    }
+
+    /**
+     * Change current window to another opened window.
+     *
+     * @param index
+     */
+    @When("^I change active window$")
+    public void seleniumChangeWindow() {
+        String originalWindowHandle = commonspec.getDriver().getWindowHandle();
+        Set<String> windowHandles = commonspec.getDriver().getWindowHandles();
+
+        for (String window: windowHandles) {
+            if(!window.equals(originalWindowHandle)){
+                commonspec.getDriver().switchTo().window(window);
+            }
+        }
+
     }
 }
