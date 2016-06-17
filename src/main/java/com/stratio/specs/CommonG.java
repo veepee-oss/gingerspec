@@ -364,8 +364,11 @@ public class CommonG {
 	 * @return String
 	 */
 	public String captureEvidence(WebDriver driver, String type, String suffix) {
-
-		String dir = "./target/executions/";
+        String testSuffix = System.getProperty("TESTSUFFIX");
+        String dir = "./target/executions/";
+        if (testSuffix != null) {
+            dir = dir + testSuffix + "/";
+        }		
 
 		String clazz = ThreadProperty.get("class");
 		String currentBrowser = ThreadProperty.get("browser");

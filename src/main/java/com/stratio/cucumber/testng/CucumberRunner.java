@@ -44,18 +44,22 @@ public class CucumberRunner {
         RuntimeOptionsFactory runtimeOptionsFactory = new RuntimeOptionsFactory(clazz,
                 new Class[] { CucumberOptions.class });
         RuntimeOptions runtimeOptions = runtimeOptionsFactory.create();
-
-        boolean aux = new File("target/executions/").mkdirs();
+        String testSuffix = System.getProperty("TESTSUFFIX");
+        String targetExecutionsPath="target/executions/";
+        if (testSuffix != null) {
+            targetExecutionsPath = targetExecutionsPath + testSuffix + "/";
+        }
+        boolean aux = new File(targetExecutionsPath).mkdirs();
         CucumberReporter reporterTestNG;
 
         if ((feature.length == 0)) {
-            reporterTestNG = new CucumberReporter("target/executions/", clazz.getCanonicalName(), "");
+            reporterTestNG = new CucumberReporter(targetExecutionsPath, clazz.getCanonicalName(), "");
         } else {
             List<String> features = new ArrayList<String>();
             String fPath = "src/test/resources/features/" + feature[0] + ".feature";
             features.add(fPath);
             runtimeOptions.getFeaturePaths().addAll(features);
-            reporterTestNG = new CucumberReporter("target/executions/", clazz.getCanonicalName(), feature[0]);
+            reporterTestNG = new CucumberReporter(targetExecutionsPath, clazz.getCanonicalName(), feature[0]);
         }
 
         List<String> uniqueGlue = new ArrayList<String>();

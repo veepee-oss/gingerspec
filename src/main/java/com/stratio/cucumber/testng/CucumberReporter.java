@@ -218,7 +218,6 @@ public class CucumberReporter implements Formatter, Reporter {
             test.setAttribute("name", CucumberReporter.class.getName());
             test.setAttribute("duration-ms",
                     String.valueOf(getTotalDuration(suite.getElementsByTagName("test-method"))));
-
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
             StreamResult streamResult = new StreamResult(writer);
@@ -331,14 +330,19 @@ public class CucumberReporter implements Formatter, Reporter {
 
         private void start(Element element, Integer iteration, Element JunitElement) {
             this.iteration = iteration;
+            String testSuffix = System.getProperty("TESTSUFFIX");
+            String name = scenario.getName();
+            if (testSuffix != null) {
+                name = name + " [" +testSuffix + "]";
+            }
             if ((examplesData == null) || (this.iteration >= examplesData.getRows().size())) {
-                element.setAttribute("name", scenario.getName());
-                JunitElement.setAttribute("name", scenario.getName());
+                element.setAttribute("name", name);
+                JunitElement.setAttribute("name", name);
                 ThreadProperty.set("dataSet", "");
             } else {
                 String data = obtainOutlineScenariosExamples(examplesData.getRows().get(iteration).getCells().toString());
-                element.setAttribute("name", scenario.getName() + " " + data);
-                JunitElement.setAttribute("name", scenario.getName() + " " + data);
+                element.setAttribute("name", name + " " + data);
+                JunitElement.setAttribute("name", name + " " + data);
                 ThreadProperty.set("dataSet", data);
             }
             element.setAttribute("started-at", DATE_FORMAT.format(new Date()));
@@ -604,8 +608,13 @@ public class CucumberReporter implements Formatter, Reporter {
         }
 
         private String hasCapture(String feat, String scen) {
-
-            File dir =new File("./target/executions/");
+            String testSuffix = System.getProperty("TESTSUFFIX");
+            File dir;
+            if (testSuffix != null) {
+                dir = new File("./target/executions/" + testSuffix + "/");
+            } else {
+                dir = new File("./target/executions/");
+            }
             final String[] imgext = {"png"};
             Collection<File> files = FileUtils.listFiles(dir, imgext, true);
 
