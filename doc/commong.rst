@@ -126,6 +126,9 @@ Where:
 		- REPLACE: Update value in key or modify part of string.
 			- {"key1":"val1", "key2":"val2"} -> | key1 | REPLACE | al->alue | -> {"key1":"value1", "key2":"val2"}
 			- "mystring" -> | str | REPLACE | mod | -> "mymoding"
+                - REPLACE: Modify part per Json object
+		        - {"key1":"value1","key2":{"key3":"value3"}} -> | key2.key3 | REPLACE | 5 | number | -> {"key1":"value1","key2":{"key3":newValue}}
+                        - "value3" -> | value3 | REPLACE | 5 | -> 5
 		- APPEND: Append value to key value or to string
 			- {"key1":"val1", "key2":"val2"} -> | key1 | APPEND | new | -> {"key1":"val1new", "key2":"val2"}
 			- "mystring" -> | N/A | APPEND | new | -> "mystringnew"

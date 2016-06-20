@@ -658,24 +658,42 @@ public class CommonG {
 	 * @param type type of information, it can be: json|string
 	 * @param modifications modifications to apply with a format:
 	 * WHERE,ACTION,VALUE
-	 * in case of delete action modifications is ("key1", "DELETE", "N/A"),
+	 *
+	 * DELETE: Delete the key in json or string in current value
+	 * in case of DELETE action modifications is |key1|DELETE|N/A|
 	 * and with json {"key1":"value1","key2":{"key3":null}}
 	 * returns {"key2":{"key3":null}}
-	 * DELETE deletes json's key:value
+	 * Example 2:
+	 * {"key1":"val1", "key2":"val2"} -> | key1 | DELETE | N/A | -> {"key2":"val2"}
+	 *  "mystring" -> | str | DELETE | N/A | -> "mying"
 	 *
-	 * in case of add action is  ("N/A", "ADD", "&config=config"),
+	 * ADD: Add new key to json or append string to current value.
+	 * in case of ADD action is  |N/A|ADD|&config=config|,
 	 * and with data  username=username&password=password
 	 * returns username=username&password=password&config=config
+	 * Example 2:
+	 * {"key1":"val1", "key2":"val2"} -> | key3 | ADD | val3 | -> {"key1":"val1", "key2":"val2", "key3":"val3"}
+	 * "mystring" -> | N/A | ADD | new | -> "mystringnew"
 	 *
-	 * in case of update action is ("username=username", "UPDATE", "username=NEWusername"),
+	 * UPDATE: Update value in key or modify part of string.
+	 * in case of UPDATE action is |username=username|UPDATE|username=NEWusername|,
 	 * and with data username=username&password=password
 	 * returns username=NEWusername&password=password
+	 * Example 2:
+	 * {"key1":"val1", "key2":"val2"} -> | key1 | UPDATE | newval1 | -> {"key1":"newval1", "key2":"val2"}
+	 * "mystring" -> | str | UPDATE | mod | -> "mymoding"
 	 *
-	 * in case of prepend action is ("username=username", "PREPEND", "key1=value1&"),
+	 * PREPEND: Prepend value to key value or to string
+	 * in case of PREPEND action is |username=username|PREPEND|key1=value1&|,
 	 * and with data username=username&password=password
 	 * returns key1=value1&username=username&password=password
+	 * Example 2:
+	 * {"key1":"val1", "key2":"val2"} -> | key1 | PREPEND | new | -> {"key1":"newval1", "key2":"val2"}
+	 * "mystring" -> | N/A | PREPEND | new | -> "newmystring"
 	 *
-	 * in case of replace action is ("key2.key3", "REPLACE", "lu->REPLACE")
+	 *
+	 * REPLACE: Update value in key or modify part of string.
+	 * in case of REPLACE action is |key2.key3|REPLACE|lu->REPLACE|
 	 * and with json {"key1":"value1","key2":{"key3":"value3"}}
 	 * returns {"key1":"value1","key2":{"key3":"vaREPLACEe3"}}
 	 * the  format is (WHERE,  ACTION,  CHANGE FROM -> TO).
@@ -684,14 +702,26 @@ public class CommonG {
 	 * if modifications has fourth argument, the replacement is effected per special json object
 	 * the format is:
 	 * (WHERE,   ACTION,    CHANGE_TO, JSON_TYPE),
-	 * for example: "key2.key3", "REPLACE", "{}", "object")
+	 * WHERE is the key, ACTION is REPLACE,
+	 * CHANGE_TO is the new value of the key,
+	 * JSON_TYPE is the type of jason object,
+	 * there are 5 special cases of json object replacements:
+	 * array|object|number|boolean|null
+	 *
+	 * example1: |key2.key3|REPLACE|5|number|
+	 * with json {"key1":"value1","key2":{"key3":"value3"}}
+	 * returns {"key1":"value1","key2":{"key3":5}}
+	 * in this case it replaces value of key3
+	 * per jason number
+	 *
+	 * example2: |key2.key3|REPLACE|{}|object|
 	 * with json  {"key1":"value1","key2":{"key3":"value3"}}
 	 * returns  {"key1":"value1","key2":{"key3":{}}}
 	 * in this case it replaces per empty json object
 	 *
-	 * there are 5 special cases of json objects replacements:
-	 * array|object|number|boolean|null
-	 *
+	 * APPEND: Append value to key value or to string
+	 * {"key1":"val1", "key2":"val2"} -> | key1 | APPEND | new | -> {"key1":"val1new", "key2":"val2"}
+	 * "mystring" -> | N/A | APPEND | new | -> "mystringnew"
 	 * @return String
 	 * @throws Exception 
 	 */
