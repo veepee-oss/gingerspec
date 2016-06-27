@@ -378,10 +378,18 @@ public class GivenGSpec extends BaseGSpec {
      * @param restHost
      * @param restPort
      */
-    @Given("^I send requests to '([^:]+?)(:.+?)?'$")
-    public void setupRestClient(String restHost, String restPort) {
+    @Given("^I( securely)? send requests to '([^:]+?)(:.+?)?'$")
+    public void setupRestClient(String isSecured,String restHost, String restPort) {
         assertThat(restHost).isNotEmpty();
         assertThat(restPort).isNotEmpty();
+
+        String restProtocol = "http://";
+
+        if (isSecured != null) {
+            restProtocol= "https://";
+        }
+
+
 
         if (restHost == null) {
             restHost = "localhost";
@@ -391,9 +399,10 @@ public class GivenGSpec extends BaseGSpec {
             restPort = ":80";
         }
 
+        commonspec.setRestProtocol(restProtocol);
         commonspec.setRestHost(restHost);
         commonspec.setRestPort(restPort);
-        commonspec.getLogger().debug("Sending requests to http://{}{}", restHost, restPort);
+        commonspec.getLogger().debug("Sending requests to {}{}{}",restProtocol, restHost, restPort);
     }
 
     /**

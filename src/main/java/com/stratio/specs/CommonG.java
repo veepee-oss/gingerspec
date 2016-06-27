@@ -8,6 +8,7 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClient.BoundRequestBuilder;
+import com.ning.http.client.RequestBuilder;
 import com.ning.http.client.Response;
 import com.ning.http.client.cookie.Cookie;
 import com.stratio.conditions.Conditions;
@@ -73,6 +74,7 @@ public class CommonG {
 	private RemoteSSHConnection remoteSSHConnection;
 	private int commandExitStatus;
 	private String commandResult;
+	private String restProtocol;
 
 	/**
 	 * Get the common remote connection.
@@ -207,7 +209,16 @@ public class CommonG {
 	public void setRestHost(String restHost) {
 		this.restHost = restHost;
 	}
-	
+
+	/**
+	 * Set the REST host.
+	 *
+	 * @param restProtocol
+	 */
+	public void setRestProtocol(String restProtocol) {
+		this.restProtocol = restProtocol;
+	}
+
 	/**
 	 * Set the REST port.
 	 * 
@@ -862,13 +873,10 @@ public class CommonG {
 	 */
 	public Future<Response> generateRequest(String requestType, boolean secure, String endPoint, String data, String type, String codeBase64) throws Exception {
 
-		String protocol = "http";
-		if (secure) {
-			protocol = "https";
-		}
-
+		String protocol = this.getRestProtocol();
 		Future<Response> response = null;
 		BoundRequestBuilder request;
+
 
 		if (this.getRestHost() == null) {
 			throw new Exception("Rest host has not been set");
@@ -877,8 +885,12 @@ public class CommonG {
 		if (this.getRestPort() == null) {
 			throw new Exception("Rest port has not been set");
 		}
+		
+		if (this.getRestProtocol() == null) {
+			protocol = "http://";
+		}
 
-		String restURL = protocol + "://" + this.getRestHost() + this.getRestPort();
+		String restURL = protocol + this.getRestHost() + this.getRestPort();
 
 		switch(requestType.toUpperCase()) {
 			case "GET":
@@ -1437,5 +1449,9 @@ public class CommonG {
 
 	public void setCommandExitStatus(int commandExitStatus) {
 		this.commandExitStatus = commandExitStatus;
+	}
+
+	public String getRestProtocol() {
+		return restProtocol;
 	}
 }

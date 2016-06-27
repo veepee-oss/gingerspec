@@ -255,7 +255,7 @@ public class HookGSpec extends BaseGSpec {
     public void restClientSetup() throws Exception {
         commonspec.getLogger().debug("Starting a REST client");
 
-        commonspec.setClient(new AsyncHttpClient(new AsyncHttpClientConfig.Builder().setAllowPoolingConnections(false)
+        commonspec.setClient(new AsyncHttpClient(new AsyncHttpClientConfig.Builder().setAcceptAnyCertificate(true).setAllowPoolingConnections(false)
                 .build()));
     }
 
