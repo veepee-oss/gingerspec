@@ -8,7 +8,6 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClient.BoundRequestBuilder;
-import com.ning.http.client.RequestBuilder;
 import com.ning.http.client.Response;
 import com.ning.http.client.cookie.Cookie;
 import com.stratio.conditions.Conditions;
@@ -1454,4 +1453,13 @@ public class CommonG {
 	public String getRestProtocol() {
 		return restProtocol;
 	}
+
+	public String getJSONPathString(String jsonString, String expr) {
+
+		String result = JsonValue.readHjson(jsonString).toString();
+		String value = JsonPath.parse(result).read(expr).toString();
+
+		return value;
+	}
+
 }

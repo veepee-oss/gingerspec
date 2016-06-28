@@ -665,154 +665,72 @@ public class CommonGTest {
 	}
 
 	@Test
-	public void testValueEqualInJSON() throws Exception{
-		String baseData = "consulMesosJSON.conf";
-		String envVar = "consulMesos";
+	public void testParseJSONFragments() throws Exception {
 		ThreadProperty.set("class", this.getClass().getCanonicalName());
-		CommonG commong = new CommonG();
-		ThenGSpec theng = new ThenGSpec(commong);
+		String baseData = "fragmentsJSON.conf";
 
-		String result = new String(Files.readAllBytes(
+		String jsonString = new String(Files.readAllBytes(
 				Paths.get(getClass().getClassLoader().getResource(baseData).getFile())));
 
-		ThreadProperty.set(envVar,result);
-
-		List<String> row1 = Arrays.asList("$.[0].Node","==","paaslab31.stratio.com");
-		List<String> row2 = Arrays.asList("[0].Node","==","paaslab31.stratio.com");
-
-		List<List<String>> rawData = Arrays.asList(row1,row2);
-
-		DataTable table = DataTable.create(rawData);
-
-		theng.matchWithExpresion(envVar,table);
-
-	}
-
-
-	@Test
-	public void testValueNotEqualInJSON() throws Exception{
-		String baseData = "consulMesosJSON.conf";
-		String envVar = "consulMesos";
-		ThreadProperty.set("class", this.getClass().getCanonicalName());
 		CommonG commong = new CommonG();
-		ThenGSpec theng = new ThenGSpec(commong);
 
-		String result = new String(Files.readAllBytes(
-				Paths.get(getClass().getClassLoader().getResource(baseData).getFile())));
-
-		ThreadProperty.set(envVar,result);
-
-		List<String> row1 = Arrays.asList("$.[1].Node","!=","paaslab31.stratio.com");
-		List<String> row2 = Arrays.asList("[2].Node","!=","paaslab32.stratio.com");
-
-		List<List<String>> rawData = Arrays.asList(row1,row2);
-
-		DataTable table = DataTable.create(rawData);
-
-		theng.matchWithExpresion(envVar,table);
-
-	}
-
-
-	@Test
-	public void testValueContainsInJSON() throws Exception{
-		String baseData = "consulMesosJSON.conf";
-		String envVar = "consulMesos";
-		ThreadProperty.set("class", this.getClass().getCanonicalName());
-		CommonG commong = new CommonG();
-		ThenGSpec theng = new ThenGSpec(commong);
-
-		String result = new String(Files.readAllBytes(
-				Paths.get(getClass().getClassLoader().getResource(baseData).getFile())));
-
-		ThreadProperty.set(envVar,result);
-
-		List<String> row1 = Arrays.asList("$.[0].ServiceTags","contains","leader");
-		List<String> row2 = Arrays.asList("[1].ServiceTags","contains","master");
-
-		List<List<String>> rawData = Arrays.asList(row1,row2);
-
-		DataTable table = DataTable.create(rawData);
-
-		theng.matchWithExpresion(envVar,table);
-
-	}
-
-	@Test
-	public void testValueDoesNotContainInJSON() throws Exception{
-		String baseData = "consulMesosJSON.conf";
-		String envVar = "consulMesos";
-		ThreadProperty.set("class", this.getClass().getCanonicalName());
-		CommonG commong = new CommonG();
-		ThenGSpec theng = new ThenGSpec(commong);
-
-		String result = new String(Files.readAllBytes(
-				Paths.get(getClass().getClassLoader().getResource(baseData).getFile())));
-
-		ThreadProperty.set(envVar,result);
-
-		List<String> row1 = Arrays.asList("$.[0].ServiceTags","does not contain","adsads");
-		List<String> row2 = Arrays.asList("[1].Node","does not contain","rgrerg");
-
-		List<List<String>> rawData = Arrays.asList(row1,row2);
-
-		DataTable table = DataTable.create(rawData);
-
-		theng.matchWithExpresion(envVar,table);
-
-	}
-
-	@Test
-	public void testWrongOperatorInJSON() throws Exception{
-		String baseData = "consulMesosJSON.conf";
-		String envVar = "consulMesos";
-		ThreadProperty.set("class", this.getClass().getCanonicalName());
-		CommonG commong = new CommonG();
-		ThenGSpec theng = new ThenGSpec(commong);
-
-		String result = new String(Files.readAllBytes(
-				Paths.get(getClass().getClassLoader().getResource(baseData).getFile())));
-
-		ThreadProperty.set(envVar,result);
-
-		List<String> row1 = Arrays.asList("$.[0].ServiceTags","&&","leader");
-		List<String> row2 = Arrays.asList("[1].Node","||","paaslab32.stratio.com");
-
-		List<List<String>> rawData = Arrays.asList(row1,row2);
-
-		DataTable table = DataTable.create(rawData);
-
-		try {
-			theng.matchWithExpresion(envVar, table);
-			fail("Operation is implemented but it shouldn't");
-		} catch(AssertionError e) {
-			assertThat(true).as("Unknown error").isTrue();
+		try{
+			String value = commong.getJSONPathString(jsonString,"$");
+		}catch(Exception e){
+			fail("Error parsing JSON String");
 		}
-
 	}
 
 	@Test
-	public void testKeysContainsInJSON() throws Exception {
-		String baseData = "exampleJSON.conf";
-		String envVar = "exampleEnvVar";
+	public void testParseJSONElasticseach() throws Exception {
 		ThreadProperty.set("class", this.getClass().getCanonicalName());
-		CommonG commong = new CommonG();
-		ThenGSpec theng = new ThenGSpec(commong);
+		String baseData = "elasticJSON.conf";
 
-		String result = new String(Files.readAllBytes(
+		String jsonString = new String(Files.readAllBytes(
 				Paths.get(getClass().getClassLoader().getResource(baseData).getFile())));
 
-		ThreadProperty.set(envVar, result);
+		CommonG commong = new CommonG();
 
-		List<String> row1 = Arrays.asList("$.glossary.~[0]", "contains", "title");
-		List<String> row2 = Arrays.asList("$.glossary.GlossDiv.~", "contains", "GlossList");
+		try{
+			String value = commong.getJSONPathString(jsonString,"$");
+		}catch(Exception e){
+			fail("Error parsing JSON String");
+		}
+	}
 
-		List<List<String>> rawData = Arrays.asList(row1, row2);
 
-		DataTable table = DataTable.create(rawData);
+	@Test
+	public void testParseJSONWhere() throws Exception {
+		ThreadProperty.set("class", this.getClass().getCanonicalName());
+		String baseData = "whereJSON.conf";
 
-		theng.matchWithExpresion(envVar, table);
+		String jsonString = new String(Files.readAllBytes(
+				Paths.get(getClass().getClassLoader().getResource(baseData).getFile())));
 
+		CommonG commong = new CommonG();
+
+		try{
+			String value = commong.getJSONPathString(jsonString,"$");
+		}catch(Exception e){
+			fail("Error parsing JSON String");
+		}
+	}
+
+	@Test
+	public void testParseJSONConsulMesos() throws Exception {
+		ThreadProperty.set("class", this.getClass().getCanonicalName());
+		String baseData = "consulMesosJSON.conf";
+
+		String jsonString = new String(Files.readAllBytes(
+				Paths.get(getClass().getClassLoader().getResource(baseData).getFile())));
+
+		CommonG commong = new CommonG();
+
+		try{
+			String value = commong.getJSONPathString(jsonString,"$");
+		}catch(Exception e){
+			fail("Error parsing JSON String");
+		}
 	}
 
 }

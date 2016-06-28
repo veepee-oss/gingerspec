@@ -15,6 +15,7 @@ import cucumber.api.java.en.Then;
 import gherkin.formatter.model.DataTableRow;
 import org.apache.commons.collections.IteratorUtils;
 import org.assertj.core.api.WritableAssertionInfo;
+import org.hjson.JsonValue;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.openqa.selenium.WebElement;
@@ -24,7 +25,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.stratio.assertions.Assertions.assertThat;
-import static org.assertj.core.api.Fail.fail;
+import static org.assertj.core.api.Assertions.fail;
 
 public class ThenGSpec extends BaseGSpec {
 
@@ -566,7 +567,7 @@ public class ThenGSpec extends BaseGSpec {
             String result = row.getCells().get(2);
 
             if(expression.contains(".~")) {
-                commonspec.getLogger().debug("Expression refered to json keys");
+                commonspec.getLogger().debug("Expression referred to json keys");
                 Pattern pattern = Pattern.compile("^(.*?).~(.*?)$");
                 Matcher matcher = pattern.matcher(expression);
                 String aux = null;
@@ -599,15 +600,15 @@ public class ThenGSpec extends BaseGSpec {
 
     }
 
-    public void evaluateJSONElementOperation(Object o,String condition,String result) {
+    public void evaluateJSONElementOperation(Object o,String condition,String result) throws Exception{
 
         if(o instanceof String){
             String value = (String)o;
             switch (condition) {
-                case "==":
+                case "equal":
                     assertThat(value).as("Evaluate JSONPath does not match with proposed value").isEqualTo(result);
                     break;
-                case "!=":
+                case "not equal":
                     assertThat(value).as("Evaluate JSONPath match with proposed value").isNotEqualTo(result);
                     break;
                 case "contains":
@@ -615,6 +616,14 @@ public class ThenGSpec extends BaseGSpec {
                     break;
                 case "does not contain":
                     assertThat(value).as("Evaluate JSONPath contain proposed value").doesNotContain(result);
+                    break;
+                case "size":
+                    JsonValue jsonObject = JsonValue.readHjson(value);
+                    if (jsonObject.isArray()) {
+                        assertThat(jsonObject.asArray()).as("Keys size does not match").hasSize(Integer.parseInt(result));
+                    } else {
+                        fail("Expected array for size operation check");
+                    }
                     break;
                 default:
                     fail("Not implemented condition");
@@ -631,7 +640,6 @@ public class ThenGSpec extends BaseGSpec {
                     break;
                 default:
                     fail("Operation not implemented for JSON keys");
-                    break;
             }
         }
 
