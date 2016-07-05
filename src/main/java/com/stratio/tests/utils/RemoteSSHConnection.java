@@ -178,6 +178,8 @@ public class RemoteSSHConnection {
 
         InputStream in = channel.getInputStream();
 
+        ((ChannelExec)channel).setPty(true);
+
         channel.connect();
 
         byte[] tmp=new byte[1024];
