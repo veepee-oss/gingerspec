@@ -415,7 +415,7 @@ public class GivenGSpec extends BaseGSpec {
      * Switches to a frame/ iframe.
      *
      */
-    @Given("^I switch to the iframe on index '(\\d+?)' $")
+    @Given("^I switch to the iframe on index '(\\d+?)'$")
     public void seleniumSwitchFrame(Integer index) {
 
         assertThat(commonspec.getPreviousWebElements()).as("There are less found elements than required")

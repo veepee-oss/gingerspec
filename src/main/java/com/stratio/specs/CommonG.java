@@ -1457,7 +1457,13 @@ public class CommonG {
 	public String getJSONPathString(String jsonString, String expr) {
 
 		String result = JsonValue.readHjson(jsonString).toString();
-		String value = JsonPath.parse(result).read(expr).toString();
+		Object data = JsonPath.parse(result).read(expr);
+		String value = null;
+		if (data instanceof LinkedHashMap) {
+			value = (new JSONObject((LinkedHashMap)data)).toString();
+		} else {
+			value = data.toString();
+		}
 
 		return value;
 	}
