@@ -1,38 +1,26 @@
 package com.stratio.specs;
 
-import static com.stratio.assertions.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.filter;
-//import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.*;
-import java.util.concurrent.Future;
-import java.util.logging.Logger;
-
+import com.csvreader.CsvReader;
+import com.mongodb.DBCollection;
+import com.mongodb.DBCursor;
+import com.mongodb.DBObject;
+import com.mongodb.util.JSON;
+import com.ning.http.client.Response;
+import com.stratio.cucumber.converter.ArrayListConverter;
+import com.stratio.cucumber.converter.NullableStringConverter;
+import cucumber.api.DataTable;
+import cucumber.api.Transform;
+import cucumber.api.java.en.When;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.Select;
 
-import com.ning.http.client.Response;
-import com.stratio.cucumber.converter.ArrayListConverter;
+import java.util.*;
+import java.util.concurrent.Future;
 
-import cucumber.api.DataTable;
-import cucumber.api.Transform;
-import cucumber.api.java.en.Given;
-import cucumber.api.java.en.When;
-
-import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
-import com.mongodb.DBCursor;
-import com.mongodb.DB;
-import com.mongodb.util.JSON;
-import com.stratio.cucumber.converter.NullableStringConverter;
-
-import org.json.JSONObject;
-import org.json.JSONArray;
-
-import com.csvreader.CsvReader;
+import static com.stratio.assertions.Assertions.assertThat;
 
 public class WhenGSpec extends BaseGSpec {
 
@@ -243,8 +231,8 @@ public class WhenGSpec extends BaseGSpec {
      * being the result of the modification: {"key1": "value1", "key2": {"key3": "new value3"}}
      * @throws Exception
      */
-    @When("^I send a '(.+?)' request to '(.+?)' based on '([^:]+?)'( as '(json|string)')? with:$")
-    public void sendRequest(String requestType, String endPoint, String baseData, String foo, String type, DataTable modifications) throws Exception {
+    @When("^I send a '(.+?)' request to '(.+?)'( with user and password '(.+:.+?)')? based on '([^:]+?)'( as '(json|string)')? with:$")
+    public void sendRequest(String requestType, String endPoint, String foo, String loginInfo, String baseData, String baz, String type, DataTable modifications) throws Exception {
 	// Retrieve data
 	commonspec.getLogger().debug("Retrieving data based on {} as {}", baseData, type);
 	String retrievedData = commonspec.retrieveData(baseData, type);
@@ -254,8 +242,16 @@ public class WhenGSpec extends BaseGSpec {
 	String modifiedData;
 	modifiedData = commonspec.modifyData(retrievedData, type, modifications).toString();
 
+        String user = null;
+        String password = null;
+        if (loginInfo != null) {
+            user = loginInfo.substring(0, loginInfo.indexOf(':'));
+            password = loginInfo.substring(loginInfo.indexOf(':') + 1, loginInfo.length());
+        }
+
+
 	commonspec.getLogger().debug("Generating request {} to {} with data {} as {}", requestType, endPoint, modifiedData, type);
-	Future<Response> response = commonspec.generateRequest(requestType, endPoint, modifiedData, type);
+    Future<Response> response = commonspec.generateRequest(requestType, false, user, password, endPoint, modifiedData, type, "");
 
 	// Save response
 	commonspec.getLogger().debug("Saving response");
@@ -276,18 +272,25 @@ public class WhenGSpec extends BaseGSpec {
      *
      * @throws Exception
      */
-    @When("^I send a '(.+?)' request to '(.+?)'( based on '([^:]+?)')?( as '(json|string)')?$")
-    public void sendRequestNoDataTable (String requestType, String endPoint, String foo, String baseData, String bar, String type) throws Exception {
+    @When("^I send a '(.+?)' request to '(.+?)'( with user and password '(.+:.+?)')?( based on '([^:]+?)')?( as '(json|string)')?$")
+    public void sendRequestNoDataTable (String requestType, String endPoint, String foo, String loginInfo, String bar, String baseData, String baz, String type) throws Exception {
 	Future<Response> response;
+        String user = null;
+        String password = null;
+
+        if (loginInfo != null) {
+            user = loginInfo.substring(0, loginInfo.indexOf(':'));
+            password = loginInfo.substring(loginInfo.indexOf(':') + 1, loginInfo.length());
+        }
 
 	if (baseData != null) {
 	    // Retrieve data
 	    String retrievedData = commonspec.retrieveData(baseData, type);
 	    // Generate request
-	    response = commonspec.generateRequest(requestType, endPoint, retrievedData, type);
+        response = commonspec.generateRequest(requestType, false, user, password, endPoint, retrievedData, type, "");
 	} else {
 	    // Generate request
-	    response = commonspec.generateRequest(requestType, endPoint, "", type);
+        response = commonspec.generateRequest(requestType, false, user, password, endPoint, "", type, "");
 	}
 
 	// Save response
@@ -296,17 +299,17 @@ public class WhenGSpec extends BaseGSpec {
 
     @When("^I attempt a login to '(.+?)' based on '([^:]+?)' as '(json|string)'$")
     public void loginUser(String endPoint, String baseData, String type) throws Exception {
-	sendRequestNoDataTable("POST", endPoint, null, baseData, null, type);
+	sendRequestNoDataTable("POST", endPoint, null, null, null, baseData, null, type);
     }
 
     @When("^I attempt a login to '(.+?)' based on '([^:]+?)' as '(json|string)' with:$")
     public void loginUser(String endPoint, String baseData, String type, DataTable modifications) throws Exception {
-	sendRequest("POST", endPoint, baseData, "", type, modifications);
+	sendRequest("POST", endPoint, null, null, baseData, "", type, modifications);
     }
 
     @When("^I attempt a logout to '(.+?)'$")
     public void logoutUser(String endPoint) throws Exception {
-	sendRequestNoDataTable("GET", endPoint, null, "", null, "");
+	sendRequestNoDataTable("GET", endPoint, null, null, null, "", null, "");
     }
 
     /**
@@ -408,8 +411,7 @@ public class WhenGSpec extends BaseGSpec {
      * @param filterType it could be equals, gt, gte, lt and lte.
      * @param value value of the column to be filtered.
      */
-    @When("^I execute an elasticsearch query over index '(.*?)' and mapping '(.*?)' and column '(.*?)' with value '("
-            + ".*?)' to '(.*?)'$")
+    @When("^I execute an elasticsearch query over index '(.*?)' and mapping '(.*?)' and column '(.*?)' with value '(.*?)' to '(.*?)'$")
     public void elasticSearchQueryWithFilter(String indexName, String mappingName, String
             columnName ,String filterType, String value){
         commonspec.getLogger().debug("Executing query over " + indexName + "/" + mappingName + " over column " +
@@ -527,10 +529,10 @@ public class WhenGSpec extends BaseGSpec {
         commonspec.setCSVResults(results);
     }
 
+
     /**
      * Change current window to another opened window.
      *
-     * @param index
      */
     @When("^I change active window$")
     public void seleniumChangeWindow() {

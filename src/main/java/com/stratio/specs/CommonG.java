@@ -9,6 +9,8 @@ import com.mongodb.DBObject;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClient.BoundRequestBuilder;
 import com.ning.http.client.Response;
+import com.ning.http.client.Realm;
+import com.ning.http.client.Realm.AuthScheme;
 import com.ning.http.client.cookie.Cookie;
 import com.stratio.conditions.Conditions;
 import com.stratio.tests.utils.*;
@@ -859,10 +861,13 @@ public class CommonG {
 	    return modifiedData;
 	}
 
+
 	/**
 	 * Generates the request based on the type of request, the end point, the data and type passed
 	 * @param requestType type of request to be sent
  	 * @param secure type of protocol
+     * @param user user to be used in request
+     * @param password password to be used in request
 	 * @param endPoint end point to sent the request to
 	 * @param data to be sent for PUT/POST requests
 	 * @param type type of data to be sent (json|string)
@@ -870,11 +875,12 @@ public class CommonG {
 	 * @throws Exception
 	 *
 	 */
-	public Future<Response> generateRequest(String requestType, boolean secure, String endPoint, String data, String type, String codeBase64) throws Exception {
+	public Future<Response> generateRequest(String requestType, boolean secure, String user, String password, String endPoint, String data, String type, String codeBase64) throws Exception {
 
 		String protocol = this.getRestProtocol();
 		Future<Response> response = null;
 		BoundRequestBuilder request;
+        Realm realm = null;
 
 
 		if (this.getRestHost() == null) {
@@ -890,6 +896,16 @@ public class CommonG {
 		}
 
 		String restURL = protocol + this.getRestHost() + this.getRestPort();
+
+        // Setup user and password for requests
+        if (user != null) {
+            realm = new Realm.RealmBuilder()
+                       .setPrincipal(user)
+                       .setPassword(password)
+                       .setUsePreemptiveAuth(true)
+                       .setScheme(AuthScheme.BASIC)
+                       .build();
+        }
 
 		switch(requestType.toUpperCase()) {
 			case "GET":
@@ -917,9 +933,12 @@ public class CommonG {
 								false, cookie.getDomain(), cookie.getPath(), 99, false, false));
 					}
 				}
+                if (user != null) {
+                    request = request.setRealm(realm);
+                }
 
 				response = request.execute();
-				break;
+                break;
 			case "DELETE":
 				request = this.getClient().prepareDelete(restURL + endPoint);
 
@@ -933,6 +952,9 @@ public class CommonG {
 								false, cookie.getDomain(), cookie.getPath(), 99, false, false));
 					}
 				}
+                if (user != null) {
+                    request = request.setRealm(realm);
+                }
 
 				response = request.execute();
 				break;
@@ -959,6 +981,9 @@ public class CommonG {
 									false, cookie.getDomain(), cookie.getPath(), 99, false, false));
 						}
 					}
+                    if (user != null) {
+                        request = request.setRealm(realm);
+                    }
 
 					response = this.getClient().executeRequest(request.build());
 					break;
@@ -985,6 +1010,9 @@ public class CommonG {
 									false, cookie.getDomain(), cookie.getPath(), 99, false, false));
 						}
 					}
+                    if (user != null) {
+                        request = request.setRealm(realm);
+                    }
 
 					response = this.getClient().executeRequest(request.build());
 					break;
@@ -1002,22 +1030,24 @@ public class CommonG {
 		return response;
 	}
 
-	/**
-	 * Generates the request based on the type of request, the end point, the data and type passed
-	 * @param requestType type of request to be sent
-	 * @param endPoint end point to sent the request to
-	 * @param data to be sent for PUT/POST requests
-	 * @param type type of data to be sent (json|string)
-	 *
-	 * @deprecated  Improved with  {@link #generateRequest(String, boolean, String, String, String, String)}.
-	 * @throws Exception
-	 *
-	 */
-	@Deprecated
-	public Future<Response> generateRequest(String requestType, String endPoint, String data, String type) throws Exception {
-	    return generateRequest(requestType, false, endPoint, data, type,"");
-	}
-	
+
+    /**
+     * Generates the request based on the type of request, the end point, the data and type passed
+     * @param requestType type of request to be sent
+     * @param secure type of protocol
+     * @param endPoint end point to sent the request to
+     * @param data to be sent for PUT/POST requests
+     * @param type type of data to be sent (json|string)
+     *
+     * @throws Exception
+     *
+     */
+    @Deprecated
+    public Future<Response> generateRequest(String requestType, boolean secure, String endPoint, String data, String type, String codeBase64) throws Exception {
+        return generateRequest(requestType, false, null, null, endPoint, data, type, "");
+    }
+
+
 	/**
 	 * Saves the value in the attribute in class extending CommonG.
 	 * 

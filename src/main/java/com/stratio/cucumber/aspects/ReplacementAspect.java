@@ -196,7 +196,7 @@ public class ReplacementAspect {
 		String newVal = element;
 		while (newVal.contains("@{")) {
 			String placeholder = newVal.substring(newVal.indexOf("@{"),
-					newVal.indexOf("}") + 1);
+					newVal.indexOf("}", newVal.indexOf("@{")) + 1);
 			String property = placeholder.substring(2, placeholder.length() - 1);
 			String subproperty = "";
 			if (placeholder.contains(".")) {
@@ -250,7 +250,7 @@ public class ReplacementAspect {
 		String newVal = element;
 		while (newVal.contains("!{")) {
 			String placeholder = newVal.substring(newVal.indexOf("!{"),
-					newVal.indexOf("}") + 1);
+					newVal.indexOf("}", newVal.indexOf("!{")) + 1);
 			String attribute = placeholder.substring(2, placeholder.length() - 1);
 			// we want to use value previously saved
 			String prop = ThreadProperty.get(attribute);
@@ -277,7 +277,7 @@ public class ReplacementAspect {
 		String newVal = element;
 		while (newVal.contains("${")) {
 			String placeholder = newVal.substring(newVal.indexOf("${"),
-					newVal.indexOf("}") + 1);
+					newVal.indexOf("}", newVal.indexOf("${")) + 1);
 			String modifier = "";
 			String sysProp = "";
 			if (placeholder.contains(".")) {

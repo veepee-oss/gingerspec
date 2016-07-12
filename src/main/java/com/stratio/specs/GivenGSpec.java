@@ -1,11 +1,13 @@
 package com.stratio.specs;
 
+import com.jayway.jsonpath.JsonPath;
 import com.stratio.exceptions.DBException;
 import com.stratio.tests.utils.RemoteSSHConnection;
 import com.stratio.tests.utils.ThreadProperty;
 import cucumber.api.DataTable;
 import cucumber.api.java.en.Given;
 import org.assertj.core.api.Assertions;
+import org.hjson.JsonValue;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
@@ -174,10 +176,17 @@ public class GivenGSpec extends BaseGSpec {
      * @throws InvocationTargetException
      * @throws NoSuchMethodException
      */
-    @Given("^I save element '(.+?)' in environment variable '(.+?)'$")
-    public void saveElementEnvironment(String element, String envVar) throws Exception{
+    @Given("^I save element (in position '(.+?)' in )?'(.+?)' in environment variable '(.+?)'$")
+    public void saveElementEnvironment(String foo, String position, String element, String envVar) throws Exception{
         String json = commonspec.getResponse().getResponse();
-        String value = commonspec.getJSONPathString(json,element);
+	String hjson = JsonValue.readHjson(json).asObject().toString();
+	String value;
+	if ( position != null) {
+		net.minidev.json.JSONArray val = JsonPath.parse(hjson).read(element);
+        value = val.toArray()[Integer.parseInt(position)].toString();
+	} else {
+        	value = JsonPath.parse(hjson).read(element);
+	}
 
         if (value == null) {
             throw new Exception("Element to be saved: " + element + " is null");
@@ -376,7 +385,7 @@ public class GivenGSpec extends BaseGSpec {
      * @param restPort
      */
     @Given("^I( securely)? send requests to '([^:]+?)(:.+?)?'$")
-    public void setupRestClient(String isSecured,String restHost, String restPort) {
+    public void setupRestClient(String isSecured, String restHost, String restPort) {
         assertThat(restHost).isNotEmpty();
         assertThat(restPort).isNotEmpty();
 
@@ -528,7 +537,6 @@ public class GivenGSpec extends BaseGSpec {
     }
 
 
-
     /**
      * Insert document in a MongoDB table.
      *
@@ -543,6 +551,7 @@ public class GivenGSpec extends BaseGSpec {
         commonspec.getMongoDBClient().connectToMongoDBDataBase(dataBase);
         commonspec.getMongoDBClient().insertDocIntoMongoDBCollection(collection, retrievedDoc);
     }
+
 
     /**
      * Get all opened windows and store it.

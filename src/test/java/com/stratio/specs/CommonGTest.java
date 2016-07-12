@@ -553,7 +553,7 @@ public class CommonGTest {
 	String type = "string";
 
 	try {
-	    commong.generateRequest(requestType, endPoint, data, type);
+	    commong.generateRequest(requestType, false, null, null, endPoint, data, type, "");
 	    fail("Expected Exception");
 	} catch (Exception e) {
 	    assertThat(e.getClass().toString()).as("Unexpected exception").isEqualTo(Exception.class.toString());
@@ -573,7 +573,8 @@ public class CommonGTest {
 	try {
 	    commong.setRestHost("localhost");
 	    commong.setRestPort("80");
-	    commong.generateRequest(requestType, endPoint, data, type);
+
+	    commong.generateRequest(requestType, false, null, null, endPoint, data, type, "");
 	    fail("Expected Exception");
 	} catch (Exception e) {
 	    assertThat(e.getClass().toString()).as("Unexpected exception").isEqualTo(Exception.class.toString());
@@ -593,7 +594,7 @@ public class CommonGTest {
 	try {
 	    commong.setRestHost("localhost");
 	    commong.setRestPort("80");
-	    commong.generateRequest(requestType, endPoint, data, type);
+	    commong.generateRequest(requestType, false, null, null, endPoint, data, type, "");
 	    fail("Expected Exception");
 	} catch (Exception e) {
 	    assertThat(e.getClass().toString()).as("Unexpected exception").isEqualTo(Exception.class.toString());
@@ -612,7 +613,7 @@ public class CommonGTest {
 	try {
 	    commong.setRestHost("localhost");
 	    commong.setRestPort("80");
-	    commong.generateRequest(requestType, endPoint, null, type);
+	    commong.generateRequest(requestType, false, null, null, endPoint, null, type, "");
 	    fail("Expected Exception");
 	} catch (Exception e) {
 	    assertThat(e.getClass().toString()).as("Unexpected exception").isEqualTo(Exception.class.toString());
@@ -631,7 +632,7 @@ public class CommonGTest {
 		try {
 			commong.setRestHost("localhost");
 			commong.setRestPort("80");
-			commong.generateRequest(requestType, endPoint, null, type);
+			commong.generateRequest(requestType, false, null, null, endPoint, null, type, "");
 			fail("Expected Exception");
 		} catch (Exception e) {
 			assertThat(e.getClass().toString()).as("Unexpected exception").isEqualTo(Exception.class.toString());
