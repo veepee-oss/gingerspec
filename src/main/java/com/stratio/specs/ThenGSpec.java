@@ -527,6 +527,17 @@ public class ThenGSpec extends BaseGSpec {
     }
 
     /**
+     * Check the non existence of a text at a command output
+     *
+     * @param search
+     *
+     **/
+    @Then("^the command output does not contain '(.+?)'$")
+    public void notFindShellOutput(String search) throws Exception {
+        commonspec.getLogger().debug("Expecting exit status: " + search);
+        assertThat(commonspec.getCommandResult()).as("NotContains "+search+".").doesNotContain(search);
+    }
+    /**
      * Check the exitStatus of previous command execution matches the expected one
      *
      * @param expectedExitStatus
