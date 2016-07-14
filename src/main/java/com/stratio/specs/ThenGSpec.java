@@ -345,6 +345,44 @@ public class ThenGSpec extends BaseGSpec {
 
     }
 
+    /**
+     * Checks if {@code expectedCount} element is found, whithin a {@code timeout} and with a location
+     * {@code method}. Each negative lookup is followed by a wait of {@code wait} seconds. Selenium times are not
+     * accounted for the mentioned timeout.
+     *
+     * @param timeout
+     * @param wait
+     * @param command
+     * @param search
+     * @throws InterruptedException
+     */
+    @Then("^in less than '(\\d+?)' seconds, checking each '(\\d+?)' seconds, the command output '(.+?)' contains '(.+?)'$")
+    public void assertCommandExistsOnTimeOut(Integer timeout, Integer wait, String command,String search) throws Exception {
+        commonspec.getLogger().debug("Executing command '" + command + "' with " + timeout + " as timeout");
+
+        Boolean found = false;
+        AssertionError ex = null;
+
+        for (int i = 0; (i <= timeout); i += wait) {
+            if (found) break;
+            commonspec.getLogger().debug("Checking output value");
+            commonspec.getRemoteSSHConnection().runCommand(command);
+            commonspec.setCommandResult(commonspec.getRemoteSSHConnection().getResult());
+            try {
+                assertThat(commonspec.getCommandResult()).as("Contains " + search + ".").contains(search);
+                found = true;
+            } catch (AssertionError e) {
+                commonspec.getLogger().info("Command output don't found yet");
+                Thread.sleep(wait * 1000);
+                ex = e;
+            }
+        }
+        if (!found) {
+            throw (ex);
+        }
+        commonspec.getLogger().info("Command output found after " + (wait * 1000) + " seconds");
+    }
+
 
     /**
      * Verifies that a webelement previously found {@code isDisplayed}
