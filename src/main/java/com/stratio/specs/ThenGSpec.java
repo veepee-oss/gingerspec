@@ -371,8 +371,9 @@ public class ThenGSpec extends BaseGSpec {
             try {
                 assertThat(commonspec.getCommandResult()).as("Contains " + search + ".").contains(search);
                 found = true;
+                timeout = i;
             } catch (AssertionError e) {
-                commonspec.getLogger().info("Command output don't found yet");
+                commonspec.getLogger().info("Command output don't found yet after " + i + " seconds");
                 Thread.sleep(wait * 1000);
                 ex = e;
             }
@@ -380,7 +381,7 @@ public class ThenGSpec extends BaseGSpec {
         if (!found) {
             throw (ex);
         }
-        commonspec.getLogger().info("Command output found after " + (wait * 1000) + " seconds");
+        commonspec.getLogger().info("Command output found after " + timeout + " seconds");
     }
 
 
