@@ -1,6 +1,8 @@
 package com.stratio.specs;
 
+import com.auth0.jwt.JWTSigner;
 import com.jayway.jsonpath.JsonPath;
+import com.ning.http.client.cookie.Cookie;
 import com.stratio.exceptions.DBException;
 import com.stratio.tests.utils.RemoteSSHConnection;
 import com.stratio.tests.utils.ThreadProperty;
@@ -481,6 +483,35 @@ public class GivenGSpec extends BaseGSpec {
 
     }
 
+ /*
+ * Authenticate in a DCOS cluster
+ *
+ * @param dcosHost
+ * @param user
+ *
+ */
+    @Given("^I authenticate in DCOS cluster '(.+?)' with email '(.+?)'$")
+    public void authenticateDCOS(String dcosCluster, String user) throws Exception {
+        commonspec.getLogger().debug("Authenticating in DCOS cluster " + dcosCluster + " with user " + user);
+
+        commonspec.setRemoteSSHConnection(new RemoteSSHConnection("root", "stratio", dcosCluster, null));
+        commonspec.getRemoteSSHConnection().runCommand("cat /var/lib/dcos/auth-token-secret");
+        String DCOSsecret = commonspec.getRemoteSSHConnection().getResult().trim();
+
+        final JWTSigner signer = new JWTSigner(DCOSsecret);
+        final HashMap<String, Object> claims = new HashMap();
+        claims.put("uid", user);
+
+        final String jwt = signer.sign(claims);
+
+        Cookie cookie = new Cookie("dcos-acs-auth-cookie", jwt, false, "", "", 99999, false, false);
+        List<Cookie> cookieList = new ArrayList<Cookie>();
+
+        cookieList.add(cookie);
+
+        commonspec.setCookies(cookieList);
+
+    }
 
     /*
      * Copies file/s from remote system into local system

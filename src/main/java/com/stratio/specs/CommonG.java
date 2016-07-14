@@ -57,6 +57,7 @@ public class CommonG {
 	private AsyncHttpClient client;
 	//private String URL;
 	private HttpResponse response;
+	private List<Cookie> cookies = new ArrayList<Cookie>();
     private ResultSet previousCassandraResults;
 	private DBCursor previousMongoResults;
 	private List<JSONObject> previousElasticsearchResults;
@@ -927,6 +928,10 @@ public class CommonG {
 					request = request.setCookies(this.getResponse().getCookies());
 				}
 
+				for (Cookie cook: this.getCookies()){
+					request = request.addCookie(cook);
+				}
+
 				if (this.getSeleniumCookies().size()>0) {
 					for(org.openqa.selenium.Cookie cookie:this.getSeleniumCookies()) {
 						request.addCookie(new Cookie(cookie.getName(), cookie.getValue(),
@@ -1498,4 +1503,11 @@ public class CommonG {
 		return value;
 	}
 
+	public List<Cookie> getCookies() {
+		return cookies;
+	}
+
+	public void setCookies(List<Cookie> cookies) {
+		this.cookies = cookies;
+	}
 }
