@@ -735,6 +735,24 @@ public class CommonGTest {
 	}
 
 	@Test
+	public void testParseJSONConsulMesosPositions() throws Exception {
+		ThreadProperty.set("class", this.getClass().getCanonicalName());
+		String baseData = "consulMesosJSON.conf";
+
+		String jsonString = new String(Files.readAllBytes(
+				Paths.get(getClass().getClassLoader().getResource(baseData).getFile())));
+
+		CommonG commong = new CommonG();
+
+		try{
+			String value = commong.getJSONPathString(jsonString,"$","0");
+			String value2 = commong.getJSONPathString(jsonString,"$.[0].ServiceTags","1");
+		}catch(Exception e){
+			fail("Error parsing JSON String");
+		}
+	}
+
+	@Test
 	public void testParseJSONConsulServices() throws Exception {
 		ThreadProperty.set("class", this.getClass().getCanonicalName());
 		String baseData = "consulServicesJSON.conf";
