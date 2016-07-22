@@ -1,7 +1,6 @@
 package com.stratio.specs;
 
 import com.auth0.jwt.JWTSigner;
-import com.jayway.jsonpath.JsonPath;
 import com.ning.http.client.cookie.Cookie;
 import com.stratio.exceptions.DBException;
 import com.stratio.tests.utils.RemoteSSHConnection;
@@ -9,7 +8,6 @@ import com.stratio.tests.utils.ThreadProperty;
 import cucumber.api.DataTable;
 import cucumber.api.java.en.Given;
 import org.assertj.core.api.Assertions;
-import org.hjson.JsonValue;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
@@ -178,25 +176,18 @@ public class GivenGSpec extends BaseGSpec {
      * @throws InvocationTargetException
      * @throws NoSuchMethodException
      */
-    @Given("^I save element (in position '(.+?)' in )?'(.+?)' in environment variable '(.+?)'$")
-    public void saveElementEnvironment(String foo, String position, String element, String envVar) throws Exception{
-        String json = commonspec.getResponse().getResponse();
-	String hjson = JsonValue.readHjson(json).asObject().toString();
-	String value;
-	if ( position != null) {
-		net.minidev.json.JSONArray val = JsonPath.parse(hjson).read(element);
-        value = val.toArray()[Integer.parseInt(position)].toString();
-	} else {
-        	value = JsonPath.parse(hjson).read(element);
-	}
+     @Given("^I save element (in position \'(.+?)\' in )?\'(.+?)\' in environment variable \'(.+?)\'$")
+     public void saveElementEnvironment(String foo, String position, String element, String envVar) throws Exception {
+         String json = commonspec.getResponse().getResponse();
+         String value = commonspec.getJSONPathString(json,element,position);
 
-        if (value == null) {
-            throw new Exception("Element to be saved: " + element + " is null");
-        }
-
-        commonspec.getLogger().debug("Saving element: {} with value: {} in environment variable: {}", element, value, envVar);
-        ThreadProperty.set(envVar, value);
-    }
+         if(value == null) {
+             throw new Exception("Element to be saved: " + element + " is null");
+         } else {
+             this.commonspec.getLogger().debug("Saving element: {} with value: {} in environment variable: {}", new Object[]{element, value, envVar});
+             ThreadProperty.set(envVar, value);
+         }
+     }
 
     /**
      * Drop all the ElasticSearch indexes.

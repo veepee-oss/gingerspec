@@ -1510,4 +1510,24 @@ public class CommonG {
 	public void setCookies(List<Cookie> cookies) {
 		this.cookies = cookies;
 	}
+
+	public String getJSONPathString(String jsonString, String expr, String position) {
+
+		String result = JsonValue.readHjson(jsonString).toString();
+		Object data = JsonPath.parse(result).read(expr);
+		String value = null;
+
+		if(position != null) {
+			JSONArray jsonArray = new JSONArray(data.toString());
+			value = jsonArray.get(Integer.parseInt(position)).toString();
+		} else {
+			if (data instanceof LinkedHashMap) {
+				value = (new JSONObject((LinkedHashMap) data)).toString();
+			} else {
+				value = data.toString();
+			}
+		}
+
+		return value;
+	}
 }
