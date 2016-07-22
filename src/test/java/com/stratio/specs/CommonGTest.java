@@ -676,7 +676,7 @@ public class CommonGTest {
 		CommonG commong = new CommonG();
 
 		try{
-			String value = commong.getJSONPathString(jsonString,"$");
+			String value = commong.getJSONPathString(jsonString,"$",null);
 		}catch(Exception e){
 			fail("Error parsing JSON String");
 		}
@@ -693,7 +693,7 @@ public class CommonGTest {
 		CommonG commong = new CommonG();
 
 		try{
-			String value = commong.getJSONPathString(jsonString,"$");
+			String value = commong.getJSONPathString(jsonString,"$",null);
 		}catch(Exception e){
 			fail("Error parsing JSON String");
 		}
@@ -711,7 +711,7 @@ public class CommonGTest {
 		CommonG commong = new CommonG();
 
 		try{
-			String value = commong.getJSONPathString(jsonString,"$");
+			String value = commong.getJSONPathString(jsonString,"$",null);
 		}catch(Exception e){
 			fail("Error parsing JSON String");
 		}
@@ -728,7 +728,7 @@ public class CommonGTest {
 		CommonG commong = new CommonG();
 
 		try{
-			String value = commong.getJSONPathString(jsonString,"$");
+			String value = commong.getJSONPathString(jsonString,"$",null);
 		}catch(Exception e){
 			fail("Error parsing JSON String");
 		}
@@ -745,7 +745,7 @@ public class CommonGTest {
 		CommonG commong = new CommonG();
 
 		try{
-			String value = commong.getJSONPathString(jsonString,"$");
+			String value = commong.getJSONPathString(jsonString,"$",null);
 		}catch(Exception e){
 			fail("Error parsing JSON String: "+e.toString());
 		}

@@ -1489,20 +1489,6 @@ public class CommonG {
 		return restProtocol;
 	}
 
-	public String getJSONPathString(String jsonString, String expr) {
-
-		String result = JsonValue.readHjson(jsonString).toString();
-		Object data = JsonPath.parse(result).read(expr);
-		String value = null;
-		if (data instanceof LinkedHashMap) {
-			value = (new JSONObject((LinkedHashMap)data)).toString();
-		} else {
-			value = data.toString();
-		}
-
-		return value;
-	}
-
 	public List<Cookie> getCookies() {
 		return cookies;
 	}
