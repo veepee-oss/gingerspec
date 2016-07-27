@@ -19,6 +19,7 @@ import org.openqa.selenium.support.ui.Select;
 
 import java.util.*;
 import java.util.concurrent.Future;
+import java.util.regex.Pattern;
 
 import static com.stratio.assertions.Assertions.assertThat;
 
@@ -295,6 +296,51 @@ public class WhenGSpec extends BaseGSpec {
 
 	// Save response
 	commonspec.setResponse(requestType, response.get());
+    }
+
+
+    /**
+     * Same sendRequest, but in this case, the rersponse is checked until it contains the expected value
+     *
+     * @param timeout
+     * @param wait
+     * @param requestType
+     * @param endPoint
+     * @param responseVal
+     * @throws Exception
+     */
+    @When("^in less than '(\\d+?)' seconds, checking each '(\\d+?)' seconds, I send a '(.+?)' request to '(.+?)' so that the response contains '(.+?)'$")
+    public void sendRequestTimeout (Integer timeout, Integer wait, String requestType, String endPoint, String responseVal) throws Exception {
+
+        commonspec.getLogger().info("Sending " + requestType + " request to " + endPoint + " with " + timeout + " as timeout until the response contains " + responseVal);
+
+
+        Boolean found = false;
+        AssertionError ex = null;
+
+        String type = "";
+        Future<Response> response;
+        Pattern pattern = CommonG.matchesOrContains(responseVal);
+
+        for (int i = 0; (i <= timeout); i += wait) {
+            if (found) break;
+            response = commonspec.generateRequest(requestType, false, null, null, endPoint, "", type, "");
+            commonspec.setResponse(requestType, response.get());
+            commonspec.getLogger().debug("Checking response value");
+            try {
+                assertThat(commonspec.getResponse().getResponse()).containsPattern(pattern);
+                found = true;
+                timeout = i;
+            } catch (AssertionError e) {
+                commonspec.getLogger().info("Response value don't found yet after " + i + " seconds");
+                Thread.sleep(wait * 1000);
+                ex = e;
+            }
+        }
+        if (!found) {
+            throw (ex);
+        }
+        commonspec.getLogger().info("Response value found after " + timeout + " seconds");
     }
 
     @When("^I attempt a login to '(.+?)' based on '([^:]+?)' as '(json|string)'$")
