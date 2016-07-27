@@ -2,7 +2,6 @@ package com.stratio.specs;
 
 import com.stratio.tests.utils.ThreadProperty;
 import cucumber.api.DataTable;
-import org.hjson.ParseException;
 import org.testng.annotations.Test;
 
 import java.nio.file.Files;
@@ -186,7 +185,7 @@ public class ThenGTest {
 
     }
 
-    @Test(expectedExceptions = ParseException.class)
+    @Test(expectedExceptions = AssertionError.class)
     public void testNotParsedArraySizeInJSON() throws Exception {
         String baseData = "consulMesosJSON.conf";
         String envVar = "exampleEnvVar";

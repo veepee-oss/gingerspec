@@ -5,7 +5,6 @@ import com.datastax.driver.core.ColumnDefinitions;
 import com.datastax.driver.core.DataType;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
-import com.jayway.jsonpath.JsonPath;
 import com.mongodb.DBObject;
 import com.stratio.assertions.DBObjectsAssert;
 import com.stratio.tests.utils.PreviousWebElements;
@@ -13,19 +12,14 @@ import com.stratio.tests.utils.ThreadProperty;
 import cucumber.api.DataTable;
 import cucumber.api.java.en.Then;
 import gherkin.formatter.model.DataTableRow;
-import org.apache.commons.collections.IteratorUtils;
 import org.assertj.core.api.WritableAssertionInfo;
-import org.hjson.JsonValue;
 import org.json.JSONArray;
-import org.json.JSONObject;
 import org.openqa.selenium.WebElement;
 
 import java.util.*;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.stratio.assertions.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
 
 public class ThenGSpec extends BaseGSpec {
 
@@ -603,7 +597,7 @@ public class ThenGSpec extends BaseGSpec {
      * Check if expression defined by JSOPath (http://goessner.net/articles/JsonPath/index.html)
      * match in JSON stored in a environment variable.
      *
-     * @param envVar environment variable where JSON ias stored
+     * @param envVar environment variable where JSON is stored
      * @param table data table in which each row stores one expression
      *
      */
@@ -616,84 +610,12 @@ public class ThenGSpec extends BaseGSpec {
             String condition = row.getCells().get(1);
             String result = row.getCells().get(2);
 
-            if(expression.contains(".~")) {
-                commonspec.getLogger().debug("Expression referred to json keys");
-                Pattern pattern = Pattern.compile("^(.*?).~(.*?)$");
-                Matcher matcher = pattern.matcher(expression);
-                String aux = null;
-                String op = null;
-                if (matcher.find()) {
-                    aux = matcher.group(1);
-                    op = matcher.group(2);
-                }
-                LinkedHashMap data = JsonPath.parse(jsonString).read(aux);
-                JSONObject json = new JSONObject(data);
-                List<String> keys = IteratorUtils.toList(json.keys());
-                if(op.equals("")) {
-                    this.evaluateJSONElementOperation(keys,condition,result);
-                } else {
-                    Pattern patternOp = Pattern.compile("^\\[(\\d+)\\]$");
-                    Matcher matcherOp = patternOp.matcher(op);
-                    Integer index = null;
-                    if (matcherOp.find()) {
-                        String a = matcherOp.group(1);
-                        index = Integer.parseInt(matcherOp.group(1));
-                    }
-                    String value = keys.get(index).toString();
-                    this.evaluateJSONElementOperation(value,condition,result);
-                }
-            } else {
-                String value = JsonPath.read(jsonString, expression).toString();
-                this.evaluateJSONElementOperation(value,condition,result);
-            }
+            String value = commonspec.getJSONPathString(jsonString,expression,null);
+            commonspec.evaluateJSONElementOperation(value,condition,result);
         }
-
     }
 
-    public void evaluateJSONElementOperation(Object o,String condition,String result) throws Exception{
 
-        if(o instanceof String){
-            String value = (String)o;
-            switch (condition) {
-                case "equal":
-                    assertThat(value).as("Evaluate JSONPath does not match with proposed value").isEqualTo(result);
-                    break;
-                case "not equal":
-                    assertThat(value).as("Evaluate JSONPath match with proposed value").isNotEqualTo(result);
-                    break;
-                case "contains":
-                    assertThat(value).as("Evaluate JSONPath does not contain proposed value").contains(result);
-                    break;
-                case "does not contain":
-                    assertThat(value).as("Evaluate JSONPath contain proposed value").doesNotContain(result);
-                    break;
-                case "size":
-                    JsonValue jsonObject = JsonValue.readHjson(value);
-                    if (jsonObject.isArray()) {
-                        assertThat(jsonObject.asArray()).as("Keys size does not match").hasSize(Integer.parseInt(result));
-                    } else {
-                        fail("Expected array for size operation check");
-                    }
-                    break;
-                default:
-                    fail("Not implemented condition");
-                    break;
-            }
-        }else if (o instanceof List){
-            List<String> keys = (List<String>)o;
-            switch (condition) {
-                case "contains":
-                    assertThat(keys).as("Keys does not contain that name").contains(result);
-                    break;
-                case "size":
-                    assertThat(keys).as("Keys size does not match").hasSize(Integer.parseInt(result));
-                    break;
-                default:
-                    fail("Operation not implemented for JSON keys");
-            }
-        }
-
-    }
 
 }
 

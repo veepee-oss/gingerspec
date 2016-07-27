@@ -15,7 +15,9 @@ import com.ning.http.client.cookie.Cookie;
 import com.stratio.conditions.Conditions;
 import com.stratio.tests.utils.*;
 import cucumber.api.DataTable;
+import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.io.FileUtils;
+import org.assertj.core.api.Assertions;
 import org.assertj.core.api.Condition;
 import org.hjson.JsonValue;
 import org.json.JSONArray;
@@ -36,6 +38,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.concurrent.Future;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.stratio.assertions.Assertions.assertThat;
@@ -64,6 +67,7 @@ public class CommonG {
 	private List<Map<String,String>> previousCSVResults;
     private String resultsType="";
 	private Set<org.openqa.selenium.Cookie> seleniumCookies = new HashSet<org.openqa.selenium.Cookie>();
+	private Map<String,String> headers = new HashMap<>();
 
 
 	// CONNECTION DETAILS
@@ -823,6 +827,9 @@ public class CommonG {
 						jsonAsMap = JsonPath.parse(modifiedData).set(composeKey, newValue).json();
 						break;
 					}
+				case "HEADER":
+					this.headers.put(composeKey,newValue);
+					break;
 	    		default:
 	    		    throw new Exception("Modification type does not exist: " + operation);
 		    }
@@ -854,6 +861,9 @@ public class CommonG {
 	    		case "PREPEND":
 	    		    modifiedData = newValue + modifiedData;
 	    		    break;
+				case "HEADER":
+					this.headers.put(value,newValue);
+					break;
 	    		default:
 	    		    throw new Exception("Modification type does not exist: " + operation);
 		    }
@@ -938,6 +948,13 @@ public class CommonG {
 								false, cookie.getDomain(), cookie.getPath(), 99, false, false));
 					}
 				}
+
+				if (!this.headers.isEmpty()) {
+					for (Map.Entry<String, String> header : headers.entrySet()) {
+						request = request.setHeader(header.getKey(),header.getValue());
+					}
+				}
+
                 if (user != null) {
                     request = request.setRealm(realm);
                 }
@@ -957,6 +974,13 @@ public class CommonG {
 								false, cookie.getDomain(), cookie.getPath(), 99, false, false));
 					}
 				}
+
+				if (!this.headers.isEmpty()) {
+					for (Map.Entry<String, String> header : headers.entrySet()) {
+						request = request.setHeader(header.getKey(),header.getValue());
+					}
+				}
+
                 if (user != null) {
                     request = request.setRealm(realm);
                 }
@@ -986,6 +1010,13 @@ public class CommonG {
 									false, cookie.getDomain(), cookie.getPath(), 99, false, false));
 						}
 					}
+
+					if (!this.headers.isEmpty()) {
+						for (Map.Entry<String, String> header : headers.entrySet()) {
+							request = request.setHeader(header.getKey(),header.getValue());
+						}
+					}
+
                     if (user != null) {
                         request = request.setRealm(realm);
                     }
@@ -1015,6 +1046,13 @@ public class CommonG {
 									false, cookie.getDomain(), cookie.getPath(), 99, false, false));
 						}
 					}
+
+					if (!this.headers.isEmpty()) {
+						for (Map.Entry<String, String> header : headers.entrySet()) {
+							request = request.setHeader(header.getKey(),header.getValue());
+						}
+					}
+
                     if (user != null) {
                         request = request.setRealm(realm);
                     }
@@ -1121,6 +1159,10 @@ public class CommonG {
 	public Set<org.openqa.selenium.Cookie> getSeleniumCookies() { return seleniumCookies; }
 
 	public void setSeleniumCookies(Set<org.openqa.selenium.Cookie> cookies) { this.seleniumCookies = cookies; }
+
+	public Map<String,String> getHeaders() { return headers; }
+
+	public void setHeaders(Map<String,String> headers) { this.headers = headers; }
 
 	/**
      * Checks the different results of a previous query to CSV file
@@ -1499,21 +1541,101 @@ public class CommonG {
 
 	public String getJSONPathString(String jsonString, String expr, String position) {
 
-		String result = JsonValue.readHjson(jsonString).toString();
-		Object data = JsonPath.parse(result).read(expr);
-		String value = null;
+		String value;
 
-		if(position != null) {
-			JSONArray jsonArray = new JSONArray(data.toString());
-			value = jsonArray.get(Integer.parseInt(position)).toString();
-		} else {
-			if (data instanceof LinkedHashMap) {
-				value = (new JSONObject((LinkedHashMap) data)).toString();
+		if(expr.contains(".~")) {
+			this.getLogger().debug("Expression referred to json keys");
+			Pattern pattern = Pattern.compile("^(.*?).~(.*?)$");
+			Matcher matcher = pattern.matcher(expr);
+			String aux = null;
+			String op = null;
+			if (matcher.find()) {
+				aux = matcher.group(1);
+				op = matcher.group(2);
+			}
+			LinkedHashMap auxData = JsonPath.parse(jsonString).read(aux);
+			JSONObject json = new JSONObject(auxData);
+			List<String> keys = IteratorUtils.toList(json.keys());
+			if(op.equals("")) {
+				value = keys.toString();
 			} else {
-				value = data.toString();
+				Pattern patternOp = Pattern.compile("^\\[(-?\\d+)\\]$");
+				Matcher matcherOp = patternOp.matcher(op);
+				Integer index = null;
+				Boolean isNegative = false;
+				if (matcherOp.find()) {
+					if (matcherOp.group(1).contains("-")){
+						isNegative = true;
+					}
+					index = Integer.parseInt(matcherOp.group(1).replace("-",""));
+				}
+				if (isNegative) {
+					value = keys.get(keys.size() - index).toString();
+				} else {
+					value = keys.get(index).toString();
+				}
+
+			}
+		} else {
+			String result = JsonValue.readHjson(jsonString).toString();
+			Object data = JsonPath.parse(result).read(expr);
+			if (position != null) {
+				JSONArray jsonArray = new JSONArray(data.toString());
+				value = jsonArray.get(Integer.parseInt(position)).toString();
+			} else {
+				if (data instanceof LinkedHashMap) {
+					value = (new JSONObject((LinkedHashMap) data)).toString();
+				} else {
+					value = data.toString();
+				}
+			}
+		}
+		return value;
+	}
+
+
+	public void evaluateJSONElementOperation(Object o,String condition,String result) throws Exception{
+
+		if(o instanceof String){
+			String value = (String)o;
+			switch (condition) {
+				case "equal":
+					assertThat(value).as("Evaluate JSONPath does not match with proposed value").isEqualTo(result);
+					break;
+				case "not equal":
+					assertThat(value).as("Evaluate JSONPath match with proposed value").isNotEqualTo(result);
+					break;
+				case "contains":
+					assertThat(value).as("Evaluate JSONPath does not contain proposed value").contains(result);
+					break;
+				case "does not contain":
+					assertThat(value).as("Evaluate JSONPath contain proposed value").doesNotContain(result);
+					break;
+				case "size":
+					JsonValue jsonObject = JsonValue.readHjson(value);
+					if (jsonObject.isArray()) {
+						assertThat(jsonObject.asArray()).as("Keys size does not match").hasSize(Integer.parseInt(result));
+					} else {
+						Assertions.fail("Expected array for size operation check");
+					}
+					break;
+				default:
+					Assertions.fail("Not implemented condition");
+					break;
+			}
+		}else if (o instanceof List){
+			List<String> keys = (List<String>)o;
+			switch (condition) {
+				case "contains":
+					assertThat(keys).as("Keys does not contain that name").contains(result);
+					break;
+				case "size":
+					assertThat(keys).as("Keys size does not match").hasSize(Integer.parseInt(result));
+					break;
+				default:
+					Assertions.fail("Operation not implemented for JSON keys");
 			}
 		}
 
-		return value;
 	}
 }

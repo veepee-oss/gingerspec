@@ -746,7 +746,9 @@ public class CommonGTest {
 
 		try{
 			String value = commong.getJSONPathString(jsonString,"$","0");
-			String value2 = commong.getJSONPathString(jsonString,"$.[0].ServiceTags","1");
+			String value2 = commong.getJSONPathString(jsonString,"$.[0]",null);
+			String value3 = commong.getJSONPathString(jsonString,"$.[0].ServiceTags","1");
+			String value4 = commong.getJSONPathString(jsonString,"$.[0].ServiceTags.[1]",null);
 		}catch(Exception e){
 			fail("Error parsing JSON String");
 		}
@@ -766,6 +768,23 @@ public class CommonGTest {
 			String value = commong.getJSONPathString(jsonString,"$",null);
 		}catch(Exception e){
 			fail("Error parsing JSON String: "+e.toString());
+		}
+	}
+
+	@Test
+	public void testParseJSONConsulMesosFrameworks() throws Exception {
+		ThreadProperty.set("class", this.getClass().getCanonicalName());
+		String baseData = "mesosFrameworks.conf";
+
+		String jsonString = new String(Files.readAllBytes(
+				Paths.get(getClass().getClassLoader().getResource(baseData).getFile())));
+
+		CommonG commong = new CommonG();
+
+		try{
+			String value = commong.getJSONPathString(jsonString,"$.frameworks[?(@.name == \"arangodb3\")].failover_timeout","0");
+		}catch(Exception e){
+			fail("Error parsing JSON String");
 		}
 	}
 
