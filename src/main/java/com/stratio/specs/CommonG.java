@@ -1539,6 +1539,22 @@ public class CommonG {
 		this.cookies = cookies;
 	}
 
+
+	/**
+	 * Parse jsonpath expression from a given string.
+	 *
+	 * If the string is json we can obtain its keys using ~ symbol.
+	 *
+	 * If position is not null and the result of jsonpath expression is an array,
+     * then this function will return the element at the given position at the array.
+	 *
+	 * If position is null, it will return the result of the jsonpath evaluation as string.
+	 *
+	 * @param jsonString string to be parsed
+	 * @param expr jsonpath expression
+	 * @param position position from a search result
+	 *
+	 */
 	public String getJSONPathString(String jsonString, String expr, String position) {
 
 		String value;
@@ -1556,8 +1572,12 @@ public class CommonG {
 			LinkedHashMap auxData = JsonPath.parse(jsonString).read(aux);
 			JSONObject json = new JSONObject(auxData);
 			List<String> keys = IteratorUtils.toList(json.keys());
-			if(op.equals("")) {
-				value = keys.toString();
+			List<String> stringKeys = new ArrayList<String>();
+			if (op.equals("")) {
+				for (String key:keys) {
+					stringKeys.add("\""+key+"\"");
+				}
+				value = stringKeys.toString();
 			} else {
 				Pattern patternOp = Pattern.compile("^\\[(-?\\d+)\\]$");
 				Matcher matcherOp = patternOp.matcher(op);
@@ -1594,6 +1614,17 @@ public class CommonG {
 	}
 
 
+
+	/**
+	 * Evaluate an expression.
+	 *
+	 * Object o could be a string or a list.
+	 *
+	 * @param o object to be evaluated
+	 * @param condition condition to compare
+	 * @param result expected result
+	 *
+	 */
 	public void evaluateJSONElementOperation(Object o,String condition,String result) throws Exception{
 
 		if(o instanceof String){

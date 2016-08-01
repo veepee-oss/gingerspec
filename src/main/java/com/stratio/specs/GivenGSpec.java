@@ -15,6 +15,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.UnknownHostException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.stratio.assertions.Assertions.assertThat;
 
@@ -162,9 +164,18 @@ public class GivenGSpec extends BaseGSpec {
 
 
      /**
-     * Save value for future use
+     * Save value for future use.
      *
-     * @param element key in the json response to be saved (i.e. $.fragments[0].id)
+     * If element is a jsonpath expression (i.e. $.fragments[0].id), it will be
+     * applied over the last httpResponse.
+     *
+     * If element is a jsonpath expression preceded by some other string
+     * (i.e. ["a","b",,"c"].$.[0]), it will be applied over this string.
+     * This will help to save the result of a jsonpath expression evaluated over
+     * previous stored variable.
+     *
+     * @param position position from a search result
+     * @param element key in the json response to be saved
      * @param envVar thread environment variable where to store the value
      *
      * @throws IllegalAccessException
@@ -178,8 +189,21 @@ public class GivenGSpec extends BaseGSpec {
      */
      @Given("^I save element (in position \'(.+?)\' in )?\'(.+?)\' in environment variable \'(.+?)\'$")
      public void saveElementEnvironment(String foo, String position, String element, String envVar) throws Exception {
-         String json = commonspec.getResponse().getResponse();
-         String value = commonspec.getJSONPathString(json,element,position);
+
+         Pattern pattern = Pattern.compile("^((.*)(\\.)+)(\\$.*)$");
+         Matcher matcher = pattern.matcher(element);
+         String json;
+         String parsedElement;
+
+         if (matcher.find()) {
+             json  = matcher.group(2);
+             parsedElement = matcher.group(4);
+         } else {
+             json = commonspec.getResponse().getResponse();
+             parsedElement = element;
+         }
+
+         String value = commonspec.getJSONPathString(json,parsedElement,position);
 
          if(value == null) {
              throw new Exception("Element to be saved: " + element + " is null");

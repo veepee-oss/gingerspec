@@ -675,11 +675,18 @@ public class CommonGTest {
 
 		CommonG commong = new CommonG();
 
+		String value1 = null;
+		String value2 = null;
+
 		try{
-			String value = commong.getJSONPathString(jsonString,"$",null);
+			value1 = commong.getJSONPathString(jsonString,"$.id",null);
+			value2 = commong.getJSONPathString(jsonString,"$.element.name",null);
 		}catch(Exception e){
 			fail("Error parsing JSON String");
 		}
+
+		assertThat(value1).as("Value for id key does not match").isEqualTo("id");
+		assertThat(value2).as("Value for element.name key does not match").isEqualTo("elementName");
 	}
 
 	@Test
@@ -692,11 +699,15 @@ public class CommonGTest {
 
 		CommonG commong = new CommonG();
 
+		String value1 = null;
+
 		try{
-			String value = commong.getJSONPathString(jsonString,"$",null);
+			value1 = commong.getJSONPathString(jsonString,"$.product",null);
 		}catch(Exception e){
 			fail("Error parsing JSON String");
 		}
+
+		assertThat(value1).as("Value for product key does not match").isEqualTo("productValue");
 	}
 
 
@@ -710,11 +721,15 @@ public class CommonGTest {
 
 		CommonG commong = new CommonG();
 
+		String value1 = null;
+
 		try{
-			String value = commong.getJSONPathString(jsonString,"$",null);
+			value1 = commong.getJSONPathString(jsonString,"$",null);
 		}catch(Exception e){
 			fail("Error parsing JSON String");
 		}
+
+		assertThat(value1).as("Value does not match").isEqualTo("column = 'value'");
 	}
 
 	@Test
@@ -727,32 +742,20 @@ public class CommonGTest {
 
 		CommonG commong = new CommonG();
 
+		String value1 = null;
+		String value2 = null;
+
 		try{
-			String value = commong.getJSONPathString(jsonString,"$",null);
+			value1 = commong.getJSONPathString(jsonString,"$.[0].Node",null);
+			value2 = commong.getJSONPathString(jsonString,"$.[1].Node",null);
 		}catch(Exception e){
 			fail("Error parsing JSON String");
 		}
+
+		assertThat(value1).as("Value for [0].Node key does not match").isEqualTo("paaslab31.stratio.com");
+		assertThat(value2).as("Value for [1].Node key does not match").isEqualTo("paaslab33.stratio.com");
 	}
 
-	@Test
-	public void testParseJSONConsulMesosPositions() throws Exception {
-		ThreadProperty.set("class", this.getClass().getCanonicalName());
-		String baseData = "consulMesosJSON.conf";
-
-		String jsonString = new String(Files.readAllBytes(
-				Paths.get(getClass().getClassLoader().getResource(baseData).getFile())));
-
-		CommonG commong = new CommonG();
-
-		try{
-			String value = commong.getJSONPathString(jsonString,"$","0");
-			String value2 = commong.getJSONPathString(jsonString,"$.[0]",null);
-			String value3 = commong.getJSONPathString(jsonString,"$.[0].ServiceTags","1");
-			String value4 = commong.getJSONPathString(jsonString,"$.[0].ServiceTags.[1]",null);
-		}catch(Exception e){
-			fail("Error parsing JSON String");
-		}
-	}
 
 	@Test
 	public void testParseJSONConsulServices() throws Exception {
@@ -764,11 +767,19 @@ public class CommonGTest {
 
 		CommonG commong = new CommonG();
 
+		String value1 = null;
+		String value2 = null;
+
 		try{
-			String value = commong.getJSONPathString(jsonString,"$",null);
+			value1 = commong.getJSONPathString(jsonString,"$.~[0]",null);
+			value2 = commong.getJSONPathString(jsonString,"$.~[2]",null);
 		}catch(Exception e){
 			fail("Error parsing JSON String: "+e.toString());
 		}
+
+		assertThat(value1).as("key in 0 does not match").isEqualTo("mesos");
+		assertThat(value2).as("key in 2 does not match").isEqualTo("consul");
+
 	}
 
 	@Test
@@ -781,11 +792,16 @@ public class CommonGTest {
 
 		CommonG commong = new CommonG();
 
+		String value1 = null;
+
 		try{
-			String value = commong.getJSONPathString(jsonString,"$.frameworks[?(@.name == \"arangodb3\")].failover_timeout","0");
+			value1 = commong.getJSONPathString(jsonString,"$.frameworks[?(@.name == \"arangodb3\")].hostname","0");
 		}catch(Exception e){
 			fail("Error parsing JSON String");
 		}
+
+		assertThat(value1).as("Value for search does not match").isEqualTo("paaslab34.stratio.com");
 	}
+
 
 }

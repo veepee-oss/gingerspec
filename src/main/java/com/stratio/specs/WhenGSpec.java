@@ -8,9 +8,12 @@ import com.mongodb.util.JSON;
 import com.ning.http.client.Response;
 import com.stratio.cucumber.converter.ArrayListConverter;
 import com.stratio.cucumber.converter.NullableStringConverter;
+import com.stratio.tests.utils.ThreadProperty;
 import cucumber.api.DataTable;
 import cucumber.api.Transform;
 import cucumber.api.java.en.When;
+import org.hjson.JsonArray;
+import org.hjson.JsonValue;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
@@ -591,5 +594,52 @@ public class WhenGSpec extends BaseGSpec {
             }
         }
 
+    }
+
+    /**
+     * Sort elements in envVar by a criteria and order.
+     *
+     * @param envVar Environment variable to be sorted
+     * @param criteria alphabetical,...
+     * @param order ascending or descending
+     *
+     */
+    @When("^I sort elements in '(.+?)' by '(.+?)' criteria in '(.+?)' order$")
+    public void sortElements(String envVar, String criteria, String order) {
+
+        String value = ThreadProperty.get(envVar);
+        JsonArray jsonArr = JsonValue.readHjson(value).asArray();
+
+        List<JsonValue> jsonValues = new ArrayList<JsonValue>();
+        for (int i = 0; i < jsonArr.size(); i++) {
+            jsonValues.add(jsonArr.get(i));
+        }
+
+        Comparator<JsonValue> comparator;
+        switch (criteria) {
+            case "alphabetical":
+                commonspec.getLogger().debug("Alphabetical criteria selected.");
+                comparator = new Comparator<JsonValue>() {
+                    public int compare(JsonValue json1, JsonValue json2) {
+                        int res = String.CASE_INSENSITIVE_ORDER.compare(json1.toString(), json2.toString());
+                        if (res == 0) {
+                            res = json1.toString().compareTo(json2.toString());
+                        }
+                        return res;
+                    }
+                };
+                break;
+            default:
+                commonspec.getLogger().debug("No criteria selected.");
+                comparator = null;
+        }
+
+        if ("ascending".equals(order)) {
+            Collections.sort(jsonValues,comparator);
+        } else {
+            Collections.sort(jsonValues,comparator.reversed());
+        }
+
+        ThreadProperty.set(envVar,jsonValues.toString());
     }
 }
