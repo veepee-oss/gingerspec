@@ -975,6 +975,10 @@ public class CommonG {
 					}
 				}
 
+				for (Cookie cook: this.getCookies()){
+					request = request.addCookie(cook);
+				}
+
 				if (!this.headers.isEmpty()) {
 					for (Map.Entry<String, String> header : headers.entrySet()) {
 						request = request.setHeader(header.getKey(),header.getValue());
@@ -1011,6 +1015,10 @@ public class CommonG {
 						}
 					}
 
+					for (Cookie cook: this.getCookies()){
+						request = request.addCookie(cook);
+					}
+
 					if (!this.headers.isEmpty()) {
 						for (Map.Entry<String, String> header : headers.entrySet()) {
 							request = request.setHeader(header.getKey(),header.getValue());
@@ -1045,6 +1053,10 @@ public class CommonG {
 							request.addCookie(new Cookie(cookie.getName(), cookie.getValue(),
 									false, cookie.getDomain(), cookie.getPath(), 99, false, false));
 						}
+					}
+
+					for (Cookie cook: this.getCookies()){
+						request = request.addCookie(cook);
 					}
 
 					if (!this.headers.isEmpty()) {
