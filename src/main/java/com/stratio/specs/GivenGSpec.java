@@ -510,7 +510,7 @@ public class GivenGSpec extends BaseGSpec {
         commonspec.getLogger().debug("Authenticating in DCOS cluster " + dcosCluster + " with user " + user);
 
         commonspec.setRemoteSSHConnection(new RemoteSSHConnection("root", "stratio", dcosCluster, null));
-        commonspec.getRemoteSSHConnection().runCommand("cat /var/lib/dcos/auth-token-secret");
+        commonspec.getRemoteSSHConnection().runCommand("cat /var/lib/dcos/dcos-oauth/auth-token-secret");
         String DCOSsecret = commonspec.getRemoteSSHConnection().getResult().trim();
 
         final JWTSigner signer = new JWTSigner(DCOSsecret);
