@@ -615,7 +615,48 @@ public class ThenGSpec extends BaseGSpec {
         }
     }
 
+    /**
+     * A PUT request over the body value.
+     *
+     * @param key
+     * @param value
+     * @param service
+     *
+     * @throws Exception
+     */
+    @Then("^I add a new DCOS label with key '(.+?)' and value '(.+?)' to the service '(.+?)'?$")
+    public void sendAppendRequest (String key, String value, String service) throws Exception {
+        commonspec.getLogger().info("Appending the label \"" + key  + "\":\"" + value + "\" to the service " + service);
+        String command = "touch " + service + ".json && dcos marathon app show " + service + " > /dcos/" + service + ".json";
 
+        commonspec.getRemoteSSHConnection().runCommand(command);
+        commonspec.setCommandResult(commonspec.getRemoteSSHConnection().getResult());
 
+        String commandEcho = "cat /dcos/" + service + ".json";
+        commonspec.getRemoteSSHConnection().runCommand(commandEcho);
+        commonspec.setCommandResult(commonspec.getRemoteSSHConnection().getResult());
+
+        String configFile = commonspec.getRemoteSSHConnection().getResult();
+        String myValue = commonspec.getJSONPathString(configFile,".labels","0");
+        String myJson1 = commonspec.removeJSONPathElement(configFile,".labels");
+        String myJson2 = commonspec.removeJSONPathElement(myJson1,".uris.*");
+        String myJson3 = commonspec.removeJSONPathElement(myJson2,".version");
+        String myJson = commonspec.removeJSONPathElement(myJson3,".versionInfo");
+
+        String newValue = myValue.replaceFirst("}", ", \"" + key +"\": \"" + value + "\"}");
+        newValue = "\"labels\":" + newValue;
+        String myFinalJson = myJson.replaceFirst("\\{", "{" + newValue + ",");
+        String test = myFinalJson.replaceAll("\"uris\"","\"none\"");
+
+        String file = "echo '" + test +"' > /dcos/final" + service + ".json";
+        commonspec.getRemoteSSHConnection().runCommand(file);
+        commonspec.setCommandResult(commonspec.getRemoteSSHConnection().getResult());
+
+        String updatecmd = "dcos marathon app update " + service + " < /dcos/final" + service + ".json";
+        commonspec.getRemoteSSHConnection().runCommand(updatecmd);
+        commonspec.setCommandResult(commonspec.getRemoteSSHConnection().getResult());
+        commonspec.setCommandExitStatus(commonspec.getRemoteSSHConnection().getExitStatus());
+    }
+    
 }
 

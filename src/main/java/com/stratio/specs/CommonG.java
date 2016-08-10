@@ -1,9 +1,14 @@
 package com.stratio.specs;
 
+
 import com.datastax.driver.core.ColumnDefinitions;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
+import com.jayway.jsonpath.Configuration;
+import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.spi.json.GsonJsonProvider;
+import com.jayway.jsonpath.spi.mapper.GsonMappingProvider;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.ning.http.client.AsyncHttpClient;
@@ -1626,6 +1631,21 @@ public class CommonG {
 	}
 
 
+    /**
+     * Remove a subelement in a JsonPath
+     *
+     * @param jsonString String of the json
+     * @param expr regex to be removed
+     *
+     */
+
+    public String removeJSONPathElement(String jsonString, String expr) {
+
+        Configuration conf = Configuration.builder().jsonProvider(new GsonJsonProvider()).mappingProvider(new GsonMappingProvider()).build();
+        DocumentContext context = JsonPath.using(conf).parse(jsonString);
+        context.delete(expr);
+        return context.jsonString();
+    }
 
 	/**
 	 * Evaluate an expression.
