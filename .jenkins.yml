@@ -3,26 +3,24 @@ ITSERVICES:
       image: stratio/mongo:3.0.4
       sleep: 10
   - ELASTICSEARCH:
-      image: stratio/elasticsearch:1.7.1
+      image: elasticsearch:2.2.0
       sleep: 5
-      env:
-        - CLUSTER_NAME=bddmaster
   - CASSANDRA:
       image: stratio/cassandra:2.2.5
       sleep: 10
-      env: 
+      env:
         - MAX_HEAP=256M
   - CASSANDRA:
       image: stratio/cassandra:2.2.5
       sleep: 10
-      env: 
-        - MAX_HEAP=256M        
+      env:
+        - MAX_HEAP=256M
 #      volumes:
 #        - jts:1.14.0
 
 ITPARAMETERS: >
     -DMONGO_HOST=%%MONGODB
     -DES_NODE=%%ELASTICSEARCH#0
-    -DES_CLUSTER=bddmaster
+    -DES_CLUSTER=elasticsearch
     -DCASSANDRA_HOST=%%CASSANDRA#0
     -DOTHER_CASSANDRA=%%CASSANDRA#1

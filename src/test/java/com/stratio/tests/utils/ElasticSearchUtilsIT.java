@@ -1,22 +1,20 @@
 package com.stratio.tests.utils;
 
-import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
+import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.List;
 
-import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.common.xcontent.XContentBuilder;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testng.annotations.*;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 public class ElasticSearchUtilsIT {
     private final Logger logger = LoggerFactory
@@ -91,8 +89,6 @@ public class ElasticSearchUtilsIT {
         es_utils.createMapping("testindex", "testmapping", mappingsource);
         Thread.sleep(2000);
         assertThat(es_utils.existsMapping("testindex","testmapping")).isTrue();
-        es_utils.dropMapping("testindex","testmapping");
-        assertThat(es_utils.existsMapping("testindex","testmapping")).isFalse();
         es_utils.getClient().close();
     }
 
@@ -132,9 +128,69 @@ public class ElasticSearchUtilsIT {
             e.printStackTrace();
         }
         assertThat(res).isEqualTo(1);
-        es_utils.dropMapping("testindex","testmapping");
         es_utils.dropAllIndexes();
         assertThat(es_utils.existsMapping("testindex","testmapping")).isFalse();
         es_utils.getClient().close();
+    }
+
+    @Test
+    public void indexDocument() throws UnknownHostException, IOException {
+        es_utils.connect();
+        if(es_utils.indexExists("testindex")){
+            es_utils.dropSingleIndex("testindex");
+        }
+        es_utils.createSingleIndex("testindex");
+        XContentBuilder document = jsonBuilder()
+                .startObject()
+                .field("ident", 1)
+                .field("name", "test")
+                .field("money", 10.2)
+                .field("new", false).endObject();
+        try {
+            es_utils.indexDocument("testindex", "testmapping", "1", document);
+            Thread.sleep(2000);
+            List<JSONObject> results = es_utils.searchSimpleFilterElasticsearchQuery("testindex", "testmapping",
+                    "ident", "1",
+                    "equals");
+            assertThat(results.size()).isEqualTo(1);
+            JSONObject result = results.get(0);
+            assertThat(result.getInt("ident")).isEqualTo(1);
+            assertThat(result.getString("name")).isEqualTo("test");
+            assertThat(result.getDouble("money")).isEqualTo(10.2);
+            assertThat(result.getBoolean("new")).isEqualTo(false);
+        } catch(Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    @Test
+    public void deleteDocument() throws UnknownHostException, IOException {
+        es_utils.connect();
+        if(es_utils.indexExists("testindex")){
+            es_utils.dropSingleIndex("testindex");
+        }
+        es_utils.createSingleIndex("testindex");
+        XContentBuilder document = jsonBuilder()
+                .startObject()
+                .field("ident", 1)
+                .field("name", "test")
+                .field("money", 10.2)
+                .field("new", false).endObject();
+        try {
+            es_utils.indexDocument("testindex", "testmapping", "1", document);
+            Thread.sleep(2000);
+            List<JSONObject> results = es_utils.searchSimpleFilterElasticsearchQuery("testindex", "testmapping",
+                    "ident", "1",
+                    "equals");
+            assertThat(results.size()).isEqualTo(1);
+            es_utils.deleteDocument("testindex", "testmapping", "1");
+            Thread.sleep(2000);
+            List<JSONObject> results2 = es_utils.searchSimpleFilterElasticsearchQuery("testindex", "testmapping",
+                    "ident", "1",
+                    "equals");
+            assertThat(results2.size()).isEqualTo(0);
+        } catch(Exception ex) {
+            ex.printStackTrace();
+        }
     }
 }

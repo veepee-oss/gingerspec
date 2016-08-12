@@ -1,61 +1,38 @@
 package com.stratio.tests.utils;
 
-import static org.elasticsearch.common.settings.ImmutableSettings.*;
+import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
 import java.net.InetAddress;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.elasticsearch.cluster.metadata.IndexMetaData;
-import org.elasticsearch.index.query.RangeFilterBuilder;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.admin.cluster.state.ClusterStateResponse;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
-import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsAction;
-import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
-import org.elasticsearch.action.admin.indices.mapping.delete.DeleteMappingRequest;
-import org.elasticsearch.action.admin.indices.mapping.delete.DeleteMappingResponse;
-import org.elasticsearch.action.admin.indices.mapping.get.GetMappingsResponse;
-import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
-import org.elasticsearch.action.delete.DeleteResponse;
-import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexRequestBuilder;
-import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.cluster.metadata.AliasMetaData;
+import org.elasticsearch.cluster.metadata.IndexMetaData;
 import org.elasticsearch.cluster.metadata.MappingMetaData;
 import org.elasticsearch.common.collect.ImmutableOpenMap;
-import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.elasticsearch.common.xcontent.XContentFactory;
-import org.elasticsearch.common.xcontent.XContentType;
-import org.elasticsearch.index.query.FilterBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.SearchHitField;
-import org.elasticsearch.search.SearchHits;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.stratio.exceptions.DBException;
-
-import gherkin.deps.com.google.gson.Gson;
-import gherkin.deps.com.google.gson.GsonBuilder;
 
 public class ElasticSearchUtils {
 
@@ -68,7 +45,6 @@ public class ElasticSearchUtils {
 	private String cluster;
     private Client client;
     private Settings settings;
-    private CreateIndexRequest indexRequest;
 
 	/**
 	 * Default constructor.
@@ -86,7 +62,7 @@ public class ElasticSearchUtils {
      * @param settings : LinkedHashMap with all the settings about ES connection
      */
 	public void setSettings(LinkedHashMap<String, Object> settings){
-        ImmutableSettings.Builder builder = ImmutableSettings.settingsBuilder();
+        Settings.Builder builder = Settings.settingsBuilder();
         for (Map.Entry<String, Object> entry : settings.entrySet()) {
             builder.put(entry.getKey(),entry.getValue());
         }
@@ -105,7 +81,7 @@ public class ElasticSearchUtils {
      * Connect to ES.
      */
     public void connect() throws java.net.UnknownHostException{
-        this.client = new TransportClient(this.settings)
+        this.client = TransportClient.builder().settings(this.settings).build()
                 .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(this.es_host),
                         this.es_native_port));
     }
@@ -129,25 +105,6 @@ public class ElasticSearchUtils {
             ElasticsearchException
     {
         CreateIndexRequest indexRequest = new CreateIndexRequest(indexName);
-        CreateIndexResponse res = this.client.admin().indices().create(indexRequest).actionGet();
-        return indexExists(indexName);
-    }
-
-    /**
-     * Create an ES Index with options.
-     * @param indexName
-     * @param settings : LinkedHashMap with all the settings of the ES indexes.
-     * @return true if the index has been created and false if the index has not been created.
-     * @throws ElasticsearchException
-     */
-    public boolean createSingleIndex(String indexName,LinkedHashMap<String, Object> settings) throws
-    ElasticsearchException
-    {
-        ImmutableSettings.Builder indexSettings = ImmutableSettings.settingsBuilder();
-        for (Map.Entry<String, Object> entry : settings.entrySet()) {
-            indexSettings.put(entry.getKey(),entry.getValue());
-        }
-        CreateIndexRequest indexRequest = new CreateIndexRequest(indexName, indexSettings.build());
         CreateIndexResponse res = this.client.admin().indices().create(indexRequest).actionGet();
         return indexExists(indexName);
     }
@@ -197,7 +154,7 @@ public class ElasticSearchUtils {
      * @param mappingName
      * @param mappingSource the data that has to be inserted in the mapping.
      */
-    public void createMapping(String indexName, String mappingName, ArrayList<XContentBuilder> mappingSource){
+    public void createMapping(String indexName, String mappingName, ArrayList<XContentBuilder> mappingSource) {
          IndicesExistsResponse existsResponse = this.client.admin().indices().prepareExists(indexName).execute()
                 .actionGet();
         //If the index does not exists, it will be created without options
@@ -216,18 +173,6 @@ public class ElasticSearchUtils {
             bulkRequest.add(res);
         }
         bulkRequest.execute();
-    }
-
-    /**
-     * Drop a mapping of an index
-     * @param indexName
-     * @param mappingName
-     */
-    public void dropMapping(String indexName, String mappingName){
-        if(existsMapping(indexName,mappingName) ){
-            DeleteMappingRequest deleteMapping = new DeleteMappingRequest(indexName).types(mappingName);
-            DeleteMappingResponse actionGet = this.client.admin().indices().deleteMapping(deleteMapping).actionGet();
-        }
     }
 
     /**
@@ -264,7 +209,6 @@ public class ElasticSearchUtils {
             columnName,
             Object value, String filterType) throws Exception {
         List<JSONObject> resultsJSON = new ArrayList<JSONObject>();
-        org.elasticsearch.index.query.RangeFilterBuilder range;
         QueryBuilder query;
         switch (filterType){
         case "equals":
@@ -300,5 +244,26 @@ public class ElasticSearchUtils {
         return resultsJSON;
     }
 
+    /**
+     * Indexes a document.
+     * @param indexName
+     * @param mappingName
+     * @param id unique identifier of the document
+     * @param document
+     * @throws Exception
+     */
+    public void indexDocument(String indexName, String mappingName, String id, XContentBuilder document)
+            throws Exception {
+        client.prepareIndex(indexName, mappingName, id).setSource(document).get();
+    }
 
+    /**
+     * Deletes a document by its id.
+     * @param indexName
+     * @param mappingName
+     * @param id
+     */
+    public void deleteDocument(String indexName, String mappingName, String id) {
+        client.prepareDelete(indexName, mappingName, id).get();
+    }
 }
