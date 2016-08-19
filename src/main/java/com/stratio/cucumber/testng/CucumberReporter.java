@@ -412,16 +412,13 @@ public class CucumberReporter implements Formatter, Reporter {
                                     isWrongTicket = true;
                                 }
                                 if (((userJira != null) || (passJira != null)) && (issue != "")) {
-                                    String data = userJira + ":" + passJira;
-                                    byte[] encodedBytes = Base64.encodeBase64(data.getBytes());
-                                    String encodedString = new String(encodedBytes);
-                                    String codeBase64 = "Basic " + encodedString;
+                                    comm.setRestProtocol("https://");
                                     comm.setRestHost("stratio.atlassian.net");
                                     comm.setRestPort("");
                                     comm.setClient(client);
                                     String endpoint = "/rest/api/2/issue/" + issue;
                                     try {
-                                        response = comm.generateRequest("GET", true, endpoint, "", "json", codeBase64);
+                                        response = comm.generateRequest("GET", true, userJira, passJira, endpoint, "", "json");
                                         comm.setResponse(endpoint, response.get());
                                     } catch (Exception e) {
                                         logger.error("Rest API Jira connection error " + String.valueOf(comm.getResponse().getStatusCode()));

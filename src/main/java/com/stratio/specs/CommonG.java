@@ -887,11 +887,30 @@ public class CommonG {
 	 * @param endPoint end point to sent the request to
 	 * @param data to be sent for PUT/POST requests
 	 * @param type type of data to be sent (json|string)
+	 * @param codeBase64 XXX
 	 *
 	 * @throws Exception
 	 *
 	 */
+	@Deprecated
 	public Future<Response> generateRequest(String requestType, boolean secure, String user, String password, String endPoint, String data, String type, String codeBase64) throws Exception {
+		return generateRequest(requestType, secure, user, password, endPoint, data, type);
+	}
+
+	/**
+	 * Generates the request based on the type of request, the end point, the data and type passed
+	 * @param requestType type of request to be sent
+	 * @param secure type of protocol
+	 * @param user user to be used in request
+	 * @param password password to be used in request
+	 * @param endPoint end point to sent the request to
+	 * @param data to be sent for PUT/POST requests
+	 * @param type type of data to be sent (json|string)
+	 *
+	 * @throws Exception
+	 *
+	 */
+	public Future<Response> generateRequest(String requestType, boolean secure, String user, String password, String endPoint, String data, String type) throws Exception {
 
 		String protocol = this.getRestProtocol();
 		Future<Response> response = null;
@@ -906,7 +925,7 @@ public class CommonG {
 		if (this.getRestPort() == null) {
 			throw new Exception("Rest port has not been set");
 		}
-		
+
 		if (this.getRestProtocol() == null) {
 			protocol = "http://";
 		}
@@ -932,10 +951,6 @@ public class CommonG {
 				} else if ("string".equals(type)){
 					this.getLogger().debug("Sending request as: {}", type);
 					request = request.setHeader("Content-Type", "application/x-www-form-urlencoded");
-				}
-
-				if (!codeBase64.equals("")) {
-					request = request.setHeader("Authorization", codeBase64);
 				}
 
 				if (this.getResponse() != null) {
