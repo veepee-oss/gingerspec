@@ -431,7 +431,8 @@ public class CucumberReporter implements Formatter, Reporter {
                                     try {
                                         value = JsonPath.read(json, "$.fields.status.name");
                                     } catch (PathNotFoundException pe) {
-                                        logger.error("Json Path $.fields.status.name not found");
+                                        logger.error("Json Path $.fields.status.name not found\r");
+                                        logger.error(json);
                                     }
 
                                     if (value.equals("")) {
@@ -481,7 +482,7 @@ public class CucumberReporter implements Formatter, Reporter {
                     msg1 = "The scenario was ignored due an already done ticket. " + "https://stratio.atlassian.net/browse/" + issue;;
                     msg2 =  " ";
                 } else if (isWrongTicket) {
-                    msg1 = "The scenario was ignored due to unexistant ticket.";
+                    msg1 = "The scenario was ignored due to unexistant ticket " +  issue;
                     msg2 = " ";
                 } else {
                     msg1 = "The scenario has no valid reason for being ignored. <p>Valid values: @tillfixed(ISSUE-007) @unimplemented @manual @toocomplex</p>";
