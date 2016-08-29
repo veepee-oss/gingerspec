@@ -178,15 +178,6 @@ public class CommonG {
 	}
 
 	/**
-	 * Get the Aerospike utils.
-	 * 
-	 * @return AerospikeUtils
-	 */
-	public AerospikeUtils getAerospikeClient() {
-		return AerospikeUtil.INSTANCE.getAeroSpikeUtils();
-	}
-
-	/**
 	 * Get the MongoDB utils.
 	 * 
 	 * @return MongoDBUtils

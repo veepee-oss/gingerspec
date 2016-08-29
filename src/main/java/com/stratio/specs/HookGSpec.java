@@ -96,15 +96,6 @@ public class HookGSpec extends BaseGSpec {
     }
 
     /**
-     * Connect to Aerospike.
-     */
-    @Before(order = ORDER_10, value = "@Aerospike")
-    public void aerospikeSetup() {
-        commonspec.getLogger().debug("Setting up Aerospike client");
-        commonspec.getAerospikeClient().connect();
-    }
-
-    /**
      * Connect to selenium.
      *
      * @throws MalformedURLException
@@ -226,19 +217,6 @@ public class HookGSpec extends BaseGSpec {
         try {
             commonspec.getElasticSearchClient().getClient().close();
         } catch (Exception e) {
-            fail(e.toString());
-        }
-    }
-
-    /**
-     * Close aerospike connection.
-     */
-    @After(order = ORDER_20, value = "@Aerospike")
-    public void aerospikeTeardown() {
-        commonspec.getLogger().debug("Shutdown Aerospike client");
-        try {
-            commonspec.getAerospikeClient().disconnect();
-        } catch (DBException e) {
             fail(e.toString());
         }
     }

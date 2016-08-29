@@ -33,7 +33,6 @@
 		<guava.version>18.0</guava.version>
 		<lz4.version>1.2.0</lz4.version>
 		<httpclient.version>4.3.5</httpclient.version>
-		<aerospike-client.version>[3.0.0,)</aerospike-client.version>
 		<mongo-java-driver.version>2.12.3</mongo-java-driver.version>
 		<selenium-java.version>2.49.1</selenium-java.version>
 		<jsoup.version>1.7.3</jsoup.version>
@@ -175,11 +174,6 @@
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
 			<version>${httpclient.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.aerospike</groupId>
-			<artifactId>aerospike-client</artifactId>
-			<version>${aerospike-client.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mongodb</groupId>

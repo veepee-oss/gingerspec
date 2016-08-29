@@ -256,23 +256,6 @@ public class GivenGSpec extends BaseGSpec {
         commonspec.getCassandraClient().dropKeyspace(keyspace);
     }
 
-
-    /**
-     * Create a AeroSpike namespace, table and the data of the table.
-     *
-     * @param nameSpace
-     * @param tableName
-     * @param tab
-     */
-    @Given("^I create an AeroSpike namespace '(.+?)' with table '(.+?)':$")
-    public void createAeroSpikeTable(String nameSpace, String tableName, DataTable tab) {
-        commonspec.getLogger().debug("Creating a table on AeroSpike");
-        if (commonspec.getAerospikeClient().isConnected()) {
-            commonspec.getLogger().debug("Creating a table on AeroSpike");
-        }
-        commonspec.getAerospikeClient().insertFromDataTable(nameSpace, tableName, tab);
-    }
-
     /**
      * Create a MongoDB dataBase.
      *
