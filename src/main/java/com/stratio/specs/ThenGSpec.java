@@ -12,6 +12,8 @@ import com.stratio.tests.utils.ThreadProperty;
 import cucumber.api.DataTable;
 import cucumber.api.java.en.Then;
 import gherkin.formatter.model.DataTableRow;
+import org.apache.zookeeper.KeeperException;
+import org.assertj.core.api.Assertions;
 import org.assertj.core.api.WritableAssertionInfo;
 import org.json.JSONArray;
 import org.openqa.selenium.WebElement;
@@ -657,6 +659,25 @@ public class ThenGSpec extends BaseGSpec {
         commonspec.setCommandResult(commonspec.getRemoteSSHConnection().getResult());
         commonspec.setCommandExitStatus(commonspec.getRemoteSSHConnection().getExitStatus());
     }
-    
-}
 
+    /**
+     * Read zPath
+     *
+     *  @param zNode path at zookeeper
+     *  @param document expected content of znode
+     *
+     */
+    @Then("^I check that zNode at '(.+?)' exists( and contains '(.+?)')?$")
+    public void readZNode(String zNode, Boolean foo, String document) throws KeeperException, InterruptedException {
+        commonspec.getLogger().debug("Cheking zNode at path {}", zNode);
+        if(document==null){
+            Assertions.assertThat(commonspec.getZkClient().zRead(zNode))
+                    .withFailMessage("The zNode does not exists")
+                    .as("zNode exists").contains("OK");
+        }else{
+            Assertions.assertThat(commonspec.getZkClient().zRead(zNode))
+                    .withFailMessage("The zNode does not exists or the content does not match")
+                    .as("ZNode contains {} ",document).contains(document);
+        }
+    }
+}

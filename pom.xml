@@ -190,7 +190,6 @@
 			<artifactId>jsoup</artifactId>
 			<version>${jsoup.version}</version>
 		</dependency>
-
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-slf4j-impl</artifactId>
@@ -270,10 +269,21 @@
 			<artifactId>java-jwt</artifactId>
 			<version>2.1.0</version>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.kafka</groupId>
+			<artifactId>kafka_2.10</artifactId>
+			<version>0.9.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-1.2-api</artifactId>
+			<version>2.0</version>
+		</dependency>
 	</dependencies>
     <!-- JDK8 is a lot more strict (by default) when it comes to Javadoc and it throws
                 a lot of erros when generating the project's javadoc.
             For now, the easiest way to work around the stricter Java8 Javadoc is deactivating it.-->
+
     <profiles>
         <profile>
             <id>disable-java8-doclint</id>

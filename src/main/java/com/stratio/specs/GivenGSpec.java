@@ -594,4 +594,17 @@ public class GivenGSpec extends BaseGSpec {
         Assertions.assertThat(wel).as("Element count doesnt match").hasSize(2);
     }
 
+
+    /**
+     * Connect to zookeeper.
+     *
+     * @param zookeeperHosts as host:port (comma separated)
+     */
+    @Given("^I connect to zk cluster at '(.+)'$")
+    public void connectToZk(String zookeeperHosts){
+        commonspec.getLogger().debug("Connecting to zookeeper at "+zookeeperHosts);
+        commonspec.setZookeeperConnection(zookeeperHosts,3000);
+        commonspec.getZkClient().connectZk();
+    }
+
 }

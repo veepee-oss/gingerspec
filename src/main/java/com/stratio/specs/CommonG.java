@@ -87,6 +87,8 @@ public class CommonG {
 	private String commandResult;
 	private String restProtocol;
 
+	private ZookeeperUtils zkClient;
+
 	/**
 	 * Get the common remote connection.
 	 *
@@ -113,7 +115,7 @@ public class CommonG {
 	public String getRestPort() {
 		return this.restPort;
 	}
-	
+
 	/**
 	 * Get the common WEB host.
 	 * 
@@ -176,6 +178,12 @@ public class CommonG {
 	public ElasticSearchUtils getElasticSearchClient() {
 		return ElasticSearchUtil.INSTANCE.getElasticSearchUtils();
 	}
+
+	/**
+	 * Get the elasticSearch utils.
+	 *
+	 * @return ElasticSearchUtils
+	 */
 
 	/**
 	 * Get the MongoDB utils.
@@ -319,6 +327,10 @@ public class CommonG {
 		}
 
 		return wel;
+	}
+
+	public void setZookeeperConnection (String host, int timeout){
+		this.zkClient = new ZookeeperUtils(host, timeout);
 	}
 
 	/**
@@ -1706,5 +1718,9 @@ public class CommonG {
 			}
 		}
 
+	}
+
+	public ZookeeperUtils getZkClient() {
+		return zkClient;
 	}
 }
