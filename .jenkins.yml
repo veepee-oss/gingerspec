@@ -3,8 +3,10 @@ ITSERVICES:
       image: stratio/mongo:3.0.4
       sleep: 10
   - ELASTICSEARCH:
-      image: stratio/elasticsearch:2.0.2
-      sleep: 5
+      image: elasticsearch:2.0.2
+      sleep: 10
+      env:
+        - ES_JAVA_OPTS="-Des.cluster.name=%%JUID -Des.network.host=%%OWNHOSTNAME"
   - CASSANDRA:
       image: stratio/cassandra:2.2.5
       sleep: 10
