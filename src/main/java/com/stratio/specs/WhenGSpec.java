@@ -78,15 +78,23 @@ public class WhenGSpec extends BaseGSpec {
      * Click on an numbered {@code url} previously found element.
      *
      * @param index
+     * @throws InterruptedException
      */
     @When("^I click on the element on index '(\\d+?)'$")
-    public void seleniumClick(Integer index) {
+    public void seleniumClick(Integer index) throws InterruptedException {
         commonspec.getLogger().debug("Clicking on element with index {}", index);
 
-        assertThat(this.commonspec, commonspec.getPreviousWebElements()).as("There are less found elements than required")
-        	.hasAtLeast(index);
-        commonspec.getPreviousWebElements().getPreviousWebElements().get(index).click();
-    }
+        try {
+            assertThat(this.commonspec, commonspec.getPreviousWebElements()).as("There are less found elements than required")
+                    .hasAtLeast(index);
+            commonspec.getPreviousWebElements().getPreviousWebElements().get(index).click();
+        } catch (AssertionError e) {
+            Thread.sleep(1000);
+            assertThat(this.commonspec, commonspec.getPreviousWebElements()).as("There are less found elements than required")
+                    .hasAtLeast(index);
+            commonspec.getPreviousWebElements().getPreviousWebElements().get(index).click();
+        }
+        }
 
     /**
      * Clear the text on a numbered {@code index} previously found element.
