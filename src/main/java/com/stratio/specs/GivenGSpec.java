@@ -557,12 +557,31 @@ public class GivenGSpec extends BaseGSpec {
     * @param command
     *
     **/
-    @Given("^I execute command '(.+?)' in remote ssh connection$")
-    public void executeCommand(String command) throws Exception {
+    @Given("^I execute command '(.+?)' in remote ssh connection( with exit status '(.+?)')?$")
+    public void executeCommand(String command, String foo, Integer exitStatus) throws Exception {
+        if (exitStatus == null) {
+            exitStatus = 0;
+        }
+
         commonspec.getLogger().debug("Executing command '" + command + "'");
         commonspec.getRemoteSSHConnection().runCommand(command);
-        commonspec.setCommandExitStatus(commonspec.getRemoteSSHConnection().getExitStatus());
         commonspec.setCommandResult(commonspec.getRemoteSSHConnection().getResult());
+        commonspec.setCommandExitStatus(commonspec.getRemoteSSHConnection().getExitStatus());
+
+        List<String> logOutput = Arrays.asList(commonspec.getCommandResult().split("\n"));
+        StringBuffer log = new StringBuffer();
+        int logLastLines = 25;
+        if (logOutput.size() < 25) {
+            logLastLines = logOutput.size();
+        }
+        for (String s:logOutput.subList(logOutput.size() - logLastLines, logOutput.size())) {
+            log.append(s).append("\n");
+        }
+
+        commonspec.getLogger().info("Exit status is: {}", commonspec.getRemoteSSHConnection().getExitStatus());
+        commonspec.getLogger().info("Command last " + logLastLines + " lines stdout:\n{}", log);
+        commonspec.getLogger().debug("Command complete stdout:\n{}", commonspec.getCommandResult());
+        Assertions.assertThat(commonspec.getRemoteSSHConnection().getExitStatus()).isEqualTo(exitStatus);
     }
 
 

@@ -577,7 +577,11 @@ public class ThenGSpec extends BaseGSpec {
      *
      * @param expectedExitStatus
      *
+     * @deprecated Success exit status is directly checked in the "execute remote command" method, so this is not
+     * needed anymore.
+     *
      **/
+    @Deprecated
     @Then("^the command exit status is '(.+?)'$")
     public void checkShellExitStatus(int expectedExitStatus) throws Exception {
         commonspec.getLogger().debug("Expecting exit status: " + expectedExitStatus);
