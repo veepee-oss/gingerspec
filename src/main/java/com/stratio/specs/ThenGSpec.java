@@ -684,4 +684,17 @@ public class ThenGSpec extends BaseGSpec {
                     .as("ZNode contains {} ",document).contains(document);
         }
     }
+
+    /**
+     * List topics of kafka
+     *
+     *  @param topic_name name of topic
+     *
+     */
+    @Then("^A kafka topic named '(.+?)' exists")
+    public void listTopic(String topic_name) throws KeeperException, InterruptedException {
+        commonspec.getLogger().debug("Listing kafka topics {}",commonspec.getKafkaUtils().listTopics());
+        Assertions.assertThat(commonspec.getKafkaUtils().listTopics().contains(topic_name)).withFailMessage("There is no topic with that name");
+    }
+
 }

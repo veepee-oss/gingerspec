@@ -178,12 +178,14 @@ public class CommonG {
 	public ElasticSearchUtils getElasticSearchClient() {
 		return ElasticSearchUtil.INSTANCE.getElasticSearchUtils();
 	}
-
 	/**
-	 * Get the elasticSearch utils.
+	 * Get the Kafka utils.
 	 *
-	 * @return ElasticSearchUtils
+	 * @return KafkaUtils
 	 */
+	public KafkaUtils getKafkaUtils() {
+		return KafkaUtil.INSTANCE.getKafkaUtils();
+	}
 
 	/**
 	 * Get the MongoDB utils.

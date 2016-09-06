@@ -650,4 +650,16 @@ public class WhenGSpec extends BaseGSpec {
 
         ThreadProperty.set(envVar,jsonValues.toString());
     }
+
+    /**
+     * Create a Kafka topic.
+     *
+     * @param topic_name topic name
+     *
+     */
+    @When("^I create a Kafka topic named '(.+?)'")
+    public void createKafkaTopic(String topic_name) throws Exception {
+            commonspec.getLogger().debug("Creating a kafka topic");
+            commonspec.getKafkaUtils().createTopic(topic_name);
+    }
 }

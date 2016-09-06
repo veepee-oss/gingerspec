@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -121,6 +122,17 @@ public class KafkaUtils {
         logger.debug("Topic with name: " + topicName + " correctly deleted");
         return !AdminUtils.topicExists(zkUtils,topicName);
     }
+
+    /**
+     * List all Kafka topics.
+     * @return list of topics.
+     * @throws kafka.common.KafkaException
+     */
+    public List<String> listTopics() throws KafkaException{
+        return scala.collection.JavaConversions.seqAsJavaList(zkUtils.getAllTopics());
+    }
+
+
     /**
      * Modify number of partition of a Kafka topic.
      * @param topicName name of topic.

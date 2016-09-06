@@ -1,6 +1,7 @@
 
 package com.stratio.tests.utils;
 
+import com.google.common.base.Joiner;
 import kafka.admin.AdminUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +30,19 @@ public class KafkaUtilsIT {
         kafka_utils.createTopic("testTopic");
         assertThat(AdminUtils.topicExists(kafka_utils.getZkUtils(),"testTopic")).isTrue();
         kafka_utils.deleteTopic("testTopic");
+    }
+    @Test
+    public void listTopicsTest()  {
+        if(AdminUtils.topicExists(kafka_utils.getZkUtils(),"testList")){
+            kafka_utils.deleteTopic("testList");
+        }
+        kafka_utils.createTopic("testList");
+        kafka_utils.createTopic("testList2");
+        assertThat(kafka_utils.listTopics()).contains("testList");
+        logger.error("Kafka contains next topics: " +Joiner.on(",").join(kafka_utils.listTopics()));
+        assertThat(kafka_utils.listTopics()).contains("testList2");
+        kafka_utils.deleteTopic("testList");
+        kafka_utils.deleteTopic("testList2");
     }
 
     @Test
