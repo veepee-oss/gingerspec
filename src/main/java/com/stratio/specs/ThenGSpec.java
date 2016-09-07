@@ -679,12 +679,12 @@ public class ThenGSpec extends BaseGSpec {
     public void readZNode(String zNode, String foo, String document) throws KeeperException, InterruptedException {
         commonspec.getLogger().debug("Cheking zNode at path {}", zNode);
         if(document==null){
-            String breakpoint = commonspec.getZkClient().zRead(zNode);
-            Assertions.assertThat(commonspec.getZkClient().zRead(zNode))
+            String breakpoint = commonspec.getZookeeperClient().zRead(zNode);
+            Assertions.assertThat(commonspec.getZookeeperClient().zRead(zNode))
                     .withFailMessage("The zNode does not exists")
                     .as("zNode exists").isEqualTo("");
         }else{
-            Assertions.assertThat(commonspec.getZkClient().zRead(zNode))
+            Assertions.assertThat(commonspec.getZookeeperClient().zRead(zNode))
                     .withFailMessage("The zNode does not exists or the content does not match")
                     .as("ZNode contains {} ",document).contains(document);
         }

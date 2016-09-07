@@ -197,6 +197,15 @@ public class CommonG {
 	}
 
 	/**
+	 * Get the Zookeeper utils.
+	 *
+	 * @return ZookeperUtils
+	 */
+	public ZookeeperUtils getZookeeperClient() {
+		return ZookeeperUtil.INSTANCE.getZookeeperUtils();
+	}
+
+	/**
 	 * Get the remoteWebDriver.
 	 * 
 	 * @return RemoteWebDriver
@@ -329,10 +338,6 @@ public class CommonG {
 		}
 
 		return wel;
-	}
-
-	public void setZookeeperConnection (String host, int timeout){
-		this.zkClient = new ZookeeperUtils(host, timeout);
 	}
 
 	/**
@@ -1720,9 +1725,5 @@ public class CommonG {
 			}
 		}
 
-	}
-
-	public ZookeeperUtils getZkClient() {
-		return zkClient;
 	}
 }

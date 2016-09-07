@@ -611,8 +611,8 @@ public class GivenGSpec extends BaseGSpec {
     @Given("^I connect to zk cluster at '(.+)'$")
     public void connectToZk(String zookeeperHosts) {
         commonspec.getLogger().debug("Connecting to zookeeper at " + zookeeperHosts);
-        commonspec.setZookeeperConnection(zookeeperHosts, 3000);
-        commonspec.getZkClient().connectZk();
+        commonspec.getZookeeperClient().setZookeeperConnection(zookeeperHosts, 3000);
+        commonspec.getZookeeperClient().connectZk();
     }
     /**
      * Connect to Kafka.

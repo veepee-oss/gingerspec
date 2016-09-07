@@ -14,16 +14,19 @@ import java.nio.charset.StandardCharsets;
 
 public class ZookeeperUtils {
 
-
 	private final Logger logger = LoggerFactory.getLogger(ZookeeperUtils.class);
-
-
+	private static final String DEFAULT_ZK_HOSTS = "0.0.0.0:2181";
+	private static final String DEFAULT_ZK_SESSION_TIMEOUT = "30000";
 	private String zk_hosts;
 	private int timeout;
 	private ZkConnection client;
 	private Stat st;
 	private Watcher watcher = watchedEvent -> {};
 
+	public ZookeeperUtils() {
+		this.zk_hosts = System.getProperty("ZOOKEEPER_HOSTS", DEFAULT_ZK_HOSTS);
+		this.timeout = Integer.valueOf(System.getProperty("KAFKA_REPLICATION", DEFAULT_ZK_SESSION_TIMEOUT));
+	}
 
 	public ZookeeperUtils(String hosts, int timeout) {
 		this.zk_hosts = hosts;
@@ -82,5 +85,10 @@ public class ZookeeperUtils {
 
 	public void disconnect() throws InterruptedException {
 		this.client.close();
+	}
+
+	public void setZookeeperConnection(String hosts, int timeout) {
+		this.zk_hosts = hosts;
+		this.timeout = timeout;
 	}
 }

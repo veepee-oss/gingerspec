@@ -684,7 +684,7 @@ public class WhenGSpec extends BaseGSpec {
     @When("^I remove the zNode '(.+?)'$")
     public void removeZNode(String zNode) throws KeeperException, InterruptedException {
         commonspec.getLogger().debug("Deleting zNode at path {}", zNode);
-        commonspec.getZkClient().delete(zNode);
+        commonspec.getZookeeperClient().delete(zNode);
     }
 
 
@@ -701,9 +701,9 @@ public class WhenGSpec extends BaseGSpec {
     public void createZNode(String path, String foo, String content, boolean ephemeral) throws KeeperException, InterruptedException {
         commonspec.getLogger().debug("Creating zNode at {} with document {}", path);
         if(content != null){
-            commonspec.getZkClient().zCreate(path,content,ephemeral);
+            commonspec.getZookeeperClient().zCreate(path,content,ephemeral);
         }else{
-            commonspec.getZkClient().zCreate(path,ephemeral);
+            commonspec.getZookeeperClient().zCreate(path,ephemeral);
         }
     }
 }
