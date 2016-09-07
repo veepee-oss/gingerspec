@@ -685,16 +685,29 @@ public class ThenGSpec extends BaseGSpec {
         }
     }
 
-    /**
-     * List topics of kafka
-     *
-     *  @param topic_name name of topic
-     *
-     */
-    @Then("^A kafka topic named '(.+?)' exists")
-    public void listTopic(String topic_name) throws KeeperException, InterruptedException {
-        commonspec.getLogger().debug("Listing kafka topics {}",commonspec.getKafkaUtils().listTopics());
-        Assertions.assertThat(commonspec.getKafkaUtils().listTopics().contains(topic_name)).withFailMessage("There is no topic with that name");
-    }
+
+                /**
+          * Check that a kafka topic exist
+          *
+          *  @param topic_name name of topic
+          *
+          */
+         @Then("^A kafka topic named '(.+?)' exists")
+        public void kafkaTopicExist(String topic_name) throws KeeperException, InterruptedException {
+            commonspec.getLogger().debug("Listing kafka topics {}",commonspec.getKafkaUtils().listTopics());
+            Assertions.assertThat(commonspec.getKafkaUtils().listTopics().contains(topic_name)).withFailMessage("There is no topic with that name");
+        }
+
+        /**
+         * Check that a kafka topic not exist
+          *
+          *  @param topic_name name of topic
+          *
+          */
+         @Then("^A kafka topic named '(.+?)' not exists")
+        public void kafkaTopicNotExist(String topic_name) throws KeeperException, InterruptedException {
+            commonspec.getLogger().debug("Listing kafka topics {}",commonspec.getKafkaUtils().listTopics());
+            Assertions.assertThat(!commonspec.getKafkaUtils().listTopics().contains(topic_name)).withFailMessage("There is no topic with that name");
+        }
 
 }

@@ -52,11 +52,11 @@ public class KafkaUtils {
         this.sessionTimeoutMs = Integer.valueOf(System.getProperty("KAFKA_SESSION_TIMEOUT", "10000"));
         this.connectionTimeoutMs = Integer.valueOf(System.getProperty("KAFKA_CONNECTION_TIMEOUT", "60000"));
         this.isSecureKafkaCluster = Boolean.valueOf(System.getProperty("KAFKA_CONNECTION_TIMEOUT", "false"));
-        this.zookeeperConnect = System.getProperty("ZOOKEEPER.HOSTS","0.0.0.0:2181");
+        this.zookeeperConnect = System.getProperty("ZOOKEEPER_HOSTS","0.0.0.0:2181");
         this.rackAwareMode = null;
         this.topicConfig=new Properties();
         this.props = new Properties();
-        props.put("bootstrap.servers", System.getProperty("KAFKA.HOSTS","0.0.0.0:9092"));
+        props.put("bootstrap.servers", System.getProperty("KAFKA_HOSTS","0.0.0.0:9092"));
         props.put("acks", "all");
         props.put("retries", 0);
         props.put("batch.size", 16384);
@@ -65,7 +65,7 @@ public class KafkaUtils {
         props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
         props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
         this.propsConsumer = new Properties();
-        propsConsumer.put("bootstrap.servers", System.getProperty("KAFKA.HOSTS","0.0.0.0:9092"));
+        propsConsumer.put("bootstrap.servers", System.getProperty("KAFKA_HOSTS","0.0.0.0:9092"));
         propsConsumer.put("group.id", "test");
         propsConsumer.put("enable.auto.commit", "true");
         propsConsumer.put("auto.offset.reset", "earliest");
@@ -86,7 +86,9 @@ public class KafkaUtils {
         this.zkUtils = new ZkUtils(zkClient
                 , new ZkConnection(zookeeperConnect), isSecureKafkaCluster);
     }
-
+    public void setZkHost(String host,String port, String zkPath){
+                this.zookeeperConnect = host + ":" +port + "/" + zkPath;
+            }
 
     public ZkUtils getZkUtils(){
         return zkUtils;

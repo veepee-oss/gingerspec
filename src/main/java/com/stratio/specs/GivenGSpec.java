@@ -22,7 +22,6 @@ import static com.stratio.assertions.Assertions.assertThat;
 
 /**
  * Generic Given Specs.
- *
  */
 public class GivenGSpec extends BaseGSpec {
 
@@ -44,16 +43,15 @@ public class GivenGSpec extends BaseGSpec {
      * Create a basic Index.
      *
      * @param index_name index name
-     * @param table the table where index will be created.
-     * @param column the column where index will be saved
-     * @param keyspace keyspace used
+     * @param table      the table where index will be created.
+     * @param column     the column where index will be saved
+     * @param keyspace   keyspace used
      * @throws Exception
-     *
      */
     @Given("^I create a Cassandra index named '(.+?)' in table '(.+?)' using magic_column '(.+?)' using keyspace '(.+?)'$")
     public void createBasicMapping(String index_name, String table, String column, String keyspace) throws Exception {
         commonspec.getLogger().debug("Creating a basic index");
-        String query="CREATE INDEX "+ index_name +" ON "+ table +" ("+ column +");";
+        String query = "CREATE INDEX " + index_name + " ON " + table + " (" + column + ");";
         commonspec.getCassandraClient().executeQuery(query);
     }
 
@@ -67,11 +65,12 @@ public class GivenGSpec extends BaseGSpec {
         commonspec.getLogger().debug("Creating a Cassandra keyspace");
         commonspec.getCassandraClient().createKeyspace(keyspace);
     }
+
     /**
      * Connect to cluster.
      *
      * @param clusterType DB type (Cassandra|Mongo|Elasticsearch)
-     * @param url url where is started Cassandra cluster
+     * @param url         url where is started Cassandra cluster
      */
     @Given("^I connect to '(Cassandra|Mongo|Elasticsearch)' cluster at '(.+)'$")
     public void connect(String clusterType, String url) throws DBException, UnknownHostException {
@@ -85,8 +84,8 @@ public class GivenGSpec extends BaseGSpec {
                 commonspec.getMongoDBClient().connect();
                 break;
             case "Elasticsearch":
-                LinkedHashMap<String,Object> settings_map = new LinkedHashMap<String,Object>();
-                settings_map.put("cluster.name",System.getProperty("ES_CLUSTER", "elasticsearch"));
+                LinkedHashMap<String, Object> settings_map = new LinkedHashMap<String, Object>();
+                settings_map.put("cluster.name", System.getProperty("ES_CLUSTER", "elasticsearch"));
                 commonspec.getElasticSearchClient().setSettings(settings_map);
                 commonspec.getElasticSearchClient().connect();
                 break;
@@ -104,32 +103,32 @@ public class GivenGSpec extends BaseGSpec {
      * @throws Exception
      */
     @Given("^I create a Cassandra table named '(.+?)' using keyspace '(.+?)' with:$")
-    public void createTableWithData(String table, String keyspace, DataTable datatable){
-        try{
-        commonspec.getCassandraClient().useKeyspace(keyspace);
-        commonspec.getLogger().debug("Starting a table creation", "");
-        int attrLength=datatable.getGherkinRows().get(0).getCells().size();
-        Map<String,String> columns =  new HashMap<String,String>();
-        ArrayList<String> pk=new ArrayList<String>();
+    public void createTableWithData(String table, String keyspace, DataTable datatable) {
+        try {
+            commonspec.getCassandraClient().useKeyspace(keyspace);
+            commonspec.getLogger().debug("Starting a table creation", "");
+            int attrLength = datatable.getGherkinRows().get(0).getCells().size();
+            Map<String, String> columns = new HashMap<String, String>();
+            ArrayList<String> pk = new ArrayList<String>();
 
-        for(int i=0; i<attrLength; i++){
-            columns.put(datatable.getGherkinRows().get(0).getCells().get(i),
-            datatable.getGherkinRows().get(1).getCells().get(i));
-            if((datatable.getGherkinRows().size() == 3) && datatable.getGherkinRows().get(2).getCells().get(i).equalsIgnoreCase("PK")){
-                pk.add(datatable.getGherkinRows().get(0).getCells().get(i));
+            for (int i = 0; i < attrLength; i++) {
+                columns.put(datatable.getGherkinRows().get(0).getCells().get(i),
+                        datatable.getGherkinRows().get(1).getCells().get(i));
+                if ((datatable.getGherkinRows().size() == 3) && datatable.getGherkinRows().get(2).getCells().get(i).equalsIgnoreCase("PK")) {
+                    pk.add(datatable.getGherkinRows().get(0).getCells().get(i));
+                }
             }
-        }
-        if(pk.isEmpty()){
-            throw new Exception("A PK is needed");
-        }
-        commonspec.getCassandraClient().createTableWithData(table, columns, pk);
-        }catch (Exception e) {
+            if (pk.isEmpty()) {
+                throw new Exception("A PK is needed");
+            }
+            commonspec.getCassandraClient().createTableWithData(table, columns, pk);
+        } catch (Exception e) {
             // TODO Auto-generated catch block
             commonspec.getLogger().debug("Exception captured");
             commonspec.getLogger().debug(e.toString());
             commonspec.getExceptions().add(e);
         }
-        }
+    }
 
     /**
      * Insert Data
@@ -140,21 +139,21 @@ public class GivenGSpec extends BaseGSpec {
      * @throws Exception
      */
     @Given("^I insert in keyspace '(.+?)' and table '(.+?)' with:$")
-    public void insertData(String keyspace, String table, DataTable datatable){
-        try{
-        commonspec.getCassandraClient().useKeyspace(keyspace);
-        commonspec.getLogger().debug("Starting a table creation", "");
-        int attrLength=datatable.getGherkinRows().get(0).getCells().size();
-        Map<String, Object> fields =  new HashMap<String,Object>();
-        for(int e=1; e<datatable.getGherkinRows().size();e++){
-            for(int i=0; i<attrLength; i++){
-                fields.put(datatable.getGherkinRows().get(0).getCells().get(i), datatable.getGherkinRows().get(e).getCells().get(i));
+    public void insertData(String keyspace, String table, DataTable datatable) {
+        try {
+            commonspec.getCassandraClient().useKeyspace(keyspace);
+            commonspec.getLogger().debug("Starting a table creation", "");
+            int attrLength = datatable.getGherkinRows().get(0).getCells().size();
+            Map<String, Object> fields = new HashMap<String, Object>();
+            for (int e = 1; e < datatable.getGherkinRows().size(); e++) {
+                for (int i = 0; i < attrLength; i++) {
+                    fields.put(datatable.getGherkinRows().get(0).getCells().get(i), datatable.getGherkinRows().get(e).getCells().get(i));
+
+                }
+                commonspec.getCassandraClient().insertData(keyspace + "." + table, fields);
 
             }
-            commonspec.getCassandraClient().insertData(keyspace+"."+table, fields);
-
-        }
-        }catch (Exception e) {
+        } catch (Exception e) {
             // TODO Auto-generated catch block
             commonspec.getLogger().debug("Exception captured");
             commonspec.getLogger().debug(e.toString());
@@ -163,21 +162,20 @@ public class GivenGSpec extends BaseGSpec {
     }
 
 
-     /**
+    /**
      * Save value for future use.
-     *
+     * <p>
      * If element is a jsonpath expression (i.e. $.fragments[0].id), it will be
      * applied over the last httpResponse.
-     *
+     * <p>
      * If element is a jsonpath expression preceded by some other string
      * (i.e. ["a","b",,"c"].$.[0]), it will be applied over this string.
      * This will help to save the result of a jsonpath expression evaluated over
      * previous stored variable.
      *
      * @param position position from a search result
-     * @param element key in the json response to be saved
-     * @param envVar thread environment variable where to store the value
-     *
+     * @param element  key in the json response to be saved
+     * @param envVar   thread environment variable where to store the value
      * @throws IllegalAccessException
      * @throws IllegalArgumentException
      * @throws SecurityException
@@ -187,31 +185,31 @@ public class GivenGSpec extends BaseGSpec {
      * @throws InvocationTargetException
      * @throws NoSuchMethodException
      */
-     @Given("^I save element (in position \'(.+?)\' in )?\'(.+?)\' in environment variable \'(.+?)\'$")
-     public void saveElementEnvironment(String foo, String position, String element, String envVar) throws Exception {
+    @Given("^I save element (in position \'(.+?)\' in )?\'(.+?)\' in environment variable \'(.+?)\'$")
+    public void saveElementEnvironment(String foo, String position, String element, String envVar) throws Exception {
 
-         Pattern pattern = Pattern.compile("^((.*)(\\.)+)(\\$.*)$");
-         Matcher matcher = pattern.matcher(element);
-         String json;
-         String parsedElement;
+        Pattern pattern = Pattern.compile("^((.*)(\\.)+)(\\$.*)$");
+        Matcher matcher = pattern.matcher(element);
+        String json;
+        String parsedElement;
 
-         if (matcher.find()) {
-             json  = matcher.group(2);
-             parsedElement = matcher.group(4);
-         } else {
-             json = commonspec.getResponse().getResponse();
-             parsedElement = element;
-         }
+        if (matcher.find()) {
+            json = matcher.group(2);
+            parsedElement = matcher.group(4);
+        } else {
+            json = commonspec.getResponse().getResponse();
+            parsedElement = element;
+        }
 
-         String value = commonspec.getJSONPathString(json,parsedElement,position);
+        String value = commonspec.getJSONPathString(json, parsedElement, position);
 
-         if(value == null) {
-             throw new Exception("Element to be saved: " + element + " is null");
-         } else {
-             this.commonspec.getLogger().debug("Saving element: {} with value: {} in environment variable: {}", new Object[]{element, value, envVar});
-             ThreadProperty.set(envVar, value);
-         }
-     }
+        if (value == null) {
+            throw new Exception("Element to be saved: " + element + " is null");
+        } else {
+            this.commonspec.getLogger().debug("Saving element: {} with value: {} in environment variable: {}", new Object[]{element, value, envVar});
+            ThreadProperty.set(envVar, value);
+        }
+    }
 
     /**
      * Drop all the ElasticSearch indexes.
@@ -336,7 +334,6 @@ public class GivenGSpec extends BaseGSpec {
      *
      * @param host
      * @param port
-     *
      */
     @Given("^My app is running in '([^:]+?)(:.+?)?'$")
     public void setupApp(String host, String port) {
@@ -392,9 +389,8 @@ public class GivenGSpec extends BaseGSpec {
         String restProtocol = "http://";
 
         if (isSecured != null) {
-            restProtocol= "https://";
+            restProtocol = "https://";
         }
-
 
 
         if (restHost == null) {
@@ -408,12 +404,11 @@ public class GivenGSpec extends BaseGSpec {
         commonspec.setRestProtocol(restProtocol);
         commonspec.setRestHost(restHost);
         commonspec.setRestPort(restPort);
-        commonspec.getLogger().debug("Sending requests to {}{}{}",restProtocol, restHost, restPort);
+        commonspec.getLogger().debug("Sending requests to {}{}{}", restProtocol, restHost, restPort);
     }
 
     /**
      * Maximizes current browser window. Mind the current resolution could break a test.
-     *
      */
     @Given("^I maximize the browser$")
     public void seleniumMaximize(String url) {
@@ -422,13 +417,12 @@ public class GivenGSpec extends BaseGSpec {
 
     /**
      * Switches to a frame/ iframe.
-     *
      */
     @Given("^I switch to the iframe on index '(\\d+?)'$")
     public void seleniumSwitchFrame(Integer index) {
 
         assertThat(commonspec.getPreviousWebElements()).as("There are less found elements than required")
-        .hasAtLeast(index);
+                .hasAtLeast(index);
 
         WebElement elem = commonspec.getPreviousWebElements().getPreviousWebElements().get(index);
         commonspec.getDriver().switchTo().frame(elem);
@@ -436,7 +430,6 @@ public class GivenGSpec extends BaseGSpec {
 
     /**
      * Switches to a parent frame/ iframe.
-     *
      */
     @Given("^I switch to a parent frame$")
     public void seleniumSwitchAParentFrame() {
@@ -445,7 +438,6 @@ public class GivenGSpec extends BaseGSpec {
 
     /**
      * Switches to the frames main container.
-     *
      */
     @Given("^I switch to the main frame container$")
     public void seleniumSwitchParentFrame() {
@@ -481,13 +473,13 @@ public class GivenGSpec extends BaseGSpec {
 
     }
 
- /*
- * Authenticate in a DCOS cluster
- *
- * @param dcosHost
- * @param user
- *
- */
+    /*
+    * Authenticate in a DCOS cluster
+    *
+    * @param dcosHost
+    * @param user
+    *
+    */
     @Given("^I authenticate in DCOS cluster '(.+?)' with email '(.+?)'$")
     public void authenticateDCOS(String dcosCluster, String user) throws Exception {
         commonspec.getLogger().debug("Authenticating in DCOS cluster " + dcosCluster + " with user " + user);
@@ -543,7 +535,6 @@ public class GivenGSpec extends BaseGSpec {
      * Executes the command specified in local system
      *
      * @param command
-     *
      **/
     @Given("^I execute command '(.+?)' locally$")
     public void executeLocalCommand(String command) throws Exception {
@@ -552,11 +543,10 @@ public class GivenGSpec extends BaseGSpec {
     }
 
     /**
-    * Executes the command specified in remote system
-    *
-    * @param command
-    *
-    **/
+     * Executes the command specified in remote system
+     *
+     * @param command
+     **/
     @Given("^I execute command '(.+?)' in remote ssh connection( with exit status '(.+?)')?$")
     public void executeCommand(String command, String foo, Integer exitStatus) throws Exception {
         if (exitStatus == null) {
@@ -574,7 +564,7 @@ public class GivenGSpec extends BaseGSpec {
         if (logOutput.size() < 25) {
             logLastLines = logOutput.size();
         }
-        for (String s:logOutput.subList(logOutput.size() - logLastLines, logOutput.size())) {
+        for (String s : logOutput.subList(logOutput.size() - logLastLines, logOutput.size())) {
             log.append(s).append("\n");
         }
 
@@ -603,7 +593,6 @@ public class GivenGSpec extends BaseGSpec {
 
     /**
      * Get all opened windows and store it.
-     *
      */
     @Given("^new window is opened$")
     public void seleniumGetwindows() {
@@ -620,10 +609,26 @@ public class GivenGSpec extends BaseGSpec {
      * @param zookeeperHosts as host:port (comma separated)
      */
     @Given("^I connect to zk cluster at '(.+)'$")
-    public void connectToZk(String zookeeperHosts){
-        commonspec.getLogger().debug("Connecting to zookeeper at "+zookeeperHosts);
-        commonspec.setZookeeperConnection(zookeeperHosts,3000);
+    public void connectToZk(String zookeeperHosts) {
+        commonspec.getLogger().debug("Connecting to zookeeper at " + zookeeperHosts);
+        commonspec.setZookeeperConnection(zookeeperHosts, 3000);
         commonspec.getZkClient().connectZk();
+    }
+    /**
+     * Connect to Kafka.
+     * @param zkHost
+     * @param zkPort
+     * @param zkPath
+     */
+    @Given("^I connect to kafka cluster at '(.+)':'(.+)' using path '(.+)'$")
+    public void connectKafka(String zkHost, String zkPort, String zkPath) throws UnknownHostException {
+        commonspec.getLogger().debug("Connecting to " + zkHost + " cluster");
+        if (System.getenv("DCOS_CLUSTER") != null) {
+            commonspec.getKafkaUtils().setZkHost(zkHost, zkPort, zkPath);
+        } else {
+            commonspec.getKafkaUtils().setZkHost(zkHost, zkPort, "dcos-service-" + zkPath);
+        }
+        commonspec.getKafkaUtils().connect();
     }
 
 }

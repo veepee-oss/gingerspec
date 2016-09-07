@@ -39,7 +39,7 @@ public class KafkaUtilsIT {
         kafka_utils.createTopic("testList");
         kafka_utils.createTopic("testList2");
         assertThat(kafka_utils.listTopics()).contains("testList");
-        logger.error("Kafka contains next topics: " +Joiner.on(",").join(kafka_utils.listTopics()));
+        logger.debug("Kafka contains next topics: " +Joiner.on(",").join(kafka_utils.listTopics()));
         assertThat(kafka_utils.listTopics()).contains("testList2");
         kafka_utils.deleteTopic("testList");
         kafka_utils.deleteTopic("testList2");

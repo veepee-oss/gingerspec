@@ -662,4 +662,15 @@ public class WhenGSpec extends BaseGSpec {
             commonspec.getLogger().debug("Creating a kafka topic");
             commonspec.getKafkaUtils().createTopic(topic_name);
     }
+    /**
+          * Delete a Kafka topic.
+          *
+          * @param topic_name topic name
+          *
+          */
+        @When("^I delete a Kafka topic named '(.+?)'")
+        public void deleteKafkaTopic(String topic_name) throws Exception {
+                commonspec.getLogger().debug("Deleteting kafka topic " + topic_name);
+                commonspec.getKafkaUtils().deleteTopic(topic_name);
+            }
 }
