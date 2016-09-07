@@ -21,7 +21,7 @@ public class ZookeeperUtils {
 	private String zk_hosts;
 	private int timeout;
 	private ZkConnection client;
-	private Stat st = new Stat();
+	private Stat st;
 	private Watcher watcher = watchedEvent -> {};
 
 
@@ -35,47 +35,44 @@ public class ZookeeperUtils {
 		this.client.connect(watcher);
 	}
 
-	public String zRead(String path){
-		logger.debug("Trying to read data at " +path+ ".");
-		byte[] b = new byte[0];
+	public String zRead(String path) throws KeeperException, InterruptedException {
+		logger.debug("Trying to read data at {}", path);
+		byte[] b;
 		String data;
-		try {
-			b = this.client.readData(path,this.st,false);
-		} catch (KeeperException.NoNodeException e) {
-			this.logger.error("No node has been found at "+e.getPath());
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} catch (KeeperException e) {
-			e.printStackTrace();
-		}
+		this.st = new Stat();
 
-		if(b==null){
-			logger.info("Requested path "+path+" exists");
-			data = "OK";
-		}else{
-			data = new String(b, StandardCharsets.UTF_8);
-			logger.info("Requested path "+path+" contains "+data+".");
-		}
+		b = this.client.readData(path,st,false);
+		data = new String(b, StandardCharsets.UTF_8);
+
+		logger.debug("Requested path {} contains {}", path, data);
+
 		return data;
 	}
 
 
-	public void zCreate(String path, String document, boolean isEphimeral) throws KeeperException, InterruptedException {
+	public void zCreate(String path, String document, boolean isEphemeral) throws KeeperException, InterruptedException {
 		byte[] bDoc = document.getBytes(StandardCharsets.UTF_8);
-		if(isEphimeral){
+		if(isEphemeral){
 			this.client.create(path,bDoc, CreateMode.EPHEMERAL);
 		}else{
 			this.client.create(path,bDoc, CreateMode.PERSISTENT);
 		}
 	}
 
-	public void zCreate(String path, boolean isEphimeral) throws KeeperException, InterruptedException {
+	public void zCreate(String path, boolean isEphemeral) throws KeeperException, InterruptedException {
 		byte[] bDoc = "".getBytes(StandardCharsets.UTF_8);
-		if(isEphimeral){
+		if(isEphemeral){
 			this.client.create(path,bDoc, CreateMode.EPHEMERAL);
 		}else{
 			this.client.create(path,bDoc, CreateMode.PERSISTENT);
+		}
+	}
+
+	public Boolean isConnected(){
+		if ("".equals(this.client.getServers())){
+			return false;
+		}else{
+			return true;
 		}
 	}
 
@@ -83,20 +80,7 @@ public class ZookeeperUtils {
 		this.client.delete(path);
 	}
 
-
-	public String getZk_hosts() {
-		return zk_hosts;
-	}
-
-	public void setZk_hosts(String zk_hosts) {
-		this.zk_hosts = zk_hosts;
-	}
-
-	public int getTimeout() {
-		return timeout;
-	}
-
-	public void setTimeout(int timeout) {
-		this.timeout = timeout;
+	public void disconnect() throws InterruptedException {
+		this.client.close();
 	}
 }

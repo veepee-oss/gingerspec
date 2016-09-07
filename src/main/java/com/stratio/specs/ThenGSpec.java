@@ -12,8 +12,12 @@ import com.stratio.tests.utils.ThreadProperty;
 import cucumber.api.DataTable;
 import cucumber.api.java.en.Then;
 import gherkin.formatter.model.DataTableRow;
+import org.I0Itec.zkclient.exception.ZkException;
+import org.I0Itec.zkclient.exception.ZkNoNodeException;
+import org.I0Itec.zkclient.exception.ZkNodeExistsException;
 import org.apache.zookeeper.KeeperException;
 import org.assertj.core.api.Assertions;
+import org.assertj.core.api.ThrowableAssertAlternative;
 import org.assertj.core.api.WritableAssertionInfo;
 import org.json.JSONArray;
 import org.openqa.selenium.WebElement;
@@ -672,12 +676,13 @@ public class ThenGSpec extends BaseGSpec {
      *
      */
     @Then("^I check that zNode at '(.+?)' exists( and contains '(.+?)')?$")
-    public void readZNode(String zNode, Boolean foo, String document) throws KeeperException, InterruptedException {
+    public void readZNode(String zNode, String foo, String document) throws KeeperException, InterruptedException {
         commonspec.getLogger().debug("Cheking zNode at path {}", zNode);
         if(document==null){
+            String breakpoint = commonspec.getZkClient().zRead(zNode);
             Assertions.assertThat(commonspec.getZkClient().zRead(zNode))
                     .withFailMessage("The zNode does not exists")
-                    .as("zNode exists").contains("OK");
+                    .as("zNode exists").isEqualTo("");
         }else{
             Assertions.assertThat(commonspec.getZkClient().zRead(zNode))
                     .withFailMessage("The zNode does not exists or the content does not match")
@@ -685,29 +690,29 @@ public class ThenGSpec extends BaseGSpec {
         }
     }
 
+    /**
+     * Check that a kafka topic exist
+     *
+     *  @param topic_name name of topic
+     *
+     */
+     @Then("^A kafka topic named '(.+?)' exists")
+      public void kafkaTopicExist(String topic_name) throws KeeperException, InterruptedException {
+         commonspec.getLogger().debug("Listing kafka topics {}",commonspec.getKafkaUtils().listTopics());
+         Assertions.assertThat(commonspec.getKafkaUtils().listTopics().contains(topic_name)).withFailMessage("There is no topic with that name");
+      }
 
-                /**
-          * Check that a kafka topic exist
-          *
-          *  @param topic_name name of topic
-          *
-          */
-         @Then("^A kafka topic named '(.+?)' exists")
-        public void kafkaTopicExist(String topic_name) throws KeeperException, InterruptedException {
-            commonspec.getLogger().debug("Listing kafka topics {}",commonspec.getKafkaUtils().listTopics());
-            Assertions.assertThat(commonspec.getKafkaUtils().listTopics().contains(topic_name)).withFailMessage("There is no topic with that name");
-        }
-
-        /**
-         * Check that a kafka topic not exist
-          *
-          *  @param topic_name name of topic
-          *
-          */
-         @Then("^A kafka topic named '(.+?)' not exists")
-        public void kafkaTopicNotExist(String topic_name) throws KeeperException, InterruptedException {
-            commonspec.getLogger().debug("Listing kafka topics {}",commonspec.getKafkaUtils().listTopics());
-            Assertions.assertThat(!commonspec.getKafkaUtils().listTopics().contains(topic_name)).withFailMessage("There is no topic with that name");
-        }
+     /**
+      * Check that a kafka topic not exist
+      *
+      *  @param topic_name name of topic
+      *
+      */
+      @Then("^A kafka topic named '(.+?)' not exists")
+       public void kafkaTopicNotExist(String topic_name) throws KeeperException, InterruptedException {
+          commonspec.getLogger().debug("Listing kafka topics {}",commonspec.getKafkaUtils().listTopics());
+          Assertions.assertThat(!commonspec.getKafkaUtils().listTopics().contains(topic_name)).withFailMessage("There is no topic with that name");
+       }
 
 }
+

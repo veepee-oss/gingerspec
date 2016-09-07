@@ -174,6 +174,8 @@ public class HookGSpec extends BaseGSpec {
 
     }
 
+
+
     /**
      * Close selenium web driver.
      */
@@ -248,6 +250,16 @@ public class HookGSpec extends BaseGSpec {
         commonspec.getLogger().debug("Closing SSH remote connection");
         if (commonspec.getRemoteSSHConnection() != null) {
             commonspec.getRemoteSSHConnection().getSession().disconnect();
+        }
+    }
+
+    @After(order = 10)
+    public void zkConnection() throws Exception {
+        commonspec.getLogger().debug("Closing zookeeper connection");
+        if (!"".equals(System.getProperty("ZOOKEEPER_HOSTS",""))) {
+            if(commonspec.getZkClient().isConnected()){
+                commonspec.getZkClient().disconnect();
+            }
         }
     }
 }

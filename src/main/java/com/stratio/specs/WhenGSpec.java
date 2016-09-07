@@ -12,6 +12,7 @@ import com.stratio.tests.utils.ThreadProperty;
 import cucumber.api.DataTable;
 import cucumber.api.Transform;
 import cucumber.api.java.en.When;
+import org.apache.zookeeper.KeeperException;
 import org.hjson.JsonArray;
 import org.hjson.JsonValue;
 import org.openqa.selenium.By;
@@ -663,14 +664,46 @@ public class WhenGSpec extends BaseGSpec {
             commonspec.getKafkaUtils().createTopic(topic_name);
     }
     /**
-          * Delete a Kafka topic.
-          *
-          * @param topic_name topic name
-          *
-          */
-        @When("^I delete a Kafka topic named '(.+?)'")
+     * Delete a Kafka topic.
+     *
+     * @param topic_name topic name
+     *
+     */
+     @When("^I delete a Kafka topic named '(.+?)'")
         public void deleteKafkaTopic(String topic_name) throws Exception {
                 commonspec.getLogger().debug("Deleteting kafka topic " + topic_name);
                 commonspec.getKafkaUtils().deleteTopic(topic_name);
             }
+     
+
+    /** Delete zPath, it should be empty
+     *
+     *  @param zNode path at zookeeper
+     *
+     */
+    @When("^I remove the zNode '(.+?)'$")
+    public void removeZNode(String zNode) throws KeeperException, InterruptedException {
+        commonspec.getLogger().debug("Deleting zNode at path {}", zNode);
+        commonspec.getZkClient().delete(zNode);
+    }
+
+
+    /**
+     * Create zPath and domcument
+     *
+     *  @param path path at zookeeper
+     *  @param foo a dummy match group
+     *  @param content if it has content it should be defined
+     *  @param ephemeral if it's created as ephemeral or not
+     *
+     */
+    @When("^I create the zNode '(.+?)'( with content '(.+?)')? which (IS|IS NOT) ephemeral$")
+    public void createZNode(String path, String foo, String content, boolean ephemeral) throws KeeperException, InterruptedException {
+        commonspec.getLogger().debug("Creating zNode at {} with document {}", path);
+        if(content != null){
+            commonspec.getZkClient().zCreate(path,content,ephemeral);
+        }else{
+            commonspec.getZkClient().zCreate(path,ephemeral);
+        }
+    }
 }
