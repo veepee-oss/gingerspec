@@ -1,4 +1,9 @@
 ITSERVICES:
+  - ZOOKEEPER:
+      image: confluent/zookeeper:3.4.6-cp1
+      env:
+        - zk_id=1
+      sleep: 10
   - MONGODB:
       image: stratio/mongo:3.0.4
       sleep: 10
@@ -12,11 +17,6 @@ ITSERVICES:
       sleep: 10
       env:
         - MAX_HEAP=256M
-  - ZOOKEEPER:
-      image: confluent/zookeeper:3.4.6-cp1
-      env:
-        - zk_id=1
-      sleep: 30
   - KAFKA:
       image: confluent/kafka:0.10.0.0-cp1
       env:
