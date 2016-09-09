@@ -45,7 +45,11 @@ public class ZookeeperUtils {
 		this.st = new Stat();
 
 		b = this.client.readData(path,st,false);
-		data = new String(b, StandardCharsets.UTF_8);
+		if (b==null) {
+		 	data = "";
+		} else {
+			data = new String(b, StandardCharsets.UTF_8);
+		}
 
 		logger.debug("Requested path {} contains {}", path, data);
 
