@@ -706,4 +706,34 @@ public class WhenGSpec extends BaseGSpec {
             commonspec.getZookeeperClient().zCreate(path,ephemeral);
         }
     }
+
+    /**
+     * Modify partitions in a Kafka topic.
+     *
+     * @param topic_name topic name
+     * @param numPartitions number of partitions
+     *
+     */
+    @When("^I increase '(.+?)' partitions in a Kafka topic named '(.+?)'")
+    public void modifyPartitions(int numPartitions, String topic_name) throws Exception {
+        commonspec.getLogger().debug("Increasing partition of kafka topic " + topic_name + " to" + numPartitions );
+        commonspec.getKafkaUtils().modifyTopicPartitioning(topic_name,numPartitions);
+    }
+
+
+
+    /**
+     * Sending a message in a Kafka topic.
+     *
+     * @param topic_name topic name
+     * @param message string that you send to topic
+     *
+     */
+    @When("^I send a message '(.+?)' to the kafka topic named '(.+?)'")
+    public void sendAMessage(String message, String topic_name) throws Exception {
+        commonspec.getLogger().debug("Sending to kafka topic " + topic_name + " next message: " + message );
+        commonspec.getKafkaUtils().sendMessage(topic_name,message);
+    }
+
+
 }

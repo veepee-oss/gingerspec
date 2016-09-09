@@ -13,9 +13,9 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClient.BoundRequestBuilder;
-import com.ning.http.client.Response;
 import com.ning.http.client.Realm;
 import com.ning.http.client.Realm.AuthScheme;
+import com.ning.http.client.Response;
 import com.ning.http.client.cookie.Cookie;
 import com.stratio.conditions.Conditions;
 import com.stratio.tests.utils.*;
@@ -1656,7 +1656,7 @@ public class CommonG {
 	}
 
 
-    /**
+	/**
      * Remove a subelement in a JsonPath
      *
      * @param jsonString String of the json
@@ -1671,6 +1671,18 @@ public class CommonG {
         context.delete(expr);
         return context.jsonString();
     }
+
+	/**
+	 * The function searches over the array by certain field value,
+	 * and replaces occurences with the parameter provided.
+	 *
+	 * @param jsonString Original json object
+	 * @param key Key to search
+	 * @param value Value to replace key with
+	 */
+	public String replaceJSONPathElement(String jsonString, String key, String value) {
+		return JsonPath.parse(jsonString).set(key, value).jsonString();
+	}
 
 	/**
 	 * Evaluate an expression.
@@ -1726,4 +1738,19 @@ public class CommonG {
 		}
 
 	}
+
+	public ZookeeperUtils getZkClient() {
+		return zkClient;
+	}
+
+	public void runCommandAndGetResult(String command) throws Exception{
+		getRemoteSSHConnection().runCommand(command);
+		setCommandResult(getRemoteSSHConnection().getResult());
+	}
+
+	public String updateMarathonJson(String json){
+		return removeJSONPathElement(removeJSONPathElement(removeJSONPathElement(json,".versionInfo"),".version"),".uris.*");
+	}
+
+
 }

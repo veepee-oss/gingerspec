@@ -4,6 +4,7 @@ import kafka.admin.AdminOperationException;
 import kafka.admin.AdminUtils;
 import kafka.admin.RackAwareMode;
 import kafka.common.KafkaException;
+import kafka.common.TopicAlreadyMarkedForDeletionException;
 import kafka.utils.ZKStringSerializer$;
 import kafka.utils.ZkUtils;
 import org.I0Itec.zkclient.ZkClient;
@@ -53,7 +54,7 @@ public class KafkaUtils {
         this.connectionTimeoutMs = Integer.valueOf(System.getProperty("KAFKA_CONNECTION_TIMEOUT", "60000"));
         this.isSecureKafkaCluster = Boolean.valueOf(System.getProperty("KAFKA_CONNECTION_TIMEOUT", "false"));
         this.zookeeperConnect = System.getProperty("ZOOKEEPER_HOSTS","0.0.0.0:2181");
-        this.rackAwareMode = null;
+        this.rackAwareMode = RackAwareMode.Enforced$.MODULE$;
         this.topicConfig=new Properties();
         this.props = new Properties();
         props.put("bootstrap.servers", System.getProperty("KAFKA_HOSTS","0.0.0.0:9092"));
@@ -118,7 +119,7 @@ public class KafkaUtils {
      * @return true if the topic has been deleted and false if the topic has not been deleted.
      * @throws kafka.common.KafkaException
      */
-    public boolean deleteTopic(String topicName) throws KafkaException{
+    public boolean deleteTopic(String topicName) throws KafkaException, TopicAlreadyMarkedForDeletionException{
         logger.debug("Deleting topic with name: " + topicName);
         AdminUtils.deleteTopic(zkUtils,topicName);
         logger.debug("Topic with name: " + topicName + " correctly deleted");
@@ -145,7 +146,7 @@ public class KafkaUtils {
         if (AdminUtils.topicExists(zkUtils, topicName)) {
             logger.info("Altering topic {}", topicName);
             try {
-                AdminUtils.addPartitions(zkUtils, topicName, numPartitions, "", true,rackAwareMode);
+                AdminUtils.addPartitions(zkUtils, topicName, numPartitions, "", true, RackAwareMode.Enforced$.MODULE$);
                 logger.info("Topic {} altered with partitions : {}", topicName, partitions);
             } catch (AdminOperationException aoe) {
                 logger.info("Error while altering partitions for topic : {}", topicName, aoe);

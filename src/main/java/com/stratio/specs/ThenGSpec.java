@@ -12,12 +12,8 @@ import com.stratio.tests.utils.ThreadProperty;
 import cucumber.api.DataTable;
 import cucumber.api.java.en.Then;
 import gherkin.formatter.model.DataTableRow;
-import org.I0Itec.zkclient.exception.ZkException;
-import org.I0Itec.zkclient.exception.ZkNoNodeException;
-import org.I0Itec.zkclient.exception.ZkNodeExistsException;
 import org.apache.zookeeper.KeeperException;
 import org.assertj.core.api.Assertions;
-import org.assertj.core.api.ThrowableAssertAlternative;
 import org.assertj.core.api.WritableAssertionInfo;
 import org.json.JSONArray;
 import org.openqa.selenium.WebElement;
@@ -637,34 +633,21 @@ public class ThenGSpec extends BaseGSpec {
     @Then("^I add a new DCOS label with key '(.+?)' and value '(.+?)' to the service '(.+?)'?$")
     public void sendAppendRequest (String key, String value, String service) throws Exception {
         commonspec.getLogger().info("Appending the label \"" + key  + "\":\"" + value + "\" to the service " + service);
-        String command = "touch " + service + ".json && dcos marathon app show " + service + " > /dcos/" + service + ".json";
-
-        commonspec.getRemoteSSHConnection().runCommand(command);
-        commonspec.setCommandResult(commonspec.getRemoteSSHConnection().getResult());
-
-        String commandEcho = "cat /dcos/" + service + ".json";
-        commonspec.getRemoteSSHConnection().runCommand(commandEcho);
-        commonspec.setCommandResult(commonspec.getRemoteSSHConnection().getResult());
+        commonspec.runCommandAndGetResult("touch " + service + ".json && dcos marathon app show " + service + " > /dcos/" + service + ".json");
+        commonspec.runCommandAndGetResult("cat /dcos/" + service + ".json");
 
         String configFile = commonspec.getRemoteSSHConnection().getResult();
         String myValue = commonspec.getJSONPathString(configFile,".labels","0");
-        String myJson1 = commonspec.removeJSONPathElement(configFile,".labels");
-        String myJson2 = commonspec.removeJSONPathElement(myJson1,".uris.*");
-        String myJson3 = commonspec.removeJSONPathElement(myJson2,".version");
-        String myJson = commonspec.removeJSONPathElement(myJson3,".versionInfo");
+        String myJson = commonspec.updateMarathonJson(commonspec.removeJSONPathElement(configFile,".labels"));
 
         String newValue = myValue.replaceFirst("}", ", \"" + key +"\": \"" + value + "\"}");
         newValue = "\"labels\":" + newValue;
         String myFinalJson = myJson.replaceFirst("\\{", "{" + newValue + ",");
         String test = myFinalJson.replaceAll("\"uris\"","\"none\"");
 
-        String file = "echo '" + test +"' > /dcos/final" + service + ".json";
-        commonspec.getRemoteSSHConnection().runCommand(file);
-        commonspec.setCommandResult(commonspec.getRemoteSSHConnection().getResult());
+        commonspec.runCommandAndGetResult("echo '" + test +"' > /dcos/final" + service + ".json");
+        commonspec.runCommandAndGetResult("dcos marathon app update " + service + " < /dcos/final" + service + ".json");
 
-        String updatecmd = "dcos marathon app update " + service + " < /dcos/final" + service + ".json";
-        commonspec.getRemoteSSHConnection().runCommand(updatecmd);
-        commonspec.setCommandResult(commonspec.getRemoteSSHConnection().getResult());
         commonspec.setCommandExitStatus(commonspec.getRemoteSSHConnection().getExitStatus());
     }
 
@@ -713,6 +696,48 @@ public class ThenGSpec extends BaseGSpec {
           commonspec.getLogger().debug("Listing kafka topics {}",commonspec.getKafkaUtils().listTopics());
           Assertions.assertThat(!commonspec.getKafkaUtils().listTopics().contains(topic_name)).withFailMessage("There is no topic with that name");
        }
+
+
+    /**
+     * Set a environment variable in marathon and deploy again.
+     *
+     * @param key
+     * @param value
+     * @param service
+     *
+     * @throws Exception
+     */
+    @Then("^I modify the enviroment variable '(.+?)' with value '(.+?)' in service '(.+?)'?$")
+    public void setMarathonProperty (String key, String value, String service) throws Exception {
+        commonspec.getLogger().info("Setting the environment variable \"" + key  + "\" with \"" + value + "\" to the service " + service);
+
+        commonspec.runCommandAndGetResult("touch " + service + "-env.json && dcos marathon app show " + service + " > /dcos/" + service + "-env.json");
+        commonspec.runCommandAndGetResult("cat /dcos/" + service + "-env.json");
+
+        String configFile = commonspec.getRemoteSSHConnection().getResult();
+        String myJson1 = commonspec.replaceJSONPathElement(configFile, key, value);
+        String myJson4 = commonspec.updateMarathonJson(myJson1);
+        String myJson = myJson4.replaceAll("\"uris\"","\"none\"");
+
+        commonspec.runCommandAndGetResult("echo '" + myJson +"' > /dcos/final" + service + "-env.json");
+        commonspec.runCommandAndGetResult("dcos marathon app update " + service + " < /dcos/final" + service + "-env.json");
+        commonspec.setCommandExitStatus(commonspec.getRemoteSSHConnection().getExitStatus());
+    }
+
+    /**
+     * Check that the number of partitions is like expected.
+     *
+     * @param topic_name  Name of kafka topic
+     * @param numOfPartitions Number of partitions
+     *
+     * @throws Exception
+     */
+    @Then("^The number of partitions in topic '(.+?)' should be '(.+?)''?$")
+    public void checkNumberOfPartitions (String topic_name, int numOfPartitions) throws Exception {
+        commonspec.getLogger().debug("Number of partitions is {}",commonspec.getKafkaUtils().getPartitions(topic_name));
+        Assertions.assertThat(commonspec.getKafkaUtils().getPartitions(topic_name)).isEqualTo(numOfPartitions);
+
+    }
 
 }
 
