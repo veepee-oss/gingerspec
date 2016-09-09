@@ -31,6 +31,7 @@ public class KafkaUtilsIT {
         assertThat(AdminUtils.topicExists(kafka_utils.getZkUtils(),"testTopic")).isTrue();
         kafka_utils.deleteTopic("testTopic");
     }
+
     @Test
     public void listTopicsTest()  {
         if(AdminUtils.topicExists(kafka_utils.getZkUtils(),"testList")){

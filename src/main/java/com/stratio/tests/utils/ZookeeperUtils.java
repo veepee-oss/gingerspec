@@ -78,9 +78,13 @@ public class ZookeeperUtils {
 	public Boolean isConnected(){
 		if ("".equals(this.client.getServers())){
 			return false;
-		}else{
+		} else{
 			return true;
 		}
+	}
+
+	public Boolean exists(String path) throws KeeperException, InterruptedException {
+		return this.client.exists(path, false);
 	}
 
 	public void delete(String path) throws KeeperException, InterruptedException {
