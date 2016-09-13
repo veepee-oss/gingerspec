@@ -474,6 +474,50 @@ public class GivenGSpec extends BaseGSpec {
     }
 
     /*
+   * Authenticate in a DCOS cluster
+   *
+   * @param remoteHost
+   * @param email
+   * @param user
+   * @param password
+   * @param pemFile
+   *
+   */
+    @Given("^I authenticate in DCOS cluster '(.+?)' with email '(.+?)' with user '(.+?)'( and password '(.+?)')?( using pem file '(.+?)')?$")
+    public void authenticateDCOSpem(String remoteHost,String email, String user, String foo, String password, String bar, String pemFile) throws Exception {
+        if (pemFile == null) {
+                throw new Exception("You have to provide a pem file to be used for connection");
+            }
+        commonspec.getLogger().debug("Authenticating in DCOS cluster " + remoteHost + " with user " + pemFile);
+        File pem = new File(pemFile);
+        if (!pem.exists()) {
+            throw new Exception("Pem file: " + pemFile + " does not exist");
+        }
+        commonspec.getLogger().debug("Openning remote ssh connection to " + remoteHost + " with user " +
+                " using pem file " + pemFile);
+        commonspec.setRemoteSSHConnection(new RemoteSSHConnection(user, password, remoteHost, pemFile));
+
+        commonspec.getRemoteSSHConnection().runCommand("sudo cat /var/lib/dcos/dcos-oauth/auth-token-secret");
+        String DCOSsecret = commonspec.getRemoteSSHConnection().getResult().trim();
+
+        final JWTSigner signer = new JWTSigner(DCOSsecret);
+
+
+        final HashMap<String, Object> claims = new HashMap();
+        claims.put("uid", email);
+
+        final String jwt = signer.sign(claims);
+
+        Cookie cookie = new Cookie("dcos-acs-auth-cookie", jwt, false, "", "", 99999, false, false);
+        List<Cookie> cookieList = new ArrayList<Cookie>();
+
+        cookieList.add(cookie);
+
+        commonspec.setCookies(cookieList);
+
+    }
+
+    /*
     * Authenticate in a DCOS cluster
     *
     * @param dcosHost
