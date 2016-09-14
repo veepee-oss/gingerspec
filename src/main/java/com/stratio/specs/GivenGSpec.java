@@ -574,8 +574,8 @@ public class GivenGSpec extends BaseGSpec {
      *
      * @param command
      **/
-    @Given("^I execute command '(.+?)' in remote ssh connection( with exit status '(.+?)')?$")
-    public void executeCommand(String command, String foo, Integer exitStatus) throws Exception {
+    @Given("^I execute command '(.+?)' in remote ssh connection( with exit status '(.+?)')?( and save the value in environment variable '(.+?)')?$")
+    public void executeCommand(String command, String foo, Integer exitStatus, String var, String envVar) throws Exception {
         if (exitStatus == null) {
             exitStatus = 0;
         }
@@ -595,6 +595,9 @@ public class GivenGSpec extends BaseGSpec {
             log.append(s).append("\n");
         }
 
+        if (envVar != null){
+            ThreadProperty.set(envVar, commonspec.getRemoteSSHConnection().getResult());
+        }
         commonspec.getLogger().info("Exit status is: {}", commonspec.getRemoteSSHConnection().getExitStatus());
         commonspec.getLogger().info("Command last " + logLastLines + " lines stdout:\n{}", log);
         commonspec.getLogger().debug("Command complete stdout:\n{}", commonspec.getCommandResult());
