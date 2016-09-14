@@ -315,16 +315,16 @@ public class CommonG {
 		List<WebElement> wel = null;
 		
 		if ("id".equals(method)) {
-			logger.info("Locating {} by id", element);
+			logger.debug("Locating {} by id", element);
 			wel = this.getDriver().findElements(By.id(element));
 		} else if ("name".equals(method)) {
-			logger.info("Locating {} by name", element);
+			logger.debug("Locating {} by name", element);
 			wel = this.getDriver().findElements(By.name(element));
 		} else if ("class".equals(method)) {
-			logger.info("Locating {} by class", element);
+			logger.debug("Locating {} by class", element);
 			wel = this.getDriver().findElements(By.className(element));
 		} else if ("xpath".equals(method)) {
-			logger.info("Locating {} by xpath", element);
+			logger.debug("Locating {} by xpath", element);
 			wel = this.getDriver().findElements(By.xpath(element));
 		} else if ("css".equals(method)) {
 			wel = this.getDriver().findElements(By.cssSelector(element));
@@ -354,16 +354,16 @@ public class CommonG {
 		List<WebElement> wel = null;
 
 		if ("id".equals(method)) {
-			logger.info("Locating {} by id", element);
+			logger.debug("Locating {} by id", element);
 			wel = this.getDriver().findElements(By.id(element));
 		} else if ("name".equals(method)) {
-			logger.info("Locating {} by name", element);
+			logger.debug("Locating {} by name", element);
 			wel = this.getDriver().findElements(By.name(element));
 		} else if ("class".equals(method)) {
-			logger.info("Locating {} by class", element);
+			logger.debug("Locating {} by class", element);
 			wel = this.getDriver().findElements(By.className(element));
 		} else if ("xpath".equals(method)) {
-			logger.info("Locating {} by xpath", element);
+			logger.debug("Locating {} by xpath", element);
 			wel = this.getDriver().findElements(By.xpath(element));
 		} else if ("css".equals(method)) {
 			wel = this.getDriver().findElements(By.cssSelector(element));

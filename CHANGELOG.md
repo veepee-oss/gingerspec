@@ -4,6 +4,7 @@ Only listing significant user-visible, not internal code cleanups and minor bug 
 
 ## 0.3.0 (upcoming)
 
+* CukesGHooks will invoke the logger with each step
 
 ## 0.2.0 (June 2016)
 

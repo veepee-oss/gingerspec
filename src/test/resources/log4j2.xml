@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="INFO">
+    <Properties>
+        <Property name="logLevel">INFO</Property>
+    </Properties>
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%highlight{%.20c{1}} - %highlight{%m}%n" />
+        </Console>
+        <Console name="Hooks" target="SYSTEM_OUT">
+            <PatternLayout pattern="%highlight{%.20c{1} - %msg%n}{INFO=cyan}"/>
+        </Console>
+    </Appenders>
+    <Loggers>
+        <Root level="INFO">
+            <AppenderRef ref="Console"/>
+        </Root>
+
+        <logger name="com.stratio.tests.utils" level="INFO" additivity="false">
+            <appender-ref ref="Hooks"/>
+        </logger>
+        <logger name="org.apache.zookeeper.ZooKeeper" level="OFF" />
+        <logger name="org.apache.zookeeper.ClientCnxn" level="OFF" />
+    </Loggers>
+</Configuration>

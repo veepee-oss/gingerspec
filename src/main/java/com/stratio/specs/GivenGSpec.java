@@ -50,7 +50,6 @@ public class GivenGSpec extends BaseGSpec {
      */
     @Given("^I create a Cassandra index named '(.+?)' in table '(.+?)' using magic_column '(.+?)' using keyspace '(.+?)'$")
     public void createBasicMapping(String index_name, String table, String column, String keyspace) throws Exception {
-        commonspec.getLogger().debug("Creating a basic index");
         String query = "CREATE INDEX " + index_name + " ON " + table + " (" + column + ");";
         commonspec.getCassandraClient().executeQuery(query);
     }
@@ -62,7 +61,6 @@ public class GivenGSpec extends BaseGSpec {
      */
     @Given("^I create a Cassandra keyspace named '(.+)'$")
     public void createCassandraKeyspace(String keyspace) {
-        commonspec.getLogger().debug("Creating a Cassandra keyspace");
         commonspec.getCassandraClient().createKeyspace(keyspace);
     }
 
@@ -74,7 +72,6 @@ public class GivenGSpec extends BaseGSpec {
      */
     @Given("^I connect to '(Cassandra|Mongo|Elasticsearch)' cluster at '(.+)'$")
     public void connect(String clusterType, String url) throws DBException, UnknownHostException {
-        commonspec.getLogger().debug("Connecting to " + clusterType + " cluster", "");
         switch (clusterType) {
             case "Cassandra":
                 commonspec.getCassandraClient().buildCluster();
@@ -106,7 +103,6 @@ public class GivenGSpec extends BaseGSpec {
     public void createTableWithData(String table, String keyspace, DataTable datatable) {
         try {
             commonspec.getCassandraClient().useKeyspace(keyspace);
-            commonspec.getLogger().debug("Starting a table creation", "");
             int attrLength = datatable.getGherkinRows().get(0).getCells().size();
             Map<String, String> columns = new HashMap<String, String>();
             ArrayList<String> pk = new ArrayList<String>();
@@ -142,7 +138,6 @@ public class GivenGSpec extends BaseGSpec {
     public void insertData(String keyspace, String table, DataTable datatable) {
         try {
             commonspec.getCassandraClient().useKeyspace(keyspace);
-            commonspec.getLogger().debug("Starting a table creation", "");
             int attrLength = datatable.getGherkinRows().get(0).getCells().size();
             Map<String, Object> fields = new HashMap<String, Object>();
             for (int e = 1; e < datatable.getGherkinRows().size(); e++) {
@@ -216,7 +211,6 @@ public class GivenGSpec extends BaseGSpec {
      */
     @Given("^I drop every existing elasticsearch index$")
     public void dropElasticsearchIndexes() {
-        commonspec.getLogger().debug("Dropping es indexes");
         commonspec.getElasticSearchClient().dropAllIndexes();
     }
 
@@ -227,7 +221,6 @@ public class GivenGSpec extends BaseGSpec {
      */
     @Given("^I drop an elasticsearch index named '(.+?)'$")
     public void dropElasticsearchIndex(String index) {
-        commonspec.getLogger().debug("Dropping an es index: {}", index);
         commonspec.getElasticSearchClient().dropSingleIndex(index);
     }
 

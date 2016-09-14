@@ -254,7 +254,7 @@ public class HookGSpec extends BaseGSpec {
     }
 
     @After(order = 10)
-    public void zkConnection() throws Exception {
+    public void zkConnectionTeardown() throws Exception {
         commonspec.getLogger().debug("Closing zookeeper connection");
         if (!"".equals(System.getProperty("ZOOKEEPER_HOSTS",""))) {
             if(commonspec.getZookeeperClient().isConnected()){

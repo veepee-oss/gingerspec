@@ -48,7 +48,6 @@ public class WhenGSpec extends BaseGSpec {
      */
     @When("^I wait '(\\d+?)' seconds?$")
     public void idleWait(Integer seconds) throws InterruptedException {
-        commonspec.getLogger().debug("Idling a while");
         Thread.sleep(seconds * DEFAULT_TIMEOUT);
     }
 
@@ -65,8 +64,6 @@ public class WhenGSpec extends BaseGSpec {
      */
     @When("^I drag '([^:]*?):([^:]*?)' and drop it to '([^:]*?):([^:]*?)'$")
     public void seleniumDrag(String smethod, String source, String dmethod, String destination) throws ClassNotFoundException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
-        commonspec.getLogger().debug("Dragging element");
-
         Actions builder = new Actions(commonspec.getDriver());
 
         List<WebElement> sourceElement = commonspec.locateElement(smethod, source, 1);
@@ -83,7 +80,6 @@ public class WhenGSpec extends BaseGSpec {
      */
     @When("^I click on the element on index '(\\d+?)'$")
     public void seleniumClick(Integer index) throws InterruptedException {
-        commonspec.getLogger().debug("Clicking on element with index {}", index);
 
         try {
             assertThat(this.commonspec, commonspec.getPreviousWebElements()).as("There are less found elements than required")
@@ -104,8 +100,6 @@ public class WhenGSpec extends BaseGSpec {
      */
     @When("^I clear the content on text input at index '(\\d+?)'$")
     public void seleniumClear(Integer index) {
-	commonspec.getLogger().debug("Clearing text on element with index {}", index);
-
 	assertThat(this.commonspec, commonspec.getPreviousWebElements()).as("There are less found elements than required")
         	.hasAtLeast(index);
 
@@ -123,8 +117,6 @@ public class WhenGSpec extends BaseGSpec {
      */
     @When("^I type '(.+?)' on the element on index '(\\d+?)'$")
     public void seleniumType(@Transform(NullableStringConverter.class) String text, Integer index) {
-        commonspec.getLogger().debug("Typing on element with index {}", index);
-
         assertThat(this.commonspec, commonspec.getPreviousWebElements()).as("There are less found elements than required")
 		.hasAtLeast(index);
         while (text.length() > 0) {
@@ -155,11 +147,7 @@ public class WhenGSpec extends BaseGSpec {
      */
     @When("^I send '(.+?)'( on the element on index '(\\d+?)')?$")
     public void seleniumKeys(@Transform(ArrayListConverter.class) List<String> strokes, String foo, Integer index) {
-	if (index == null) {
-	    commonspec.getLogger().debug("Sending keys to driver");
-	} else {
-	    commonspec.getLogger().debug("Sending keys on element with index {}", index);
-
+	if (index != null) {
 	    assertThat(this.commonspec, commonspec.getPreviousWebElements()).as("There are less found elements than required")
 	    	.hasAtLeast(index);
 	}
@@ -195,8 +183,6 @@ public class WhenGSpec extends BaseGSpec {
      */
     @When("^I select '(.+?)' on the element on index '(\\d+?)'$")
     public void elementSelect(String option, Integer index) {
-        commonspec.getLogger().debug("Choosing option on select");
-
         Select sel = null;
         sel = new Select(commonspec.getPreviousWebElements().getPreviousWebElements().get(index));
 
@@ -210,8 +196,6 @@ public class WhenGSpec extends BaseGSpec {
      */
     @When("^I de-select every item on the element on index '(\\d+?)'$")
     public void elementDeSelect(Integer index) {
-        commonspec.getLogger().debug("Unselecting everything");
-
         Select sel = null;
         sel = new Select(commonspec.getPreviousWebElements().getPreviousWebElements().get(index));
 
@@ -247,7 +231,6 @@ public class WhenGSpec extends BaseGSpec {
     @When("^I send a '(.+?)' request to '(.+?)'( with user and password '(.+:.+?)')? based on '([^:]+?)'( as '(json|string)')? with:$")
     public void sendRequest(String requestType, String endPoint, String foo, String loginInfo, String baseData, String baz, String type, DataTable modifications) throws Exception {
 	// Retrieve data
-	commonspec.getLogger().debug("Retrieving data based on {} as {}", baseData, type);
 	String retrievedData = commonspec.retrieveData(baseData, type);
 
 	// Modify data
@@ -323,9 +306,6 @@ public class WhenGSpec extends BaseGSpec {
      */
     @When("^in less than '(\\d+?)' seconds, checking each '(\\d+?)' seconds, I send a '(.+?)' request to '(.+?)' so that the response contains '(.+?)'$")
     public void sendRequestTimeout (Integer timeout, Integer wait, String requestType, String endPoint, String responseVal) throws Exception {
-
-        commonspec.getLogger().info("Sending " + requestType + " request to " + endPoint + " with " + timeout + " as timeout until the response contains " + responseVal);
-
 
         Boolean found = false;
         AssertionError ex = null;
@@ -472,8 +452,6 @@ public class WhenGSpec extends BaseGSpec {
     @When("^I execute an elasticsearch query over index '(.*?)' and mapping '(.*?)' and column '(.*?)' with value '(.*?)' to '(.*?)'$")
     public void elasticSearchQueryWithFilter(String indexName, String mappingName, String
             columnName ,String filterType, String value){
-        commonspec.getLogger().debug("Executing query over " + indexName + "/" + mappingName + " over column " +
-                columnName);
         try {
             commonspec.setResultsType("elasticsearch");
             commonspec.setElasticsearchResults(
@@ -505,7 +483,6 @@ public class WhenGSpec extends BaseGSpec {
      */
     @When("^I create a Cassandra index named '(.+?)' with schema '(.+?)' of type '(json|string)' in table '(.+?)' using magic_column '(.+?)' using keyspace '(.+?)' with:$")
     public void createCustomMapping(String index_name, String schema, String type, String table, String magic_column, String keyspace, DataTable modifications) throws Exception {
-        commonspec.getLogger().debug("Creating a custom mapping");
         String retrievedData = commonspec.retrieveData(schema, type);
         String modifiedData = commonspec.modifyData(retrievedData, type, modifications).toString();
         String query="CREATE CUSTOM INDEX "+ index_name +" ON "+ keyspace +"."+ table +"("+ magic_column +") "
@@ -524,9 +501,8 @@ public class WhenGSpec extends BaseGSpec {
     @When("^I drop a Cassandra table named '(.+?)' using keyspace '(.+?)'$")
     public void dropTableWithData(String table, String keyspace){
         try{
-        commonspec.getCassandraClient().useKeyspace(keyspace);
-        commonspec.getLogger().debug("Starting a table deletion");
-          commonspec.getCassandraClient().dropTable(table);
+            commonspec.getCassandraClient().useKeyspace(keyspace);
+            commonspec.getCassandraClient().dropTable(table);
         }catch (Exception e) {
             // TODO Auto-generated catch block
             commonspec.getLogger().debug("Exception captured");
@@ -545,9 +521,8 @@ public class WhenGSpec extends BaseGSpec {
     @When("^I truncate a Cassandra table named '(.+?)' using keyspace '(.+?)'$")
     public void truncateTable(String table, String keyspace){
         try{
-        commonspec.getCassandraClient().useKeyspace(keyspace);
-        commonspec.getLogger().debug("Starting a table truncation");
-          commonspec.getCassandraClient().truncateTable(table);
+            commonspec.getCassandraClient().useKeyspace(keyspace);
+            commonspec.getCassandraClient().truncateTable(table);
         }catch (Exception e) {
             // TODO Auto-generated catch block
             commonspec.getLogger().debug("Exception captured");
@@ -660,7 +635,6 @@ public class WhenGSpec extends BaseGSpec {
      */
     @When("^I create a Kafka topic named '(.+?)'")
     public void createKafkaTopic(String topic_name) throws Exception {
-            commonspec.getLogger().debug("Creating a kafka topic");
             commonspec.getKafkaUtils().createTopic(topic_name);
     }
     /**
@@ -671,7 +645,6 @@ public class WhenGSpec extends BaseGSpec {
      */
      @When("^I delete a Kafka topic named '(.+?)'")
         public void deleteKafkaTopic(String topic_name) throws Exception {
-                commonspec.getLogger().debug("Deleteting kafka topic " + topic_name);
                 commonspec.getKafkaUtils().deleteTopic(topic_name);
             }
      
@@ -683,7 +656,6 @@ public class WhenGSpec extends BaseGSpec {
      */
     @When("^I remove the zNode '(.+?)'$")
     public void removeZNode(String zNode) throws KeeperException, InterruptedException {
-        commonspec.getLogger().debug("Deleting zNode at path {}", zNode);
         commonspec.getZookeeperClient().delete(zNode);
     }
 
@@ -699,7 +671,6 @@ public class WhenGSpec extends BaseGSpec {
      */
     @When("^I create the zNode '(.+?)'( with content '(.+?)')? which (IS|IS NOT) ephemeral$")
     public void createZNode(String path, String foo, String content, boolean ephemeral) throws KeeperException, InterruptedException {
-        commonspec.getLogger().debug("Creating zNode at {} with document {}", path);
         if(content != null){
             commonspec.getZookeeperClient().zCreate(path,content,ephemeral);
         }else{
@@ -716,7 +687,6 @@ public class WhenGSpec extends BaseGSpec {
      */
     @When("^I increase '(.+?)' partitions in a Kafka topic named '(.+?)'")
     public void modifyPartitions(int numPartitions, String topic_name) throws Exception {
-        commonspec.getLogger().debug("Increasing partition of kafka topic " + topic_name + " to" + numPartitions );
         commonspec.getKafkaUtils().modifyTopicPartitioning(topic_name,numPartitions);
     }
 
@@ -731,7 +701,6 @@ public class WhenGSpec extends BaseGSpec {
      */
     @When("^I send a message '(.+?)' to the kafka topic named '(.+?)'")
     public void sendAMessage(String message, String topic_name) throws Exception {
-        commonspec.getLogger().debug("Sending to kafka topic " + topic_name + " next message: " + message );
         commonspec.getKafkaUtils().sendMessage(topic_name,message);
     }
 

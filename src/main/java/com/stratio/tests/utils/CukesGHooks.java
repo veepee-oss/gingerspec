@@ -69,7 +69,7 @@ public class CukesGHooks extends BaseGSpec implements ICucumberReporter, ICucumb
     @Override
     public void scenario(Scenario scenario) {
         this.scenario = scenario;
-        logger.info("Got to {}/{} ", feature.getName(), scenario.getName());
+        logger.info("Feature/Scenario: {}/{} ", feature.getName(), scenario.getName());
         ThreadProperty.set("scenario", scenario.getName());
     }
 
@@ -79,10 +79,12 @@ public class CukesGHooks extends BaseGSpec implements ICucumberReporter, ICucumb
 
     @Override
     public void step(Step step) {
+        logger.info("  {}{}", step.getKeyword(), step.getName());
     }
 
     @Override
     public void endOfScenarioLifeCycle(Scenario scenario) {
+        logger.info(""); //empty line to split scenarios
     }
 
     @Override
