@@ -606,17 +606,22 @@ public class ThenGSpec extends BaseGSpec {
      *
      */
     @Then("^I check that zNode at '(.+?)' exists( and contains '(.+?)')?$")
-    public void readZNode(String zNode, String foo, String document) throws KeeperException, InterruptedException {
+    public void checkZnodeExists(String zNode, String document) throws KeeperException, InterruptedException {
         if(document==null){
             String breakpoint = commonspec.getZookeeperClient().zRead(zNode);
             Assertions.assertThat(commonspec.getZookeeperClient().zRead(zNode))
-                    .withFailMessage("The zNode does not exists")
+                    .withFailMessage("The zNode does not exist")
                     .as("zNode exists").isEqualTo("");
         }else{
             Assertions.assertThat(commonspec.getZookeeperClient().zRead(zNode))
-                    .withFailMessage("The zNode does not exists or the content does not match")
+                    .withFailMessage("The zNode does not exist or the content does not match")
                     .as("ZNode contains {} ",document).contains(document);
         }
+    }
+
+    @Then("^I check that zNode at '(.+?)' does not exist")
+    public void checkZnodeNotExist(String zNode) throws KeeperException, InterruptedException {
+        Assertions.assertThat(!commonspec.getZookeeperClient().exists(zNode)).withFailMessage("The zNode exists");
     }
 
     /**
