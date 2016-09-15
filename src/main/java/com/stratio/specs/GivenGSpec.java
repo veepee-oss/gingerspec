@@ -443,12 +443,13 @@ public class GivenGSpec extends BaseGSpec {
      *
      * @param remoteHost
      * @param user
-     * @param password
+     * @param password (required if pemFile null)
+     * @param pemFile (required if password null)
      *
      */
     @Given("^I open remote ssh connection to host '(.+?)' with user '(.+?)'( and password '(.+?)')?( using pem file '(.+?)')?$")
     public void openSSHConnection(String remoteHost, String user, String foo, String password, String bar, String pemFile) throws Exception {
-        if (pemFile == null) {
+        if ((pemFile == null) || (pemFile.equals(""))) {
             if (password == null) {
                 throw new Exception("You have to provide a password or a pem file to be used for connection");
             }
@@ -473,22 +474,32 @@ public class GivenGSpec extends BaseGSpec {
    * @param remoteHost
    * @param email
    * @param user
-   * @param password
-   * @param pemFile
+   * @param password (required if pemFile null)
+   * @param pemFile (required if password null)
    *
    */
     @Given("^I want to authenticate in DCOS cluster '(.+?)' with email '(.+?)' with user '(.+?)'( and password '(.+?)')?( using pem file '(.+?)')$")
     public void authenticateDCOSpem(String remoteHost,String email, String user, String foo, String password, String bar, String pemFile) throws Exception {
-        if (pemFile != null) {
+        String DCOSsecret = null;
+        if ((pemFile.equals("") && (password != ""))) {
+            commonspec.setRemoteSSHConnection(new RemoteSSHConnection(user, password, remoteHost, null));
+            commonspec.getRemoteSSHConnection().runCommand("sudo cat /var/lib/dcos/dcos-oauth/auth-token-secret");
+            DCOSsecret = commonspec.getRemoteSSHConnection().getResult().trim();
+        } else if ((password.equals("") && (pemFile != ""))) {
             File pem = new File(pemFile);
             if (!pem.exists()) {
                 throw new Exception("Pem file: " + pemFile + " does not exist");
             }
+            commonspec.setRemoteSSHConnection(new RemoteSSHConnection(user, null, remoteHost, pemFile));
+            commonspec.getRemoteSSHConnection().runCommand("sudo cat /var/lib/dcos/dcos-oauth/auth-token-secret");
+            DCOSsecret = commonspec.getRemoteSSHConnection().getResult().trim();
         }
-
-        commonspec.setRemoteSSHConnection(new RemoteSSHConnection(user, password, remoteHost, pemFile));
-        commonspec.getRemoteSSHConnection().runCommand("sudo cat /var/lib/dcos/dcos-oauth/auth-token-secret");
-        String DCOSsecret = commonspec.getRemoteSSHConnection().getResult().trim();
+        else if ((password.equals("") && (pemFile.equals("")))){
+            throw new Exception("Either password or Pem file must be provided");
+        }
+        if (DCOSsecret == null){
+            throw new Exception("There was an error trying to obtain DCOS secret.");
+        }
         final JWTSigner signer = new JWTSigner(DCOSsecret);
         final HashMap<String, Object> claims = new HashMap();
         claims.put("uid", email);
