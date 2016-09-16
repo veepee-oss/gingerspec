@@ -80,7 +80,6 @@ public class CukesGHooks extends BaseGSpec implements ICucumberReporter, ICucumb
 
     @Override
     public void step(Step step) {
-        logger.info("  {}{}", step.getKeyword(), step.getName());
     }
 
     @Override

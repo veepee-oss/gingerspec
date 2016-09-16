@@ -175,7 +175,7 @@ public class ReplacementAspect {
 		    // Redefine step
 		    newStep = new Step(step.getComments(), step.getKeyword(), stepName, step.getLine(), myRows, step.getDocString());
 		}
-
+		logger.info("  {}{}", newStep.getKeyword(), newStep.getName());
 		return newStep;
 	}
 
