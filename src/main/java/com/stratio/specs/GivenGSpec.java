@@ -455,6 +455,7 @@ public class GivenGSpec extends BaseGSpec {
             }
             commonspec.getLogger().debug("Openning remote ssh connection to " + remoteHost + " with user " + user +
                     " and password " + password);
+            commonspec.setRemoteSSHConnection(new RemoteSSHConnection(user, password, remoteHost, null));
         } else {
             File pem = new File(pemFile);
             if (!pem.exists()) {
@@ -462,9 +463,8 @@ public class GivenGSpec extends BaseGSpec {
             }
             commonspec.getLogger().debug("Openning remote ssh connection to " + remoteHost + " with user " + user +
                     " using pem file " + pemFile);
+            commonspec.setRemoteSSHConnection(new RemoteSSHConnection(user, null, remoteHost, pemFile));
         }
-        commonspec.setRemoteSSHConnection(new RemoteSSHConnection(user, password, remoteHost, pemFile));
-
     }
 
 
