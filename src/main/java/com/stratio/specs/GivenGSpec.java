@@ -610,8 +610,11 @@ public class GivenGSpec extends BaseGSpec {
             ThreadProperty.set(envVar, commonspec.getRemoteSSHConnection().getResult());
         }
         commonspec.getLogger().info("Exit status is: {}", commonspec.getRemoteSSHConnection().getExitStatus());
-        commonspec.getLogger().info("Command last " + logLastLines + " lines stdout:\n{}", log);
-        commonspec.getLogger().debug("Command complete stdout:\n{}", commonspec.getCommandResult());
+        if (commonspec.getRemoteSSHConnection().getExitStatus() != 0) {
+            commonspec.getLogger().error("Command last {} lines stdout:", logLastLines);
+            commonspec.getLogger().error("{}", log);
+            commonspec.getLogger().debug("Command complete stdout:\n{}", commonspec.getCommandResult());
+        }
         Assertions.assertThat(commonspec.getRemoteSSHConnection().getExitStatus()).isEqualTo(exitStatus);
     }
 
