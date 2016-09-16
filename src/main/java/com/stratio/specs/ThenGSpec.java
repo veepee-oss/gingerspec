@@ -606,7 +606,7 @@ public class ThenGSpec extends BaseGSpec {
      *
      */
     @Then("^I check that zNode at '(.+?)' exists( and contains '(.+?)')?$")
-    public void checkZnodeExists(String zNode, String document) throws KeeperException, InterruptedException {
+    public void checkZnodeExists(String zNode, String foo, String document)  throws KeeperException, InterruptedException {
         if(document==null){
             String breakpoint = commonspec.getZookeeperClient().zRead(zNode);
             Assertions.assertThat(commonspec.getZookeeperClient().zRead(zNode))
