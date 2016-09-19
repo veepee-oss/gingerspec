@@ -201,7 +201,6 @@ public class GivenGSpec extends BaseGSpec {
         if (value == null) {
             throw new Exception("Element to be saved: " + element + " is null");
         } else {
-            this.commonspec.getLogger().debug("Saving element: {} with value: {} in environment variable: {}", new Object[]{element, value, envVar});
             ThreadProperty.set(envVar, value);
         }
     }
@@ -232,7 +231,6 @@ public class GivenGSpec extends BaseGSpec {
      */
     @Given("a Cassandra script with name '(.+?)' and default keyspace '(.+?)'$")
     public void insertDataOnCassandraFromFile(String filename, String keyspace) {
-        commonspec.getLogger().debug("Inserting data on cassandra from file");
         commonspec.getCassandraClient().loadTestData(keyspace, "/scripts/" + filename);
     }
 
@@ -243,7 +241,6 @@ public class GivenGSpec extends BaseGSpec {
      */
     @Given("^I drop a Cassandra keyspace '(.+)'$")
     public void dropCassandraKeyspace(String keyspace) {
-        commonspec.getLogger().debug("Dropping a Cassandra keyspace", keyspace);
         commonspec.getCassandraClient().dropKeyspace(keyspace);
     }
 
@@ -254,7 +251,6 @@ public class GivenGSpec extends BaseGSpec {
      */
     @Given("^I create a MongoDB dataBase '(.+?)'$")
     public void createMongoDBDataBase(String databaseName) {
-        commonspec.getLogger().debug("Creating a database on MongoDB");
         commonspec.getMongoDBClient().connectToMongoDBDataBase(databaseName);
 
     }
@@ -266,7 +262,6 @@ public class GivenGSpec extends BaseGSpec {
      */
     @Given("^I drop a MongoDB database '(.+?)'$")
     public void dropMongoDBDataBase(String databaseName) {
-        commonspec.getLogger().debug("Creating a database on MongoDB");
         commonspec.getMongoDBClient().dropMongoDBDataBase(databaseName);
     }
 
@@ -279,7 +274,6 @@ public class GivenGSpec extends BaseGSpec {
      */
     @Given("^I insert into a MongoDB database '(.+?)' and table '(.+?)' this values:$")
     public void insertOnMongoTable(String dataBase, String tabName, DataTable table) {
-        commonspec.getLogger().debug("Inserting data in a database on MongoDB");
         commonspec.getMongoDBClient().connectToMongoDBDataBase(dataBase);
         commonspec.getMongoDBClient().insertIntoMongoDBCollection(tabName, table);
     }
@@ -292,7 +286,6 @@ public class GivenGSpec extends BaseGSpec {
      */
     @Given("^I drop every document at a MongoDB database '(.+?)' and table '(.+?)'")
     public void truncateTableInMongo(String database, String table) {
-        commonspec.getLogger().debug("Truncating a table in MongoDB");
         commonspec.getMongoDBClient().connectToMongoDBDataBase(database);
         commonspec.getMongoDBClient().dropAllDataMongoDBCollection(table);
     }
@@ -317,7 +310,6 @@ public class GivenGSpec extends BaseGSpec {
 
         String webURL = "http://" + commonspec.getWebHost() + commonspec.getWebPort();
 
-        commonspec.getLogger().debug("Browsing to {}{} with {}", webURL, path, commonspec.getBrowserName());
         commonspec.getDriver().get(webURL + path);
         commonspec.setParentWindow(commonspec.getDriver().getWindowHandle());
     }
@@ -341,8 +333,6 @@ public class GivenGSpec extends BaseGSpec {
         commonspec.setWebPort(port);
         commonspec.setRestHost(host);
         commonspec.setRestPort(port);
-
-        commonspec.getLogger().debug("Set URL to http://{}{}/", host, port);
     }
 
 
@@ -364,8 +354,6 @@ public class GivenGSpec extends BaseGSpec {
 
         commonspec.setWebHost(webHost);
         commonspec.setWebPort(webPort);
-
-        commonspec.getLogger().debug("Set web base URL to http://{}{}", webHost, webPort);
     }
 
     /**
@@ -397,7 +385,6 @@ public class GivenGSpec extends BaseGSpec {
         commonspec.setRestProtocol(restProtocol);
         commonspec.setRestHost(restHost);
         commonspec.setRestPort(restPort);
-        commonspec.getLogger().debug("Sending requests to {}{}{}", restProtocol, restHost, restPort);
     }
 
     /**
@@ -453,16 +440,12 @@ public class GivenGSpec extends BaseGSpec {
             if (password == null) {
                 throw new Exception("You have to provide a password or a pem file to be used for connection");
             }
-            commonspec.getLogger().debug("Openning remote ssh connection to " + remoteHost + " with user " + user +
-                    " and password " + password);
             commonspec.setRemoteSSHConnection(new RemoteSSHConnection(user, password, remoteHost, null));
         } else {
             File pem = new File(pemFile);
             if (!pem.exists()) {
                 throw new Exception("Pem file: " + pemFile + " does not exist");
             }
-            commonspec.getLogger().debug("Openning remote ssh connection to " + remoteHost + " with user " + user +
-                    " using pem file " + pemFile);
             commonspec.setRemoteSSHConnection(new RemoteSSHConnection(user, null, remoteHost, pemFile));
         }
     }
@@ -520,8 +503,6 @@ public class GivenGSpec extends BaseGSpec {
     */
     @Given("^I authenticate in DCOS cluster '(.+?)' with email '(.+?)'$")
     public void authenticateDCOS(String dcosCluster, String user) throws Exception {
-        commonspec.getLogger().debug("Authenticating in DCOS cluster " + dcosCluster + " with user " + user);
-
         commonspec.setRemoteSSHConnection(new RemoteSSHConnection("root", "stratio", dcosCluster, null));
         commonspec.getRemoteSSHConnection().runCommand("cat /var/lib/dcos/dcos-oauth/auth-token-secret");
         String DCOSsecret = commonspec.getRemoteSSHConnection().getResult().trim();
@@ -550,7 +531,6 @@ public class GivenGSpec extends BaseGSpec {
      */
     @Given("^I copy '(.+?)' from remote ssh connection and store it in '(.+?)'$")
     public void copyFromRemoteFile(String remotePath, String localPath) throws Exception {
-        commonspec.getLogger().debug("Copy remote " + remotePath + " to local " + localPath);
         commonspec.getRemoteSSHConnection().copyFrom(remotePath, localPath);
     }
 
@@ -564,7 +544,6 @@ public class GivenGSpec extends BaseGSpec {
      */
     @Given("^I copy '(.+?)' to remote ssh connection in '(.+?)'$")
     public void copyToRemoteFile(String localPath, String remotePath) throws Exception {
-        commonspec.getLogger().debug("Copy local " + localPath + " to remote " + remotePath);
         commonspec.getRemoteSSHConnection().copyTo(localPath, remotePath);
     }
 
@@ -576,7 +555,6 @@ public class GivenGSpec extends BaseGSpec {
      **/
     @Given("^I execute command '(.+?)' locally$")
     public void executeLocalCommand(String command) throws Exception {
-        commonspec.getLogger().debug("Executing command '" + command + "'");
         commonspec.runLocalCommand(command);
     }
 
@@ -591,7 +569,6 @@ public class GivenGSpec extends BaseGSpec {
             exitStatus = 0;
         }
 
-        commonspec.getLogger().debug("Executing command '" + command + "'");
         commonspec.getRemoteSSHConnection().runCommand(command);
         commonspec.setCommandResult(commonspec.getRemoteSSHConnection().getResult());
         commonspec.setCommandExitStatus(commonspec.getRemoteSSHConnection().getExitStatus());
@@ -628,7 +605,6 @@ public class GivenGSpec extends BaseGSpec {
      */
     @Given("^I insert into MongoDB database '(.+?)' and collection '(.+?)' the document from schema '(.+?)'$")
     public void insertOnMongoTable(String dataBase, String collection, String document) throws Exception {
-        commonspec.getLogger().debug("Inserting data at {}.{} on MongoDB", dataBase, collection);
         String retrievedDoc = commonspec.retrieveData(document, "json");
         commonspec.getMongoDBClient().connectToMongoDBDataBase(dataBase);
         commonspec.getMongoDBClient().insertDocIntoMongoDBCollection(collection, retrievedDoc);
@@ -640,7 +616,6 @@ public class GivenGSpec extends BaseGSpec {
      */
     @Given("^new window is opened$")
     public void seleniumGetwindows() {
-        commonspec.getLogger().debug("Getting number of opened windows");
         Set<String> wel = commonspec.getDriver().getWindowHandles();
 
         Assertions.assertThat(wel).as("Element count doesnt match").hasSize(2);
@@ -654,7 +629,6 @@ public class GivenGSpec extends BaseGSpec {
      */
     @Given("^I connect to zk cluster at '(.+)'$")
     public void connectToZk(String zookeeperHosts) {
-        commonspec.getLogger().debug("Connecting to zookeeper at " + zookeeperHosts);
         commonspec.getZookeeperClient().setZookeeperConnection(zookeeperHosts, 3000);
         commonspec.getZookeeperClient().connectZk();
     }
@@ -666,7 +640,6 @@ public class GivenGSpec extends BaseGSpec {
      */
     @Given("^I connect to kafka cluster at '(.+)':'(.+)' using path '(.+)'$")
     public void connectKafka(String zkHost, String zkPort, String zkPath) throws UnknownHostException {
-        commonspec.getLogger().debug("Connecting to " + zkHost + " cluster");
         if (System.getenv("DCOS_CLUSTER") != null) {
             commonspec.getKafkaUtils().setZkHost(zkHost, zkPort, zkPath);
         } else {
