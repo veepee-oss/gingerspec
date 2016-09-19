@@ -58,7 +58,7 @@ public class CukesGHooks extends BaseGSpec implements ICucumberReporter, ICucumb
 
     @Override
     public void background(Background background) {
-        logger.info("Steps from background:");
+        logger.info("Background: {}", background.getName());
     }
 
     @Override

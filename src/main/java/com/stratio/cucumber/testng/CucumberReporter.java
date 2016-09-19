@@ -51,7 +51,7 @@ public class CucumberReporter implements Formatter, Reporter {
     public static final int DEFAULT_LENGTH = 11;
     public static final int DEFAULT_MAX_LENGTH = 140;
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-    private final Writer writer, writerJunit;
+    private Writer writer, writerJunit;
     private final Document document, jUnitDocument;
     private final Element results, jUnitResults;
     private final Element suite, jUnitSuite;
@@ -71,6 +71,10 @@ public class CucumberReporter implements Formatter, Reporter {
     long time_start, time_end;
     String featureName;
 
+    private String url;
+    private String cClass;
+    private String additional;
+
     /**
      * Constructor of cucumberReporter.
      *
@@ -79,10 +83,10 @@ public class CucumberReporter implements Formatter, Reporter {
      * @throws IOException
      */
     public CucumberReporter(String url, String cClass, String additional) throws IOException {
-        this.writer = new UTF8OutputStreamWriter(new URLOutputStream(Utils.toURL(url + cClass + additional
-                + "TESTNG.xml")));
-        this.writerJunit = new UTF8OutputStreamWriter(new URLOutputStream(Utils.toURL(url + cClass + additional
-                + "JUNIT.xml")));
+        this.url = url;
+        this.cClass = cClass;
+        this.additional = additional;
+
         TestMethod.treatSkippedAsFailure = false;
         try {
             document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
@@ -220,6 +224,10 @@ public class CucumberReporter implements Formatter, Reporter {
                     String.valueOf(getTotalDuration(suite.getElementsByTagName("test-method"))));
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+
+            this.writer = new UTF8OutputStreamWriter(new URLOutputStream(Utils.toURL(url + cClass + additional
+                    + "TESTNG.xml")));
+
             StreamResult streamResult = new StreamResult(writer);
             DOMSource domSource = new DOMSource(document);
             transformer.transform(domSource, streamResult);
@@ -232,11 +240,15 @@ public class CucumberReporter implements Formatter, Reporter {
                     String.valueOf(getTotalDurationMs(suite.getElementsByTagName("test-method"))));
             Transformer transformerJunit = TransformerFactory.newInstance().newTransformer();
             transformerJunit.setOutputProperty(OutputKeys.INDENT, "yes");
+
+            this.writerJunit = new UTF8OutputStreamWriter(new URLOutputStream(Utils.toURL(url + cClass + additional
+                    + "JUNIT.xml")));
+
             StreamResult streamResultJunit = new StreamResult(writerJunit);
             DOMSource domSourceJunit = new DOMSource(jUnitDocument);
             transformerJunit.transform(domSourceJunit, streamResultJunit);
 
-        } catch (TransformerException e) {
+        } catch (TransformerException | IOException e) {
             throw new CucumberException("Error transforming report.", e);
         }
     }

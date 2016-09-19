@@ -2,12 +2,6 @@ package com.stratio.cucumber.aspects;
 
 import com.stratio.exceptions.NonReplaceableException;
 import com.stratio.tests.utils.ThreadProperty;
-import cucumber.runtime.*;
-import cucumber.runtime.xstream.LocalizedXStreams;
-import gherkin.I18n;
-import gherkin.formatter.Argument;
-import gherkin.formatter.Reporter;
-import gherkin.formatter.model.DataTableRow;
 import gherkin.formatter.model.Step;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -24,34 +18,16 @@ import java.util.*;
 @Aspect
 public class ReplacementAspect {
 
+	private String lastEchoedStep = "";
+
 	private final Logger logger = LoggerFactory.getLogger(this.getClass()
 			.getCanonicalName());
 
-	@Pointcut("call(cucumber.runtime.StepDefinitionMatch.new(..)) && "
-			+ "args (arguments, stepDefinition, featurePath, step, localizedXStreams)")
-	protected void replacementCallPointcut(List<Argument> arguments, StepDefinition stepDefinition, String featurePath, Step step, LocalizedXStreams localizedXStreams) {
-	}
 
-	@Pointcut("execution (public void com.stratio.cucumber.testng.CucumberReporter.TestMethod.addStepAndResultListing(..)) && "
-			+ "args (sb, mergedsteps)")
-	protected void replacementTestngCallPointcut(StringBuilder sb, List<Step> mergedsteps) {
-	}
 
 	@Pointcut("execution (public String com.stratio.cucumber.testng.CucumberReporter.TestMethod.obtainOutlineScenariosExamples(..)) && "
 			+ "args (examplesData)")
 	protected void replacementOutlineScenariosCallPointcut(String examplesData) {
-	}
-
-	@Pointcut("call(void cucumber.runtime.Runtime.runStep(..)) && "
-			+ "args (featurePath, step, reporter, i18n)")
-	protected void replacementDataError(String featurePath, Step step, Reporter reporter, I18n i18n) {
-	}
-
-	@Around(value = "replacementDataError(featurePath, step, reporter, i18n)")
-	public void aroundReplacementException(ProceedingJoinPoint pjp, String featurePath, Step step, Reporter reporter, I18n i18n) throws Throwable {
-		try {
-			pjp.proceed();
-		} catch (NonReplaceableException e) {}
 	}
 
 	@Around(value = "replacementOutlineScenariosCallPointcut(examplesData)")
@@ -72,111 +48,34 @@ public class ReplacementAspect {
 		return pjp.proceed(myArray);
 	}
 
-
-
-	@Around(value = "replacementTestngCallPointcut(sb, mergedsteps)")
-	public Object aroundReplacementTestngCalls(ProceedingJoinPoint pjp, StringBuilder sb, List<Step> mergedsteps) throws Throwable {
-		List<Step> newMergedsteps = new ArrayList<Step>();
-		for (Step step: mergedsteps) {
-			newMergedsteps.add(modifyStep(step));
-		}
-
-		Object[] myArray = {sb, newMergedsteps};
-		return pjp.proceed(myArray);
+	@Pointcut("call(String gherkin.formatter.model.BasicStatement.getName())")
+	protected void replacementBasicStatementName() {
 	}
 
+	@Around(value = "replacementBasicStatementName()")
+	public String aroundReplacementBasicStatementName(ProceedingJoinPoint pjp) throws Throwable {
 
-	@Around(value = "replacementCallPointcut(arguments, stepDefinition, featurePath, step, localizedXStreams)")
-	public Object aroundReplacementCalls(ProceedingJoinPoint pjp, List<Argument> arguments, StepDefinition stepDefinition, String featurePath, Step step, LocalizedXStreams localizedXStreams) throws Throwable {
-		if (arguments.size() > 0) {
-			List<Argument> myArguments = new ArrayList<Argument>();
-			if (arguments != null) {
-				for (Argument arg : arguments) {
-					if (arg.getVal() != null) {
-						String value = arg.getVal();
-						if (value.contains("${")) {
-							value = replaceEnvironmentPlaceholders(value);
-						}
-						if (value.contains("!{")) {
-							try {
-								value = replaceReflectionPlaceholders(value);
-							} catch (NonReplaceableException e) {}
-						}
-						if (value.contains("@{")) {
-							value = replaceCodePlaceholders(value);
-						}
-						Argument myArg = new Argument(arg.getOffset(), value);
-						myArguments.add(myArg);
-					} else {
-						myArguments.add(arg);
-					}
-				}
-				arguments = myArguments;
-			}
+		String oldVal = (String) pjp.proceed();
+		String newBasicStmt = oldVal;
+
+
+		if (oldVal.contains("${")) {
+			newBasicStmt = replaceEnvironmentPlaceholders(oldVal);
 		}
-	    // Proceed with new modified params
-		Object[] myArray = {arguments, stepDefinition, featurePath, modifyStep(step), localizedXStreams};
-		return pjp.proceed(myArray);
-	}
-
-
-	protected Step modifyStep(Step step) throws Exception {
-		Step newStep = step;
-
-		if (step != null) {
-		    // Modify line
-		    String stepName = step.getName();
-
-		    if (stepName.contains("${")) {
-			stepName = replaceEnvironmentPlaceholders(stepName);
-		    }
-		    if (stepName.contains("!{")) {
-				try {
-					stepName = replaceReflectionPlaceholders(stepName);
-				} catch (NonReplaceableException e) {
-					logger.error("Unreplaceable elements at {}", stepName);
-				}
-		    }
-			if (stepName.contains("@{")) {
-			stepName = replaceCodePlaceholders(stepName);
-		    }
-
-		    // Modify datatable
-		    List<DataTableRow> stepRows = step.getRows();
-
-		    List<DataTableRow> myRows = null;
-		    if (stepRows != null) {
-				DataTableRow myRow;
-				myRows =  new ArrayList<DataTableRow>();
-				for (DataTableRow row: stepRows) {
-			    	List<String> cells = row.getCells();
-			    	List<String> myCells = new ArrayList<String>();
-			    	for (String cell: cells) {
-						if (cell.contains("${")) {
-				    		cell = replaceEnvironmentPlaceholders(cell);
-						}
-						if (cell.contains("!{")) {
-							try {
-								cell = replaceReflectionPlaceholders(cell);
-							} catch (NonReplaceableException e) {
-								logger.error("Unreplaceable elements at {}", cell);
-							}
-						}
-						if (cell.contains("@{")) {
-				    		cell = replaceCodePlaceholders(cell);
-						}
-						myCells.add(cell);
-			    	}
-			    	myRow = new DataTableRow(row.getComments(), myCells, row.getLine());
-			    	myRows.add(myRow);
-				}
-		    }
-
-		    // Redefine step
-		    newStep = new Step(step.getComments(), step.getKeyword(), stepName, step.getLine(), myRows, step.getDocString());
+		if (oldVal.contains("!{")) {
+			newBasicStmt = replaceReflectionPlaceholders(oldVal);
 		}
-		logger.info("  {}{}", newStep.getKeyword(), newStep.getName());
-		return newStep;
+		if (oldVal.contains("@{")) {
+			newBasicStmt = replaceCodePlaceholders(oldVal);
+		}
+
+		if ((pjp.getTarget() instanceof Step) &&
+				!(lastEchoedStep.equals(newBasicStmt)) &&
+				!(newBasicStmt.contains("'<"))) {
+			lastEchoedStep = newBasicStmt;
+			logger.info("  {}", newBasicStmt);
+		}
+		return newBasicStmt;
 	}
 
 	/**
@@ -255,7 +154,7 @@ public class ReplacementAspect {
 			// we want to use value previously saved
 			String prop = ThreadProperty.get(attribute);
 			if (prop == null) {
-				logger.error("Element: " + attribute + " has not been saved correctly previously.");
+				logger.error("{} -> {} has not been saved correctly previously.", element, attribute);
 				throw new NonReplaceableException("Unreplaceable placeholder: " + placeholder);
 			} else {
 				newVal = newVal.replace(placeholder, prop);
@@ -279,7 +178,7 @@ public class ReplacementAspect {
 			String placeholder = newVal.substring(newVal.indexOf("${"),
 					newVal.indexOf("}", newVal.indexOf("${")) + 1);
 			String modifier = "";
-			String sysProp = "";
+			String sysProp;
 			if (placeholder.contains(".")) {
 				sysProp = placeholder.substring(2, placeholder.indexOf("."));
 				modifier = placeholder.substring(placeholder.indexOf(".") + 1,
@@ -302,3 +201,4 @@ public class ReplacementAspect {
 		return newVal;
 	}	
 }
+
