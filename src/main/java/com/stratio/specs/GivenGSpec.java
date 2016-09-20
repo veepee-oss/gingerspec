@@ -463,11 +463,11 @@ public class GivenGSpec extends BaseGSpec {
    * @param pemFile (required if password null)
    *
    */
-    @Given("^I want to authenticate in DCOS cluster '(.+?)' with email '(.+?)' with user '(.+?)'( and password '(.+?)')?( using pem file '(.+?)')$")
+    @Given("^I want to authenticate in DCOS cluster '(.+?)' with email '(.+?)' with user '(.+?)'( and password '(.*?)')?( using pem file '(.+?)')$")
     public void authenticateDCOSpem(String remoteHost,String email, String user, String foo, String password, String bar, String pemFile) throws Exception {
         String DCOSsecret = null;
         if ((pemFile== null) || (pemFile.equals("none"))) {
-            if (password == null) {
+            if ((password.equals("")) || (password == null)){
                 throw new Exception("You have to provide a password or a pem file to be used for connection");
             }
             commonspec.setRemoteSSHConnection(new RemoteSSHConnection(user, password, remoteHost, null));
