@@ -436,17 +436,19 @@ public class GivenGSpec extends BaseGSpec {
      */
     @Given("^I open remote ssh connection to host '(.+?)' with user '(.+?)'( and password '(.+?)')?( using pem file '(.+?)')?$")
     public void openSSHConnection(String remoteHost, String user, String foo, String password, String bar, String pemFile) throws Exception {
-        if ((pemFile == null) || (pemFile.equals(""))) {
+        if ((pemFile == null) || (pemFile.equals("none"))) {
             if (password == null) {
                 throw new Exception("You have to provide a password or a pem file to be used for connection");
             }
             commonspec.setRemoteSSHConnection(new RemoteSSHConnection(user, password, remoteHost, null));
+            commonspec.getLogger().debug("Opening ssh connection with password: { " + password + "}", commonspec.getRemoteSSHConnection());
         } else {
             File pem = new File(pemFile);
             if (!pem.exists()) {
                 throw new Exception("Pem file: " + pemFile + " does not exist");
             }
             commonspec.setRemoteSSHConnection(new RemoteSSHConnection(user, null, remoteHost, pemFile));
+            commonspec.getLogger().debug("Opening ssh connection with pemFile: {}", commonspec.getRemoteSSHConnection());
         }
     }
 
@@ -464,11 +466,14 @@ public class GivenGSpec extends BaseGSpec {
     @Given("^I want to authenticate in DCOS cluster '(.+?)' with email '(.+?)' with user '(.+?)'( and password '(.+?)')?( using pem file '(.+?)')$")
     public void authenticateDCOSpem(String remoteHost,String email, String user, String foo, String password, String bar, String pemFile) throws Exception {
         String DCOSsecret = null;
-        if ((pemFile.equals("") && (password != ""))) {
+        if ((pemFile== null) || (pemFile.equals("none"))) {
+            if (password == null) {
+                throw new Exception("You have to provide a password or a pem file to be used for connection");
+            }
             commonspec.setRemoteSSHConnection(new RemoteSSHConnection(user, password, remoteHost, null));
             commonspec.getRemoteSSHConnection().runCommand("sudo cat /var/lib/dcos/dcos-oauth/auth-token-secret");
             DCOSsecret = commonspec.getRemoteSSHConnection().getResult().trim();
-        } else if ((password.equals("") && (pemFile != ""))) {
+        } else {
             File pem = new File(pemFile);
             if (!pem.exists()) {
                 throw new Exception("Pem file: " + pemFile + " does not exist");
@@ -476,12 +481,6 @@ public class GivenGSpec extends BaseGSpec {
             commonspec.setRemoteSSHConnection(new RemoteSSHConnection(user, null, remoteHost, pemFile));
             commonspec.getRemoteSSHConnection().runCommand("sudo cat /var/lib/dcos/dcos-oauth/auth-token-secret");
             DCOSsecret = commonspec.getRemoteSSHConnection().getResult().trim();
-        }
-        else if ((password.equals("") && (pemFile.equals("")))){
-            throw new Exception("Either password or Pem file must be provided");
-        }
-        if (DCOSsecret == null){
-            throw new Exception("There was an error trying to obtain DCOS secret.");
         }
         final JWTSigner signer = new JWTSigner(DCOSsecret);
         final HashMap<String, Object> claims = new HashMap();
@@ -491,6 +490,7 @@ public class GivenGSpec extends BaseGSpec {
         List<Cookie> cookieList = new ArrayList<Cookie>();
         cookieList.add(cookie);
         commonspec.setCookies(cookieList);
+        commonspec.getLogger().debug("DCOS cookie was set: " + cookie);
 
     }
 
