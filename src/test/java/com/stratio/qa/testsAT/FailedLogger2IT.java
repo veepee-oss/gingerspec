@@ -6,8 +6,8 @@ import com.stratio.tests.utils.BaseGTest;
 import cucumber.api.CucumberOptions;
 import org.testng.annotations.Test;
 
-@CucumberOptions(features = {"src/test/resources/features/replacementFailures.feature"})
-    public class FailedLoggerIT extends BaseGTest{
+@CucumberOptions(features = {"src/test/resources/features/replacementFailure2.feature"})
+    public class FailedLogger2IT extends BaseGTest{
 
         @Test (expectedExceptions = {NonReplaceableException.class})
         public void simpleNegativeTest() throws Exception {

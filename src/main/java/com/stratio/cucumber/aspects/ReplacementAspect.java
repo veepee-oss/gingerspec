@@ -73,7 +73,7 @@ public class ReplacementAspect {
 				!(lastEchoedStep.equals(newBasicStmt)) &&
 				!(newBasicStmt.contains("'<"))) {
 			lastEchoedStep = newBasicStmt;
-			logger.info("  {}", newBasicStmt);
+			logger.info("  {}{}", ((Step)pjp.getTarget()).getKeyword(),newBasicStmt);
 		}
 		return newBasicStmt;
 	}
@@ -154,7 +154,7 @@ public class ReplacementAspect {
 			// we want to use value previously saved
 			String prop = ThreadProperty.get(attribute);
 			if (prop == null) {
-				logger.error("{} -> {} has not been saved correctly previously.", element, attribute);
+				logger.error("{} -> {} local var has not been saved correctly previously.", element, attribute);
 				throw new NonReplaceableException("Unreplaceable placeholder: " + placeholder);
 			} else {
 				newVal = newVal.replace(placeholder, prop);
@@ -172,7 +172,7 @@ public class ReplacementAspect {
 	 * 
 	 * @return String
 	 */
-	protected String replaceEnvironmentPlaceholders(String element) {
+	protected String replaceEnvironmentPlaceholders(String element) throws NonReplaceableException {
 		String newVal = element;
 		while (newVal.contains("${")) {
 			String placeholder = newVal.substring(newVal.indexOf("${"),
@@ -187,14 +187,19 @@ public class ReplacementAspect {
 				sysProp = placeholder.substring(2, placeholder.length() - 1);
 			}
 
-			String prop = "";
-			if ("toLower".equals(modifier)) {
-				prop = System.getProperty(sysProp, "").toLowerCase();
-			} else if ("toUpper".equals(modifier)) {
-				prop = System.getProperty(sysProp, "").toUpperCase();
-			} else {
-				prop = System.getProperty(sysProp, "");
+			String prop = System.getProperty(sysProp);
+
+			if (prop == null) {
+				logger.error("{} -> {} env var has not been defined.", element, sysProp);
+				throw new NonReplaceableException("Unreplaceable placeholder: " + placeholder);
 			}
+
+			if ("toLower".equals(modifier)) {
+				prop = prop.toLowerCase();
+			} else if ("toUpper".equals(modifier)) {
+				prop = prop.toUpperCase();
+			}
+
 			newVal = newVal.replace(placeholder, prop);
 		}
 
