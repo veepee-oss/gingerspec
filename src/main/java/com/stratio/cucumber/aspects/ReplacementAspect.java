@@ -55,18 +55,17 @@ public class ReplacementAspect {
 	@Around(value = "replacementBasicStatementName()")
 	public String aroundReplacementBasicStatementName(ProceedingJoinPoint pjp) throws Throwable {
 
-		String oldVal = (String) pjp.proceed();
-		String newBasicStmt = oldVal;
+		String newBasicStmt = (String) pjp.proceed();
 
 
-		if (oldVal.contains("${")) {
-			newBasicStmt = replaceEnvironmentPlaceholders(oldVal);
+		if (newBasicStmt.contains("${")) {
+			newBasicStmt = replaceEnvironmentPlaceholders(newBasicStmt);
 		}
-		if (oldVal.contains("!{")) {
-			newBasicStmt = replaceReflectionPlaceholders(oldVal);
+		if (newBasicStmt.contains("!{")) {
+			newBasicStmt = replaceReflectionPlaceholders(newBasicStmt);
 		}
-		if (oldVal.contains("@{")) {
-			newBasicStmt = replaceCodePlaceholders(oldVal);
+		if (newBasicStmt.contains("@{")) {
+			newBasicStmt = replaceCodePlaceholders(newBasicStmt);
 		}
 
 		if ((pjp.getTarget() instanceof Step) &&

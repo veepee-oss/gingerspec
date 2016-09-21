@@ -48,6 +48,19 @@ public class ReplacementAspectTest {
         assertThat(repAspect.replaceEnvironmentPlaceholders("|${STRATIOBDD_ENV2}.toUpper")).as("Unexpected replacement").isEqualTo("|aA.toUpper");
     }
 
+    @Test
+    public void replaceMixedPlaceholdersTest() throws Exception {
+        ThreadProperty.set("class", this.getClass().getCanonicalName());
+        ThreadProperty.set("STRATIOBDD_LOCAL1", "LOCAL");
+        ReplacementAspect repAspect = new ReplacementAspect();
+        System.setProperty("STRATIOBDD_ENV2", "aa");
+
+        assertThat(repAspect.replaceReflectionPlaceholders(repAspect.replaceEnvironmentPlaceholders("!{STRATIOBDD_LOCAL1}:${STRATIOBDD_ENV2}")))
+                .as("Unexpected replacement").isEqualTo("LOCAL:aa");
+        assertThat(repAspect.replaceReflectionPlaceholders(repAspect.replaceEnvironmentPlaceholders("${STRATIOBDD_ENV2}:!{STRATIOBDD_LOCAL1}")))
+                .as("Unexpected replacement").isEqualTo("aa:LOCAL");
+    }
+
     @Test (expectedExceptions = {NonReplaceableException.class})
     public void replaceUnexistantPlaceholdersTest() throws NonReplaceableException {
         ThreadProperty.set("class", this.getClass().getCanonicalName());
