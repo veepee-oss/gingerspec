@@ -13,7 +13,10 @@ ITSERVICES:
       env:
         - ES_JAVA_OPTS="-Des.cluster.name=%%JUID -Des.network.host=%%OWNHOSTNAME"
   - CASSANDRA:
-      image: stratio/cassandra:2.2.5
+      image: stratio/cassandra-lucene-index:3.0.7.3
+      volumes:
+        - jts:1.14.0
+#        - stratio/cassandra-airlines:2.2.5
       sleep: 10
       env:
         - MAX_HEAP=256M
