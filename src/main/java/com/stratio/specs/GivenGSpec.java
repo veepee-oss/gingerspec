@@ -586,8 +586,8 @@ public class GivenGSpec extends BaseGSpec {
         if (envVar != null){
             ThreadProperty.set(envVar, commonspec.getRemoteSSHConnection().getResult());
         }
-        if (commonspec.getRemoteSSHConnection().getExitStatus() != 0) {
-            if (System.getProperty("logLevel", "").equalsIgnoreCase("debug")) {
+        if (commonspec.getRemoteSSHConnection().getExitStatus() != exitStatus) {
+            if (System.getProperty("logLevel", "") != null && System.getProperty("logLevel", "").equalsIgnoreCase("debug")) {
                 commonspec.getLogger().debug("Command complete stdout:\n{}", commonspec.getCommandResult());
             } else {
                 commonspec.getLogger().error("Command last {} lines stdout:", logLastLines);
