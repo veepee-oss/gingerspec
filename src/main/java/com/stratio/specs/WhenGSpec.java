@@ -704,5 +704,13 @@ public class WhenGSpec extends BaseGSpec {
         commonspec.getKafkaUtils().sendMessage(topic_name,message);
     }
 
-
+    /**
+     * Create an ElasticSearch index.
+     *
+     * @param index
+     */
+    @When("^I create an elasticsearch index named '(.+?)'$")
+    public void createElasticsearchIndex(String index) {
+        commonspec.getElasticSearchClient().createSingleIndex(index);
+    }
 }
