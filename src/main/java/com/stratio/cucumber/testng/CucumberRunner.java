@@ -64,8 +64,9 @@ public class CucumberRunner {
 
         List<String> uniqueGlue = new ArrayList<String>();
         uniqueGlue.add("classpath:com/stratio/specs");
-	uniqueGlue.add("classpath:com/stratio/sparta/testsAT/specs");
-	uniqueGlue.add("classpath:com/stratio/gosecsso/testsAT/specs");
+	    uniqueGlue.add("classpath:com/stratio/sparta/testsAT/specs");
+	    uniqueGlue.add("classpath:com/stratio/gosecsso/testsAT/specs");
+        uniqueGlue.add("classpath:com/stratio/dcos/crossdata/testsAT/specs");
         uniqueGlue.add("classpath:com/stratio/crossdata/testsAT/specs");
         uniqueGlue.add("classpath:com/stratio/streaming/testsAT/specs");
         uniqueGlue.add("classpath:com/stratio/ingestion/testsAT/specs");
@@ -76,7 +77,7 @@ public class CucumberRunner {
         uniqueGlue.add("classpath:com/stratio/manager/testsAT/specs");
         uniqueGlue.add("classpath:com/stratio/viewer/testsAT/specs");
         uniqueGlue.add("classpath:com/stratio/decision/testsAT/specs");
-	uniqueGlue.add("classpath:com/stratio/paas/testsAT/specs");
+	    uniqueGlue.add("classpath:com/stratio/paas/testsAT/specs");
         uniqueGlue.add("classpath:com/stratio/cassandra/lucene/testsAT/specs");                                  
         runtimeOptions.getGlue().clear();
         runtimeOptions.getGlue().addAll(uniqueGlue);

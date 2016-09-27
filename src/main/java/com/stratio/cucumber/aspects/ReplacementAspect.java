@@ -2,6 +2,7 @@ package com.stratio.cucumber.aspects;
 
 import com.stratio.exceptions.NonReplaceableException;
 import com.stratio.tests.utils.ThreadProperty;
+import gherkin.formatter.model.DataTableRow;
 import gherkin.formatter.model.Step;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -22,8 +23,6 @@ public class ReplacementAspect {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass()
 			.getCanonicalName());
-
-
 
 	@Pointcut("execution (public String com.stratio.cucumber.testng.CucumberReporter.TestMethod.obtainOutlineScenariosExamples(..)) && "
 			+ "args (examplesData)")
@@ -47,6 +46,35 @@ public class ReplacementAspect {
 		Object[] myArray = {newExamplesData};
 		return pjp.proceed(myArray);
 	}
+
+
+	@Pointcut("execution (public * gherkin.formatter.model.Step.getRows())")
+	protected void replacementDataTableStatementName() {
+	}
+
+    @Around(value = "replacementDataTableStatementName()")
+    public List<DataTableRow>aroundReplacementDataTableStatementName(ProceedingJoinPoint pjp) throws Throwable {
+        List<DataTableRow> dataTableOld = (List<DataTableRow>) pjp.proceed();
+        if(dataTableOld != null){
+            for(int i= 0; i < dataTableOld.size(); i++){
+                List<String> row = dataTableOld.get(i).getCells();
+                for(int x = 0; x < row.size(); x++){
+                    String value = row.get(x);
+                    if (value.contains("${")) {
+                        value = replaceEnvironmentPlaceholders(value);
+                    }
+                    if (value.contains("!{")) {
+                        value = replaceReflectionPlaceholders(value);
+                    }
+                    if (value.contains("@{")) {
+                        value = replaceCodePlaceholders(value);
+                    }
+                    dataTableOld.get(i).getCells().set(x, value);
+                }
+            }
+        }
+        return dataTableOld;
+    }
 
 	@Pointcut("call(String gherkin.formatter.model.BasicStatement.getName())")
 	protected void replacementBasicStatementName() {

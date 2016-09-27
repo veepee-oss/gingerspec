@@ -366,6 +366,7 @@ public class CucumberReporter implements Formatter, Reporter {
         }
 
         /**
+        /**
          * Finish.
          *
          * @param doc
