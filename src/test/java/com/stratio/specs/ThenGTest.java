@@ -2,6 +2,7 @@ package com.stratio.specs;
 
 import com.stratio.tests.utils.ThreadProperty;
 import cucumber.api.DataTable;
+
 import org.testng.annotations.Test;
 
 import java.nio.file.Files;
@@ -224,6 +225,40 @@ public class ThenGTest {
         DataTable table = DataTable.create(rawData);
 
         theng.matchWithExpresion(envVar, table);
+    }
+
+    @Test(expectedExceptions = AssertionError.class, expectedExceptionsMessageRegExp="^Not a valid comparison. Valid ones are: is \\| matches \\| is higher than \\| is lower than \\| contains \\| is different from$")
+    public void testCheckValueInvalidComparison() throws Exception {
+        ThreadProperty.set("class", this.getClass().getCanonicalName());
+        CommonG commong = new CommonG();
+        ThenGSpec theng = new ThenGSpec(commong);
+
+        String envVar = "EVAR";
+
+        ThreadProperty.set(envVar, "BlaBlaBla");
+        theng.checkValue(ThreadProperty.get(envVar), "not valid comparison", "BleBleBle");
+    }
+
+    @Test(expectedExceptions = AssertionError.class, expectedExceptionsMessageRegExp="^A number should be provided in order to perform a valid comparison.$")
+    public void testCheckValueInvalidNumber() throws Exception {
+        ThreadProperty.set("class", this.getClass().getCanonicalName());
+        CommonG commong = new CommonG();
+        ThenGSpec theng = new ThenGSpec(commong);
+
+        String envVar = "EVAR";
+
+        ThreadProperty.set(envVar, "1O");
+        theng.checkValue(ThreadProperty.get(envVar), "is higher than", "5");
+        ThreadProperty.set(envVar, "10");
+        theng.checkValue(ThreadProperty.get(envVar), "is higher than", "S");
+        ThreadProperty.set(envVar, "1O");
+        theng.checkValue(ThreadProperty.get(envVar), "is higher than", "5S");
+        ThreadProperty.set(envVar, "S");
+        theng.checkValue(ThreadProperty.get(envVar), "is lower than", "10");
+        ThreadProperty.set(envVar, "5");
+        theng.checkValue(ThreadProperty.get(envVar), "is lower than", "1O");
+        ThreadProperty.set(envVar, "S");
+        theng.checkValue(ThreadProperty.get(envVar), "is lower than", "1O");
     }
 
 }
