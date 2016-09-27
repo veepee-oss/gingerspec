@@ -569,6 +569,7 @@ public class GivenGSpec extends BaseGSpec {
             exitStatus = 0;
         }
 
+        command = "set -o pipefail && " + command + " | grep . --color=never; exit $PIPESTATUS";
         commonspec.getRemoteSSHConnection().runCommand(command);
         commonspec.setCommandResult(commonspec.getRemoteSSHConnection().getResult());
         commonspec.setCommandExitStatus(commonspec.getRemoteSSHConnection().getExitStatus());
