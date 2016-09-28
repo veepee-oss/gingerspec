@@ -92,7 +92,7 @@ public class GivenGSpec extends BaseGSpec {
 
     /**
      * Connect to ElasticSearch using custom parameters
-     * @param host 
+     * @param host
      * @param foo
      * @param nativePort
      * @param bar
