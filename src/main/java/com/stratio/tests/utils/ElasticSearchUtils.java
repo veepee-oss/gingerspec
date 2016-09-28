@@ -77,6 +77,10 @@ public class ElasticSearchUtils {
         this.es_host = host;
     }
 
+    public void setNativePort(Integer port) {
+        this.es_native_port = port;
+    }
+
     /**
      * Connect to ES.
      */

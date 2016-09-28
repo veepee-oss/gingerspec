@@ -25,9 +25,8 @@ import static com.stratio.assertions.Assertions.assertThat;
  */
 public class GivenGSpec extends BaseGSpec {
 
-    public static final int PAGE_LOAD_TIMEOUT = 120;
-    public static final int IMPLICITLY_WAIT = 10;
-    public static final int SCRIPT_TIMEOUT = 30;
+    public static final Integer ES_DEFAULT_NATIVE_PORT = 9300;
+    public static final String ES_DEFAULT_CLUSTER_NAME = "elasticsearch";
 
     /**
      * Generic constructor.
@@ -82,13 +81,42 @@ public class GivenGSpec extends BaseGSpec {
                 break;
             case "Elasticsearch":
                 LinkedHashMap<String, Object> settings_map = new LinkedHashMap<String, Object>();
-                settings_map.put("cluster.name", System.getProperty("ES_CLUSTER", "elasticsearch"));
+                settings_map.put("cluster.name", System.getProperty("ES_CLUSTER", ES_DEFAULT_CLUSTER_NAME));
                 commonspec.getElasticSearchClient().setSettings(settings_map);
                 commonspec.getElasticSearchClient().connect();
                 break;
             default:
                 throw new DBException("Unknown cluster type");
         }
+    }
+
+    /**
+     * Connect to ElasticSearch using custom parameters
+     * @param host 
+     * @param foo
+     * @param nativePort
+     * @param bar
+     * @param clusterName
+     * @throws DBException
+     * @throws UnknownHostException
+     * @throws NumberFormatException
+     */
+    @Given("^I connect to Elasticsearch cluster at host '(.+?)'( using native port '(.+?)')?( using cluster name '(.+?)')?$")
+    public void connectToElasticSearch(String host, String foo, String nativePort, String bar, String clusterName) throws DBException, UnknownHostException, NumberFormatException {
+        LinkedHashMap<String, Object> settings_map = new LinkedHashMap<String, Object>();
+        if (clusterName != null) {
+            settings_map.put("cluster.name", clusterName);
+        } else {
+            settings_map.put("cluster.name", ES_DEFAULT_CLUSTER_NAME);
+        }
+        commonspec.getElasticSearchClient().setSettings(settings_map);
+        if (nativePort != null) {
+            commonspec.getElasticSearchClient().setNativePort(Integer.valueOf(nativePort));
+        } else {
+            commonspec.getElasticSearchClient().setNativePort(ES_DEFAULT_NATIVE_PORT);
+        }
+        commonspec.getElasticSearchClient().setHost(host);
+        commonspec.getElasticSearchClient().connect();
     }
 
     /**
