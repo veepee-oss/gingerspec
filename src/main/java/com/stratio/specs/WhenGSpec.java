@@ -711,7 +711,9 @@ public class WhenGSpec extends BaseGSpec {
      */
     @When("^I create an elasticsearch index named '(.+?)'( removing existing index if exist)?$")
     public void createElasticsearchIndex(String index, String removeIndex) {
-        if (removeIndex != null) commonspec.getElasticSearchClient().dropSingleIndex(index);
+        if (removeIndex != null && commonspec.getElasticSearchClient().indexExists(index)) {
+            commonspec.getElasticSearchClient().dropSingleIndex(index);
+        }
         commonspec.getElasticSearchClient().createSingleIndex(index);
     }
 }
