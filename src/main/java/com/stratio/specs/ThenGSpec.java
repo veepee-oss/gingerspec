@@ -687,10 +687,24 @@ public class ThenGSpec extends BaseGSpec {
 
     }
 
+    /**
+     * Check that the ElasticSearch index exists.
+     * @param indexName
+     */
     @Then("^An Elasticsearch index named '(.+?)' exists")
     public void elasticSearchIndexExist(String indexName) {
         Assertions.assertThat(commonspec.getElasticSearchClient().indexExists(indexName)).isTrue()
                 .withFailMessage("There is no index with that name");
+    }
+
+    /**
+     * Check that the ElasticSearch index does not exist.
+     * @param indexName
+     */
+    @Then("^An Elasticsearch index named '(.+?)' does not exist")
+    public void elasticSearchIndexDoesNotExist(String indexName) {
+        Assertions.assertThat(commonspec.getElasticSearchClient().indexExists(indexName)).isFalse()
+                .withFailMessage("There is an index with that name");
     }
 
     /*
