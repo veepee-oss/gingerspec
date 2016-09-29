@@ -1,6 +1,7 @@
 package com.stratio.specs;
 
 import com.auth0.jwt.JWTSigner;
+import com.ning.http.client.Response;
 import com.ning.http.client.cookie.Cookie;
 import com.stratio.exceptions.DBException;
 import com.stratio.tests.utils.RemoteSSHConnection;
@@ -15,6 +16,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.UnknownHostException;
 import java.util.*;
+import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -233,6 +235,48 @@ public class GivenGSpec extends BaseGSpec {
         }
     }
 
+
+    /**
+     * Save clustername of elasticsearch in an environment varible for future use.
+     *
+     * @param host elasticsearch connection
+     * @param port elasticsearch port
+     * @param envVar thread environment variable where to store the value
+     * @throws IllegalAccessException
+     * @throws IllegalArgumentException
+     * @throws SecurityException
+     * @throws NoSuchFieldException
+     * @throws ClassNotFoundException
+     * @throws InstantiationException
+     * @throws InvocationTargetException
+     * @throws NoSuchMethodException
+     */
+    @Given("^I obtain elasticsearch cluster name in '([^:]+?)(:.+?)?' and save it in environment variable '(.+?)'?$")
+    public void saveElasticCluster(String host, String port, String envVar) throws Exception {
+
+        setupRestClient(null, host, port);
+
+        Future<Response> response;
+
+        response = commonspec.generateRequest("GET", false, null, null, "/", "", "json", "");
+        commonspec.setResponse("GET", response.get());
+
+        String json;
+        String parsedElement;
+        json = commonspec.getResponse().getResponse();
+        parsedElement = "$..cluster_name";
+
+        String json2 = "[" + json + "]";
+        String value = commonspec.getJSONPathString(json2, parsedElement, "0");
+
+        if (value == null) {
+            throw new Exception("No cluster name is found");
+        } else {
+            ThreadProperty.set(envVar, value);
+        }
+    }
+
+
     /**
      * Drop all the ElasticSearch indexes.
      */
@@ -392,9 +436,6 @@ public class GivenGSpec extends BaseGSpec {
      */
     @Given("^I( securely)? send requests to '([^:]+?)(:.+?)?'$")
     public void setupRestClient(String isSecured, String restHost, String restPort) {
-        assertThat(restHost).isNotEmpty();
-        assertThat(restPort).isNotEmpty();
-
         String restProtocol = "http://";
 
         if (isSecured != null) {
