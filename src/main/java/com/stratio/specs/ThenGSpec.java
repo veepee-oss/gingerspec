@@ -707,6 +707,23 @@ public class ThenGSpec extends BaseGSpec {
                 .withFailMessage("There is an index with that name");
     }
 
+    /**
+     * Check that an ElasticSearch index contains a specific document
+     * @param indexName
+     * @param columnName
+     * @param columnValue
+     */
+    @Then("^The Elasticsearch index named '(.+?)' and mapping '(.+?)' contains a column named '(.+?)' with the value '(.+?)'$")
+    public void elasticSearchIndexContainsDocument(String indexName, String mappingName, String columnName, String columnValue) throws Exception {
+        Assertions.assertThat((commonspec.getElasticSearchClient().searchSimpleFilterElasticsearchQuery(
+                indexName,
+                mappingName,
+                columnName,
+                columnValue,
+                "equals"
+                ).size()) > 0).isTrue().withFailMessage("The index does not contain that document");
+    }
+
     /*
      * Check value stored in environment variable "is|matches|is higher than|is lower than|contains|is different from" to value provided
      *

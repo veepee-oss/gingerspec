@@ -13,6 +13,7 @@ import cucumber.api.DataTable;
 import cucumber.api.Transform;
 import cucumber.api.java.en.When;
 import org.apache.zookeeper.KeeperException;
+import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.hjson.JsonArray;
 import org.hjson.JsonValue;
 import org.openqa.selenium.By;
@@ -26,6 +27,7 @@ import java.util.concurrent.Future;
 import java.util.regex.Pattern;
 
 import static com.stratio.assertions.Assertions.assertThat;
+import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
 public class WhenGSpec extends BaseGSpec {
 
@@ -715,5 +717,22 @@ public class WhenGSpec extends BaseGSpec {
             commonspec.getElasticSearchClient().dropSingleIndex(index);
         }
         commonspec.getElasticSearchClient().createSingleIndex(index);
+    }
+
+    /**
+     * Index a document within a mapping type.
+     *
+     * @param indexName
+     * @param mappingName
+     * @param key
+     * @param value
+     * @throws Exception
+     */
+    @When("^I index a document in the index named '(.+?)' using the mapping named '(.+?)' with key '(.+?)' and value '(.+?)'$")
+    public void indexElasticsearchDocument(String indexName, String mappingName, String key, String value) throws Exception {
+        ArrayList<XContentBuilder> mappingsource = new ArrayList<XContentBuilder>();
+        XContentBuilder builder = jsonBuilder().startObject().field(key, value).endObject();
+        mappingsource.add(builder);
+        commonspec.getElasticSearchClient().createMapping(indexName, mappingName, mappingsource);
     }
 }
