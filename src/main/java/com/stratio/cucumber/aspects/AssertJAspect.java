@@ -30,7 +30,7 @@ public class AssertJAspect {
 		AssertionError ae = (AssertionError) pjp.proceed();
         if(ae.getStackTrace()[2].getMethodName().equals("assertCommandExistsOnTimeOut") ||
                 ae.getStackTrace()[2].getMethodName().equals("assertSeleniumNElementExistsOnTimeOut") ||
-                ae.getStackTrace()[2].getMethodName().equals("CommandExistsOnTimeOut")){
+                ae.getStackTrace()[2].getMethodName().equals("sendRequestTimeout")){
             logger.warn("Assertion failed: {}", ae.getMessage());
         } else{
             logger.error("Assertion failed: {}", ae.getMessage());
