@@ -55,7 +55,7 @@ public class RemoteSSHConnection {
     }
 
     public String getResult() {
-        return result;
+        return result.trim();
     }
 
     public void setResult(String result) {

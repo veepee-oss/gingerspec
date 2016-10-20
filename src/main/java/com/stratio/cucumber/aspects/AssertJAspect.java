@@ -28,7 +28,13 @@ public class AssertJAspect {
 			ProceedingJoinPoint pjp) throws Throwable {
 
 		AssertionError ae = (AssertionError) pjp.proceed();
-		logger.error("Assertion failed: {}", ae.getMessage());
+        if(ae.getStackTrace()[2].getMethodName().equals("assertCommandExistsOnTimeOut") ||
+                ae.getStackTrace()[2].getMethodName().equals("assertSeleniumNElementExistsOnTimeOut") ||
+                ae.getStackTrace()[2].getMethodName().equals("CommandExistsOnTimeOut")){
+            logger.warn("Assertion failed: {}", ae.getMessage());
+        } else{
+            logger.error("Assertion failed: {}", ae.getMessage());
+        }
 		return ae;
 
 	}
