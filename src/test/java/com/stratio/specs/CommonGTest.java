@@ -658,11 +658,11 @@ public class CommonGTest {
 	public void testNonexistentLocalCommandExitStatus() throws Exception {
 		ThreadProperty.set("class", this.getClass().getCanonicalName());
 		CommonG commong = new CommonG();
-		String command = "shur";
+		String command = "nonexistscommand";
 		commong.runLocalCommand(command);
 		int exitstatus = commong.getCommandExitStatus();
 
-		assertThat(exitstatus).as("Running nonexistent command 'shur' locally").isEqualTo(1);
+		assertThat(exitstatus).as("Running nonexistent command 'shur' locally").isEqualTo(127);
 	}
 
 	@Test

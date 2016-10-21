@@ -1524,9 +1524,8 @@ public class CommonG {
 
 		String result = "", line;
 		Process p;
-
 		try {
-			p = Runtime.getRuntime().exec(command);
+			p = Runtime.getRuntime().exec(new String[] {"/bin/sh","-c",command});
 			p.waitFor();
 		} catch (java.io.IOException e) {
 			this.commandExitStatus = 1;
