@@ -492,7 +492,7 @@ public class CucumberReporter implements Formatter, Reporter {
             if (ignored && (!ignoreReason || (ignoreReason && isJiraTicketDone) || (ignoreReason && isWrongTicket))) {
                 element.setAttribute(STATUS, "FAIL");
                 if (isJiraTicketDone) {
-                    msg1 = "The scenario was ignored due an already done ticket. " + "https://stratio.atlassian.net/browse/" + issue;;
+                    msg1 = "The scenario was ignored due an already done (or in progress) ticket. " + "https://stratio.atlassian.net/browse/" + issue;;
                     msg2 =  " ";
                 } else if (isWrongTicket) {
                     msg1 = "The scenario was ignored due to unexistant ticket " +  issue;
