@@ -435,8 +435,8 @@ public class ThenGSpec extends BaseGSpec {
 
         String webURL = "http://" + commonspec.getWebHost() + commonspec.getWebPort();
 
-        assertThat(this.commonspec, commonspec.getDriver().getCurrentUrl()).as("We are not in the expected url: " + webURL + url)
-                .isEqualTo(webURL + url);
+        assertThat(this.commonspec, commonspec.getDriver().getCurrentUrl()).as("We are not in the expected url: " + webURL.toLowerCase() + url)
+                .isEqualTo(webURL.toLowerCase() + url);
     }
 
     @Then("^the service response status must be '(.*?)'.$")
