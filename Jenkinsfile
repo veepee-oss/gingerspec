@@ -3,7 +3,8 @@
 hose {
     EMAIL = 'qa'
     LANG = 'java'
-    SHORTMODULE = 'qa'
+    MODULE = 'bdt-lib'
+    REPOSITORY = 'stratio-test-bdd'
     SLACKTEAM = 'stratioqa'
     DEVTIMEOUT = 30
     RELEASETIMEOUT = 30
