@@ -478,6 +478,22 @@ public class GivenGSpec extends BaseGSpec {
     }
 
     /**
+     * Swith to the iFrame where id matches idframe
+     *
+     * @param idframe
+     */
+    @Given("^I switch to iframe with '([^:]*?):([^:]*?)'$")
+    public void seleniumIdFrame(String method, String idframe) throws IllegalAccessException, NoSuchFieldException, ClassNotFoundException {
+        assertThat(commonspec.locateElement(method, idframe, 1));
+
+        if (method.equals("id") || method.equals("name")){
+            commonspec.getDriver().switchTo().frame(idframe);
+        }
+        else
+            throw new ClassNotFoundException("Can not use this method to switch iframe");
+    }
+
+    /**
      * Switches to a parent frame/ iframe.
      */
     @Given("^I switch to a parent frame$")
