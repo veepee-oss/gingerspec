@@ -70,9 +70,4 @@ hose {
         }, failFast: conf.FAILFAST)
 
      }
-
-    RELEASE = { conf ->
-        doDeploy(conf)
-        doDoc(conf)
-    }
 }
