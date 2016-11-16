@@ -50,23 +50,23 @@ hose {
         | -DSSH=%%UBUNTU
         | -DSLEEPTEST=1""".stripMargin().stripIndent()
     
-    DEV = { conf ->        
-        doCompile(conf)
+    DEV = { config ->        
+        doCompile(config)
 
         parallel(UT: {
-            doUT(conf)
+            doUT(config)
         }, IT: {
-            doIT(conf)
-        }, failFast: conf.FAILFAST)
+            doIT(config)
+        }, failFast: config.FAILFAST)
 
-        doPackage(conf)
+        doPackage(config)
     
         parallel(DOC: {
-            doDoc(conf)
+            doDoc(config)
         }, QC: {
-            doStaticAnalysis(conf)
+            doStaticAnalysis(config)
         }, DEPLOY: {
-            doDeploy(conf)
+            doDeploy(config)
         }, failFast: conf.FAILFAST)
 
      }
