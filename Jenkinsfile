@@ -67,7 +67,7 @@ hose {
             doStaticAnalysis(config)
         }, DEPLOY: {
             doDeploy(config)
-        }, failFast: conf.FAILFAST)
+        }, failFast: config.FAILFAST)
 
      }
 }
