@@ -15,26 +15,31 @@ hose {
            'image': 'confluent/zookeeper:3.4.6-cp1',
            'env': [
                  'zk_id=1'],
-           'sleep': 10]],
+           'sleep': 30,
+           'healthcheck': 2181]],
         ['MONGODB': [
            'image': 'stratio/mongo:3.0.4']],
         ['ELASTICSEARCH': [
            'image': 'elasticsearch:2.0.2',
            'env': [
                  'ES_JAVA_OPTS="-Des.cluster.name=%%JUID -Des.network.host=%%OWNHOSTNAME"'],
-           'sleep': 10]],
+           'sleep': 10,
+           'healthcheck': 9300]],
         ['CASSANDRA': [
            'image': 'stratio/cassandra-lucene-index:3.0.7.3',
            'volumes':[
                  'jts:1.14.0'],
            'env': [
                  'MAX_HEAP=256M'],
-           'sleep': 10]],
+           'sleep': 30,
+           'healthcheck': 9042]],
         ['KAFKA': [
            'image': 'confluent/kafka:0.10.0.0-cp1',
            'env': [
                  'KAFKA_ZOOKEEPER_CONNECT=%%ZOOKEEPER:2181',
-                 'KAFKA_ADVERTISED_HOST_NAME=%%OWNHOSTNAME']]],
+                 'KAFKA_ADVERTISED_HOST_NAME=%%OWNHOSTNAME'],
+           'sleep': 30,       
+           'healthcheck': 9300]],
         ['UBUNTU': [
            'image': 'stratio/ubuntu-base:16.04',
            'ssh': true]],
