@@ -368,8 +368,8 @@ public class GivenGSpec extends BaseGSpec {
      * @param path
      * @throws Exception
      */
-    @Given("^I browse to '(.+?)'$")
-    public void seleniumBrowse(String path) throws Exception {
+    @Given("^I( securely browse| browse) to '(.+?)'$")
+    public void seleniumBrowse(Boolean isSecured, String path) throws Exception {
         assertThat(path).isNotEmpty();
 
         if (commonspec.getWebHost() == null) {
@@ -379,8 +379,12 @@ public class GivenGSpec extends BaseGSpec {
         if (commonspec.getWebPort() == null) {
             throw new Exception("Web port has not been set");
         }
+        String protocol = "http://";
+        if (isSecured) {
+            protocol = "https://";
+        }
 
-        String webURL = "http://" + commonspec.getWebHost() + commonspec.getWebPort();
+        String webURL = protocol + commonspec.getWebHost() + commonspec.getWebPort();
 
         commonspec.getDriver().get(webURL + path);
         commonspec.setParentWindow(commonspec.getDriver().getWindowHandle());
