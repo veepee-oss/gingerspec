@@ -13,6 +13,7 @@ import cucumber.api.DataTable;
 import cucumber.api.Transform;
 import cucumber.api.java.en.When;
 import org.apache.zookeeper.KeeperException;
+import org.assertj.core.api.Assertions;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.hjson.JsonArray;
 import org.hjson.JsonValue;
@@ -22,6 +23,11 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.Select;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.*;
 import java.util.concurrent.Future;
 import java.util.regex.Pattern;
@@ -237,8 +243,7 @@ public class WhenGSpec extends BaseGSpec {
 
 	// Modify data
 	commonspec.getLogger().debug("Modifying data {} as {}", retrievedData, type);
-	String modifiedData;
-	modifiedData = commonspec.modifyData(retrievedData, type, modifications).toString();
+	String modifiedData = commonspec.modifyData(retrievedData, type, modifications).toString();
 
         String user = null;
         String password = null;
@@ -734,5 +739,75 @@ public class WhenGSpec extends BaseGSpec {
         XContentBuilder builder = jsonBuilder().startObject().field(key, value).endObject();
         mappingsource.add(builder);
         commonspec.getElasticSearchClient().createMapping(indexName, mappingName, mappingsource);
+    }
+
+    /**
+     * Create a JSON in working directory with given name, so for using it you've to reference it as:
+     *  $(pwd)/fileName
+     *
+     * @param fileName name of the JSON file to be created
+     * @param baseData path to file containing the schema to be used
+     * @param type element to read from file (element should contain a json)
+     * @param modifications DataTable containing the modifications to be done to the base schema element
+     *
+     * - Syntax will be:
+     * 		| <key path> | <type of modification> | <new value> |
+     * for DELETE/ADD/UPDATE/APPEND/PREPEND
+     * where:
+     *     key path: path to the key to be modified
+     *     type of modification: DELETE/ADD/UPDATE/APPEND/PREPEND
+     *     new value: new value to be used
+     *
+     * - Or:
+     *      | <key path> | <type of modification> | <new value> | <new value type> |
+     * for REPLACE
+     * where:
+     *     key path: path to the key to be modified
+     *     type of modification: REPLACE
+     *     new value: new value to be used
+     *     json value type: type of the json property (array|object|number|boolean|null|n/a (for string))
+     *
+     *
+     * For example:
+     *
+     * (1)
+     * If the element read is {"key1": "value1", "key2": {"key3": "value3"}}
+     * and we want to modify the value in "key3" with "new value3"
+     * the modification will be:
+     *  	| key2.key3 | UPDATE | "new value3" |
+     * being the result of the modification: {"key1": "value1", "key2": {"key3": "new value3"}}
+     *
+     * (2)
+     * If the element read is {"key1": "value1", "key2": {"key3": "value3"}}
+     * and we want to replace the value in "key2" with {"key4": "value4"}
+     * the modification will be:
+     *  	| key2 | REPLACE | {"key4": "value4"} | object |
+     * being the result of the modification: {"key1": "value1", "key2": {"key4": "value4"}}
+     *
+     * @throws Exception
+     */
+    @When("^I create file '(.+?)' based on '(.+?)' as '(.+?)' with:$")
+    public void createFile(String fileName, String baseData, String type, DataTable modifications) throws Exception {
+        // Retrieve data
+        String retrievedData = commonspec.retrieveData(baseData, type);
+
+        // Modify data
+        commonspec.getLogger().debug("Modifying data {} as {}", retrievedData, type);
+        String modifiedData = commonspec.modifyData(retrievedData, type, modifications).toString();
+
+        // Create file (temporary) and set path to be accessible within test
+        String absolutePathFile = System.getProperty("user.dir") + System.getProperty("file.separator") + fileName;
+        commonspec.getLogger().debug("Creating file {} in working directory", absolutePathFile);
+        // Note that this Writer will delete the file if it exists
+        Writer out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(absolutePathFile), "UTF-8"));
+        try {
+            out.write(modifiedData);
+        } catch (Exception e) {
+            commonspec.getLogger().error("Custom file {} hasn't been created:\n{}", absolutePathFile, e.toString());
+        } finally {
+            out.close();
+        }
+
+        Assertions.assertThat(new File(absolutePathFile).isFile());
     }
 }

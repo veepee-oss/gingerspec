@@ -543,6 +543,261 @@ public class CommonGTest {
 		JSONAssert.assertEquals(expectedData,modifiedData,false);
 	}
 
+	@Test
+	public void modifyDataAddToJsonArrayTest_1() throws Exception {
+		ThreadProperty.set("class", this.getClass().getCanonicalName());
+		CommonG commong = new CommonG();
+
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("key1", new JSONArray(Arrays.asList("value1")));
+		String data = jsonObject.toString();
+		String expectedData = "{\"key1\":[\"value1\",[\"value2\"]]}";
+		String type = "json";
+		List<List<String>> rawData = Arrays.asList(Arrays.asList("key1", "ADDTO", "[\"value2\"]", "array"));
+		DataTable modifications = DataTable.create(rawData);
+
+		String modifiedData = commong.modifyData(data, type, modifications);
+		JSONAssert.assertEquals(expectedData, modifiedData, false);
+	}
+
+	@Test
+	public void modifyDataAddToJsonArrayTest_2() throws Exception {
+		ThreadProperty.set("class", this.getClass().getCanonicalName());
+		CommonG commong = new CommonG();
+
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("key1", new JSONArray(Arrays.asList("value1")));
+		String data = jsonObject.toString();
+		String expectedData = "{\"key1\":[\"value1\",[]]}";
+		String type = "json";
+		List<List<String>> rawData = Arrays.asList(Arrays.asList("key1", "ADDTO", "[]", "array"));
+		DataTable modifications = DataTable.create(rawData);
+
+		String modifiedData = commong.modifyData(data, type, modifications);
+		JSONAssert.assertEquals(expectedData, modifiedData, false);
+	}
+
+	@Test
+	public void modifyDataAddToJsonArrayTest_3() throws Exception {
+		ThreadProperty.set("class", this.getClass().getCanonicalName());
+		CommonG commong = new CommonG();
+
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("key1", new JSONArray(Arrays.asList("value1")));
+		String data = jsonObject.toString();
+		String expectedData = "{\"key1\":[\"value1\",[[]]]}";
+		String type = "json";
+		List<List<String>> rawData = Arrays.asList(Arrays.asList("key1", "ADDTO", "[[]]", "array"));
+		DataTable modifications = DataTable.create(rawData);
+
+		String modifiedData = commong.modifyData(data, type, modifications);
+		JSONAssert.assertEquals(expectedData, modifiedData, false);
+	}
+
+	@Test
+	public void modifyDataAddToJsonObjectTest_1() throws Exception {
+		ThreadProperty.set("class", this.getClass().getCanonicalName());
+		CommonG commong = new CommonG();
+
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("key1", new JSONArray(Arrays.asList("value1")));
+		String data = jsonObject.toString();
+		String expectedData = "{\"key1\":[\"value1\",{\"key2\": \"value2\"}]}";
+		String type = "json";
+		List<List<String>> rawData = Arrays.asList(Arrays.asList("key1", "ADDTO", "{\"key2\": \"value2\"}", "object"));
+		DataTable modifications = DataTable.create(rawData);
+
+		String modifiedData = commong.modifyData(data, type, modifications);
+		JSONAssert.assertEquals(expectedData, modifiedData, false);
+	}
+
+	@Test
+	public void modifyDataAddToJsonObjectTest_2() throws Exception {
+		ThreadProperty.set("class", this.getClass().getCanonicalName());
+		CommonG commong = new CommonG();
+
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("key1", new JSONArray(Arrays.asList("value1")));
+		String data = jsonObject.toString();
+		String expectedData = "{\"key1\":[\"value1\",{}]}";
+		String type = "json";
+		List<List<String>> rawData = Arrays.asList(Arrays.asList("key1", "ADDTO", "{}", "object"));
+		DataTable modifications = DataTable.create(rawData);
+
+		String modifiedData = commong.modifyData(data, type, modifications);
+		JSONAssert.assertEquals(expectedData, modifiedData, false);
+	}
+
+	@Test
+	public void modifyDataAddToJsonStringTest_1() throws Exception {
+		ThreadProperty.set("class", this.getClass().getCanonicalName());
+		CommonG commong = new CommonG();
+
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("key1", new JSONArray(Arrays.asList("value1")));
+		String data = jsonObject.toString();
+		String expectedData = "{\"key1\":[\"value1\",\"value2\"]}";
+		String type = "json";
+		List<List<String>> rawData = Arrays.asList(Arrays.asList("key1", "ADDTO", "value2", "string"));
+		DataTable modifications = DataTable.create(rawData);
+
+		String modifiedData = commong.modifyData(data, type, modifications);
+		JSONAssert.assertEquals(expectedData, modifiedData, false);
+	}
+
+	@Test
+	public void modifyDataAddToJsonStringTest_2() throws Exception {
+		ThreadProperty.set("class", this.getClass().getCanonicalName());
+		CommonG commong = new CommonG();
+
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("key1", new JSONArray(Arrays.asList("value1")));
+		String data = jsonObject.toString();
+		String expectedData = "{\"key1\":[\"value1\",\"\"]}";
+		String type = "json";
+		List<List<String>> rawData = Arrays.asList(Arrays.asList("key1", "ADDTO", "", "string"));
+		DataTable modifications = DataTable.create(rawData);
+
+		String modifiedData = commong.modifyData(data, type, modifications);
+		JSONAssert.assertEquals(expectedData, modifiedData, false);
+	}
+
+	@Test
+	public void modifyDataAddToJsonNumberTest_1() throws Exception {
+		ThreadProperty.set("class", this.getClass().getCanonicalName());
+		CommonG commong = new CommonG();
+
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("key1", new JSONArray(Arrays.asList("value1")));
+		String data = jsonObject.toString();
+		String expectedData = "{\"key1\":[\"value1\",666]}";
+		String type = "json";
+		List<List<String>> rawData = Arrays.asList(Arrays.asList("key1", "ADDTO", "666", "number"));
+		DataTable modifications = DataTable.create(rawData);
+
+		String modifiedData = commong.modifyData(data, type, modifications);
+		JSONAssert.assertEquals(expectedData, modifiedData, false);
+	}
+
+	@Test
+	public void modifyDataAddToJsonNumberTest_2() throws Exception {
+		ThreadProperty.set("class", this.getClass().getCanonicalName());
+		CommonG commong = new CommonG();
+
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("key1", new JSONArray(Arrays.asList("value1")));
+		String data = jsonObject.toString();
+		String expectedData = "{\"key1\":[\"value1\",66.6]}";
+		String type = "json";
+		List<List<String>> rawData = Arrays.asList(Arrays.asList("key1", "ADDTO", "66.6", "number"));
+		DataTable modifications = DataTable.create(rawData);
+
+		String modifiedData = commong.modifyData(data, type, modifications);
+		JSONAssert.assertEquals(expectedData, modifiedData, false);
+	}
+
+	@Test
+	public void modifyDataAddToJsonNumberTest_3() throws Exception {
+		ThreadProperty.set("class", this.getClass().getCanonicalName());
+		CommonG commong = new CommonG();
+
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("key1", new JSONArray(Arrays.asList("value1")));
+		String data = jsonObject.toString();
+		String expectedData = "{\"key1\":[\"value1\",0]}";
+		String type = "json";
+		List<List<String>> rawData = Arrays.asList(Arrays.asList("key1", "ADDTO", "0", "number"));
+		DataTable modifications = DataTable.create(rawData);
+
+		String modifiedData = commong.modifyData(data, type, modifications);
+		JSONAssert.assertEquals(expectedData, modifiedData, false);
+	}
+
+	@Test
+	public void modifyDataAddToJsonBooleanTest_1() throws Exception {
+		ThreadProperty.set("class", this.getClass().getCanonicalName());
+		CommonG commong = new CommonG();
+
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("key1", new JSONArray(Arrays.asList("value1")));
+		String data = jsonObject.toString();
+		String expectedData = "{\"key1\":[\"value1\",true]}";
+		String type = "json";
+		List<List<String>> rawData = Arrays.asList(Arrays.asList("key1", "ADDTO", "true", "boolean"));
+		DataTable modifications = DataTable.create(rawData);
+
+		String modifiedData = commong.modifyData(data, type, modifications);
+		JSONAssert.assertEquals(expectedData, modifiedData, false);
+	}
+
+	@Test
+	public void modifyDataAddToJsonBooleanTest_2() throws Exception {
+		ThreadProperty.set("class", this.getClass().getCanonicalName());
+		CommonG commong = new CommonG();
+
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("key1", new JSONArray(Arrays.asList("value1")));
+		String data = jsonObject.toString();
+		String expectedData = "{\"key1\":[\"value1\",false]}";
+		String type = "json";
+		List<List<String>> rawData = Arrays.asList(Arrays.asList("key1", "ADDTO", "false", "boolean"));
+		DataTable modifications = DataTable.create(rawData);
+
+		String modifiedData = commong.modifyData(data, type, modifications);
+		JSONAssert.assertEquals(expectedData, modifiedData, false);
+	}
+
+	@Test
+	public void modifyDataAddToJsonBooleanTest_3() throws Exception {
+		ThreadProperty.set("class", this.getClass().getCanonicalName());
+		CommonG commong = new CommonG();
+
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("key1", new JSONArray(Arrays.asList("value1")));
+		String data = jsonObject.toString();
+		String expectedData = "{\"key1\":[\"value1\",false]}";
+		String type = "json";
+		List<List<String>> rawData = Arrays.asList(Arrays.asList("key1", "ADDTO", "", "boolean"));
+		DataTable modifications = DataTable.create(rawData);
+
+		String modifiedData = commong.modifyData(data, type, modifications);
+		JSONAssert.assertEquals(expectedData, modifiedData, false);
+	}
+
+	@Test
+	public void modifyDataAddToJsonNullTest_1() throws Exception {
+		ThreadProperty.set("class", this.getClass().getCanonicalName());
+		CommonG commong = new CommonG();
+
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("key1", new JSONArray(Arrays.asList("value1")));
+		String data = jsonObject.toString();
+		String expectedData = "{\"key1\":[\"value1\",null]}";
+		String type = "json";
+		List<List<String>> rawData = Arrays.asList(Arrays.asList("key1", "ADDTO", "null", "null"));
+		DataTable modifications = DataTable.create(rawData);
+
+		String modifiedData = commong.modifyData(data, type, modifications);
+		JSONAssert.assertEquals(expectedData, modifiedData, false);
+	}
+
+	@Test
+	public void modifyDataAddToJsonNullTest_2() throws Exception {
+		ThreadProperty.set("class", this.getClass().getCanonicalName());
+		CommonG commong = new CommonG();
+
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("key1", new JSONArray(Arrays.asList("value1")));
+		String data = jsonObject.toString();
+		String expectedData = "{\"key1\":[\"value1\",null]}";
+		String type = "json";
+		List<List<String>> rawData = Arrays.asList(Arrays.asList("key1", "ADDTO", "", "null"));
+		DataTable modifications = DataTable.create(rawData);
+
+		String modifiedData = commong.modifyData(data, type, modifications);
+		JSONAssert.assertEquals(expectedData, modifiedData, false);
+	}
+
     @Test
     public void generateRequestNoAppURLTest() throws Exception {
 	ThreadProperty.set("class", this.getClass().getCanonicalName());

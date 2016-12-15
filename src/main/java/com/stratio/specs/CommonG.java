@@ -761,6 +761,11 @@ public class CommonG {
 	    String modifiedData = data;
 		String typeJsonObject = "";
 		String nullValue = "";
+
+		JSONArray jArray;
+		JSONObject jObject;
+		Double jNumber;
+		Boolean jBoolean;
 	    
 	    if ("json".equals(type)) {
 		LinkedHashMap jsonAsMap = new LinkedHashMap();
@@ -772,9 +777,9 @@ public class CommonG {
 			if (modifications.raw().get(0).size()==4){
 				typeJsonObject =  modifications.raw().get(i).get(3);
 			}
-	    
+
 		    modifiedData = JsonValue.readHjson(modifiedData).asObject().toString();
-		    
+
 		    modifiedData = modifiedData.replaceAll("null", "\"TO_BE_NULL\"");
 		    switch(operation.toUpperCase()) {
 	    		case "DELETE":
@@ -805,30 +810,32 @@ public class CommonG {
 					jsonAsMap = JsonPath.parse(modifiedData).set(composeKey, newValue + prependValue).json();
 	    		    break;
 	    		case "REPLACE":
-	    		    String replaceValue = JsonPath.parse(modifiedData).read(composeKey);
 					if ("array".equals(typeJsonObject)) {
-						JSONArray ja = new JSONArray();
+						jArray = new JSONArray();
 						if (newValue != "[]") {
-							ja = new JSONArray(newValue);
+							jArray = new JSONArray(newValue);
 						}
-						jsonAsMap = JsonPath.parse(modifiedData).set(composeKey, ja).json();
+						jsonAsMap = JsonPath.parse(modifiedData).set(composeKey, jArray).json();
 						break;
 					} else if ("object".equals(typeJsonObject)) {
-						JSONObject jo = new JSONObject();
+						jObject = new JSONObject();
 						if (newValue != "{}") {
-							jo = new JSONObject(newValue);
+							jObject = new JSONObject(newValue);
 						}
-						jsonAsMap = JsonPath.parse(modifiedData).set(composeKey, jo).json();
+						jsonAsMap = JsonPath.parse(modifiedData).set(composeKey, jObject).json();
+						break;
+					} else if ("string".equals(typeJsonObject)) {
+						jsonAsMap = JsonPath.parse(modifiedData).set(composeKey, newValue).json();
 						break;
 
 					} else if ("number".equals(typeJsonObject)) {
-						Double numD = new Double(newValue);
-						jsonAsMap = JsonPath.parse(modifiedData).set(composeKey, numD).json();
+						jNumber = new Double(newValue);
+						jsonAsMap = JsonPath.parse(modifiedData).set(composeKey, jNumber).json();
 						break;
 
 					} else if ("boolean".equals(typeJsonObject)) {
-						Boolean jsonB = new Boolean(newValue);
-						jsonAsMap = JsonPath.parse(modifiedData).set(composeKey,jsonB).json();
+						jBoolean = new Boolean(newValue);
+						jsonAsMap = JsonPath.parse(modifiedData).set(composeKey,jBoolean).json();
 						break;
 
 					} else if ("null".equals(typeJsonObject)) {
@@ -836,19 +843,53 @@ public class CommonG {
 						break;
 
 					}else {
+						String replaceValue = JsonPath.parse(modifiedData).read(composeKey);
 						String toBeReplaced = newValue.split("->")[0];
 						String replacement = newValue.split("->")[1];
 						newValue = replaceValue.replace(toBeReplaced, replacement);
 						jsonAsMap = JsonPath.parse(modifiedData).set(composeKey, newValue).json();
 						break;
 					}
+					case "ADDTO":
+						if ("array".equals(typeJsonObject)) {
+							jArray = new JSONArray();
+							if (newValue != "[]") {
+								jArray = new JSONArray(newValue);
+							}
+							jsonAsMap = JsonPath.parse(modifiedData).add(composeKey, jArray).json();
+							break;
+						} else if ("object".equals(typeJsonObject)) {
+							jObject = new JSONObject();
+							if (newValue != "{}") {
+								jObject = new JSONObject(newValue);
+							}
+							jsonAsMap = JsonPath.parse(modifiedData).add(composeKey, jObject).json();
+							break;
+						} else if ("string".equals(typeJsonObject)) {
+							jsonAsMap = JsonPath.parse(modifiedData).add(composeKey, newValue).json();
+							break;
+						} else if ("number".equals(typeJsonObject)) {
+							jNumber = new Double(newValue);
+							jsonAsMap = JsonPath.parse(modifiedData).add(composeKey, jNumber).json();
+							break;
+						} else if ("boolean".equals(typeJsonObject)) {
+							jBoolean = new Boolean(newValue);
+							jsonAsMap = JsonPath.parse(modifiedData).add(composeKey, jBoolean).json();
+							break;
+						} else if ("null".equals(typeJsonObject)) {
+							nullValue = JsonPath.parse(modifiedData).add(composeKey, null).jsonString();
+							break;
+						} else {
+							// TO-DO: understand  newValue.split("->")[0];  and  newValue.split("->")[1];
+							break;
+						}
 				case "HEADER":
 					this.headers.put(composeKey,newValue);
 					break;
 	    		default:
 	    		    throw new Exception("Modification type does not exist: " + operation);
 		    }
-		    
+
 		    modifiedData = new JSONObject(jsonAsMap).toString();
 			if (!"".equals(nullValue)) {
 				modifiedData = nullValue;
@@ -860,7 +901,7 @@ public class CommonG {
 		    String value = modifications.raw().get(i).get(0);
 		    String operation =  modifications.raw().get(i).get(1);
 		    String newValue =  modifications.raw().get(i).get(2);
-	    
+
 		    switch(operation.toUpperCase()) {
 	    		case "DELETE":
 	    		    modifiedData = modifiedData.replace(value,"");
@@ -1532,8 +1573,6 @@ public class CommonG {
 			this.commandResult = "Error";
 			return;
 		}
-
-
 
 		BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
 		while ((line = input.readLine()) != null) {

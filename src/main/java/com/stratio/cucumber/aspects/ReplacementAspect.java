@@ -1,6 +1,7 @@
 package com.stratio.cucumber.aspects;
 
 import com.stratio.exceptions.NonReplaceableException;
+import com.stratio.specs.CommonG;
 import com.stratio.tests.utils.ThreadProperty;
 import gherkin.formatter.model.DataTableRow;
 import gherkin.formatter.model.Step;
@@ -8,9 +9,16 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
+import org.hjson.JsonValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -112,6 +120,9 @@ public class ReplacementAspect {
 	 * If the element starts with:
 	 * 	- IP: We expect it to be followed by '.' + interface name (i.e. IP.eth0). It can contain other replacements.
 	 *
+	 * If the element starts with:
+	 * 	- JSON: We expect it to be followed by '.' + json path. The json is read and its content is returned as a string
+	 *
 	 * @param element
 	 *
 	 * @return String
@@ -121,8 +132,7 @@ public class ReplacementAspect {
 	protected String replaceCodePlaceholders(String element) throws Exception {
 		String newVal = element;
 		while (newVal.contains("@{")) {
-			String placeholder = newVal.substring(newVal.indexOf("@{"),
-					newVal.indexOf("}", newVal.indexOf("@{")) + 1);
+			String placeholder = newVal.substring(newVal.indexOf("@{"),	newVal.indexOf("}", newVal.indexOf("@{")) + 1);
 			String property = placeholder.substring(2, placeholder.length() - 1);
 			String subproperty = "";
 			if (placeholder.contains(".")) {
@@ -149,6 +159,10 @@ public class ReplacementAspect {
 					if (!found) {
 						throw new Exception("Interface " + subproperty + " not available" );
 					}
+					break;
+				case "JSON":
+					CommonG commonJson = new CommonG();
+					newVal = commonJson.retrieveData(subproperty, "json");
 					break;
 				default:
 					throw new Exception("Property not defined");
