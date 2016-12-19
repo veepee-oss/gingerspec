@@ -742,8 +742,8 @@ public class WhenGSpec extends BaseGSpec {
     }
 
     /**
-     * Create a JSON in working directory with given name, so for using it you've to reference it as:
-     *  $(pwd)/fileName
+     * Create a JSON in resources directory with given name, so for using it you've to reference it as:
+     *  $(pwd)/src/test/resources/fileName
      *
      * @param fileName name of the JSON file to be created
      * @param baseData path to file containing the schema to be used
@@ -796,7 +796,11 @@ public class WhenGSpec extends BaseGSpec {
         String modifiedData = commonspec.modifyData(retrievedData, type, modifications).toString();
 
         // Create file (temporary) and set path to be accessible within test
-        String absolutePathFile = System.getProperty("user.dir") + System.getProperty("file.separator") + fileName;
+        File tempDirectory = new File(String.valueOf(System.getProperty("user.dir") + "/src/test/resources/"));
+        if (! tempDirectory.exists()) {
+            tempDirectory.mkdirs();
+        }
+        String absolutePathFile = tempDirectory.getAbsolutePath() + "/" + fileName;
         commonspec.getLogger().debug("Creating file {} in working directory", absolutePathFile);
         // Note that this Writer will delete the file if it exists
         Writer out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(absolutePathFile), "UTF-8"));
