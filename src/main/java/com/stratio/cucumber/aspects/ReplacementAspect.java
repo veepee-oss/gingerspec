@@ -121,7 +121,12 @@ public class ReplacementAspect {
 	 * 	- IP: We expect it to be followed by '.' + interface name (i.e. IP.eth0). It can contain other replacements.
 	 *
 	 * If the element starts with:
-	 * 	- JSON: We expect it to be followed by '.' + json path. The json is read and its content is returned as a string
+	 * 	- JSON: We expect it to be followed by '.' + path_to_json_file (relative to src/test/resources or
+	 * 	target/test-classes). The json is read and its content is returned as a string
+	 *
+	 * If the element starts with:
+	 * 	- FILE: We expect it to be followed by '.' + path_to_file (relative to src/test/resources or
+	 * 	target/test-classes). The file is read and its content is returned as a string
 	 *
 	 * @param element
 	 *
@@ -135,6 +140,7 @@ public class ReplacementAspect {
 			String placeholder = newVal.substring(newVal.indexOf("@{"),	newVal.indexOf("}", newVal.indexOf("@{")) + 1);
 			String property = placeholder.substring(2, placeholder.length() - 1);
 			String subproperty = "";
+			CommonG commonJson;
 			if (placeholder.contains(".")) {
 				property = placeholder.substring(2, placeholder.indexOf("."));
 				subproperty = placeholder.substring(placeholder.indexOf(".") + 1, placeholder.length() - 1);
@@ -161,8 +167,12 @@ public class ReplacementAspect {
 					}
 					break;
 				case "JSON":
-					CommonG commonJson = new CommonG();
+					commonJson = new CommonG();
 					newVal = commonJson.retrieveData(subproperty, "json");
+					break;
+				case "FILE":
+					commonJson = new CommonG();
+					newVal = commonJson.retrieveData(subproperty, "file");
 					break;
 				default:
 					throw new Exception("Property not defined");

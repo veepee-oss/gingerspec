@@ -10,7 +10,13 @@ Feature: Create file test
     Given I create file 'testCreateFileObject.json' based on 'schemas/testCreateFile.json' as 'json' with:
       | $.key3 | REPLACE | @{JSON.schemas/testCreateFileReplaceObject.json} | object |
     Then I execute command 'cat $(pwd)/target/test-classes/testCreateFileObject.json' locally
-    And I execute command 'if ! diff $(pwd)/src/test/resources/testCreateFileObject.json $(pwd)/target/test-classes/schemas/testCreateFileResultObject.json -q ; then exit 1; fi' locally
+    And I execute command 'if ! diff $(pwd)/target/test-classes/testCreateFileObject.json $(pwd)/target/test-classes/schemas/testCreateFileResultObject.json -q ; then exit 1; fi' locally
+
+  Scenario: Create JSON file (plain text file)
+    Given I create file 'testCreateFilePlain.json' based on 'schemas/testCreateFile.json' as 'json' with:
+      | $.key2 | ADDTO | @{FILE.schemas/testCreateFileReplacePlainText.json} | string |
+    Then I execute command 'cat $(pwd)/target/test-classes/testCreateFilePlain.json' locally
+    And I execute command 'if ! diff $(pwd)/target/test-classes/testCreateFilePlain.json $(pwd)/target/test-classes/schemas/testCreateFileReplacePlainTextResult.json -q ; then exit 1; fi' locally
 
   Scenario: Create JSON file replacing with previous file
     Given I create file 'testCreatePrevious.json' based on 'schemas/testCreatePreviousFile.json' as 'json' with:
