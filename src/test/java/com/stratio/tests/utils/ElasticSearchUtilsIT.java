@@ -32,15 +32,6 @@ public class ElasticSearchUtilsIT {
                 .getProperty("ES_CLUSTER", "elasticsearch"));
     }
 
-    @Test(expectedExceptions = java.net.UnknownHostException.class)
-    public void connectErrorTest() throws UnknownHostException {
-        LinkedHashMap<String,Object> settings_map = new LinkedHashMap<String,Object>();
-        es_utils.setHost("www.badhost.ccom");
-        es_utils.setSettings(settings_map);
-        es_utils.connect();
-        es_utils.getClient().close();
-    }
-
     @Test
     public void connectTest() throws UnknownHostException {
         es_utils.connect();
