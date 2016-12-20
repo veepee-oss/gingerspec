@@ -108,7 +108,7 @@ public class ReplacementAspect {
 				!(lastEchoedStep.equals(newBasicStmt)) &&
 				!(newBasicStmt.contains("'<"))) {
 			lastEchoedStep = newBasicStmt;
-			logger.info("  {}{}", ((Step)pjp.getTarget()).getKeyword(),newBasicStmt);
+			logger.debug("  {}{}", ((Step)pjp.getTarget()).getKeyword(),newBasicStmt);
 		}
 		return newBasicStmt;
 	}
