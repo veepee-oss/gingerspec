@@ -19,9 +19,12 @@ import org.apache.kafka.common.requests.MetadataResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.*;
+import java.util.stream.Collectors;
 
 /**
  * Generic utilities for operations over Kafka.
@@ -43,6 +46,8 @@ public class KafkaUtils {
     private Properties props;
     private Properties propsConsumer;
     private ZkClient zkClient;
+    private ExecutorService execService;
+    private ArrayBlockingQueue<String> kafkaMessages;
 
     /**
      * Generic contructor of KafkaUtils.
@@ -52,7 +57,7 @@ public class KafkaUtils {
         this.replication = Integer.valueOf(System.getProperty("KAFKA_REPLICATION", "1"));
         this.sessionTimeoutMs = Integer.valueOf(System.getProperty("KAFKA_SESSION_TIMEOUT", "10000"));
         this.connectionTimeoutMs = Integer.valueOf(System.getProperty("KAFKA_CONNECTION_TIMEOUT", "60000"));
-        this.isSecureKafkaCluster = Boolean.valueOf(System.getProperty("KAFKA_CONNECTION_TIMEOUT", "false"));
+        this.isSecureKafkaCluster = Boolean.valueOf(System.getProperty("KAFKA_SECURED", "false"));
         this.zookeeperConnect = System.getProperty("ZOOKEEPER_HOSTS","0.0.0.0:2181");
         this.rackAwareMode = RackAwareMode.Enforced$.MODULE$;
         this.topicConfig=new Properties();
@@ -70,6 +75,7 @@ public class KafkaUtils {
         propsConsumer.put("group.id", "test");
         propsConsumer.put("enable.auto.commit", "true");
         propsConsumer.put("auto.offset.reset", "earliest");
+        propsConsumer.put("auto.commit.interval.ms", "1000");
         propsConsumer.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         propsConsumer.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
     }
@@ -78,7 +84,7 @@ public class KafkaUtils {
      * Connect to Kafka.
      */
     public void connect() {
-        logger.debug("Connecticting to kafka...");
+        logger.debug("Connecting to kafka...");
         this.zkClient = new ZkClient(
                 zookeeperConnect,
                 sessionTimeoutMs,
@@ -167,21 +173,34 @@ public class KafkaUtils {
     }
 
     /**
-     * Read messages from a topic.
-     * @param topicName name of topic.
-     * @return a list with the value of messages.
+     * Send (and confirm) a message
+     * @param message The message to be sent
+     * @param topicName name of topic
+     * @param timeoutSeconds Number of seconds to wait for acknowledgement by Kafka
      */
-    public void readMessage(String topicName){
-        KafkaConsumer<String, String> consumer = new KafkaConsumer<String, String>(propsConsumer);
-        consumer.subscribe(Arrays.asList(topicName));
+    public void sendAndConfirmMessage(String message, String topicName, long timeoutSeconds) throws InterruptedException, ExecutionException, TimeoutException {
+        Producer<String, String> producer = new KafkaProducer<>(props);
+        try {
+            producer.send(new ProducerRecord<String, String>(topicName,message)).get(timeoutSeconds, TimeUnit.SECONDS);
+            logger.debug("Message sent and acknowlegded by Kafka");
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+             logger.error("Message not sent or acknowlegded by Kafka {}", e.getMessage());
+            throw e;
+        } finally {
+            producer.close();
+        }        
+    }
 
+    public List<String> readTopicFromBeginning(String topic) {
+        List<String> result = new ArrayList<>();
+        KafkaConsumer<String, String> consumer = new KafkaConsumer<>(propsConsumer);
+        consumer.subscribe(Arrays.asList(topic));
         ConsumerRecords<String, String> records = consumer.poll(100);
-        while (true){
-            for (ConsumerRecord<String, String> record : records) {
-                logger.debug("topic = %s, partition = %s, offset = %d, customer = %s, country = %s",
-                        record.topic(), record.partition(), record.offset(), record.key(), record.value());
-            }
+        while (records.isEmpty()) {
+            records = consumer.poll(100);
+            for (ConsumerRecord<String, String> record : records)
+                result.add(record.value());
         }
-
+        return result;
     }
 }

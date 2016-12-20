@@ -10,6 +10,10 @@ import org.testng.annotations.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.*;
+
 public class KafkaUtilsIT {
     private final Logger logger = LoggerFactory
             .getLogger(KafkaUtilsIT.class);
@@ -44,6 +48,21 @@ public class KafkaUtilsIT {
         assertThat(kafka_utils.listTopics()).contains("testList2");
         kafka_utils.deleteTopic("testList");
         kafka_utils.deleteTopic("testList2");
+    }
+
+    @Test
+    public void writeAndReadKafkaTest() throws InterruptedException, ExecutionException, TimeoutException{
+        String topic = "kafkaTest";
+        String oneMessage = "Opening message";
+        String anotherMessage = "This is a test";
+
+        if (!AdminUtils.topicExists(kafka_utils.getZkUtils(), topic)){
+            kafka_utils.createTopic(topic);
+        }
+        kafka_utils.sendAndConfirmMessage(oneMessage, topic, 1);
+        kafka_utils.sendAndConfirmMessage(anotherMessage, topic, 1);
+        assertThat(kafka_utils.readTopicFromBeginning(topic).contains("This is a test")).as("Topic {} contains {}", topic, anotherMessage);
+        kafka_utils.deleteTopic(topic);
     }
 
     @Test

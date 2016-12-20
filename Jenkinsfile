@@ -37,7 +37,8 @@ hose {
            'image': 'confluent/kafka:0.10.0.0-cp1',
            'env': [
                  'KAFKA_ZOOKEEPER_CONNECT=%%ZOOKEEPER:2181',
-                 'KAFKA_ADVERTISED_HOST_NAME=%%OWNHOSTNAME'],
+                 'KAFKA_ADVERTISED_HOST_NAME=%%OWNHOSTNAME',
+                 'KAFKA_DELETE_TOPIC_ENABLE=true'],
            'sleep': 30,       
            'healthcheck': 9300]],
         ['UBUNTU': [

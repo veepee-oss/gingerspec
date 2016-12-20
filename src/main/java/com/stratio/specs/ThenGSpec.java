@@ -22,6 +22,7 @@ import org.openqa.selenium.WebElement;
 
 import java.util.*;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static com.stratio.assertions.Assertions.assertThat;
 
@@ -763,6 +764,11 @@ public class ThenGSpec extends BaseGSpec {
             default:
                 Fail.fail("Not a valid comparison. Valid ones are: is | matches | is higher than | is lower than | contains | is different from");
         }
+    }
+
+    @Then("^The kafka topic '(.*?)' has a message containing '(.*?)'$")
+    public void checkMessages(String topic, String content){
+        Assertions.assertThat(commonspec.getKafkaUtils().readTopicFromBeginning(topic).contains(content)).as("Topic {} contains {}", topic, content).withFailMessage("{} not found", content);
     }
 
 }
