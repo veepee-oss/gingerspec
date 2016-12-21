@@ -368,7 +368,7 @@ public class GivenGSpec extends BaseGSpec {
      * @param path
      * @throws Exception
      */
-    @Given("^I( securely browse| browse) to '(.+?)'$")
+    @Given("^I( securely)? browse to '(.+?)'$")
     public void seleniumBrowse(Boolean isSecured, String path) throws Exception {
         assertThat(path).isNotEmpty();
 
