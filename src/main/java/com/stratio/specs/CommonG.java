@@ -1790,5 +1790,30 @@ public class CommonG {
 		return removeJSONPathElement(removeJSONPathElement(removeJSONPathElement(json,".versionInfo"),".version"),".uris.*");
 	}
 
+	public void runCommandLoggerAndEnvVar(int exitStatus, String envVar) {
+		List<String> logOutput = Arrays.asList(this.getCommandResult().split("\n"));
+		StringBuffer log = new StringBuffer();
+		int logLastLines = 25;
+		if (logOutput.size() < 25) {
+			logLastLines = logOutput.size();
+		}
+		for (String s : logOutput.subList(logOutput.size() - logLastLines, logOutput.size())) {
+			log.append(s).append("\n");
+		}
+
+		if (envVar != null){
+			ThreadProperty.set(envVar, this.getRemoteSSHConnection().getResult().trim());
+		}
+		if (this.getCommandExitStatus() != exitStatus) {
+			if (System.getProperty("logLevel", "") != null && System.getProperty("logLevel", "").equalsIgnoreCase("debug")) {
+				this.getLogger().debug("Command complete stdout:\n{}", this.getCommandResult());
+			} else {
+				this.getLogger().error("Command last {} lines stdout:", logLastLines);
+				this.getLogger().error("{}", log);
+			}
+		} else {
+			this.getLogger().debug("Command complete stdout:\n{}", this.getCommandResult());
+		}
+	}
 
 }

@@ -642,9 +642,16 @@ public class GivenGSpec extends BaseGSpec {
      *
      * @param command
      **/
-    @Given("^I execute command '(.+?)' locally$")
-    public void executeLocalCommand(String command) throws Exception {
+    @Given("^I execute command '(.+?)' locally( with exit status '(.+?)')?( and save the value in environment variable '(.+?)')?$")
+    public void executeLocalCommand(String command, String foo, Integer exitStatus, String bar, String envVar) throws Exception {
+        if (exitStatus == null) {
+            exitStatus = 0;
+        }
+
         commonspec.runLocalCommand(command);
+        commonspec.runCommandLoggerAndEnvVar(exitStatus, envVar);
+
+        Assertions.assertThat(commonspec.getCommandExitStatus()).isEqualTo(exitStatus);
     }
 
     /**
@@ -653,7 +660,7 @@ public class GivenGSpec extends BaseGSpec {
      * @param command
      **/
     @Given("^I execute command '(.+?)' in remote ssh connection( with exit status '(.+?)')?( and save the value in environment variable '(.+?)')?$")
-    public void executeCommand(String command, String foo, Integer exitStatus, String var, String envVar) throws Exception {
+    public void executeCommand(String command, String foo, Integer exitStatus, String bar, String envVar) throws Exception {
         if (exitStatus == null) {
             exitStatus = 0;
         }
@@ -662,30 +669,8 @@ public class GivenGSpec extends BaseGSpec {
         commonspec.getRemoteSSHConnection().runCommand(command);
         commonspec.setCommandResult(commonspec.getRemoteSSHConnection().getResult());
         commonspec.setCommandExitStatus(commonspec.getRemoteSSHConnection().getExitStatus());
+        commonspec.runCommandLoggerAndEnvVar(exitStatus, envVar);
 
-        List<String> logOutput = Arrays.asList(commonspec.getCommandResult().split("\n"));
-        StringBuffer log = new StringBuffer();
-        int logLastLines = 25;
-        if (logOutput.size() < 25) {
-            logLastLines = logOutput.size();
-        }
-        for (String s : logOutput.subList(logOutput.size() - logLastLines, logOutput.size())) {
-            log.append(s).append("\n");
-        }
-
-        if (envVar != null){
-            ThreadProperty.set(envVar, commonspec.getRemoteSSHConnection().getResult().trim());
-        }
-        if (commonspec.getRemoteSSHConnection().getExitStatus() != exitStatus) {
-            if (System.getProperty("logLevel", "") != null && System.getProperty("logLevel", "").equalsIgnoreCase("debug")) {
-                commonspec.getLogger().debug("Command complete stdout:\n{}", commonspec.getCommandResult());
-            } else {
-                commonspec.getLogger().error("Command last {} lines stdout:", logLastLines);
-                commonspec.getLogger().error("{}", log);
-            }
-        } else {
-            commonspec.getLogger().debug("Command complete stdout:\n{}", commonspec.getCommandResult());
-        }
         Assertions.assertThat(commonspec.getRemoteSSHConnection().getExitStatus()).isEqualTo(exitStatus);
     }
 
