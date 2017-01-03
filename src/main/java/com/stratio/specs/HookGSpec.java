@@ -123,6 +123,7 @@ public class HookGSpec extends BaseGSpec {
         case "chrome":
             ChromeOptions chromeOptions = new ChromeOptions();
             chromeOptions.addArguments("--no-sandbox");
+            chromeOptions.addArguments("--ignore-certificate-errors");
             capabilities = DesiredCapabilities.chrome();
             capabilities.setCapability(ChromeOptions.CAPABILITY, chromeOptions);
             break;
