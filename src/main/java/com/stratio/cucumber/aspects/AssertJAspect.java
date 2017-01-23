@@ -10,32 +10,31 @@ import org.slf4j.LoggerFactory;
 @Aspect
 public class AssertJAspect {
 
-	private final Logger logger = LoggerFactory.getLogger(this.getClass()
-			.getCanonicalName());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass()
+            .getCanonicalName());
 
-	@Pointcut("execution(* org.assertj.core.internal.Failures.failure(..))")
-	protected void logAssertJFailurePointcut() {
-	}
+    @Pointcut("execution(* org.assertj.core.internal.Failures.failure(..))")
+    protected void logAssertJFailurePointcut() {
+    }
 
-	/**
-	 * 
-	 * @param pjp
-	 * @return AssertionError
-	 * @throws Throwable
-	 */
-	@Around("logAssertJFailurePointcut()")
-	public AssertionError aroundLogAssertJFailurePointcut(
-			ProceedingJoinPoint pjp) throws Throwable {
+    /**
+     * @param pjp
+     * @return AssertionError
+     * @throws Throwable
+     */
+    @Around("logAssertJFailurePointcut()")
+    public AssertionError aroundLogAssertJFailurePointcut(
+            ProceedingJoinPoint pjp) throws Throwable {
 
-		AssertionError ae = (AssertionError) pjp.proceed();
-        if(ae.getStackTrace()[2].getMethodName().equals("assertCommandExistsOnTimeOut") ||
+        AssertionError ae = (AssertionError) pjp.proceed();
+        if (ae.getStackTrace()[2].getMethodName().equals("assertCommandExistsOnTimeOut") ||
                 ae.getStackTrace()[2].getMethodName().equals("assertSeleniumNElementExistsOnTimeOut") ||
-                ae.getStackTrace()[2].getMethodName().equals("sendRequestTimeout")){
+                ae.getStackTrace()[2].getMethodName().equals("sendRequestTimeout")) {
             logger.warn("Assertion failed: {}", ae.getMessage());
-        } else{
+        } else {
             logger.error("Assertion failed: {}", ae.getMessage());
         }
-		return ae;
+        return ae;
 
-	}
+    }
 }

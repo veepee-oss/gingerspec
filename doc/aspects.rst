@@ -12,8 +12,8 @@ The entries will look something like this:
 	<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
 	<aspectj>
 		<aspects>
-			<aspect name="com.stratio.cucumber.aspects.IgnoreTagAspect" />
-			<aspect name="com.stratio.cucumber.aspects.ReplacementAspect" />
+			<aspect name="IgnoreTagAspect" />
+			<aspect name="ReplacementAspect" />
 		</aspects>
 		<weaver
 			options="-Xlint:ignore -Xset:weaveJavaPackages=true,weaveJavaxPackages=true">
