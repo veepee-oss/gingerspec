@@ -4,7 +4,7 @@ hose {
     EMAIL = 'qa'
     LANG = 'java'
     MODULE = 'bdt-lib'
-    REPOSITORY = 'stratio-test-bdd'
+    REPOSITORY = 'github.com/bdt'
     SLACKTEAM = 'stratioqa'
     DEVTIMEOUT = 30
     RELEASETIMEOUT = 30
