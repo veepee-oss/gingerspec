@@ -20,7 +20,7 @@ Feature: Create file test
 
   Scenario: Create JSON file replacing with previous file
     Given I create file 'testCreatePrevious.json' based on 'schemas/testCreatePreviousFile.json' as 'json' with:
-      | $.key_previous_1 | UPDATE  | value_previous_2 | string |
+      | $.key_previous_1 | UPDATE | value_previous_2 | string |
     Then I create file 'testCreatePreviousFinal.json' based on 'schemas/testCreateFile.json' as 'json' with:
       | $.key2 | ADDTO | @{JSON.testCreatePrevious.json} | object |
     Then I execute command 'cat $(pwd)/target/test-classes/testCreatePreviousFinal.json' locally

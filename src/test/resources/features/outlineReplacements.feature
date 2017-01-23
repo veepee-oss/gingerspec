@@ -1,9 +1,9 @@
-  Feature: Further replacements
+Feature: Further replacements
 
-    Scenario Outline: With scenarios outlines #fails
-      Given I wait '<ExSLeep>' seconds
+  Scenario Outline: With scenarios outlines #fails
+    Given I wait '<ExSLeep>' seconds
 
-      Examples:
+    Examples:
       | ExSLeep      |
       | 3            |
       | ${SLEEPTEST} |

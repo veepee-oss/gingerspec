@@ -4,7 +4,7 @@ Only listing significant user-visible, not internal code cleanups and minor bug 
 
 ## 0.4.0 (upcoming)
 
-* Pending changelog
+* [QA-272] better classes packaging
 
 ## 0.3.0 (upcoming)
 
