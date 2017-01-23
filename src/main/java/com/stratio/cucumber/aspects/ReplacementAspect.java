@@ -1,65 +1,72 @@
 package com.stratio.cucumber.aspects;
 
-import com.stratio.qa.exceptions.NonReplaceableException;
-import com.stratio.qa.specs.CommonG;
-import com.stratio.qa.utils.ThreadProperty;
+import com.stratio.exceptions.NonReplaceableException;
+import com.stratio.specs.CommonG;
+import com.stratio.tests.utils.ThreadProperty;
 import gherkin.formatter.model.DataTableRow;
 import gherkin.formatter.model.Step;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
+import org.hjson.JsonValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
-import java.util.Enumeration;
-import java.util.List;
+import java.util.*;
 
 @Aspect
 public class ReplacementAspect {
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass()
-            .getCanonicalName());
-    private String lastEchoedStep = "";
+	private String lastEchoedStep = "";
 
-    @Pointcut("execution (public String CucumberReporter.TestMethod.obtainOutlineScenariosExamples(..)) && "
-            + "args (examplesData)")
-    protected void replacementOutlineScenariosCallPointcut(String examplesData) {
-    }
+	private final Logger logger = LoggerFactory.getLogger(this.getClass()
+			.getCanonicalName());
 
-    @Around(value = "replacementOutlineScenariosCallPointcut(examplesData)")
-    public Object aroundReplacementOutlineScenariosCalls(ProceedingJoinPoint pjp, String examplesData) throws Throwable {
-        String newExamplesData = examplesData;
+	@Pointcut("execution (public String com.stratio.cucumber.testng.CucumberReporter.TestMethod.obtainOutlineScenariosExamples(..)) && "
+			+ "args (examplesData)")
+	protected void replacementOutlineScenariosCallPointcut(String examplesData) {
+	}
 
-        if (newExamplesData.contains("${")) {
-            newExamplesData = replaceEnvironmentPlaceholders(newExamplesData);
-        }
-        if (newExamplesData.contains("!{")) {
-            newExamplesData = replaceReflectionPlaceholders(newExamplesData);
-        }
-        if (newExamplesData.contains("@{")) {
-            newExamplesData = replaceCodePlaceholders(newExamplesData);
-        }
+	@Around(value = "replacementOutlineScenariosCallPointcut(examplesData)")
+	public Object aroundReplacementOutlineScenariosCalls(ProceedingJoinPoint pjp, String examplesData) throws Throwable {
+		String newExamplesData = examplesData;
 
-        Object[] myArray = {newExamplesData};
-        return pjp.proceed(myArray);
-    }
+		if (newExamplesData.contains("${")) {
+			newExamplesData = replaceEnvironmentPlaceholders(newExamplesData);
+		}
+		if (newExamplesData.contains("!{")) {
+			newExamplesData = replaceReflectionPlaceholders(newExamplesData);
+		}
+		if (newExamplesData.contains("@{")) {
+			newExamplesData = replaceCodePlaceholders(newExamplesData);
+		}
+
+		Object[] myArray = {newExamplesData};
+		return pjp.proceed(myArray);
+	}
 
 
-    @Pointcut("execution (public * gherkin.formatter.model.Step.getRows())")
-    protected void replacementDataTableStatementName() {
-    }
+	@Pointcut("execution (public * gherkin.formatter.model.Step.getRows())")
+	protected void replacementDataTableStatementName() {
+	}
 
     @Around(value = "replacementDataTableStatementName()")
-    public List<DataTableRow> aroundReplacementDataTableStatementName(ProceedingJoinPoint pjp) throws Throwable {
+    public List<DataTableRow>aroundReplacementDataTableStatementName(ProceedingJoinPoint pjp) throws Throwable {
         List<DataTableRow> dataTableOld = (List<DataTableRow>) pjp.proceed();
-        if (dataTableOld != null) {
-            for (int i = 0; i < dataTableOld.size(); i++) {
+        if(dataTableOld != null){
+            for(int i= 0; i < dataTableOld.size(); i++){
                 List<String> row = dataTableOld.get(i).getCells();
-                for (int x = 0; x < row.size(); x++) {
+                for(int x = 0; x < row.size(); x++){
                     String value = row.get(x);
                     if (value.contains("${")) {
                         value = replaceEnvironmentPlaceholders(value);
@@ -77,172 +84,177 @@ public class ReplacementAspect {
         return dataTableOld;
     }
 
-    @Pointcut("call(String gherkin.formatter.model.BasicStatement.getName())")
-    protected void replacementBasicStatementName() {
-    }
+	@Pointcut("call(String gherkin.formatter.model.BasicStatement.getName())")
+	protected void replacementBasicStatementName() {
+	}
 
-    @Around(value = "replacementBasicStatementName()")
-    public String aroundReplacementBasicStatementName(ProceedingJoinPoint pjp) throws Throwable {
+	@Around(value = "replacementBasicStatementName()")
+	public String aroundReplacementBasicStatementName(ProceedingJoinPoint pjp) throws Throwable {
 
-        String newBasicStmt = (String) pjp.proceed();
-
-
-        if (newBasicStmt.contains("${")) {
-            newBasicStmt = replaceEnvironmentPlaceholders(newBasicStmt);
-        }
-        if (newBasicStmt.contains("!{")) {
-            newBasicStmt = replaceReflectionPlaceholders(newBasicStmt);
-        }
-        if (newBasicStmt.contains("@{")) {
-            newBasicStmt = replaceCodePlaceholders(newBasicStmt);
-        }
-
-        if ((pjp.getTarget() instanceof Step) &&
-                !(lastEchoedStep.equals(newBasicStmt)) &&
-                !(newBasicStmt.contains("'<"))) {
-            lastEchoedStep = newBasicStmt;
-            logger.debug("  {}{}", ((Step) pjp.getTarget()).getKeyword(), newBasicStmt);
-        }
-        return newBasicStmt;
-    }
-
-    /**
-     * Replaces every placeholded element, enclosed in @{} with the
-     * corresponding attribute value in local Common class
-     * <p>
-     * If the element starts with:
-     * - IP: We expect it to be followed by '.' + interface name (i.e. IP.eth0). It can contain other replacements.
-     * <p>
-     * If the element starts with:
-     * - JSON: We expect it to be followed by '.' + path_to_json_file (relative to src/test/resources or
-     * target/test-classes). The json is read and its content is returned as a string
-     * <p>
-     * If the element starts with:
-     * - FILE: We expect it to be followed by '.' + path_to_file (relative to src/test/resources or
-     * target/test-classes). The file is read and its content is returned as a string
-     *
-     * @param element
-     * @return String
-     * @throws Exception
-     */
-    protected String replaceCodePlaceholders(String element) throws Exception {
-        String newVal = element;
-        while (newVal.contains("@{")) {
-            String placeholder = newVal.substring(newVal.indexOf("@{"), newVal.indexOf("}", newVal.indexOf("@{")) + 1);
-            String property = placeholder.substring(2, placeholder.length() - 1);
-            String subproperty = "";
-            CommonG commonJson;
-            if (placeholder.contains(".")) {
-                property = placeholder.substring(2, placeholder.indexOf("."));
-                subproperty = placeholder.substring(placeholder.indexOf(".") + 1, placeholder.length() - 1);
-            } else {
-                throw new Exception("Interface not defined");
-            }
-
-            switch (property) {
-                case "IP":
-                    boolean found = false;
-                    if (!subproperty.isEmpty()) {
-                        Enumeration<InetAddress> ifs = NetworkInterface.getByName(subproperty).getInetAddresses();
-                        while (ifs.hasMoreElements() && !found) {
-                            InetAddress itf = ifs.nextElement();
-                            if (itf instanceof Inet4Address) {
-                                String ip = itf.getHostAddress();
-                                newVal = newVal.replace(placeholder, ip);
-                                found = true;
-                            }
-                        }
-                    }
-                    if (!found) {
-                        throw new Exception("Interface " + subproperty + " not available");
-                    }
-                    break;
-                case "JSON":
-                    commonJson = new CommonG();
-                    newVal = commonJson.retrieveData(subproperty, "json");
-                    break;
-                case "FILE":
-                    commonJson = new CommonG();
-                    newVal = commonJson.retrieveData(subproperty, "file");
-                    break;
-                default:
-                    throw new Exception("Property not defined");
-            }
-        }
-        return newVal;
-    }
+		String newBasicStmt = (String) pjp.proceed();
 
 
-    /**
-     * Replaces every placeholded element, enclosed in !{} with the
-     * corresponding attribute value in local Common class
-     *
-     * @param element
-     * @return String
-     * @throws ClassNotFoundException
-     * @throws NoSuchFieldException
-     * @throws SecurityException
-     * @throws IllegalArgumentException
-     * @throws IllegalAccessException
-     */
-    protected String replaceReflectionPlaceholders(String element) throws Exception {
-        String newVal = element;
-        while (newVal.contains("!{")) {
-            String placeholder = newVal.substring(newVal.indexOf("!{"),
-                    newVal.indexOf("}", newVal.indexOf("!{")) + 1);
-            String attribute = placeholder.substring(2, placeholder.length() - 1);
-            // we want to use value previously saved
-            String prop = ThreadProperty.get(attribute);
-            if (prop == null) {
-                logger.error("{} -> {} local var has not been saved correctly previously.", element, attribute);
-                throw new NonReplaceableException("Unreplaceable placeholder: " + placeholder);
-            } else {
-                newVal = newVal.replace(placeholder, prop);
-            }
-        }
-        return newVal;
-    }
+		if (newBasicStmt.contains("${")) {
+			newBasicStmt = replaceEnvironmentPlaceholders(newBasicStmt);
+		}
+		if (newBasicStmt.contains("!{")) {
+			newBasicStmt = replaceReflectionPlaceholders(newBasicStmt);
+		}
+		if (newBasicStmt.contains("@{")) {
+			newBasicStmt = replaceCodePlaceholders(newBasicStmt);
+		}
+
+		if ((pjp.getTarget() instanceof Step) &&
+				!(lastEchoedStep.equals(newBasicStmt)) &&
+				!(newBasicStmt.contains("'<"))) {
+			lastEchoedStep = newBasicStmt;
+			logger.debug("  {}{}", ((Step)pjp.getTarget()).getKeyword(),newBasicStmt);
+		}
+		return newBasicStmt;
+	}
+
+	/**
+	 * Replaces every placeholded element, enclosed in @{} with the
+	 * corresponding attribute value in local Common class
+	 *
+	 * If the element starts with:
+	 * 	- IP: We expect it to be followed by '.' + interface name (i.e. IP.eth0). It can contain other replacements.
+	 *
+	 * If the element starts with:
+	 * 	- JSON: We expect it to be followed by '.' + path_to_json_file (relative to src/test/resources or
+	 * 	target/test-classes). The json is read and its content is returned as a string
+	 *
+	 * If the element starts with:
+	 * 	- FILE: We expect it to be followed by '.' + path_to_file (relative to src/test/resources or
+	 * 	target/test-classes). The file is read and its content is returned as a string
+	 *
+	 * @param element
+	 *
+	 * @return String
+	 *
+	 * @throws Exception
+	 */
+	protected String replaceCodePlaceholders(String element) throws Exception {
+		String newVal = element;
+		while (newVal.contains("@{")) {
+			String placeholder = newVal.substring(newVal.indexOf("@{"),	newVal.indexOf("}", newVal.indexOf("@{")) + 1);
+			String property = placeholder.substring(2, placeholder.length() - 1);
+			String subproperty = "";
+			CommonG commonJson;
+			if (placeholder.contains(".")) {
+				property = placeholder.substring(2, placeholder.indexOf("."));
+				subproperty = placeholder.substring(placeholder.indexOf(".") + 1, placeholder.length() - 1);
+			} else {
+				throw new Exception("Interface not defined");
+			}
+
+			switch (property) {
+				case "IP":
+					boolean found = false;
+					if (!subproperty.isEmpty()) {
+						Enumeration<InetAddress> ifs = NetworkInterface.getByName(subproperty).getInetAddresses();
+						while (ifs.hasMoreElements() && !found) {
+							InetAddress itf = ifs.nextElement();
+							if (itf instanceof Inet4Address) {
+								String ip = itf.getHostAddress();
+								newVal = newVal.replace(placeholder, ip);
+								found = true;
+							}
+						}
+					}
+					if (!found) {
+						throw new Exception("Interface " + subproperty + " not available" );
+					}
+					break;
+				case "JSON":
+					commonJson = new CommonG();
+					newVal = commonJson.retrieveData(subproperty, "json");
+					break;
+				case "FILE":
+					commonJson = new CommonG();
+					newVal = commonJson.retrieveData(subproperty, "file");
+					break;
+				default:
+					throw new Exception("Property not defined");
+			}
+		}
+		return newVal;
+	}
 
 
-    /**
-     * Replaces every placeholded element, enclosed in ${} with the
-     * corresponding java property
-     *
-     * @param element
-     * @return String
-     */
-    protected String replaceEnvironmentPlaceholders(String element) throws NonReplaceableException {
-        String newVal = element;
-        while (newVal.contains("${")) {
-            String placeholder = newVal.substring(newVal.indexOf("${"),
-                    newVal.indexOf("}", newVal.indexOf("${")) + 1);
-            String modifier = "";
-            String sysProp;
-            if (placeholder.contains(".")) {
-                sysProp = placeholder.substring(2, placeholder.indexOf("."));
-                modifier = placeholder.substring(placeholder.indexOf(".") + 1,
-                        placeholder.length() - 1);
-            } else {
-                sysProp = placeholder.substring(2, placeholder.length() - 1);
-            }
+	/**
+	 * Replaces every placeholded element, enclosed in !{} with the
+	 * corresponding attribute value in local Common class
+	 * 
+	 * @param element
+	 * 
+	 * @return String
+	 * 
+	 * @throws ClassNotFoundException
+	 * @throws NoSuchFieldException
+	 * @throws SecurityException
+	 * @throws IllegalArgumentException
+	 * @throws IllegalAccessException
+	 */
+	protected String replaceReflectionPlaceholders(String element) throws Exception {
+		String newVal = element;
+		while (newVal.contains("!{")) {
+			String placeholder = newVal.substring(newVal.indexOf("!{"),
+					newVal.indexOf("}", newVal.indexOf("!{")) + 1);
+			String attribute = placeholder.substring(2, placeholder.length() - 1);
+			// we want to use value previously saved
+			String prop = ThreadProperty.get(attribute);
+			if (prop == null) {
+				logger.error("{} -> {} local var has not been saved correctly previously.", element, attribute);
+				throw new NonReplaceableException("Unreplaceable placeholder: " + placeholder);
+			} else {
+				newVal = newVal.replace(placeholder, prop);
+			}
+		}
+		return newVal;
+	}
+	
+	
+	/**
+	 * Replaces every placeholded element, enclosed in ${} with the
+	 * corresponding java property
+	 * 
+	 * @param element
+	 * 
+	 * @return String
+	 */
+	protected String replaceEnvironmentPlaceholders(String element) throws NonReplaceableException {
+		String newVal = element;
+		while (newVal.contains("${")) {
+			String placeholder = newVal.substring(newVal.indexOf("${"),
+					newVal.indexOf("}", newVal.indexOf("${")) + 1);
+			String modifier = "";
+			String sysProp;
+			if (placeholder.contains(".")) {
+				sysProp = placeholder.substring(2, placeholder.indexOf("."));
+				modifier = placeholder.substring(placeholder.indexOf(".") + 1,
+						placeholder.length() - 1);
+			} else {
+				sysProp = placeholder.substring(2, placeholder.length() - 1);
+			}
 
-            String prop = System.getProperty(sysProp);
+			String prop = System.getProperty(sysProp);
 
-            if (prop == null) {
-                logger.error("{} -> {} env var has not been defined.", element, sysProp);
-                throw new NonReplaceableException("Unreplaceable placeholder: " + placeholder);
-            }
+			if (prop == null) {
+				logger.error("{} -> {} env var has not been defined.", element, sysProp);
+				throw new NonReplaceableException("Unreplaceable placeholder: " + placeholder);
+			}
 
-            if ("toLower".equals(modifier)) {
-                prop = prop.toLowerCase();
-            } else if ("toUpper".equals(modifier)) {
-                prop = prop.toUpperCase();
-            }
+			if ("toLower".equals(modifier)) {
+				prop = prop.toLowerCase();
+			} else if ("toUpper".equals(modifier)) {
+				prop = prop.toUpperCase();
+			}
 
-            newVal = newVal.replace(placeholder, prop);
-        }
+			newVal = newVal.replace(placeholder, prop);
+		}
 
-        return newVal;
-    }
+		return newVal;
+	}	
 }
 

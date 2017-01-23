@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
 <aspectj>
     <aspects>
-        <aspect name="com.stratio.qa.aspects.ReplacementAspect"/>
-        <aspect name="com.stratio.qa.aspects.IgnoreTagAspect"/>
-        <aspect name="com.stratio.qa.aspects.AssertJAspect"/>
-        <aspect name="com.stratio.qa.aspects.SeleniumAspect"/>
-        <aspect name="com.stratio.qa.aspects.BrowsersDataProviderAspect"/>
-        <aspect name="com.stratio.qa.aspects.IncludeTagAspect"/>
+        <aspect name="com.stratio.cucumber.aspects.ReplacementAspect" />
+        <aspect name="com.stratio.cucumber.aspects.IgnoreTagAspect" />
+        <aspect name="com.stratio.cucumber.aspects.AssertJAspect" />
+        <aspect name="com.stratio.cucumber.aspects.SeleniumAspect" />
+        <aspect name="com.stratio.cucumber.aspects.BrowsersDataProviderAspect" />
+        <aspect name="com.stratio.cucumber.aspects.IncludeTagAspect" />
     </aspects>
     <weaver
             options="-Xlint:ignore -Xset:weaveJavaPackages=true,weaveJavaxPackages=true">

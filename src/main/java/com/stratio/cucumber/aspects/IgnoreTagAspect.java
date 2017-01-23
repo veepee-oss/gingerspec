@@ -1,11 +1,16 @@
 package com.stratio.cucumber.aspects;
 
-import cucumber.runtime.Runtime;
-import cucumber.runtime.model.CucumberScenario;
+import com.stratio.cucumber.testng.CucumberReporter;
+import cucumber.runtime.CucumberException;
 import gherkin.formatter.Formatter;
 import gherkin.formatter.Reporter;
+import gherkin.formatter.model.Result;
 import gherkin.formatter.model.Scenario;
 import gherkin.formatter.model.Tag;
+
+import java.lang.reflect.Method;
+import java.util.Set;
+
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -13,8 +18,8 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Method;
-import java.util.Set;
+import cucumber.runtime.Runtime;
+import cucumber.runtime.model.CucumberScenario;
 
 @Aspect
 public class IgnoreTagAspect {
@@ -25,17 +30,17 @@ public class IgnoreTagAspect {
             + "args (formatter, reporter, runtime)")
     protected void addIgnoreTagPointcutScenario(Formatter formatter, Reporter reporter, Runtime runtime) {
     }
-
-    /**
-     * @param pjp
-     * @param formatter
-     * @param reporter
-     * @param runtime
-     * @throws Throwable
-     */
+/**
+ * 
+ * @param pjp
+ * @param formatter
+ * @param reporter
+ * @param runtime
+ * @throws Throwable
+ */
     @Around(value = "addIgnoreTagPointcutScenario(formatter, reporter, runtime)")
     public void aroundAddIgnoreTagPointcut(ProceedingJoinPoint pjp, Formatter formatter, Reporter reporter,
-                                           Runtime runtime) throws Throwable {
+            Runtime runtime) throws Throwable {
         logger.debug("Executing pointcut CucumberScenario run method");
 
         CucumberScenario scen = (CucumberScenario) pjp.getThis();
@@ -50,39 +55,39 @@ public class IgnoreTagAspect {
         Boolean ignoreReason = false;
 
         for (Tag tag : tags) {
-            if (tag.getName().equals("@ignore")) {
+            if(tag.getName().equals("@ignore")) {
                 ignore = true;
-                for (Tag tagNs : tags) {
+                for (Tag tagNs : tags){
                     //@tillFixed
-                    if ((tagNs.getName()).matches("@tillfixed\\(\\w+-\\d+\\)")) {
+                    if ((tagNs.getName()).matches("@tillfixed\\(\\w+-\\d+\\)")){
                         String issueNumb = tagNs.getName().substring(tagNs.getName().lastIndexOf('(') + 1);
-                        logger.warn("Scenario '" + scenario.getName() + "' ignored because of Issue: " + issueNumb.subSequence(0, issueNumb.length() - 1) + ".");
-                        ignoreReason = true;
+                        logger.warn("Scenario '"+scenario.getName()+"' ignored because of Issue: " + issueNumb.subSequence(0, issueNumb.length() - 1) +".");
+                        ignoreReason=true;
                         break;
                     }
                     //@unimplemented
-                    if (tagNs.getName().matches("@unimplemented")) {
-                        logger.warn("Scenario '" + scenario.getName() + "' ignored because it is not yet implemented.");
-                        ignoreReason = true;
+                    if (tagNs.getName().matches("@unimplemented")){
+                        logger.warn("Scenario '"+scenario.getName()+"' ignored because it is not yet implemented.");
+                        ignoreReason=true;
                         break;
                     }
                     //@manual
-                    if (tagNs.getName().matches("@manual")) {
-                        logger.warn("Scenario '" + scenario.getName() + "' ignored because it is marked as manual test.");
-                        ignoreReason = true;
+                    if (tagNs.getName().matches("@manual")){
+                        logger.warn("Scenario '"+scenario.getName()+"' ignored because it is marked as manual test.");
+                        ignoreReason=true;
                         break;
                     }
                     //@toocomplex
-                    if (tagNs.getName().matches("@toocomplex")) {
-                        logger.warn("Scenario '" + scenario.getName() + "' ignored because the test is too complex.");
-                        ignoreReason = true;
+                    if (tagNs.getName().matches("@toocomplex")){
+                        logger.warn("Scenario '"+scenario.getName()+"' ignored because the test is too complex.");
+                        ignoreReason=true;
                         break;
                     }
                 }
             }
         }
 
-        if (ignore && !ignoreReason) {
+        if (ignore && !ignoreReason){
             logger.error("Scenario '" + scenario.getName() + "' failed due to wrong use of the @ignore tag. ");
         }
 

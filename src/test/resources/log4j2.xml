@@ -5,7 +5,7 @@
     </Properties>
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout pattern="%highlight{%.20c{1}} - %highlight{%m}%n"/>
+            <PatternLayout pattern="%highlight{%.20c{1}} - %highlight{%m}%n" />
         </Console>
         <Console name="Hooks" target="SYSTEM_OUT">
             <PatternLayout pattern="%highlight{   %msg%n}{INFO=blue}"/>
@@ -19,20 +19,15 @@
             <AppenderRef ref="Console"/>
         </Root>
 
-        <logger name="com.stratio.qa.aspects.ReplacementAspect" level="INFO" additivity="false">
+        <logger name="com.stratio.cucumber.aspects.ReplacementAspect" level="INFO" additivity="false">
             <appender-ref ref="Steps"/>
         </logger>
-        <logger name="com.stratio.qa.utils.CukesGHooks" level="INFO" additivity="false">
+        <logger name="com.stratio.tests.utils.CukesGHooks" level="INFO" additivity="false">
             <appender-ref ref="Hooks"/>
         </logger>
-        <logger name="com.stratio.specs" level="DEBUG" additivity="false"/>
+        <logger name="com.stratio.specs" level="DEBUG" additivity="false" />
 
-        <logger name="org.apache.zookeeper" level="OFF"/>
-        <logger name="org.reflections.Reflections" level="WARN"/>
-        <logger name="org.I0Itec.zkclient" level="WARN"/>
-        <logger name="org.apache.kafka" level="WARN"/>
-        <logger name="org.elasticsearch.plugins" level="WARN"/>
-        <logger name="com.datastax.driver.core" level="OFF"/>
-        <logger name="kafka.admin" level="OFF"/>
+        <logger name="org.apache.zookeeper.ZooKeeper" level="OFF" />
+        <logger name="org.apache.zookeeper.ClientCnxn" level="OFF" />
     </Loggers>
 </Configuration>
