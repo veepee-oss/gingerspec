@@ -85,7 +85,7 @@ public class CommonG {
     private String commandResult;
     private String restProtocol;
 
-    private ZookeeperUtils zkClient;
+    private ZookeeperSecUtils zkSecClient;
 
     /**
      * Checks if a given string matches a regular expression or contains a string
@@ -256,12 +256,12 @@ public class CommonG {
     }
 
     /**
-     * Get the Zookeeper utils.
+     * Get the Zookeeper Sec utils.
      *
-     * @return ZookeperUtils
+     * @return ZookeperSecUtils
      */
-    public ZookeeperUtils getZookeeperClient() {
-        return ZookeeperUtil.INSTANCE.getZookeeperUtils();
+    public ZookeeperSecUtils getZookeeperSecClient() {
+        return ZookeeperSecUtil.INSTANCE.getZookeeperSecUtils();
     }
 
     /**
@@ -1771,8 +1771,8 @@ public class CommonG {
 
     }
 
-    public ZookeeperUtils getZkClient() {
-        return zkClient;
+    public ZookeeperSecUtils getZkSecClient() {
+        return zkSecClient;
     }
 
     public void runCommandAndGetResult(String command) throws Exception {

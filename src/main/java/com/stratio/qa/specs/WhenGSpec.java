@@ -650,8 +650,8 @@ public class WhenGSpec extends BaseGSpec {
      * @param zNode path at zookeeper
      */
     @When("^I remove the zNode '(.+?)'$")
-    public void removeZNode(String zNode) throws KeeperException, InterruptedException {
-        commonspec.getZookeeperClient().delete(zNode);
+    public void removeZNode(String zNode) throws Exception {
+        commonspec.getZookeeperSecClient().delete(zNode);
     }
 
 
@@ -664,11 +664,11 @@ public class WhenGSpec extends BaseGSpec {
      * @param ephemeral if it's created as ephemeral or not
      */
     @When("^I create the zNode '(.+?)'( with content '(.+?)')? which (IS|IS NOT) ephemeral$")
-    public void createZNode(String path, String foo, String content, boolean ephemeral) throws KeeperException, InterruptedException {
+    public void createZNode(String path, String foo, String content, boolean ephemeral) throws Exception {
         if (content != null) {
-            commonspec.getZookeeperClient().zCreate(path, content, ephemeral);
+            commonspec.getZookeeperSecClient().zCreate(path,content,ephemeral);
         } else {
-            commonspec.getZookeeperClient().zCreate(path, ephemeral);
+            commonspec.getZookeeperSecClient().zCreate(path,ephemeral);
         }
     }
 

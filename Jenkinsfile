@@ -52,6 +52,7 @@ hose {
         | -DES_NODE=%%ELASTICSEARCH#0
         | -DES_CLUSTER=%%JUID
         | -DZOOKEEPER_HOSTS=%%ZOOKEEPER:2181
+        | -DSECURIZED_ZOOKEEPER=false
         | -DKAFKA_HOSTS=%%KAFKA:9092
         | -DSSH=%%UBUNTU
         | -DSLEEPTEST=1""".stripMargin().stripIndent()

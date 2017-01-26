@@ -707,10 +707,21 @@ public class GivenGSpec extends BaseGSpec {
      * @param zookeeperHosts as host:port (comma separated)
      */
     @Given("^I connect to zk cluster at '(.+)'$")
-    public void connectToZk(String zookeeperHosts) {
-        commonspec.getZookeeperClient().setZookeeperConnection(zookeeperHosts, 3000);
-        commonspec.getZookeeperClient().connectZk();
+    public void connectToZk(String zookeeperHosts) throws InterruptedException {
+        commonspec.getZookeeperSecClient().setZookeeperSecConnection(zookeeperHosts, 3000);
+        commonspec.getZookeeperSecClient().connectZk();
     }
+
+
+    /**
+     * Disconnect from zookeeper.
+     *
+     */
+    @Given("^I disconnect from zk cluster$")
+    public void disconnectFromZk() throws InterruptedException {
+        commonspec.getZookeeperSecClient().disconnect();
+    }
+
 
     /**
      * Connect to Kafka.

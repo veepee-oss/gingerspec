@@ -601,22 +601,22 @@ public class ThenGSpec extends BaseGSpec {
      * @param document expected content of znode
      */
     @Then("^I check that zNode at '(.+?)' exists( and contains '(.+?)')?$")
-    public void checkZnodeExists(String zNode, String foo, String document) throws KeeperException, InterruptedException {
+    public void checkZnodeExists(String zNode, String foo, String document)  throws Exception {
         if (document == null) {
-            String breakpoint = commonspec.getZookeeperClient().zRead(zNode);
-            Assertions.assertThat(commonspec.getZookeeperClient().zRead(zNode))
+            String breakpoint = commonspec.getZookeeperSecClient().zRead(zNode);
+            Assertions.assertThat(commonspec.getZookeeperSecClient().zRead(zNode))
                     .withFailMessage("The zNode does not exist")
                     .as("zNode exists").isEqualTo("");
         } else {
-            Assertions.assertThat(commonspec.getZookeeperClient().zRead(zNode))
+            Assertions.assertThat(commonspec.getZookeeperSecClient().zRead(zNode))
                     .withFailMessage("The zNode does not exist or the content does not match")
                     .as("ZNode contains {} ", document).contains(document);
         }
     }
 
     @Then("^I check that zNode at '(.+?)' does not exist")
-    public void checkZnodeNotExist(String zNode) throws KeeperException, InterruptedException {
-        Assertions.assertThat(!commonspec.getZookeeperClient().exists(zNode)).withFailMessage("The zNode exists");
+    public void checkZnodeNotExist(String zNode) throws Exception {
+        Assertions.assertThat(!commonspec.getZookeeperSecClient().exists(zNode)).withFailMessage("The zNode exists");
     }
 
     /**
