@@ -6,7 +6,7 @@ Only listing significant user-visible, not internal code cleanups and minor bug 
 
 * [QA-272] better classes packaging
 
-## 0.3.0 (upcoming)
+## 0.3.0 (January 26, 2017)
 
 * CukesGHooks will invoke the logger with each step
 
