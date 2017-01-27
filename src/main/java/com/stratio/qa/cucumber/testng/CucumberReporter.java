@@ -43,14 +43,19 @@ public class CucumberReporter implements Formatter, Reporter {
     public static final int DEFAULT_MAX_LENGTH = 140;
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
     private static final String STATUS = "status";
-    private final Document document, jUnitDocument;
-    private final Element results, jUnitResults;
-    private final Element suite, jUnitSuite;
+    private final Document document;
+    private final Document jUnitDocument;
+    private final Element results;
+    private final Element jUnitResults;
+    private final Element suite;
+    private final Element jUnitSuite;
     private final Element test;
     String featureName;
-    private Writer writer, writerJunit;
+    private Writer writer;
+    private Writer  writerJunit;
     private Element clazz;
-    private Element root, jUnitRoot;
+    private Element root;
+    private Element jUnitRoot;
     private TestMethod testMethod;
     private Examples tmpExamples;
     private List<Result> tmpHooks = new ArrayList<Result>();
@@ -437,8 +442,7 @@ public class CucumberReporter implements Formatter, Reporter {
                                         isWrongTicket = true;
                                     } else if ("done".equals(value.toLowerCase()) || "finalizado".equals(value.toLowerCase()) ||
                                             "qa".equals(value.toLowerCase()) ||
-                                            "in progress".equals(value.toLowerCase()) || "en progreso".equals(value.toLowerCase())
-                                            ) {
+                                            "in progress".equals(value.toLowerCase()) || "en progreso".equals(value.toLowerCase())) {
                                         isJiraTicketDone = true;
                                     }
 

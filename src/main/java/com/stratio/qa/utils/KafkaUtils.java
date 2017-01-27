@@ -203,8 +203,9 @@ public class KafkaUtils {
         ConsumerRecords<String, String> records = consumer.poll(100);
         while (records.isEmpty()) {
             records = consumer.poll(100);
-            for (ConsumerRecord<String, String> record : records)
+            for (ConsumerRecord<String, String> record : records) {
                 result.add(record.value());
+            }
         }
         return result;
     }

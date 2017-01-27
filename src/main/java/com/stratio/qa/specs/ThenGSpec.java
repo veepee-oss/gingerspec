@@ -501,6 +501,8 @@ public class ThenGSpec extends BaseGSpec {
             case "csv":
                 commonspec.resultsMustBeCSV(expectedResults);
                 break;
+            default:
+                commonspec.getLogger().warn("default switch branch on results check");
         }
     }
 

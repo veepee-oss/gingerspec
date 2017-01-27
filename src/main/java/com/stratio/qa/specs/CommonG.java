@@ -1551,7 +1551,8 @@ public class CommonG {
      */
     public void runLocalCommand(String command) throws Exception {
 
-        String result = "", line;
+        String result = "";
+        String line;
         Process p;
         try {
             p = Runtime.getRuntime().exec(new String[]{"/bin/sh", "-c", command});

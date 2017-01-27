@@ -291,8 +291,11 @@ public class RemoteSSHConnection {
             fos = new FileOutputStream(prefix == null ? lfile : prefix + file);
             int foo;
             while (true) {
-                if (buf.length < filesize) foo = buf.length;
-                else foo = (int) filesize;
+                if (buf.length < filesize) {
+                    foo = buf.length;
+                } else {
+                    foo = (int) filesize;
+                }
                 foo = in.read(buf, 0, foo);
                 if (foo < 0) {
                     // error

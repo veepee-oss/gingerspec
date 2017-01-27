@@ -493,8 +493,9 @@ public class GivenGSpec extends BaseGSpec {
 
         if (method.equals("id") || method.equals("name")) {
             commonspec.getDriver().switchTo().frame(idframe);
-        } else
+        } else {
             throw new ClassNotFoundException("Can not use this method to switch iframe");
+        }
     }
 
     /**

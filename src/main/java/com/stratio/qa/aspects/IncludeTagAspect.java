@@ -164,9 +164,8 @@ public class IncludeTagAspect {
                                 if (!checkParams(sParamline, params)) {
                                     throw new IncludeException("-> Wrong number of parameters.");
                                 }
-                            } else {
-                                if (!sParamline.toUpperCase().contains("EXAMPLES:"))
-                                    parsedFeature = parsedFeature + sParamline + "\n";
+                            } else if (!sParamline.toUpperCase().contains("EXAMPLES:")) {
+                                parsedFeature = parsedFeature + sParamline + "\n";
                             }
                         }
                     } else if (!sCurrentLine.toUpperCase().contains("OUTLINE") && sCurrentLine.toUpperCase().contains("SCENARIO:")) {
