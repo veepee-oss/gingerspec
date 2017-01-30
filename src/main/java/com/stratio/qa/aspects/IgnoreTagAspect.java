@@ -1,5 +1,6 @@
 package com.stratio.qa.aspects;
 
+import com.stratio.qa.utils.ThreadProperty;
 import cucumber.runtime.Runtime;
 import cucumber.runtime.model.CucumberScenario;
 import gherkin.formatter.Formatter;
@@ -50,9 +51,15 @@ public class IgnoreTagAspect {
         Boolean ignoreReason = false;
 
         for (Tag tag : tags) {
-            if (tag.getName().equals("@ignore")) {
+            if (tag.getName().contains("@ignore")) {
                 ignore = true;
                 for (Tag tagNs : tags) {
+                    //@runOnEnv
+                    //@skipOnEnv
+                    if ((tagNs.getName()).contains("runOnEnvs")) {
+                        ignoreReason = true;
+                        break;
+                    }
                     //@tillFixed
                     if ((tagNs.getName()).matches("@tillfixed\\(\\w+-\\d+\\)")) {
                         String issueNumb = tagNs.getName().substring(tagNs.getName().lastIndexOf('(') + 1);

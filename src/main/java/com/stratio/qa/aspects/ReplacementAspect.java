@@ -3,7 +3,9 @@ package com.stratio.qa.aspects;
 import com.stratio.qa.exceptions.NonReplaceableException;
 import com.stratio.qa.specs.CommonG;
 import com.stratio.qa.utils.ThreadProperty;
+import cucumber.runtime.model.CucumberScenario;
 import gherkin.formatter.model.DataTableRow;
+import gherkin.formatter.model.Scenario;
 import gherkin.formatter.model.Step;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -32,6 +34,9 @@ public class ReplacementAspect {
 
     @Around(value = "replacementOutlineScenariosCallPointcut(examplesData)")
     public Object aroundReplacementOutlineScenariosCalls(ProceedingJoinPoint pjp, String examplesData) throws Throwable {
+        if (isSkippedOnParams(pjp)) {
+            return null;
+        }
         String newExamplesData = examplesData;
 
         if (newExamplesData.contains("${")) {
@@ -55,6 +60,9 @@ public class ReplacementAspect {
 
     @Around(value = "replacementDataTableStatementName()")
     public List<DataTableRow> aroundReplacementDataTableStatementName(ProceedingJoinPoint pjp) throws Throwable {
+        if (isSkippedOnParams(pjp)) {
+            return null;
+        }
         List<DataTableRow> dataTableOld = (List<DataTableRow>) pjp.proceed();
         if (dataTableOld != null) {
             for (int i = 0; i < dataTableOld.size(); i++) {
@@ -83,7 +91,9 @@ public class ReplacementAspect {
 
     @Around(value = "replacementBasicStatementName()")
     public String aroundReplacementBasicStatementName(ProceedingJoinPoint pjp) throws Throwable {
-
+        if (isSkippedOnParams(pjp)) {
+            return "Omitted scenario";
+        }
         String newBasicStmt = (String) pjp.proceed();
 
 
@@ -106,6 +116,19 @@ public class ReplacementAspect {
         return newBasicStmt;
     }
 
+    private boolean isSkippedOnParams (ProceedingJoinPoint pjp) {
+
+
+        if (pjp.getTarget() instanceof Scenario) {
+            try {
+                return ("true".equals(ThreadProperty.get("skippedOnParams" + pjp.proceed())));
+            } catch (Throwable throwable) {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
     /**
      * Replaces every placeholded element, enclosed in @{} with the
      * corresponding attribute value in local Common class

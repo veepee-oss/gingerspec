@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
 <aspectj>
     <aspects>
+        <aspect name="com.stratio.qa.aspects.RunOnTagAspect"/>
         <aspect name="com.stratio.qa.aspects.ReplacementAspect"/>
         <aspect name="com.stratio.qa.aspects.IgnoreTagAspect"/>
         <aspect name="com.stratio.qa.aspects.AssertJAspect"/>
