@@ -433,10 +433,10 @@ public class ThenGSpec extends BaseGSpec {
             throw new Exception("Web port has not been set");
         }
 
-        String webURL = "http://" + commonspec.getWebHost() + commonspec.getWebPort();
+        String webURL = commonspec.getWebHost() + commonspec.getWebPort();
 
-        assertThat(this.commonspec, commonspec.getDriver().getCurrentUrl()).as("We are not in the expected url: " + webURL.toLowerCase() + url)
-                .isEqualTo(webURL.toLowerCase() + url);
+        assertThat(commonspec.getDriver().getCurrentUrl()).as("We are not in the expected url: " + webURL.toLowerCase() + url)
+                .endsWith(webURL.toLowerCase() + url);
     }
 
     @Then("^the service response status must be '(.*?)'.$")
