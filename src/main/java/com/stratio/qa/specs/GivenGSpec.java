@@ -238,6 +238,23 @@ public class GivenGSpec extends BaseGSpec {
 
 
     /**
+     * Save value for future use.
+     *
+     * @param value  value to be saved
+     * @param envVar thread environment variable where to store the value
+     * @throws Exception
+     */
+    @Given("^I save \'(.+?)\' in environment variable \'(.+?)\'$")
+    public void saveInEnvironment(String value, String envVar) throws Exception {
+        if (envVar.isEmpty()) {
+            throw new Exception("Environment variable must be specified!");
+        } else {
+            ThreadProperty.set(envVar, value);
+        }
+    }
+
+
+    /**
      * Save clustername of elasticsearch in an environment varible for future use.
      *
      * @param host   elasticsearch connection
