@@ -1,9 +1,7 @@
 package com.stratio.qa.aspects;
 
 import com.stratio.qa.utils.ThreadProperty;
-import cucumber.runtime.model.CucumberScenario;
 import gherkin.formatter.model.Comment;
-import gherkin.formatter.model.Scenario;
 import gherkin.formatter.model.Tag;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -12,9 +10,7 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Method;
 import java.util.List;
-import java.util.Set;
 
 @Aspect
 public class RunOnTagAspect {
@@ -91,7 +87,7 @@ public class RunOnTagAspect {
         if (s.isEmpty()){
             throw new Exception("-> Error while parsing params. Params must be at least one");
         } else {
-            vals = s.substring((s.lastIndexOf("(") + 1), (s.length()) - 1).trim().split(",");
+            vals = s.substring((s.lastIndexOf("(") + 1), (s.length()) - 1).split(",");
         }
         return vals;
     }

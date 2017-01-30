@@ -472,6 +472,13 @@ public class CucumberReporter implements Formatter, Reporter {
                                 ignoreReason = true;
                                 break;
                             }
+
+                            //@runOnEnvs
+                            if (tagNs.getName().contains("runOnEnvs")) {
+                                exceptionmsg = "This scenario was omitted because of tag condition";
+                                ignoreReason = true;
+                                break;
+                            }
                         }
                     }
 
