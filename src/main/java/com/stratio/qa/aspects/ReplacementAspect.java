@@ -4,6 +4,7 @@ import com.stratio.qa.exceptions.NonReplaceableException;
 import com.stratio.qa.specs.CommonG;
 import com.stratio.qa.utils.ThreadProperty;
 import cucumber.runtime.model.CucumberScenario;
+import cucumber.runtime.model.CucumberScenarioOutline;
 import gherkin.formatter.model.DataTableRow;
 import gherkin.formatter.model.Scenario;
 import gherkin.formatter.model.Step;
@@ -96,6 +97,10 @@ public class ReplacementAspect {
         }
         String newBasicStmt = (String) pjp.proceed();
 
+        if (CucumberScenarioOutline.class.isAssignableFrom(pjp.getSourceLocation().getWithinType())) {
+            String name = (String) pjp.proceed();
+            return name;
+        }
 
         if (newBasicStmt.contains("${")) {
             newBasicStmt = replaceEnvironmentPlaceholders(newBasicStmt);
