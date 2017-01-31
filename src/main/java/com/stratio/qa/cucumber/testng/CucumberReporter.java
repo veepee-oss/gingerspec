@@ -402,6 +402,7 @@ public class CucumberReporter implements Formatter, Reporter {
             Logger logger = LoggerFactory.getLogger(ThreadProperty.get("class"));
             String value = "";
             String issue = "";
+            Boolean ignoreRun = false;
 
             for (Tag tag : tags) {
                 if ("@ignore".equals(tag.getName())) {
@@ -483,12 +484,21 @@ public class CucumberReporter implements Formatter, Reporter {
                     }
 
                 }
+                if ("@ignore(runOnEnvs)".equals(tag.getName())) {
+                    ignoreRun = true;
+                    break;
+                }
             }
 
             String msg1 = null;
             String msg2 = null;
 
-            if (ignored && (!ignoreReason || (ignoreReason && isJiraTicketDone) || (ignoreReason && isWrongTicket))) {
+            if (ignoreRun) {
+                if ("Omitted scenario".equals(docJunit.getDocumentElement().getLastChild().getLastChild().getAttributes().item(0).getNodeValue())){
+                    docJunit.getDocumentElement().getLastChild().removeChild(docJunit.getDocumentElement().getLastChild().getLastChild());
+                }
+                return;
+            } else if (ignored && (!ignoreReason || (ignoreReason && isJiraTicketDone) || (ignoreReason && isWrongTicket))) {
                 element.setAttribute(STATUS, "FAIL");
                 if (isJiraTicketDone) {
                     msg1 = "The scenario was ignored due an already done (or in progress) ticket. " + "https://stratio.atlassian.net/browse/" + issue;
