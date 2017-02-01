@@ -126,7 +126,8 @@ public class ReplacementAspect {
 
         if (pjp.getTarget() instanceof Scenario) {
             try {
-                return ("true".equals(ThreadProperty.get("skippedOnParams" + pjp.proceed())));
+                Scenario linescn = (Scenario) pjp.getTarget();
+                return ("true".equals(ThreadProperty.get("skippedOnParams" + pjp.proceed() + linescn.getLine())));
             } catch (Throwable throwable) {
                 return false;
             }

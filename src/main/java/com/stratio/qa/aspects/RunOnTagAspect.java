@@ -2,6 +2,7 @@ package com.stratio.qa.aspects;
 
 import com.stratio.qa.utils.ThreadProperty;
 import gherkin.formatter.model.Comment;
+import gherkin.formatter.model.Scenario;
 import gherkin.formatter.model.Tag;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -66,13 +67,15 @@ public class RunOnTagAspect {
             if (tag.getName().contains("@runOnEnv")) {
                 if (!checkParams(getParams(tag.getName()))) {
                     tags.add(new Tag("@ignore(runOnEnvs)", line));
-                    ThreadProperty.set("skippedOnParams" + pjp.getArgs()[3].toString(), "true");
+                    Scenario linescn = (Scenario) pjp.getTarget();
+                    ThreadProperty.set("skippedOnParams" + pjp.getArgs()[3].toString() + linescn.getLine(), "true");
                     break;
                 }
             } else if (tag.getName().contains("@skipOnEnv")){
                 if (checkParams(getParams(tag.getName()))) {
+                    Scenario linescn = (Scenario) pjp.getTarget();
                     tags.add(new Tag("@ignore(runOnEnvs)", line));
-                    ThreadProperty.set("skippedOnParams" + pjp.getArgs()[3].toString(), "true");
+                    ThreadProperty.set("skippedOnParams" + pjp.getArgs()[3].toString() + linescn.getLine(), "true");
                     break;
                 }
             }
