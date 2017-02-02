@@ -87,7 +87,7 @@ public class CucumberRunner {
         runtimeOptions.getGlue().addAll(uniqueGlue);
 
         runtimeOptions.addFormatter(reporterTestNG);
-        Set<Class<? extends ICucumberFormatter>> implementers = new Reflections("com.stratio.tests.utils")
+        Set<Class<? extends ICucumberFormatter>> implementers = new Reflections("com.stratio.qa.utils")
                 .getSubTypesOf(ICucumberFormatter.class);
 
         for (Class<? extends ICucumberFormatter> implementerClazz : implementers) {
