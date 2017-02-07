@@ -9,6 +9,7 @@ hose {
     DEVTIMEOUT = 30
     RELEASETIMEOUT = 30
     MAXITRETRIES = 2
+    FOSS = true
 
     ITSERVICES = [
         ['ZOOKEEPER': [

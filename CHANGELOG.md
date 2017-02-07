@@ -5,6 +5,7 @@ Only listing significant user-visible, not internal code cleanups and minor bug 
 ## 0.4.0 (upcoming)
 
 * [QA-272] better classes packaging
+* [QA-298] Apache2 license. Step definitions redefined
 
 ## 0.3.0 (January 26, 2017)
 

@@ -1,3 +1,18 @@
+/*
+ * Copyright (C) 2014 Stratio (http://stratio.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.stratio.qa.specs;
 
 import com.auth0.jwt.JWTSigner;
@@ -150,7 +165,6 @@ public class GivenGSpec extends BaseGSpec {
             }
             commonspec.getCassandraClient().createTableWithData(table, columns, pk);
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             commonspec.getLogger().debug("Exception captured");
             commonspec.getLogger().debug(e.toString());
             commonspec.getExceptions().add(e);
@@ -180,7 +194,6 @@ public class GivenGSpec extends BaseGSpec {
 
             }
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             commonspec.getLogger().debug("Exception captured");
             commonspec.getLogger().debug(e.toString());
             commonspec.getExceptions().add(e);
@@ -244,7 +257,7 @@ public class GivenGSpec extends BaseGSpec {
      * @param envVar thread environment variable where to store the value
      * @throws Exception
      */
-    @Given("^I save \'(.+?)\' in environment variable \'(.+?)\'$")
+    @Given("^I save \'(.+?)\' in variable \'(.+?)\'$")
     public void saveInEnvironment(String value, String envVar) throws Exception {
         if (envVar.isEmpty()) {
             throw new Exception("Environment variable must be specified!");
@@ -259,7 +272,7 @@ public class GivenGSpec extends BaseGSpec {
      *
      * @param host   elasticsearch connection
      * @param port   elasticsearch port
-     * @param envVar thread environment variable where to store the value
+     * @param envVar thread variable where to store the value
      * @throws IllegalAccessException
      * @throws IllegalArgumentException
      * @throws SecurityException
@@ -269,7 +282,7 @@ public class GivenGSpec extends BaseGSpec {
      * @throws InvocationTargetException
      * @throws NoSuchMethodException
      */
-    @Given("^I obtain elasticsearch cluster name in '([^:]+?)(:.+?)?' and save it in environment variable '(.+?)'?$")
+    @Given("^I obtain elasticsearch cluster name in '([^:]+?)(:.+?)?' and save it in variable '(.+?)'?$")
     public void saveElasticCluster(String host, String port, String envVar) throws Exception {
 
         setupRestClient(null, host, port);
@@ -319,7 +332,7 @@ public class GivenGSpec extends BaseGSpec {
      * @param filename
      * @param keyspace
      */
-    @Given("a Cassandra script with name '(.+?)' and default keyspace '(.+?)'$")
+    @Given("I load a Cassandra script with name '(.+?)' into the keyspace '(.+?)'$")
     public void insertDataOnCassandraFromFile(String filename, String keyspace) {
         commonspec.getCassandraClient().loadTestData(keyspace, "/scripts/" + filename);
     }
@@ -541,7 +554,7 @@ public class GivenGSpec extends BaseGSpec {
      * @param pemFile (required if password null)
      *
      */
-    @Given("^I open remote ssh connection to host '(.+?)' with user '(.+?)'( and password '(.+?)')?( using pem file '(.+?)')?$")
+    @Given("^I open a ssh connection to '(.+?)' with user '(.+?)'( and password '(.+?)')?( using pem file '(.+?)')?$")
     public void openSSHConnection(String remoteHost, String user, String foo, String password, String bar, String pemFile) throws Exception {
         if ((pemFile == null) || (pemFile.equals("none"))) {
             if (password == null) {
@@ -570,7 +583,7 @@ public class GivenGSpec extends BaseGSpec {
     * @param pemFile (required if password null)
     *
     */
-    @Given("^I want to authenticate in DCOS cluster '(.+?)' with email '(.+?)' with user '(.+?)'( and password '(.*?)')?( using pem file '(.+?)')$")
+    @Given("^I authenticate to DCOS cluster '(.+?)' with email '(.+?)', user '(.+?)'( and password '(.*?)')?( using pem file '(.+?)')$")
     public void authenticateDCOSpem(String remoteHost, String email, String user, String foo, String password, String bar, String pemFile) throws Exception {
         String DCOSsecret = null;
         if ((pemFile == null) || (pemFile.equals("none"))) {
@@ -597,7 +610,7 @@ public class GivenGSpec extends BaseGSpec {
         List<Cookie> cookieList = new ArrayList<Cookie>();
         cookieList.add(cookie);
         commonspec.setCookies(cookieList);
-        commonspec.getLogger().debug("DCOS cookie was set: " + cookie);
+        commonspec.getLogger().debug("DCOS cookie was set: {}", cookie);
 
     }
 
@@ -608,7 +621,7 @@ public class GivenGSpec extends BaseGSpec {
     * @param user
     *
     */
-    @Given("^I authenticate in DCOS cluster '(.+?)' with email '(.+?)'$")
+    @Given("^I authenticate to DCOS cluster '(.+?)' with email '(.+?)'$")
     public void authenticateDCOS(String dcosCluster, String user) throws Exception {
         commonspec.setRemoteSSHConnection(new RemoteSSHConnection("root", "stratio", dcosCluster, null));
         commonspec.getRemoteSSHConnection().runCommand("cat /var/lib/dcos/dcos-oauth/auth-token-secret");
@@ -636,7 +649,7 @@ public class GivenGSpec extends BaseGSpec {
      * @param localPath
      *
      */
-    @Given("^I copy '(.+?)' from remote ssh connection and store it in '(.+?)'$")
+    @Given("^I inbound copy '(.+?)' through a ssh connection to '(.+?)'$")
     public void copyFromRemoteFile(String remotePath, String localPath) throws Exception {
         commonspec.getRemoteSSHConnection().copyFrom(remotePath, localPath);
     }
@@ -649,7 +662,7 @@ public class GivenGSpec extends BaseGSpec {
      * @param remotePath
      *
      */
-    @Given("^I copy '(.+?)' to remote ssh connection in '(.+?)'$")
+    @Given("^I outbound copy '(.+?)' through a ssh connection to '(.+?)'$")
     public void copyToRemoteFile(String localPath, String remotePath) throws Exception {
         commonspec.getRemoteSSHConnection().copyTo(localPath, remotePath);
     }
@@ -660,7 +673,7 @@ public class GivenGSpec extends BaseGSpec {
      *
      * @param command
      **/
-    @Given("^I execute command '(.+?)' locally( with exit status '(.+?)')?( and save the value in environment variable '(.+?)')?$")
+    @Given("^I run '(.+?)' locally( with exit status '(.+?)')?( and save the value in environment variable '(.+?)')?$")
     public void executeLocalCommand(String command, String foo, Integer exitStatus, String bar, String envVar) throws Exception {
         if (exitStatus == null) {
             exitStatus = 0;
@@ -677,7 +690,7 @@ public class GivenGSpec extends BaseGSpec {
      *
      * @param command
      **/
-    @Given("^I execute command '(.+?)' in remote ssh connection( with exit status '(.+?)')?( and save the value in environment variable '(.+?)')?$")
+    @Given("^I run '(.+?)' in the ssh connection( with exit status '(.+?)')?( and save the value in environment variable '(.+?)')?$")
     public void executeCommand(String command, String foo, Integer exitStatus, String bar, String envVar) throws Exception {
         if (exitStatus == null) {
             exitStatus = 0;
@@ -711,7 +724,7 @@ public class GivenGSpec extends BaseGSpec {
     /**
      * Get all opened windows and store it.
      */
-    @Given("^new window is opened$")
+    @Given("^a new window is opened$")
     public void seleniumGetwindows() {
         Set<String> wel = commonspec.getDriver().getWindowHandles();
 
@@ -724,7 +737,7 @@ public class GivenGSpec extends BaseGSpec {
      *
      * @param zookeeperHosts as host:port (comma separated)
      */
-    @Given("^I connect to zk cluster at '(.+)'$")
+    @Given("^I connect to Zookeeper at '(.+)'$")
     public void connectToZk(String zookeeperHosts) throws InterruptedException {
         commonspec.getZookeeperSecClient().setZookeeperSecConnection(zookeeperHosts, 3000);
         commonspec.getZookeeperSecClient().connectZk();
@@ -735,7 +748,7 @@ public class GivenGSpec extends BaseGSpec {
      * Disconnect from zookeeper.
      *
      */
-    @Given("^I disconnect from zk cluster$")
+    @Given("^I disconnect from Zookeeper$")
     public void disconnectFromZk() throws InterruptedException {
         commonspec.getZookeeperSecClient().disconnect();
     }
@@ -748,7 +761,7 @@ public class GivenGSpec extends BaseGSpec {
      * @param zkPort
      * @param zkPath
      */
-    @Given("^I connect to kafka cluster at '(.+)':'(.+)' using path '(.+)'$")
+    @Given("^I connect to kafka at '(.+)':'(.+)' using path '(.+)'$")
     public void connectKafka(String zkHost, String zkPort, String zkPath) throws UnknownHostException {
         if (System.getenv("DCOS_CLUSTER") != null) {
             commonspec.getKafkaUtils().setZkHost(zkHost, zkPort, zkPath);
@@ -757,5 +770,4 @@ public class GivenGSpec extends BaseGSpec {
         }
         commonspec.getKafkaUtils().connect();
     }
-
 }

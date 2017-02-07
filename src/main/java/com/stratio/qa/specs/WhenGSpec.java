@@ -1,3 +1,18 @@
+/*
+ * Copyright (C) 2014 Stratio (http://stratio.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.stratio.qa.specs;
 
 import com.csvreader.CsvReader;
@@ -339,17 +354,17 @@ public class WhenGSpec extends BaseGSpec {
         commonspec.getLogger().info("Response value found after " + timeout + " seconds");
     }
 
-    @When("^I attempt a login to '(.+?)' based on '([^:]+?)' as '(json|string)'$")
+    @When("^I login to '(.+?)' based on '([^:]+?)' as '(json|string)'$")
     public void loginUser(String endPoint, String baseData, String type) throws Exception {
         sendRequestNoDataTable("POST", endPoint, null, null, null, baseData, null, type);
     }
 
-    @When("^I attempt a login to '(.+?)' based on '([^:]+?)' as '(json|string)' with:$")
+    @When("^I login to '(.+?)' based on '([^:]+?)' as '(json|string)' with:$")
     public void loginUser(String endPoint, String baseData, String type, DataTable modifications) throws Exception {
         sendRequest("POST", endPoint, null, null, baseData, "", type, modifications);
     }
 
-    @When("^I attempt a logout to '(.+?)'$")
+    @When("^I logout from '(.+?)'$")
     public void logoutUser(String endPoint) throws Exception {
         sendRequestNoDataTable("GET", endPoint, null, null, null, "", null, "");
     }
@@ -391,10 +406,9 @@ public class WhenGSpec extends BaseGSpec {
                 query = "SELECT " + fields + " FROM " + table + " WHERE " + magic_column + " = '" + modifiedData + "';";
 
             }
-            commonspec.getLogger().debug("query: " + query);
+            commonspec.getLogger().debug("query: {}", query);
             commonspec.setCassandraResults(commonspec.getCassandraClient().executeQuery(query));
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             commonspec.getLogger().debug("Exception captured");
             commonspec.getLogger().debug(e.toString());
             commonspec.getExceptions().add(e);
@@ -412,7 +426,7 @@ public class WhenGSpec extends BaseGSpec {
      * @param collection    collection in database
      * @param modifications modifications to perform in query
      */
-    @When("^I execute query '(.+?)' of type '(json|string)' in '(mongo)' database '(.+?)' using collection '(.+?)' with:$")
+    @When("^I execute a query '(.+?)' of type '(json|string)' in '(mongo)' database '(.+?)' using collection '(.+?)' with:$")
     public void sendQueryOfType(String query, String type, String dbType, String database, String collection, DataTable modifications) throws Exception {
         try {
             commonspec.setResultsType(dbType);
@@ -437,7 +451,6 @@ public class WhenGSpec extends BaseGSpec {
                     throw new Exception("Invalid database type: " + dbType);
             }
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             commonspec.getLogger().debug("Exception captured");
             commonspec.getLogger().debug(e.toString());
             commonspec.getExceptions().add(e);
@@ -504,7 +517,6 @@ public class WhenGSpec extends BaseGSpec {
             commonspec.getCassandraClient().useKeyspace(keyspace);
             commonspec.getCassandraClient().dropTable(table);
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             commonspec.getLogger().debug("Exception captured");
             commonspec.getLogger().debug(e.toString());
             commonspec.getExceptions().add(e);
@@ -523,7 +535,6 @@ public class WhenGSpec extends BaseGSpec {
             commonspec.getCassandraClient().useKeyspace(keyspace);
             commonspec.getCassandraClient().truncateTable(table);
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             commonspec.getLogger().debug("Exception captured");
             commonspec.getLogger().debug(e.toString());
             commonspec.getExceptions().add(e);
@@ -696,7 +707,7 @@ public class WhenGSpec extends BaseGSpec {
     }
 
     /**
-     * Create an ElasticSearch index.
+     * Create an elasticsearch index.
      *
      * @param index
      */

@@ -1,3 +1,18 @@
+/*
+ * Copyright (C) 2014 Stratio (http://stratio.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.stratio.qa.specs;
 
 
@@ -83,7 +98,7 @@ public class ThenGSpec extends BaseGSpec {
      * @param keyspace
      * @param tableName
      */
-    @Then("^a Casandra keyspace '(.+?)' contains a table '(.+?)'$")
+    @Then("^a Cassandra keyspace '(.+?)' contains a table '(.+?)'$")
     public void assertTableExistsOnCassandraKeyspace(String keyspace, String tableName) {
         assertThat(commonspec.getCassandraClient().getTables(keyspace)).as("The table " + tableName + "exists on cassandra").contains(tableName);
     }
@@ -95,7 +110,7 @@ public class ThenGSpec extends BaseGSpec {
      * @param tableName
      * @param numberRows
      */
-    @Then("^a Casandra keyspace '(.+?)' contains a table '(.+?)' with '(.+?)' rows$")
+    @Then("^a Cassandra keyspace '(.+?)' contains a table '(.+?)' with '(.+?)' rows$")
     public void assertRowNumberOfTableOnCassandraKeyspace(String keyspace, String tableName, String numberRows) {
         Long numberRowsLong = Long.parseLong(numberRows);
         commonspec.getCassandraClient().useKeyspace(keyspace);
@@ -111,7 +126,7 @@ public class ThenGSpec extends BaseGSpec {
      * @param data
      * @throws InterruptedException
      */
-    @Then("^a Casandra keyspace '(.+?)' contains a table '(.+?)' with values:$")
+    @Then("^a Cassandra keyspace '(.+?)' contains a table '(.+?)' with values:$")
     public void assertValuesOfTable(String keyspace, String tableName, DataTable data) throws InterruptedException {
         //  USE of Keyspace
         commonspec.getCassandraClient().useKeyspace(keyspace);
@@ -602,7 +617,7 @@ public class ThenGSpec extends BaseGSpec {
      * @param zNode    path at zookeeper
      * @param document expected content of znode
      */
-    @Then("^I check that zNode at '(.+?)' exists( and contains '(.+?)')?$")
+    @Then("^the  zNode '(.+?)' exists( and contains '(.+?)')?$")
     public void checkZnodeExists(String zNode, String foo, String document)  throws Exception {
         if (document == null) {
             String breakpoint = commonspec.getZookeeperSecClient().zRead(zNode);
@@ -616,7 +631,7 @@ public class ThenGSpec extends BaseGSpec {
         }
     }
 
-    @Then("^I check that zNode at '(.+?)' does not exist")
+    @Then("^the zNode '(.+?)' does not exist")
     public void checkZnodeNotExist(String zNode) throws Exception {
         Assertions.assertThat(!commonspec.getZookeeperSecClient().exists(zNode)).withFailMessage("The zNode exists");
     }
@@ -650,7 +665,7 @@ public class ThenGSpec extends BaseGSpec {
      * @param service
      * @throws Exception
      */
-    @Then("^I modify the enviroment variable '(.+?)' with value '(.+?)' in service '(.+?)'?$")
+    @Then("^I modify the enviroment variable '(.+?)' with value '(.+?)' for service '(.+?)'?$")
     public void setMarathonProperty(String key, String value, String service) throws Exception {
         commonspec.runCommandAndGetResult("touch " + service + "-env.json && dcos marathon app show " + service + " > /dcos/" + service + "-env.json");
         commonspec.runCommandAndGetResult("cat /dcos/" + service + "-env.json");
@@ -683,7 +698,7 @@ public class ThenGSpec extends BaseGSpec {
      *
      * @param indexName
      */
-    @Then("^An Elasticsearch index named '(.+?)' exists")
+    @Then("^An elasticsearch index named '(.+?)' exists")
     public void elasticSearchIndexExist(String indexName) {
         Assertions.assertThat(commonspec.getElasticSearchClient().indexExists(indexName)).isTrue()
                 .withFailMessage("There is no index with that name");
@@ -694,14 +709,14 @@ public class ThenGSpec extends BaseGSpec {
      *
      * @param indexName
      */
-    @Then("^An Elasticsearch index named '(.+?)' does not exist")
+    @Then("^An elasticsearch index named '(.+?)' does not exist")
     public void elasticSearchIndexDoesNotExist(String indexName) {
         Assertions.assertThat(commonspec.getElasticSearchClient().indexExists(indexName)).isFalse()
                 .withFailMessage("There is an index with that name");
     }
 
     /**
-     * Check that an ElasticSearch index contains a specific document
+     * Check that an elasticsearch index contains a specific document
      *
      * @param indexName
      * @param columnName

@@ -9,7 +9,7 @@
     </parent>
 
     <groupId>com.stratio.qa</groupId>
-    <artifactId>bdt-lib</artifactId>
+    <artifactId>bdt</artifactId>
     <version>0.4.0-SNAPSHOT</version>
 
     <name>Stratio BDT framework</name>
@@ -21,6 +21,46 @@
         </developerConnection>
         <tag>HEAD</tag>
     </scm>
+
+    <inceptionYear>2014</inceptionYear>
+
+    <developers>
+        <developer>
+            <id>witokondoria</id>
+            <name>Javier Delgado</name>
+            <email>jdelgado at stratio dot com</email>
+        </developer>
+        <developer>
+            <id>antonioalf</id>
+            <name>Antonio Alfonso</name>
+            <email>aalfonso at stratio dot com</email>
+        </developer>
+        <developer>
+            <id>adoblas</id>
+            <name>Alicia Doblas</name>
+            <email>adoblas at stratio dot com</email>
+        </developer>
+        <developer>
+            <id>hdominguez1989</id>
+            <name>Hugo Dominguez</name>
+            <email>hdominguez at stratio dot com</email>
+        </developer>
+        <developer>
+            <id>mpenate</id>
+            <name>Marcos Peñate</name>
+            <email>mpenate at stratio dot com</email>
+        </developer>
+        <developer>
+            <id>carlosgarciamartin</id>
+            <name>carlos Garcia</name>
+            <email>carlosgarcia at stratio dot com</email>
+        </developer>
+        <developer>
+            <id>pbedia-stratio</id>
+            <name>Pedro Bedia</name>
+            <email>pbedia at stratio dot com</email>
+        </developer>
+    </developers>
 
     <properties>
         <cucumber-java.version>1.1.6</cucumber-java.version>
@@ -86,6 +126,19 @@
                             </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.mycila</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>**/.*/**</exclude>
+                        <exclude>**/*.rst</exclude>
+                        <exclude>**/*.feature</exclude>
+                        <exclude>**/*.conf</exclude>
+                        <exclude>**/*.sh</exclude>
+                    </excludes>
+                </configuration>
             </plugin>
         </plugins>
     </build>
