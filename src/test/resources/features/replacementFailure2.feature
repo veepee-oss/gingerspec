@@ -1,3 +1,4 @@
+@manual
 Feature: Non-existant vars
 
   Scenario: In a step as local var

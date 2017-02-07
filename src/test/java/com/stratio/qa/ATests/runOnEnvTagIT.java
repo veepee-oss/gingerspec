@@ -25,7 +25,7 @@ import org.testng.annotations.Test;
 })
 public class runOnEnvTagIT extends BaseGTest {
 
-    @Test(expectedExceptions = {})
+    @Test
     public void runOnEnvTagTest() throws Exception {
         new CucumberRunner(this.getClass()).runCukes();
     }

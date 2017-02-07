@@ -96,7 +96,6 @@ public class CucumberReporter implements Formatter, Reporter {
         this.cClass = cClass;
         this.additional = additional;
 
-        TestMethod.treatSkippedAsFailure = false;
         try {
             document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
             results = document.createElement("testng-results");
@@ -331,9 +330,9 @@ public class CucumberReporter implements Formatter, Reporter {
         return getTotalDuration(testCaseNodes) / 1000;
     }
 
-    private static final class TestMethod {
+    public final class TestMethod {
 
-        private static boolean treatSkippedAsFailure = false;
+        private boolean treatSkippedAsFailure = false;
         private final List<Result> results = new ArrayList<Result>();
         private Scenario scenario = null;
         private String featureName;
@@ -343,7 +342,7 @@ public class CucumberReporter implements Formatter, Reporter {
         private List<Result> hooks;
         private Integer iteration = 1;
 
-        private TestMethod(String feature, Scenario scenario) {
+        public TestMethod(String feature, Scenario scenario) {
             this.featureName = feature;
             this.scenario = scenario;
         }
@@ -542,6 +541,16 @@ public class CucumberReporter implements Formatter, Reporter {
                 Element systemOut = systemOutPrintJunit(docJunit, exceptionmsg);
                 Junit.appendChild(systemOut);
 
+            } else if ((stringBuilder.toString().contains("${")) || (stringBuilder.toString().contains("!{")) || (stringBuilder.toString().contains("@{"))) {
+                element.setAttribute(STATUS, "FAIL");
+                Element exception = createException(doc, "The scenario has unreplaced variables.",
+                        "The scenario has unreplaced variables.", " ");
+                element.appendChild(exception);
+                Element exceptionJunit = createExceptionJunit(docJunit, "The scenario has unreplaced variables.",
+                        "The scenario has unreplaced variables.", " ");
+                Junit.appendChild(exceptionJunit);
+                Element systemOut = systemOutPrintJunit(docJunit, stringBuilder.toString());
+                Junit.appendChild(systemOut);
             } else {
                 for (Result result : results) {
                     if ("failed".equals(result.getStatus())) {

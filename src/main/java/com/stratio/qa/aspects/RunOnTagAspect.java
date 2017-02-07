@@ -41,27 +41,27 @@ public class RunOnTagAspect {
 
     /**
      * Allows conditional scenario execution.
-     * <p>
+     * <dl>
      * If the scenario contains the following tag:
-     * @runOnEnv(param): The scenario will only be executed if the param is defined when test is launched.
-     * <p>
-     * <p>
+     *
+     *    <dt>\@runOnEnv(param)</dt>
+     *<dd>The scenario will only be executed if the param is defined when test is launched. Configuration map object.
      * More than one param can be passed in the tag. To do so, the params must be comma separated:
-     * @runOnEnv(param1,param2,param3): The scenario will only be executed if ALL the params are defined.
-     * <p>
+     * \@runOnEnv(param): The scenario will only be executed if the param is defined when test is launched.
+     * \@runOnEnv(param1,param2,param3): The scenario will only be executed if ALL the params are defined.</dd>
+     *
      * Additionally, if the scenario contains the following tag:
-     * @skipOnEnv(param): The scenario will be omitted if the param is defined when test is launched.
-     * <p>
-     * <p>
-     * More than one param can be passed in the tag. To do so, the params must be comma separated:
-     * @skipOnEnv(param1,param2,param3): The scenario will omitted if ANY of params are defined. (OR)
-     * <p>
-     * Or in separated lines to force ALL of the params to be defined in order to omit the execution:
-     * <p>
-     * @skipOnEnv(param1)
-     * @skipOnEnv(param2)
-     * @skipOnEnv(param3): The scenario will omitted if ALL of params are defined. (AND)
-     * <p>
+     *    <dt>\@skipOnEnv(param)</dt>
+     *<dd>The scenario will be omitted if the param is defined when test is launched.
+     * More than one param can be passed in the tag. To do so, the params must be comma separated.
+     * The scenario will omitted if ANY of params are defined. (OR)</dd>
+     *
+     *<dd>Or in separated lines to force ALL of the params to be defined in order to omit the execution</dd>
+     *    <dt>  \@skipOnEnv(param1)
+     *          \@skipOnEnv(param2)
+     *          \@skipOnEnv(param3)</dt>
+     *<dd>The scenario will omitted if ALL of params are defined. (AND)</dd>
+     *</dl>
      *
      * @param pjp
      * @param comments

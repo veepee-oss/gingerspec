@@ -29,7 +29,7 @@ public class CukesGHooks extends BaseGSpec implements ICucumberReporter, ICucumb
     private final Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
 
     Feature feature;
-    Scenario scenario;
+    public Scenario scenario;
 
     public CukesGHooks() {
     }

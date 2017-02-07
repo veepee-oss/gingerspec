@@ -15,6 +15,7 @@
  */
 package com.stratio.qa.cucumber.testng;
 
+import com.stratio.qa.utils.CukesGHooks;
 import cucumber.api.CucumberOptions;
 import cucumber.runtime.ClassFinder;
 import cucumber.runtime.CucumberException;
@@ -23,12 +24,14 @@ import cucumber.runtime.RuntimeOptionsFactory;
 import cucumber.runtime.io.MultiLoader;
 import cucumber.runtime.io.ResourceLoader;
 import cucumber.runtime.io.ResourceLoaderClassFinder;
+import gherkin.formatter.Formatter;
 import org.reflections.Reflections;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -37,6 +40,8 @@ import java.util.Set;
 public class CucumberRunner {
 
     private final cucumber.runtime.Runtime runtime;
+    private ClassLoader classLoader;
+    private RuntimeOptions runtimeOptions;
 
     /**
      * Default constructor for cucumber Runner.
@@ -53,12 +58,12 @@ public class CucumberRunner {
     @SuppressWarnings("unused")
     public CucumberRunner(Class<?> clazz, String... feature) throws IOException, ClassNotFoundException,
             InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-        ClassLoader classLoader = clazz.getClassLoader();
+        classLoader = clazz.getClassLoader();
         ResourceLoader resourceLoader = new MultiLoader(classLoader);
 
         RuntimeOptionsFactory runtimeOptionsFactory = new RuntimeOptionsFactory(clazz,
                 new Class[]{CucumberOptions.class});
-        RuntimeOptions runtimeOptions = runtimeOptionsFactory.create();
+        runtimeOptions = runtimeOptionsFactory.create();
         String testSuffix = System.getProperty("TESTSUFFIX");
         String targetExecutionsPath = "target/executions/";
         if (testSuffix != null) {
@@ -120,9 +125,26 @@ public class CucumberRunner {
      *
      * @throws IOException
      */
-    public void runCukes() throws IOException {
-        runtime.run();
+    public void runCukes() throws IOException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
 
+        try {
+            runtime.run();
+        } catch (Exception e){
+
+            Class<?> runtimeOptionsClass = runtimeOptions.getClass();
+            Method tt = runtimeOptionsClass.getDeclaredMethod("getFormatters");
+            tt.setAccessible(true);
+            List<Formatter> formaterList = (List<Formatter>) tt.invoke(runtimeOptions);
+
+            for (Object elem : formaterList) {
+                if (elem instanceof CukesGHooks) {
+                    Formatter formatter = runtimeOptions.formatter(classLoader);
+                    formatter.endOfScenarioLifeCycle(((CukesGHooks) elem).scenario);
+                    formatter.done();
+                    formatter.close();
+                }
+            }
+        }
         if (!runtime.getErrors().isEmpty()) {
             throw new CucumberException(runtime.getErrors().get(0));
         }

@@ -15,10 +15,10 @@
  */
 package com.stratio.qa.aspects;
 
+import com.stratio.qa.cucumber.testng.CucumberReporter;
 import com.stratio.qa.exceptions.NonReplaceableException;
 import com.stratio.qa.specs.CommonG;
 import com.stratio.qa.utils.ThreadProperty;
-import cucumber.runtime.model.CucumberScenario;
 import cucumber.runtime.model.CucumberScenarioOutline;
 import gherkin.formatter.model.DataTableRow;
 import gherkin.formatter.model.Scenario;
@@ -56,13 +56,13 @@ public class ReplacementAspect {
         String newExamplesData = examplesData;
 
         if (newExamplesData.contains("${")) {
-            newExamplesData = replaceEnvironmentPlaceholders(newExamplesData);
+            newExamplesData = replaceEnvironmentPlaceholders(newExamplesData, pjp);
         }
         if (newExamplesData.contains("!{")) {
-            newExamplesData = replaceReflectionPlaceholders(newExamplesData);
+            newExamplesData = replaceReflectionPlaceholders(newExamplesData, pjp);
         }
         if (newExamplesData.contains("@{")) {
-            newExamplesData = replaceCodePlaceholders(newExamplesData);
+            newExamplesData = replaceCodePlaceholders(newExamplesData, pjp);
         }
 
         Object[] myArray = {newExamplesData};
@@ -86,13 +86,13 @@ public class ReplacementAspect {
                 for (int x = 0; x < row.size(); x++) {
                     String value = row.get(x);
                     if (value.contains("${")) {
-                        value = replaceEnvironmentPlaceholders(value);
+                        value = replaceEnvironmentPlaceholders(value,pjp);
                     }
                     if (value.contains("!{")) {
-                        value = replaceReflectionPlaceholders(value);
+                        value = replaceReflectionPlaceholders(value,pjp);
                     }
                     if (value.contains("@{")) {
-                        value = replaceCodePlaceholders(value);
+                        value = replaceCodePlaceholders(value,pjp);
                     }
                     dataTableOld.get(i).getCells().set(x, value);
                 }
@@ -118,13 +118,13 @@ public class ReplacementAspect {
         }
 
         if (newBasicStmt.contains("${")) {
-            newBasicStmt = replaceEnvironmentPlaceholders(newBasicStmt);
+            newBasicStmt = replaceEnvironmentPlaceholders(newBasicStmt, pjp);
         }
         if (newBasicStmt.contains("!{")) {
-            newBasicStmt = replaceReflectionPlaceholders(newBasicStmt);
+            newBasicStmt = replaceReflectionPlaceholders(newBasicStmt, pjp);
         }
         if (newBasicStmt.contains("@{")) {
-            newBasicStmt = replaceCodePlaceholders(newBasicStmt);
+            newBasicStmt = replaceCodePlaceholders(newBasicStmt, pjp);
         }
 
         if ((pjp.getTarget() instanceof Step) &&
@@ -169,7 +169,7 @@ public class ReplacementAspect {
      * @return String
      * @throws Exception
      */
-    protected String replaceCodePlaceholders(String element) throws Exception {
+    protected String replaceCodePlaceholders(String element, ProceedingJoinPoint pjp) throws Exception {
         String newVal = element;
         while (newVal.contains("@{")) {
             String placeholder = newVal.substring(newVal.indexOf("@{"), newVal.indexOf("}", newVal.indexOf("@{")) + 1);
@@ -180,7 +180,12 @@ public class ReplacementAspect {
                 property = placeholder.substring(2, placeholder.indexOf("."));
                 subproperty = placeholder.substring(placeholder.indexOf(".") + 1, placeholder.length() - 1);
             } else {
-                throw new Exception("Interface not defined");
+                if (pjp.getThis() instanceof CucumberReporter.TestMethod) {
+                    return newVal;
+                } else {
+                    logger.error("{} -> {} placeholded element has not been replaced previously.", element, property);
+                    throw new NonReplaceableException("Unreplaceable placeholder: " + placeholder);
+                }
             }
 
             switch (property) {
@@ -229,7 +234,7 @@ public class ReplacementAspect {
      * @throws IllegalArgumentException
      * @throws IllegalAccessException
      */
-    protected String replaceReflectionPlaceholders(String element) throws Exception {
+    protected String replaceReflectionPlaceholders(String element, ProceedingJoinPoint pjp) throws Exception {
         String newVal = element;
         while (newVal.contains("!{")) {
             String placeholder = newVal.substring(newVal.indexOf("!{"),
@@ -237,7 +242,10 @@ public class ReplacementAspect {
             String attribute = placeholder.substring(2, placeholder.length() - 1);
             // we want to use value previously saved
             String prop = ThreadProperty.get(attribute);
-            if (prop == null) {
+
+            if (prop == null && (pjp.getThis() instanceof CucumberReporter.TestMethod)) {
+                return element;
+            } else if (prop == null) {
                 logger.error("{} -> {} local var has not been saved correctly previously.", element, attribute);
                 throw new NonReplaceableException("Unreplaceable placeholder: " + placeholder);
             } else {
@@ -255,7 +263,7 @@ public class ReplacementAspect {
      * @param element
      * @return String
      */
-    protected String replaceEnvironmentPlaceholders(String element) throws NonReplaceableException {
+    protected String replaceEnvironmentPlaceholders(String element, ProceedingJoinPoint pjp) throws NonReplaceableException {
         String newVal = element;
         while (newVal.contains("${")) {
             String placeholder = newVal.substring(newVal.indexOf("${"),
@@ -272,7 +280,9 @@ public class ReplacementAspect {
 
             String prop = System.getProperty(sysProp);
 
-            if (prop == null) {
+            if (prop == null && (pjp.getThis() instanceof CucumberReporter.TestMethod)) {
+                return element;
+            } else if (prop == null) {
                 logger.error("{} -> {} env var has not been defined.", element, sysProp);
                 throw new NonReplaceableException("Unreplaceable placeholder: " + placeholder);
             }
@@ -282,7 +292,6 @@ public class ReplacementAspect {
             } else if ("toUpper".equals(modifier)) {
                 prop = prop.toUpperCase();
             }
-
             newVal = newVal.replace(placeholder, prop);
         }
 
