@@ -250,7 +250,7 @@ public class ThenGSpec extends BaseGSpec {
      *
      * @param text
      */
-    @Then("^a text '(.+?)' exists$")
+    @Then("^this text exists:$")
     public void assertSeleniumTextInSource(String text) {
         assertThat(this.commonspec, commonspec.getDriver()).as("Expected text not found at page").contains(text);
     }
@@ -261,7 +261,7 @@ public class ThenGSpec extends BaseGSpec {
      * @param index
      * @param text
      */
-    @Then("^the element on index '(\\d+?)' has '(.*?)' as text$")
+    @Then("^the element on index '(\\d+?)' has this text:$")
     public void assertSeleniumTextOnElementPresent(Integer index, String text) {
         assertThat(commonspec.getPreviousWebElements()).as("There are less found elements than required")
                 .hasAtLeast(index);
