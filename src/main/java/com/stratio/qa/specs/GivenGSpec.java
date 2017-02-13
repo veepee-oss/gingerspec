@@ -621,7 +621,7 @@ public class GivenGSpec extends BaseGSpec {
     * @param user
     *
     */
-    @Given("^I authenticate to DCOS cluster '(.+?)' with email '(.+?)'$")
+    @Given("^I authenticate to DCOS cluster '(.+?)' with email '(.+?)'.$")
     public void authenticateDCOS(String dcosCluster, String user) throws Exception {
         commonspec.setRemoteSSHConnection(new RemoteSSHConnection("root", "stratio", dcosCluster, null));
         commonspec.getRemoteSSHConnection().runCommand("cat /var/lib/dcos/dcos-oauth/auth-token-secret");
