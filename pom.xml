@@ -330,6 +330,13 @@
             <artifactId>curator-recipes</artifactId>
             <version>2.6.0</version>
         </dependency>
+        <dependency>
+            <groupId>sun.jdk</groupId>
+            <artifactId>tools</artifactId>
+            <version>1.8.0</version>
+            <scope>system</scope>
+            <systemPath>${java.home}/../lib/tools.jar</systemPath>
+        </dependency>
     </dependencies>
 
     <profiles>
@@ -362,22 +369,25 @@
                                 </goals>
                                 <phase>package</phase>
                             </execution>
+                            <execution>
+                                <id>annotation</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                                <phase>package</phase>
+                                <configuration>
+                                    <doclet>
+                                        com.stratio.qa.doclet.AnnotationsDoclet
+                                    </doclet>
+                                    <docletPath>
+                                        ../classes
+                                    </docletPath>
+                                </configuration>
+                            </execution>
                         </executions>
                     </plugin>
                 </plugins>
             </build>
-        </profile>
-        <!-- JDK8 is a lot more strict (by default) when it comes to Javadoc and it throws
-                a lot of erros when generating the project's javadoc.
-            For now, the easiest way to work around the stricter Java8 Javadoc is deactivating it.-->
-        <profile>
-            <id>disable-java8-doclint</id>
-            <activation>
-                <jdk>[1.8,)</jdk>
-            </activation>
-            <properties>
-                <additionalparam>-Xdoclint:none</additionalparam>
-            </properties>
         </profile>
     </profiles>
 </project>

@@ -39,6 +39,7 @@ import static com.stratio.qa.assertions.Assertions.assertThat;
 
 /**
  * Generic Given Specs.
+ * @see <a href="GivenGSpec-annotations.html">Given Steps & Matching Regex</a>
  */
 public class GivenGSpec extends BaseGSpec {
 

@@ -46,6 +46,10 @@ import java.util.regex.Pattern;
 import static com.stratio.qa.assertions.Assertions.assertThat;
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
+/**
+ * Generic When Specs.
+ * @see <a href="WhenGSpec-annotations.html">When Steps & Matching Regex</a>
+ */
 public class WhenGSpec extends BaseGSpec {
 
     public static final int DEFAULT_TIMEOUT = 1000;

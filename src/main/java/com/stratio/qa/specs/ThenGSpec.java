@@ -39,6 +39,10 @@ import java.util.regex.Pattern;
 
 import static com.stratio.qa.assertions.Assertions.assertThat;
 
+/**
+ * Generic Then Specs.
+ * @see <a href="ThenGSpec-annotations.html">Then Steps & Matching Regex</a>
+ */
 public class ThenGSpec extends BaseGSpec {
 
     public static final int VALUE_SUBSTRING = 3;
