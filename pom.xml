@@ -361,6 +361,9 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
                         <version>2.4</version>
+                        <configuration>
+                            <outputDirectory>target/site/apidocs</outputDirectory>
+                        </configuration>
                         <executions>
                             <execution>
                                 <id>javadoc</id>
@@ -380,7 +383,7 @@
                                         com.stratio.qa.doclet.AnnotationsDoclet
                                     </doclet>
                                     <docletPath>
-                                        ../classes
+                                        ../../classes
                                     </docletPath>
                                 </configuration>
                             </execution>
