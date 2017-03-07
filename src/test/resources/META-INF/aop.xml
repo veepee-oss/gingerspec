@@ -19,6 +19,8 @@
 <aspectj>
     <aspects>
         <aspect name="com.stratio.qa.aspects.RunOnTagAspect"/>
+        <aspect name="com.stratio.qa.aspects.LoopTagAspect"/>
+        <aspect name="com.stratio.qa.aspects.CoordinationAspect"/>
         <aspect name="com.stratio.qa.aspects.ReplacementAspect"/>
         <aspect name="com.stratio.qa.aspects.IgnoreTagAspect"/>
         <aspect name="com.stratio.qa.aspects.AssertJAspect"/>

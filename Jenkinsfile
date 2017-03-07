@@ -55,6 +55,7 @@ hose {
         | -DZOOKEEPER_HOSTS=%%ZOOKEEPER:2181
         | -DSECURIZED_ZOOKEEPER=false
         | -DWAIT=1
+        | -DAGENT_LIST=agente1,agente2,agente3
         | -DKAFKA_HOSTS=%%KAFKA:9092
         | -DSSH=%%UBUNTU
         | -DSLEEPTEST=1""".stripMargin().stripIndent()
