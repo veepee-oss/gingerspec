@@ -15,7 +15,6 @@
  */
 package com.stratio.qa.aspects;
 
-import cucumber.api.java.Before;
 import cucumber.runtime.io.Resource;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -52,15 +51,21 @@ public class LoopTagAspect {
             String[] elems;
             if (lines.get(s).contains("@loop")) {
                 listParams = lines.get(s).substring((lines.get(s).lastIndexOf("(") + 1), (lines.get(s).length()) - 1).split(",")[0];
-                elems = System.getProperty(listParams).split(",");
+                try {
+                    elems = System.getProperty(listParams).split(",");
+                } catch (Exception e) {
+                    logger.error("-> Error while parsing params. {} is not defined.", listParams);
+                    throw new Exception("-> Error while parsing params. {} is not defined." + listParams);
+                }
                 paramReplace = lines.get(s).substring((lines.get(s).lastIndexOf("(") + 1), (lines.get(s).length()) - 1).split(",")[1];
+                lines.set(s, " ");
                 while (!(lines.get(s).toUpperCase().contains("SCENARIO:"))) {
                     s ++;
                 }
                 lines.set(s,lines.get(s).replaceAll("Scenario", "Scenario Outline"));
                 s++;
                 while ( s < lines.size()) {
-                    if ((lines.get(s).toUpperCase().contains("SCENARIO")) || (lines.get(s).contains("@"))) {
+                    if ((lines.get(s).toUpperCase().contains("SCENARIO")) || lines.get(s).matches(".*@[^\\{].*")) {
                         break;
                     }
                     s++;
