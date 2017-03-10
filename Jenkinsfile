@@ -13,7 +13,7 @@ hose {
 
     ITSERVICES = [
         ['ZOOKEEPER': [
-           'image': 'confluent/zookeeper:3.4.6-cp1',
+           'image': 'jplock/zookeeper:3.5.2-alpha',
            'env': [
                  'zk_id=1'],
            'sleep': 30,
