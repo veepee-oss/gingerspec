@@ -53,6 +53,12 @@ public class ReplacementAspect {
         if (isSkippedOnParams(pjp)) {
             return null;
         }
+
+        if (CucumberScenarioOutline.class.isAssignableFrom(pjp.getSourceLocation().getWithinType())) {
+            String name = (String) pjp.proceed();
+            return name;
+        }
+
         String newExamplesData = examplesData;
 
         if (newExamplesData.contains("${")) {
@@ -173,11 +179,11 @@ public class ReplacementAspect {
         String newVal = element;
         while (newVal.contains("@{")) {
             String placeholder = newVal.substring(newVal.indexOf("@{"), newVal.indexOf("}", newVal.indexOf("@{")) + 1);
-            String property = placeholder.substring(2, placeholder.length() - 1);
+            String property = placeholder.substring(2, placeholder.length() - 1).toLowerCase();
             String subproperty = "";
             CommonG commonJson;
             if (placeholder.contains(".")) {
-                property = placeholder.substring(2, placeholder.indexOf("."));
+                property = placeholder.substring(2, placeholder.indexOf(".")).toLowerCase();
                 subproperty = placeholder.substring(placeholder.indexOf(".") + 1, placeholder.length() - 1);
             } else {
                 if (pjp.getThis() instanceof CucumberReporter.TestMethod) {
@@ -189,7 +195,7 @@ public class ReplacementAspect {
             }
 
             switch (property) {
-                case "IP":
+                case "ip":
                     boolean found = false;
                     if (!subproperty.isEmpty()) {
                         Enumeration<InetAddress> ifs = NetworkInterface.getByName(subproperty).getInetAddresses();
@@ -206,16 +212,15 @@ public class ReplacementAspect {
                         throw new Exception("Interface " + subproperty + " not available");
                     }
                     break;
-                case "JSON":
+                case "json":
+                case "file":
                     commonJson = new CommonG();
-                    newVal = commonJson.retrieveData(subproperty, "json");
-                    break;
-                case "FILE":
-                    commonJson = new CommonG();
-                    newVal = commonJson.retrieveData(subproperty, "file");
+                    newVal = newVal.replace(placeholder, commonJson.retrieveData(subproperty, property));
                     break;
                 default:
-                    throw new Exception("Property not defined");
+                    commonJson = new CommonG();
+                    commonJson.getLogger().error("Replacement with an undefined option ({})", property);
+                    newVal = newVal.replace(placeholder, "");
             }
         }
         return newVal;

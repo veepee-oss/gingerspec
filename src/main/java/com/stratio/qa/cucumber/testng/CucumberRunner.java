@@ -145,9 +145,11 @@ public class CucumberRunner {
                     formatter.close();
                 }
             }
-        }
-        if (!runtime.getErrors().isEmpty()) {
-            throw new CucumberException(runtime.getErrors().get(0));
+            throw e;
+        } finally {
+            if (!runtime.getErrors().isEmpty()) {
+                throw new CucumberException(runtime.getErrors().get(0));
+            }
         }
     }
 }

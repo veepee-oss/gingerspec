@@ -671,7 +671,8 @@ public class CommonG {
         Reader reader;
 
         if (stream == null) {
-            throw new Exception("File does not exist: " + baseData);
+            this.getLogger().error("File does not exist: {}", baseData);
+            return "ERROR: File does not exist: " + baseData;
         }
 
         try {

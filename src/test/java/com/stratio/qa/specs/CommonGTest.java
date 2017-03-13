@@ -166,13 +166,7 @@ public class CommonGTest {
         String baseData = "invalid.conf";
         String type = "string";
 
-        try {
-            commong.retrieveData(baseData, type);
-            fail("Expected Exception");
-        } catch (Exception e) {
-            assertThat(e.getClass().toString()).as("Unexpected exception").isEqualTo(Exception.class.toString());
-            assertThat(e.getMessage()).as("Unexpected exception message").isEqualTo("File does not exist: " + baseData);
-        }
+        assertThat(commong.retrieveData(baseData, type)).as("File not found exception").isEqualTo("ERROR: File does not exist: invalid.conf");
     }
 
     @Test
