@@ -456,8 +456,7 @@ public class CucumberReporter implements Formatter, Reporter {
                                     if (value.equals("")) {
                                         isWrongTicket = true;
                                     } else if ("done".equals(value.toLowerCase()) || "finalizado".equals(value.toLowerCase()) ||
-                                            "qa".equals(value.toLowerCase()) ||
-                                            "in progress".equals(value.toLowerCase()) || "en progreso".equals(value.toLowerCase())) {
+                                            "qa".equals(value.toLowerCase())) {
                                         isJiraTicketDone = true;
                                     }
 
