@@ -795,7 +795,7 @@ public class CommonG {
 
                 modifiedData = JsonValue.readHjson(modifiedData).asObject().toString();
 
-                modifiedData = modifiedData.replaceAll("null", "\"TO_BE_NULL\"");
+                modifiedData = modifiedData.replaceAll("^null", "\"TO_BE_NULL\"");
                 switch (operation.toUpperCase()) {
                     case "DELETE":
                         jsonAsMap = JsonPath.parse(modifiedData).delete(composeKey).json();
