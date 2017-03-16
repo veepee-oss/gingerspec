@@ -83,10 +83,12 @@ public class ReplacementAspect {
             Field field = docString.getClass().getField("value");
             field.set(field, value);
         }
-        if ((rows != null) && (rows.size() == 1)) {
-            List<String> cells = rows.get(0).getCells();
-            for (int c = 0; c < cells.size(); c++) {
-                cells.set(c, replacedElement(cells.get(c) , jp));
+        if (rows != null) {
+            for (int r = 0; r < rows.size(); r++) {
+                List<String> cells = rows.get(r).getCells();
+                for (int c = 0; c < cells.size(); c++) {
+                    cells.set(c, replacedElement(cells.get(c), jp));
+                }
             }
         }
 
