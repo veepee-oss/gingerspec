@@ -9,4 +9,11 @@ Feature: Feature used in testing loop tag aspect
 
   Scenario: verify file content.
     Given I run 'wc -l testOutput.txt' locally
-    Then the command output contains '3'
+    Then the command output contains '2'
+
+  @loop(AGENT_LIST,VAR_NAME)
+  Scenario: With scenarios outlines and datatables
+    Given I create file 'testSOATtag<VAR_NAME.id>.json' based on 'schemas/simple<VAR_NAME>.json' as 'json' with:
+      | $.a | REPLACE | @{JSON.schemas/empty.json}     | object   |
+    Given I save '@{JSON.testSOATtag<VAR_NAME.id>.json}' in variable 'VAR'
+    Then I run '[ "!{VAR}" = "{"a":{}}" ]' locally

@@ -19,20 +19,19 @@ import com.stratio.qa.cucumber.testng.CucumberReporter;
 import com.stratio.qa.exceptions.NonReplaceableException;
 import com.stratio.qa.specs.CommonG;
 import com.stratio.qa.utils.ThreadProperty;
-import cucumber.runtime.model.CucumberScenarioOutline;
-import gherkin.formatter.model.DataTableRow;
-import gherkin.formatter.model.Scenario;
-import gherkin.formatter.model.Step;
-import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.Around;
-import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Pointcut;
+import gherkin.I18n;
+import gherkin.formatter.Reporter;
+import gherkin.formatter.model.*;
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Field;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -43,119 +42,87 @@ public class ReplacementAspect {
             .getCanonicalName());
     private String lastEchoedStep = "";
 
-    @Pointcut("execution (public String CucumberReporter.TestMethod.obtainOutlineScenariosExamples(..)) && "
-            + "args (examplesData)")
-    protected void replacementOutlineScenariosCallPointcut(String examplesData) {
+
+    @Pointcut("(execution (gherkin.formatter.model.Scenario.new(..)) ||  execution (gherkin.formatter.model.ScenarioOutline.new(..))) && "
+            + "args (comments, tags, keyword, name, description, line, id) ")
+    protected void replacementScenarios(List<Comment> comments, List<Tag> tags, String keyword, String name, String description, Integer line, String id) {
     }
 
-    @Around(value = "replacementOutlineScenariosCallPointcut(examplesData)")
-    public Object aroundReplacementOutlineScenariosCalls(ProceedingJoinPoint pjp, String examplesData) throws Throwable {
-        if (isSkippedOnParams(pjp)) {
-            return null;
-        }
+    @After(value = "replacementScenarios(comments, tags, keyword, name, description, line, id)")
+    public void aroundScenarios(JoinPoint jp, List<Comment> comments, List<Tag> tags, String keyword, String name, String description, Integer line, String id) throws Throwable {
 
-        if (CucumberScenarioOutline.class.isAssignableFrom(pjp.getSourceLocation().getWithinType())) {
-            String name = (String) pjp.proceed();
-            return name;
-        }
+        BasicStatement scenario = (BasicStatement) jp.getThis();
+        String scenarioName = scenario.getName();
+        String newScenarioName = replacedElement(scenarioName , jp);
 
-        String newExamplesData = examplesData;
+        if (!scenarioName.equals(newScenarioName)) {
+            Field field = null;
+            Class current = scenario.getClass();
+            do {
+                try {
+                    field = current.getDeclaredField("name");
+                } catch(Exception e) {}
+            } while((current = current.getSuperclass()) != null);
 
-        if (newExamplesData.contains("${")) {
-            newExamplesData = replaceEnvironmentPlaceholders(newExamplesData, pjp);
+            field.setAccessible(true);
+            field.set(scenario, replacedElement(name, jp));
         }
-        if (newExamplesData.contains("!{")) {
-            newExamplesData = replaceReflectionPlaceholders(newExamplesData, pjp);
-        }
-        if (newExamplesData.contains("@{")) {
-            newExamplesData = replaceCodePlaceholders(newExamplesData, pjp);
-        }
-
-        Object[] myArray = {newExamplesData};
-        return pjp.proceed(myArray);
     }
 
-
-    @Pointcut("execution (public * gherkin.formatter.model.Step.getRows())")
-    protected void replacementDataTableStatementName() {
+    @Pointcut("execution (public void cucumber.runtime.Runtime.runStep(..)) && "
+            + "args (featurePath, step, reporter, i18n)")
+    protected void replacementStar(String featurePath, Step step, Reporter reporter, I18n i18n) {
     }
 
-    @Around(value = "replacementDataTableStatementName()")
-    public List<DataTableRow> aroundReplacementDataTableStatementName(ProceedingJoinPoint pjp) throws Throwable {
-        if (isSkippedOnParams(pjp)) {
-            return null;
+    @Before(value = "replacementStar(featurePath, step, reporter, i18n)")
+    public void aroundReplacementStar(JoinPoint jp, String featurePath, Step step, Reporter reporter, I18n i18n) throws Throwable{
+        DocString docString = step.getDocString();
+        List<DataTableRow> rows= step.getRows();
+        if (docString != null) {
+            String value = replacedElement(docString.getValue(), jp);
+            Field field = docString.getClass().getField("value");
+            field.set(field, value);
         }
-        List<DataTableRow> dataTableOld = (List<DataTableRow>) pjp.proceed();
-        if (dataTableOld != null) {
-            for (int i = 0; i < dataTableOld.size(); i++) {
-                List<String> row = dataTableOld.get(i).getCells();
-                for (int x = 0; x < row.size(); x++) {
-                    String value = row.get(x);
-                    if (value.contains("${")) {
-                        value = replaceEnvironmentPlaceholders(value,pjp);
-                    }
-                    if (value.contains("!{")) {
-                        value = replaceReflectionPlaceholders(value,pjp);
-                    }
-                    if (value.contains("@{")) {
-                        value = replaceCodePlaceholders(value,pjp);
-                    }
-                    dataTableOld.get(i).getCells().set(x, value);
-                }
+        if ((rows != null) && (rows.size() == 1)) {
+            List<String> cells = rows.get(0).getCells();
+            for (int c = 0; c < cells.size(); c++) {
+                cells.set(c, replacedElement(cells.get(c) , jp));
             }
         }
-        return dataTableOld;
+
+        String stepName = step.getName();
+        String newName = replacedElement(stepName , jp);
+        if (!stepName.equals(newName)) {
+            //field up to BasicStatement, from Step and ExampleStep
+            Field field = null;
+            Class current = step.getClass();
+            do {
+                try {
+                    field = current.getDeclaredField("name");
+                } catch(Exception e) {}
+            } while((current = current.getSuperclass()) != null);
+
+            field.setAccessible(true);
+            field.set(step, newName);
+        }
+
+        lastEchoedStep = step.getName();
+        logger.info("  {}{}", step.getKeyword(), step.getName());
     }
 
-    @Pointcut("call(String gherkin.formatter.model.BasicStatement.getName())")
-    protected void replacementBasicStatementName() {
+    private String replacedElement(String el, JoinPoint jp) throws NonReplaceableException {
+        if (el.contains("${")) {
+            el = replaceEnvironmentPlaceholders(el,jp);
+        }
+        if (el.contains("!{")) {
+            el = replaceReflectionPlaceholders(el,jp);
+        }
+        if (el.contains("@{")) {
+            el = replaceCodePlaceholders(el,jp);
+        }
+        return el;
     }
 
-    @Around(value = "replacementBasicStatementName()")
-    public String aroundReplacementBasicStatementName(ProceedingJoinPoint pjp) throws Throwable {
-        if (isSkippedOnParams(pjp)) {
-            return "Omitted scenario";
-        }
-        String newBasicStmt = (String) pjp.proceed();
-
-        if (CucumberScenarioOutline.class.isAssignableFrom(pjp.getSourceLocation().getWithinType())) {
-            String name = (String) pjp.proceed();
-            return name;
-        }
-
-        if (newBasicStmt.contains("${")) {
-            newBasicStmt = replaceEnvironmentPlaceholders(newBasicStmt, pjp);
-        }
-        if (newBasicStmt.contains("!{")) {
-            newBasicStmt = replaceReflectionPlaceholders(newBasicStmt, pjp);
-        }
-        if (newBasicStmt.contains("@{")) {
-            newBasicStmt = replaceCodePlaceholders(newBasicStmt, pjp);
-        }
-
-        if ((pjp.getTarget() instanceof Step) &&
-                !(lastEchoedStep.equals(newBasicStmt)) &&
-                !(newBasicStmt.contains("'<"))) {
-            lastEchoedStep = newBasicStmt;
-            logger.debug("  {}{}", ((Step) pjp.getTarget()).getKeyword(), newBasicStmt);
-        }
-        return newBasicStmt;
-    }
-
-    private boolean isSkippedOnParams (ProceedingJoinPoint pjp) {
-
-
-        if (pjp.getTarget() instanceof Scenario) {
-            try {
-                Scenario linescn = (Scenario) pjp.getTarget();
-                return ("true".equals(ThreadProperty.get("skippedOnParams" + pjp.proceed() + linescn.getLine())));
-            } catch (Throwable throwable) {
-                return false;
-            }
-        } else {
-            return false;
-        }
-    }
     /**
      * Replaces every placeholded element, enclosed in @{} with the
      * corresponding attribute value in local Common class
@@ -175,7 +142,7 @@ public class ReplacementAspect {
      * @return String
      * @throws Exception
      */
-    protected String replaceCodePlaceholders(String element, ProceedingJoinPoint pjp) throws Exception {
+    protected String replaceCodePlaceholders(String element, JoinPoint pjp) throws NonReplaceableException {
         String newVal = element;
         while (newVal.contains("@{")) {
             String placeholder = newVal.substring(newVal.indexOf("@{"), newVal.indexOf("}", newVal.indexOf("@{")) + 1);
@@ -198,7 +165,12 @@ public class ReplacementAspect {
                 case "ip":
                     boolean found = false;
                     if (!subproperty.isEmpty()) {
-                        Enumeration<InetAddress> ifs = NetworkInterface.getByName(subproperty).getInetAddresses();
+                        Enumeration<InetAddress> ifs = null;
+                        try {
+                            ifs = NetworkInterface.getByName(subproperty).getInetAddresses();
+                        } catch (SocketException e) {
+                            this.logger.error(e.getMessage());
+                        }
                         while (ifs.hasMoreElements() && !found) {
                             InetAddress itf = ifs.nextElement();
                             if (itf instanceof Inet4Address) {
@@ -209,7 +181,7 @@ public class ReplacementAspect {
                         }
                     }
                     if (!found) {
-                        throw new Exception("Interface " + subproperty + " not available");
+                        throw new NonReplaceableException("Interface " + subproperty + " not available");
                     }
                     break;
                 case "json":
@@ -239,7 +211,7 @@ public class ReplacementAspect {
      * @throws IllegalArgumentException
      * @throws IllegalAccessException
      */
-    protected String replaceReflectionPlaceholders(String element, ProceedingJoinPoint pjp) throws Exception {
+    protected String replaceReflectionPlaceholders(String element, JoinPoint pjp) throws NonReplaceableException {
         String newVal = element;
         while (newVal.contains("!{")) {
             String placeholder = newVal.substring(newVal.indexOf("!{"),
@@ -268,7 +240,7 @@ public class ReplacementAspect {
      * @param element
      * @return String
      */
-    protected String replaceEnvironmentPlaceholders(String element, ProceedingJoinPoint pjp) throws NonReplaceableException {
+    protected String replaceEnvironmentPlaceholders(String element, JoinPoint jp) throws NonReplaceableException {
         String newVal = element;
         while (newVal.contains("${")) {
             String placeholder = newVal.substring(newVal.indexOf("${"),
@@ -285,7 +257,7 @@ public class ReplacementAspect {
 
             String prop = System.getProperty(sysProp);
 
-            if (prop == null && (pjp.getThis() instanceof CucumberReporter.TestMethod)) {
+            if (prop == null && (jp.getThis() instanceof CucumberReporter.TestMethod)) {
                 return element;
             } else if (prop == null) {
                 logger.error("{} -> {} env var has not been defined.", element, sysProp);

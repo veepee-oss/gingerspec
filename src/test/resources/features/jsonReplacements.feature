@@ -6,7 +6,13 @@ Feature: JSON replacements
 
   Scenario: Simplest read with failure message
     Given I save '@{JSON.schemas/otherempty.json}' in variable 'VAR'
-    Then I run '[ "!{VAR}" = "ERROR: File does not exist: schemas/otherempty.json" ]' locally
+    Then I run '[ "!{VAR}" = "ERR! File not found: schemas/otherempty.json" ]' locally
+
+  Scenario: Simplest read @{JSON.schemas/empty.json} on scenario name
+    Given I run 'ls' locally
+
+  Scenario: Simplest read ${WAIT} on scenario name 2
+    Given I run 'ls' locally
 
   Scenario Outline: With scenarios outlines
     Given I save '@{JSON.schemas/simple<id>.json}' in variable 'VAR'
@@ -35,3 +41,15 @@ Feature: JSON replacements
     Examples:
       | content  | file                       |
       | {"a":{}} | @{JSON.schemas/empty.json} |
+
+  Scenario Outline: With scenarios outlines and datatables2
+    Given I run 'ls' locally
+    Given I create file 'testSOATtag.json' based on 'schemas/simple1.json' as 'json' with:
+      | $.a | REPLACE | @{JSON.schemas/<file>.json}     | object   |
+    Given I save '@{JSON.testSOATtag.json}' in variable 'VAR'
+    Then I run '[ "!{VAR}" = "<content>" ]' locally
+
+    Examples:
+      | content  | file  |
+      | {"a":{}} | empty |
+      | {"a":{}} | simple0 |

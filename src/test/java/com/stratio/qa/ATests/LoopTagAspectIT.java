@@ -24,7 +24,7 @@ import org.testng.annotations.Test;
 @CucumberOptions(features = {
         "src/test/resources/features/loopTag.feature"
 })
-public class loopTagAspectIT extends BaseGTest {
+public class LoopTagAspectIT extends BaseGTest {
 
     @Test
     public void loopTagTest() throws Exception {

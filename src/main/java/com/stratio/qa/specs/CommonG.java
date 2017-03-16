@@ -661,7 +661,7 @@ public class CommonG {
      * @return String
      * @throws Exception
      */
-    public String retrieveData(String baseData, String type) throws Exception {
+    public String retrieveData(String baseData, String type) {
         String result;
 
         InputStream stream = getClass().getClassLoader().getResourceAsStream(baseData);
@@ -672,7 +672,7 @@ public class CommonG {
 
         if (stream == null) {
             this.getLogger().error("File does not exist: {}", baseData);
-            return "ERROR: File does not exist: " + baseData;
+            return "ERR! File not found: " + baseData;
         }
 
         try {
@@ -681,8 +681,14 @@ public class CommonG {
             while ((n = reader.read(buffer)) != -1) {
                 writer.write(buffer, 0, n);
             }
+        } catch(Exception readerexception){
+            this.getLogger().error(readerexception.getMessage());
         } finally {
-            stream.close();
+            try {
+                stream.close();
+            } catch (Exception closeException) {
+                this.getLogger().error(closeException.getMessage());
+            }
         }
         String text = writer.toString();
 
@@ -795,7 +801,7 @@ public class CommonG {
 
                 modifiedData = JsonValue.readHjson(modifiedData).asObject().toString();
 
-                modifiedData = modifiedData.replaceAll("^null", "\"TO_BE_NULL\"");
+                modifiedData = modifiedData.replaceAll("null", "\"TO_BE_NULL\"");
                 switch (operation.toUpperCase()) {
                     case "DELETE":
                         jsonAsMap = JsonPath.parse(modifiedData).delete(composeKey).json();

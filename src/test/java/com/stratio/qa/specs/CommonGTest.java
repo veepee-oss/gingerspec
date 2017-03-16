@@ -166,7 +166,7 @@ public class CommonGTest {
         String baseData = "invalid.conf";
         String type = "string";
 
-        assertThat(commong.retrieveData(baseData, type)).as("File not found exception").isEqualTo("ERROR: File does not exist: invalid.conf");
+        assertThat(commong.retrieveData(baseData, type)).as("File not found exception").isEqualTo("ERR! File not found: invalid.conf");
     }
 
     @Test
@@ -211,7 +211,6 @@ public class CommonGTest {
         ThreadProperty.set("class", this.getClass().getCanonicalName());
         CommonG commong = new CommonG();
         String data = jsonObject4.toString();
-        ;
         String expectedData = "{\"key2\":{\"key3\":null}}";
         String type = "json";
         List<List<String>> rawData = Arrays.asList(Arrays.asList("key1", "DELETE", "N/A"));

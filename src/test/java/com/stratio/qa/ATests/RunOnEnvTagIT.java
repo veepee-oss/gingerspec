@@ -23,7 +23,7 @@ import org.testng.annotations.Test;
 @CucumberOptions(features = {
         "src/test/resources/features/runOnEnvTag.feature"
 })
-public class runOnEnvTagIT extends BaseGTest {
+public class RunOnEnvTagIT extends BaseGTest {
 
     @Test
     public void runOnEnvTagTest() throws Exception {
