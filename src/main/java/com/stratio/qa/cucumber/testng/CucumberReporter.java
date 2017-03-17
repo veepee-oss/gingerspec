@@ -51,6 +51,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class CucumberReporter implements Formatter, Reporter {
     public static final int DURATION_STRING = 1000000;
@@ -84,6 +85,8 @@ public class CucumberReporter implements Formatter, Reporter {
     private String cClass;
     private String additional;
 
+    private final Logger logger = LoggerFactory.getLogger(this.getClass()
+            .getCanonicalName());
     /**
      * Constructor of cucumberReporter.
      *
@@ -190,17 +193,12 @@ public class CucumberReporter implements Formatter, Reporter {
     @Override
     public void endOfScenarioLifeCycle(Scenario scenario) {
 
-        List<Tag> tags = scenario.getTags();
-
         try {
-            testMethod.finish(document, root, this.position, tags, jUnitDocument, jUnitRoot);
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+            testMethod.finish(document, root, this.position, scenario.getTags(), jUnitDocument, jUnitRoot);
+        } catch (ExecutionException  | InterruptedException  | IOException e) {
             e.printStackTrace();
         }
+
         this.position++;
         if ((tmpExamples != null) && (iteration >= tmpExamples.getRows().size())) {
             tmpExamples = null;
@@ -232,8 +230,13 @@ public class CucumberReporter implements Formatter, Reporter {
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 
-            this.writer = new UTF8OutputStreamWriter(new URLOutputStream(Utils.toURL(url + cClass + additional
-                    + "TESTNG.xml")));
+            URLOutputStream urlOS = null;
+            try {
+                urlOS = new URLOutputStream(Utils.toURL(url + cClass + additional + "TESTNG.xml"));
+                this.writer = new UTF8OutputStreamWriter(urlOS);
+            } catch (Exception e) {
+                logger.error("error writing TESTNG.xml file", e);
+            }
 
             StreamResult streamResult = new StreamResult(writer);
             DOMSource domSource = new DOMSource(document);
@@ -248,14 +251,18 @@ public class CucumberReporter implements Formatter, Reporter {
             Transformer transformerJunit = TransformerFactory.newInstance().newTransformer();
             transformerJunit.setOutputProperty(OutputKeys.INDENT, "yes");
 
-            this.writerJunit = new UTF8OutputStreamWriter(new URLOutputStream(Utils.toURL(url + cClass + additional
-                    + "JUNIT.xml")));
+            try {
+                urlOS = new URLOutputStream(Utils.toURL(url + cClass + additional + "JUNIT.xml"));
+                this.writerJunit = new UTF8OutputStreamWriter(urlOS);
+            } catch (Exception e) {
+                logger.error("error writing TESTNG.xml file", e);
+            }
 
             StreamResult streamResultJunit = new StreamResult(writerJunit);
             DOMSource domSourceJunit = new DOMSource(jUnitDocument);
             transformerJunit.transform(domSourceJunit, streamResultJunit);
 
-        } catch (TransformerException | IOException e) {
+        } catch (TransformerException e) {
             throw new CucumberException("Error transforming report.", e);
         }
     }
@@ -373,6 +380,54 @@ public class CucumberReporter implements Formatter, Reporter {
         }
 
         /**
+         * Checks the passed by ticket parameter validity against a Attlasian Jira account
+         *
+         * @param ticket
+
+         */
+        private boolean isValidJiraTicket (String ticket) {
+            String userJira = System.getProperty("usernamejira");
+            String passJira = System.getProperty("passwordjira");
+            Boolean validTicket = false;
+
+            if ((userJira != null) || (passJira != null)  || "".equals(ticket)) {
+                CommonG comm = new CommonG();
+                AsyncHttpClient client = new AsyncHttpClient();
+                Future<Response> response = null;
+                Logger logger = LoggerFactory.getLogger(ThreadProperty.get("class"));
+
+                comm.setRestProtocol("https://");
+                comm.setRestHost("stratio.atlassian.net");
+                comm.setRestPort("");
+                comm.setClient(client);
+                String endpoint = "/rest/api/2/issue/" + ticket;
+                try {
+                    response = comm.generateRequest("GET", true, userJira, passJira, endpoint, "", "json");
+                    comm.setResponse(endpoint, response.get());
+                } catch (Exception e) {
+                    logger.error("Rest API Jira connection error " + String.valueOf(comm.getResponse().getStatusCode()));
+                    return false;
+                }
+
+                String json = comm.getResponse().getResponse();
+                String value = "";
+                try {
+                    value = JsonPath.read(json, "$.fields.status.name");
+                    value = value.toLowerCase();
+                } catch (PathNotFoundException pe) {
+                    logger.error("Json Path $.fields.status.name not found\r");
+                    logger.error(json);
+                    return false;
+                }
+
+                if (!"done".equals(value) || !"finalizado".equals(value) || !"qa".equals(value)) {
+                    validTicket = true;
+                }
+            }
+            return validTicket;
+        }
+
+        /**
          * Builds a test result xml document, builds exception messages on non valid ignore causes such as
          * \@tillfixed without an in progress Stratio's Jira ticker
          *
@@ -404,107 +459,52 @@ public class CucumberReporter implements Formatter, Reporter {
             Boolean ignored = false;
             Boolean ignoreReason = false;
             String exceptionmsg = "Failed";
-
-            AsyncHttpClient client = new AsyncHttpClient();
-            Future<Response> response = null;
+            String ticket = "";
             Boolean isJiraTicketDone = false;
             Boolean isWrongTicket = false;
-            CommonG comm = new CommonG();
-            String userJira = System.getProperty("usernamejira");
-            String passJira = System.getProperty("passwordjira");
-
-            Logger logger = LoggerFactory.getLogger(ThreadProperty.get("class"));
-            String value = "";
-            String issue = "";
             Boolean ignoreRun = false;
 
-            for (Tag tag : tags) {
-                if ("@ignore".equals(tag.getName())) {
-                    ignored = true;
-                    for (Tag tagNs : tags) {
-                        if (!(tagNs.getName().equals("@ignore"))) {
-                            String tillFix = tagNs.getName();
-                            if (tillFix.startsWith("@tillfixed")) {
-                                Pattern pattern = Pattern.compile("@(.*?)\\((.*?)\\)");
-                                Matcher matcher = pattern.matcher(tillFix);
-                                if (matcher.find()) {
-                                    issue = matcher.group(2);
-                                } else {
-                                    isWrongTicket = true;
-                                }
-                                if (((userJira != null) || (passJira != null)) && !"".equals(issue)) {
-                                    comm.setRestProtocol("https://");
-                                    comm.setRestHost("stratio.atlassian.net");
-                                    comm.setRestPort("");
-                                    comm.setClient(client);
-                                    String endpoint = "/rest/api/2/issue/" + issue;
-                                    try {
-                                        response = comm.generateRequest("GET", true, userJira, passJira, endpoint, "", "json");
-                                        comm.setResponse(endpoint, response.get());
-                                    } catch (Exception e) {
-                                        logger.error("Rest API Jira connection error " + String.valueOf(comm.getResponse().getStatusCode()));
-                                    }
+            List<String> tagList = new ArrayList<>();
+            tagList = tags.stream().map(Tag::getName).collect(Collectors.toList());
 
-                                    String json = comm.getResponse().getResponse();
-                                    try {
-                                        value = JsonPath.read(json, "$.fields.status.name");
-                                    } catch (PathNotFoundException pe) {
-                                        logger.error("Json Path $.fields.status.name not found\r");
-                                        logger.error(json);
-                                    }
-
-                                    if (value.equals("")) {
-                                        isWrongTicket = true;
-                                    } else if ("done".equals(value.toLowerCase()) || "finalizado".equals(value.toLowerCase()) ||
-                                            "qa".equals(value.toLowerCase())) {
-                                        isJiraTicketDone = true;
-                                    }
-
-                                }
-                                exceptionmsg = "This scenario was skipped because of https://stratio.atlassian.net/browse/" + issue;
-                                ignoreReason = true;
-                                break;
-                            }
-
-                            //@unimplemented
-                            if (tagNs.getName().matches("@unimplemented")) {
-                                exceptionmsg = "This scenario was skipped because of it is not yet implemented";
-                                ignoreReason = true;
-                                break;
-                            }
-
-                            //@manual
-                            if (tagNs.getName().matches("@manual")) {
-                                ignoreReason = true;
-                                exceptionmsg = "This scenario was skipped because it is marked as manual.";
-                                break;
-                            }
-
-                            //@toocomplex
-                            if (tagNs.getName().matches("@toocomplex")) {
-                                exceptionmsg = "This scenario was skipped because of being too complex to test";
-                                ignoreReason = true;
-                                break;
-                            }
-
-                            //@runOnEnvs
-                            if (tagNs.getName().contains("runOnEnvs")) {
-                                exceptionmsg = "This scenario was omitted because of tag condition";
-                                ignoreReason = true;
-                                break;
-                            }
+            if (tagList.contains("@ignore")) {
+                ignored = true;
+                for (String tag: tagList) {
+                    Pattern pattern = Pattern.compile("@tillfixed\\((.*?)\\)");
+                    Matcher matcher = pattern.matcher(tag);
+                    if (matcher.find()) {
+                        ticket = matcher.group(1);
+                        if (isValidJiraTicket(ticket)) {
+                            exceptionmsg = "This scenario was skipped because of a pending Jira ticket: " + ticket;
+                            ignoreReason = true;
                         }
+                        break;
                     }
-
                 }
-                if ("@ignore(runOnEnvs)".equals(tag.getName())) {
-                    ignoreRun = true;
-                    break;
+
+                if (tagList.contains("@unimplemented")) {
+                    exceptionmsg = "This scenario was skipped because of it is not yet implemented";
+                    ignoreReason = true;
+                }
+
+                if (tagList.contains("@manual")) {
+                    ignoreReason = true;
+                    exceptionmsg = "This scenario was skipped because it is marked as manual.";
+                }
+
+                if (tagList.contains("@toocomplex")) {
+                    exceptionmsg = "This scenario was skipped because of being too complex to test";
+                    ignoreReason = true;
+                }
+
+                if (tagList.contains("runOnEnvs")) {
+                    exceptionmsg = "This scenario was omitted because of tag condition";
+                    ignoreReason = true;
                 }
             }
 
-            String msg1 = null;
-            String msg2 = null;
+            String msg1 = "";
+            String msg2 = "";
 
             if (ignoreRun) {
                 if ("Omitted scenario".equals(docJunit.getDocumentElement().getLastChild().getLastChild().getAttributes().item(0).getNodeValue())){
@@ -514,15 +514,11 @@ public class CucumberReporter implements Formatter, Reporter {
             } else if (ignored && (!ignoreReason || (ignoreReason && isJiraTicketDone) || (ignoreReason && isWrongTicket))) {
                 element.setAttribute(STATUS, "FAIL");
                 if (isJiraTicketDone) {
-                    msg1 = "The scenario was ignored due an already done (or in progress) ticket. " + "https://stratio.atlassian.net/browse/" + issue;
-                    ;
-                    msg2 = " ";
+                    msg1 = "The scenario was ignored due an already done (or in progress) ticket. " + "https://stratio.atlassian.net/browse/" + ticket;
                 } else if (isWrongTicket) {
-                    msg1 = "The scenario was ignored due to unexistant ticket " + issue;
-                    msg2 = " ";
+                    msg1 = "The scenario was ignored due to unexistant ticket " + ticket;
                 } else {
-                    msg1 = "The scenario has no valid reason for being ignored. <p>Valid values: @tillfixed(ISSUE-007) @unimplemented @manual @toocomplex</p>";
-                    msg2 = " ";
+                    msg1 = "The scenario has no valid reason for being ignored. \n Valid values: @tillfixed(ISSUE-007) @unimplemented @manual @toocomplex";
                 }
 
                 Element exception = createException(doc, msg1, msg1, msg2);

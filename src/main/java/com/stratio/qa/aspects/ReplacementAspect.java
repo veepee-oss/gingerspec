@@ -114,13 +114,13 @@ public class ReplacementAspect {
 
     private String replacedElement(String el, JoinPoint jp) throws NonReplaceableException {
         if (el.contains("${")) {
-            el = replaceEnvironmentPlaceholders(el,jp);
+            el = replaceEnvironmentPlaceholders(el, jp);
         }
         if (el.contains("!{")) {
-            el = replaceReflectionPlaceholders(el,jp);
+            el = replaceReflectionPlaceholders(el, jp);
         }
         if (el.contains("@{")) {
-            el = replaceCodePlaceholders(el,jp);
+            el = replaceCodePlaceholders(el, jp);
         }
         return el;
     }

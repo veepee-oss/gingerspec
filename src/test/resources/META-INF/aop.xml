@@ -29,6 +29,6 @@
         <aspect name="com.stratio.qa.aspects.IncludeTagAspect"/>
     </aspects>
     <weaver
-            options="-verbose -Xlint:ignore -Xset:weaveJavaPackages=true,weaveJavaxPackages=true">
+            options="-Xlint:ignore -Xset:weaveJavaPackages=true,weaveJavaxPackages=true">
     </weaver>
 </aspectj>
