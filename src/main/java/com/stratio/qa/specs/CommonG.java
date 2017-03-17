@@ -38,6 +38,9 @@ import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.io.FileUtils;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.Condition;
+import org.hjson.JsonArray;
+import org.hjson.JsonObject;
+import org.hjson.JsonType;
 import org.hjson.JsonValue;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -799,9 +802,10 @@ public class CommonG {
                     typeJsonObject = modifications.raw().get(i).get(3);
                 }
 
-                modifiedData = JsonValue.readHjson(modifiedData).asObject().toString();
+                JsonObject object = new JsonObject(JsonValue.readHjson(modifiedData).asObject());
+                removeNulls(object);
+                modifiedData = JsonValue.readHjson(object.toString()).toString();
 
-                modifiedData = modifiedData.replaceAll("null", "\"TO_BE_NULL\"");
                 switch (operation.toUpperCase()) {
                     case "DELETE":
                         jsonAsMap = JsonPath.parse(modifiedData).delete(composeKey).json();
@@ -949,6 +953,24 @@ public class CommonG {
         return modifiedData;
     }
 
+    /**
+     * Eliminates null occurrences, replacing them with "TO_BE_NULL"
+     *
+     * @param object JsonObject containing json where to replace null ocurrences
+     * @return
+     */
+    public JsonObject removeNulls(JsonObject object){
+        for(int j = 0; j < object.names().size(); j++){
+            if (JsonType.OBJECT.equals(object.get(object.names().get(j)).getType())) {
+                removeNulls(object.get(object.names().get(j)).asObject());
+            } else {
+                if (object.get(object.names().get(j)).isNull()) {
+                    object.set(object.names().get(j), "TO_BE_NULL");
+                }
+            }
+        }
+        return object;
+    }
 
     /**
      * Generates the request based on the type of request, the end point, the data and type passed
