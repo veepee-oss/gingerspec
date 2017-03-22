@@ -17,3 +17,9 @@ Feature: Feature used in testing loop tag aspect
       | $.a | REPLACE | @{JSON.schemas/empty.json}     | object   |
     Given I save '@{JSON.testSOATtag<VAR_NAME.id>.json}' in variable 'VAR'
     Then I run '[ "!{VAR}" = "{"a":{}}" ]' locally
+
+#  @loop(AGENT_LIST,VAR_NAME)
+#  Scenario: This is an omitted scenario so it contains a failing assert
+#    Given I run 'echo <VAR_NAME> >> ignore.txt' locally
+#    When I run 'wc -l ignore.txt' locally
+#    Then the command output contains '<VAR_NAME.id>'

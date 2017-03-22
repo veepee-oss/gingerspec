@@ -1845,13 +1845,17 @@ public class CommonG {
         }
         if (this.getCommandExitStatus() != exitStatus) {
             if (System.getProperty("logLevel", "") != null && System.getProperty("logLevel", "").equalsIgnoreCase("debug")) {
-                this.getLogger().debug("Command complete stdout:\n{}", this.getCommandResult());
+                if (!("".equals(this.getCommandResult()))) {
+                    this.getLogger().debug("Command complete stdout:\n{}", this.getCommandResult());
+                }
             } else {
                 this.getLogger().error("Command last {} lines stdout:", logLastLines);
                 this.getLogger().error("{}", log);
             }
         } else {
-            this.getLogger().debug("Command complete stdout:\n{}", this.getCommandResult());
+            if (!("".equals(this.getCommandResult()))) {
+                this.getLogger().debug("Command complete stdout:\n{}", this.getCommandResult());
+            }
         }
     }
 

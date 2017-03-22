@@ -49,7 +49,7 @@ public class LoopTagAspect {
 
         for (int s = 0; s < lines.size(); s++) {
             String[] elems;
-            if (lines.get(s).contains("@loop")) {
+            if (lines.get(s).matches("\\s*@loop.*")) {
                 listParams = lines.get(s).substring((lines.get(s).lastIndexOf("(") + 1), (lines.get(s).length()) - 1).split(",")[0];
                 try {
                     elems = System.getProperty(listParams).split(",");
