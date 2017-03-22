@@ -23,3 +23,18 @@ Feature: Feature used in testing loop tag aspect
 #    Given I run 'echo <VAR_NAME> >> ignore.txt' locally
 #    When I run 'wc -l ignore.txt' locally
 #    Then the command output contains '<VAR_NAME.id>'
+
+  @skipOnEnv(AGENT_LIST)
+  Scenario: This scenario should be omitted.
+    Given I run '[ "SHOULDNT_RUN" = "FAIL OTHERWISE" ]' locally
+
+  @runOnEnv(AGENT_LIST)
+  Scenario: This scenario should be executed.
+    Given I run '[ "SHOULD_RUN" = "SHOULD_RUN" ]' locally
+
+  @loop(AGENT_LIST,VAR_NAME)
+  Scenario: With scenarios outlines and datatables
+    Given I create file 'testSOATtag<VAR_NAME.id>B.json' based on 'schemas/simple<VAR_NAME>.json' as 'json' with:
+      | $.a | REPLACE | @{JSON.schemas/empty.json}     | object   |
+    Given I save '@{JSON.testSOATtag<VAR_NAME.id>B.json}' in variable 'VAR'
+    Then I run '[ "!{VAR}" = "{"a":{}}" ]' locally

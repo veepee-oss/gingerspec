@@ -64,7 +64,6 @@ public class HookGSpec extends BaseGSpec {
      */
     @Before(order = 0)
     public void globalSetup() {
-        commonspec.getLogger().debug("Clearing exception list");
         commonspec.getExceptions().clear();
     }
 
@@ -239,7 +238,6 @@ public class HookGSpec extends BaseGSpec {
      */
     @After(order = 0)
     public void teardown() {
-        commonspec.getLogger().debug("Ended running hooks");
     }
 
     @Before(order = 10, value = "@rest")

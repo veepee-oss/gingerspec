@@ -22,7 +22,7 @@
     </Properties>
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout pattern="%highlight{%.20c{1}} - %highlight{%m}%n"/>
+            <PatternLayout pattern="\t%highlight{%.20c{1}} - %highlight{%m}%n"/>
         </Console>
         <Console name="Hooks" target="SYSTEM_OUT">
             <PatternLayout pattern="%highlight{   %msg%n}{INFO=blue}"/>

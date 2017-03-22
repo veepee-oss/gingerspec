@@ -72,12 +72,13 @@ public class IgnoreTagAspect {
         List<String> tagList = new ArrayList<>();
         tagList = tags.stream().map(Tag::getName).collect(Collectors.toList());
 
-        if (tagList.contains("@ignore")) {
-            ignore = true;
-            if (tagList.contains("runOnEnvs")) {
-                ignoreReason = true;
-            }
-            for (String tag: tagList) {
+
+        for (String tag: tagList) {
+            if (tag.contains("@ignore")) {
+                ignore = true;
+                if (tag.contains("runOnEnvs")) {
+                    ignoreReason = true;
+                }
                 Pattern pattern = Pattern.compile("@tillfixed\\((.*?)\\)");
                 Matcher matcher = pattern.matcher(tag);
                 if (matcher.find()) {
@@ -87,15 +88,15 @@ public class IgnoreTagAspect {
                     break;
                 }
             }
-            if (tagList.contains("@unimplemented")) {
+            if (tag.contains("@unimplemented")) {
                 logger.warn("Scenario '" + scenario.getName() + "' ignored because it is not yet implemented.");
                 ignoreReason = true;
             }
-            if (tagList.contains("@manual")) {
+            if (tag.contains("@manual")) {
                 logger.warn("Scenario '" + scenario.getName() + "' ignored because it is marked as manual test.");
                 ignoreReason = true;
             }
-            if (tagList.contains("@toocomplex")) {
+            if (tag.contains("@toocomplex")) {
                 logger.warn("Scenario '" + scenario.getName() + "' ignored because the test is too complex.");
                 ignoreReason = true;
             }
