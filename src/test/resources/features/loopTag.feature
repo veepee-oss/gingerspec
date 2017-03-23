@@ -20,9 +20,7 @@ Feature: Feature used in testing loop tag aspect
 
 #  @loop(AGENT_LIST,VAR_NAME)
 #  Scenario: This is an omitted scenario so it contains a failing assert
-#    Given I run 'echo <VAR_NAME> >> ignore.txt' locally
-#    When I run 'wc -l ignore.txt' locally
-#    Then the command output contains '<VAR_NAME.id>'
+#    Given I run '[ "SHOULDNT_RUN" = "FAIL OTHERWISE" ]' locally
 
   @skipOnEnv(AGENT_LIST)
   Scenario: This scenario should be omitted.
@@ -32,6 +30,7 @@ Feature: Feature used in testing loop tag aspect
   Scenario: This scenario should be executed.
     Given I run '[ "SHOULD_RUN" = "SHOULD_RUN" ]' locally
 
+  @runOnEnv(AGENT_LIST)
   @loop(AGENT_LIST,VAR_NAME)
   Scenario: With scenarios outlines and datatables
     Given I create file 'testSOATtag<VAR_NAME.id>B.json' based on 'schemas/simple<VAR_NAME>.json' as 'json' with:

@@ -497,9 +497,8 @@ public class CucumberReporter implements Formatter, Reporter {
                     ignoreReason = true;
                 }
 
-                if (tagList.contains("runOnEnvs")) {
-                    exceptionmsg = "This scenario was omitted because of tag condition";
-                    ignoreReason = true;
+                if (tagList.contains("@envCondition")) {
+                    ignoreRun = true;
                 }
             }
 
@@ -507,9 +506,7 @@ public class CucumberReporter implements Formatter, Reporter {
             String msg2 = "";
 
             if (ignoreRun) {
-                if ("Omitted scenario".equals(docJunit.getDocumentElement().getLastChild().getLastChild().getAttributes().item(0).getNodeValue())){
-                    docJunit.getDocumentElement().getLastChild().removeChild(docJunit.getDocumentElement().getLastChild().getLastChild());
-                }
+                docJunit.getDocumentElement().getLastChild().removeChild(docJunit.getDocumentElement().getLastChild().getLastChild());
                 return;
             } else if (ignored && (!ignoreReason || (ignoreReason && isJiraTicketDone) || (ignoreReason && isWrongTicket))) {
                 element.setAttribute(STATUS, "FAIL");

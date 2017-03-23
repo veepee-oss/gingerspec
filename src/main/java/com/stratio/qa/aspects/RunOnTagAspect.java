@@ -81,7 +81,8 @@ public class RunOnTagAspect {
         for (Tag tag : tags) {
             if (tag.getName().contains("@runOnEnv")) {
                 if (!checkParams(getParams(tag.getName()))) {
-                    tags.add(new Tag("@ignore(runOnEnvs)", line));
+                    tags.add(new Tag("@ignore", line));
+                    tags.add(new Tag("@envCondition", line));
                     Scenario linescn = (Scenario) pjp.getTarget();
                     ThreadProperty.set("skippedOnParams" + pjp.getArgs()[3].toString() + linescn.getLine(), "true");
                     break;
@@ -89,7 +90,8 @@ public class RunOnTagAspect {
             } else if (tag.getName().contains("@skipOnEnv")){
                 if (checkParams(getParams(tag.getName()))) {
                     Scenario linescn = (Scenario) pjp.getTarget();
-                    tags.add(new Tag("@ignore(runOnEnvs)", line));
+                    tags.add(new Tag("@ignore", line));
+                    tags.add(new Tag("@envCondition", line));
                     ThreadProperty.set("skippedOnParams" + pjp.getArgs()[3].toString() + linescn.getLine(), "true");
                     break;
                 }
