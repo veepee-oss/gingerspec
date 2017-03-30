@@ -681,7 +681,7 @@ public class GivenGSpec extends BaseGSpec {
         }
 
         commonspec.runLocalCommand(command);
-        commonspec.runCommandLoggerAndEnvVar(exitStatus, envVar);
+        commonspec.runCommandLoggerAndEnvVar(exitStatus, envVar, Boolean.TRUE);
 
         Assertions.assertThat(commonspec.getCommandExitStatus()).isEqualTo(exitStatus);
     }
@@ -701,7 +701,7 @@ public class GivenGSpec extends BaseGSpec {
         commonspec.getRemoteSSHConnection().runCommand(command);
         commonspec.setCommandResult(commonspec.getRemoteSSHConnection().getResult());
         commonspec.setCommandExitStatus(commonspec.getRemoteSSHConnection().getExitStatus());
-        commonspec.runCommandLoggerAndEnvVar(exitStatus, envVar);
+        commonspec.runCommandLoggerAndEnvVar(exitStatus, envVar, Boolean.FALSE);
 
         Assertions.assertThat(commonspec.getRemoteSSHConnection().getExitStatus()).isEqualTo(exitStatus);
     }
