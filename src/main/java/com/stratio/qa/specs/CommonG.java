@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.stratio.qa.specs;
 
 import com.datastax.driver.core.ColumnDefinitions;
@@ -69,38 +70,53 @@ import static org.testng.Assert.fail;
 public class CommonG {
 
     private static final long DEFAULT_CURRENT_TIME = 1000L;
+
     private static final int DEFAULT_SLEEP_TIME = 1500;
 
     private final Logger logger = LoggerFactory.getLogger(ThreadProperty.get("class"));
 
     private RemoteWebDriver driver = null;
+
     private String browserName = null;
+
     private PreviousWebElements previousWebElements = null;
+
     private String parentWindow = "";
 
-    // COPIED FROM COMMON.JAVA
     private AsyncHttpClient client;
+
     private HttpResponse response;
+
     private List<Cookie> cookies = new ArrayList<Cookie>();
+
     private ResultSet previousCassandraResults;
+
     private DBCursor previousMongoResults;
+
     private List<JSONObject> previousElasticsearchResults;
+
     private List<Map<String, String>> previousCSVResults;
+
     private String resultsType = "";
+
     private Set<org.openqa.selenium.Cookie> seleniumCookies = new HashSet<org.openqa.selenium.Cookie>();
+
     private Map<String, String> headers = new HashMap<>();
 
-
-    // CONNECTION DETAILS
     private String restHost;
+
     private String restPort;
+
     private String webHost;
+
     private String webPort;
 
-    // REMOTE CONNECTION
     private RemoteSSHConnection remoteSSHConnection;
+
     private int commandExitStatus;
+
     private String commandResult;
+
     private String restProtocol;
 
     private ZookeeperSecUtils zkSecClient;
@@ -684,7 +700,7 @@ public class CommonG {
             while ((n = reader.read(buffer)) != -1) {
                 writer.write(buffer, 0, n);
             }
-        } catch(Exception readerexception){
+        } catch (Exception readerexception) {
             this.getLogger().error(readerexception.getMessage());
         } finally {
             try {
@@ -959,8 +975,8 @@ public class CommonG {
      * @param object JsonObject containing json where to replace null ocurrences
      * @return
      */
-    public JsonObject removeNulls(JsonObject object){
-        for(int j = 0; j < object.names().size(); j++){
+    public JsonObject removeNulls(JsonObject object) {
+        for (int j = 0; j < object.names().size(); j++) {
             if (JsonType.OBJECT.equals(object.get(object.names().get(j)).getType())) {
                 removeNulls(object.get(object.names().get(j)).asObject());
             } else {
@@ -1843,8 +1859,8 @@ public class CommonG {
         if (envVar != null) {
             if (this.getRemoteSSHConnection() != null && !local) {
                 ThreadProperty.set(envVar, this.getRemoteSSHConnection().getResult().trim());
-            }else{
-                ThreadProperty.set(envVar,this.getCommandResult().trim());
+            } else {
+                ThreadProperty.set(envVar, this.getCommandResult().trim());
             }
         }
         if (this.getCommandExitStatus() != exitStatus) {

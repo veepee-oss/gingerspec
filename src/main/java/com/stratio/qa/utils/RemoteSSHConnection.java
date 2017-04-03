@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.stratio.qa.utils;
 
 import com.jcraft.jsch.*;
@@ -27,10 +28,12 @@ import java.util.List;
 public class RemoteSSHConnection {
 
     private final Logger logger = LoggerFactory.getLogger(RemoteSSHConnection.class);
-    private Session session;
-    private String result;
-    private int exitStatus;
 
+    private Session session;
+
+    private String result;
+
+    private int exitStatus;
 
     /**
      * Default constructor.
@@ -289,7 +292,7 @@ public class RemoteSSHConnection {
             }
 
             String file = null;
-            for (int i = 0; ; i++) {
+            for (int i = 0;; i++) {
                 in.read(buf, i, 1);
                 if (buf[i] == (byte) 0x0a) {
                     file = new String(buf, 0, i);

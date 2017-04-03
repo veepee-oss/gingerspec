@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.stratio.qa.specs;
 
 import com.csvreader.CsvReader;
@@ -681,9 +682,9 @@ public class WhenGSpec extends BaseGSpec {
     @When("^I create the zNode '(.+?)'( with content '(.+?)')? which (IS|IS NOT) ephemeral$")
     public void createZNode(String path, String foo, String content, boolean ephemeral) throws Exception {
         if (content != null) {
-            commonspec.getZookeeperSecClient().zCreate(path,content,ephemeral);
+            commonspec.getZookeeperSecClient().zCreate(path, content, ephemeral);
         } else {
-            commonspec.getZookeeperSecClient().zCreate(path,ephemeral);
+            commonspec.getZookeeperSecClient().zCreate(path, ephemeral);
         }
     }
 

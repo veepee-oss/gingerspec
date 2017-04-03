@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.stratio.qa.assertions;
 
+package com.stratio.qa.assertions;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
@@ -24,7 +24,6 @@ import org.assertj.core.api.AbstractAssert;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-
 
 public class DBObjectsAssert extends AbstractAssert<DBObjectsAssert, ArrayList<DBObject>> {
 

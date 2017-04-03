@@ -10,3 +10,4 @@ target/*
 .DS_Store
 *.iml
 *.log
+_ajdump/

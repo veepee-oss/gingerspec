@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.stratio.qa.aspects;
 
 import com.stratio.qa.utils.ThreadProperty;
@@ -87,7 +88,7 @@ public class RunOnTagAspect {
                     ThreadProperty.set("skippedOnParams" + pjp.getArgs()[3].toString() + linescn.getLine(), "true");
                     break;
                 }
-            } else if (tag.getName().contains("@skipOnEnv")){
+            } else if (tag.getName().contains("@skipOnEnv")) {
                 if (checkParams(getParams(tag.getName()))) {
                     Scenario linescn = (Scenario) pjp.getTarget();
                     tags.add(new Tag("@ignore", line));
@@ -104,7 +105,7 @@ public class RunOnTagAspect {
     */
     public String[] getParams(String s) throws Exception {
         String[] vals;
-        if (s.isEmpty()){
+        if (s.isEmpty()) {
             throw new Exception("-> Error while parsing params. Params must be at least one");
         } else {
             vals = s.substring((s.lastIndexOf("(") + 1), (s.length()) - 1).split(",");
@@ -116,8 +117,8 @@ public class RunOnTagAspect {
     * Checks if every param in the array of strings is defined
     */
     public boolean checkParams(String[] params) {
-        for(int i = 0; i < params.length; i++) {
-            if (System.getProperty(params[i], "").isEmpty()){
+        for (int i = 0; i < params.length; i++) {
+            if (System.getProperty(params[i], "").isEmpty()) {
                 return false;
             }
         }

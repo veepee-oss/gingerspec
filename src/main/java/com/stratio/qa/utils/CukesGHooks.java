@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.stratio.qa.utils;
 
 import com.stratio.qa.cucumber.testng.ICucumberFormatter;
@@ -29,6 +30,7 @@ public class CukesGHooks extends BaseGSpec implements ICucumberReporter, ICucumb
     private final Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
 
     Feature feature;
+
     public Scenario scenario;
 
     public CukesGHooks() {

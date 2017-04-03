@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.stratio.qa.utils;
 
 import com.ning.http.client.cookie.Cookie;
@@ -20,8 +21,11 @@ import com.ning.http.client.cookie.Cookie;
 import java.util.List;
 
 public class HttpResponse {
+
     private int statusCode;
+
     private String response;
+
     private List<Cookie> cookies;
 
     /**

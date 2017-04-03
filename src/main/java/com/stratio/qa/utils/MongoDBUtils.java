@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.stratio.qa.utils;
 
 import com.mongodb.*;
@@ -37,8 +38,11 @@ public class MongoDBUtils {
             .getLogger(MongoDBUtils.class);
 
     private final String host;
+
     private final int port;
+
     private MongoClient mongoClient;
+
     private DB dataBase;
 
     /**

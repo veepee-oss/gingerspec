@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.stratio.qa.specs;
 
 import com.auth0.jwt.JWTSigner;
@@ -44,6 +45,7 @@ import static com.stratio.qa.assertions.Assertions.assertThat;
 public class GivenGSpec extends BaseGSpec {
 
     public static final Integer ES_DEFAULT_NATIVE_PORT = 9300;
+
     public static final String ES_DEFAULT_CLUSTER_NAME = "elasticsearch";
 
     /**

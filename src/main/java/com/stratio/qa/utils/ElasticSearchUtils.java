@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.stratio.qa.utils;
 
 import org.elasticsearch.ElasticsearchException;
@@ -48,8 +49,11 @@ import java.util.Map;
 public class ElasticSearchUtils {
 
     private String es_host;
+
     private int es_native_port;
+
     private Client client;
+
     private Settings settings;
 
     /**

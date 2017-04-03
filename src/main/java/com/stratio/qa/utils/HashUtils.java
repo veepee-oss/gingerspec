@@ -13,10 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.stratio.qa.utils;
 
 public final class HashUtils {
+
     private static final int HASH = 7;
+
     private static final int MULTIPLIER = 31;
 
     private HashUtils() {

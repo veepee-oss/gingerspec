@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.stratio.qa.utils;
 
 import com.datastax.driver.core.*;
@@ -29,7 +30,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
 /**
  * Generic utilities for operations over Cassandra.
  */
@@ -37,10 +37,15 @@ public class CassandraUtils {
 
     private static final Logger LOGGER = LoggerFactory
             .getLogger(CassandraUtils.class);
+
     private final String host;
+
     private Cluster cluster;
+
     private Metadata metadata;
+
     private Session session;
+
     private CassandraQueryUtils cassandraqueryUtils;
 
     /**

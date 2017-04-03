@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.stratio.qa.doclet;
 
 import com.sun.javadoc.*;
@@ -59,7 +60,7 @@ public class AnnotationsDoclet {
                     sb.append("<dl>");
                     sb.append("<dt><b>Regex</b>: " + annotations[j].elementValues()[0].value().toString() + "</dt>");
                     sb.append("<dd><b>Step</b>: " + annotations[j].elementValues()[0].value().toString().replace("\\", "") + "</dd>");
-                    sb.append("<dd><b>Method</b>: <a href=\"./" + className + ".html#" + ((MethodDocImpl) mems[i]).name() + "-" + ((MethodDocImpl) mems[i]).signature().replace("(","").replace(")","").replace(", ","-") + "-\">" + ((MethodDocImpl) mems[i]).qualifiedName() + ((MethodDocImpl) mems[i]).signature() + "</a></dd>");
+                    sb.append("<dd><b>Method</b>: <a href=\"./" + className + ".html#" + ((MethodDocImpl) mems[i]).name() + "-" + ((MethodDocImpl) mems[i]).signature().replace("(", "").replace(")", "").replace(", ", "-") + "-\">" + ((MethodDocImpl) mems[i]).qualifiedName() + ((MethodDocImpl) mems[i]).signature() + "</a></dd>");
                     sb.append("</dl>");
 
                     sb.append("</body>");

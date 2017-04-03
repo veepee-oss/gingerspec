@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.stratio.qa.utils;
 
 import org.jacoco.core.data.ExecutionDataWriter;
@@ -34,6 +35,7 @@ import java.net.Socket;
 public class JaCoCoClient extends TestListenerAdapter {
 
     private static final String DESTFILE = "target/jacocoAT.exec";
+
     private static final int PORT = 6300;
 
     private final Logger logger = LoggerFactory.getLogger(JaCoCoClient.class);

@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.stratio.qa.cucumber.testng;
 
 import com.jayway.jsonpath.JsonPath;
@@ -54,35 +55,65 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class CucumberReporter implements Formatter, Reporter {
+
     public static final int DURATION_STRING = 1000000;
+
     public static final int DEFAULT_LENGTH = 11;
+
     public static final int DEFAULT_MAX_LENGTH = 140;
+
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+
     private static final String STATUS = "status";
+
     private final Document document;
+
     private final Document jUnitDocument;
+
     private final Element results;
+
     private final Element jUnitResults;
+
     private final Element suite;
+
     private final Element jUnitSuite;
+
     private final Element test;
-    String featureName;
+
+    private String featureName;
+
     private Writer writer;
+
     private Writer  writerJunit;
+
     private Element clazz;
+
     private Element root;
+
     private Element jUnitRoot;
+
     private TestMethod testMethod;
+
     private Examples tmpExamples;
+
     private List<Result> tmpHooks = new ArrayList<Result>();
+
     private List<Step> tmpSteps = new ArrayList<Step>();
+
     private List<Step> tmpStepsBG = new ArrayList<Step>();
+
     private Integer iteration = 0;
+
     private Integer position = 0;
+
     private String callerClass;
+
     private Background background;
+
     private String url;
+
     private String cClass;
+
     private String additional;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass()
@@ -340,13 +371,21 @@ public class CucumberReporter implements Formatter, Reporter {
     public final class TestMethod {
 
         private boolean treatSkippedAsFailure = false;
+
         private final List<Result> results = new ArrayList<Result>();
+
         private Scenario scenario = null;
+
         private String featureName;
+
         private Examples examplesData;
+
         private List<Step> steps;
+
         private List<Step> stepsbg;
+
         private List<Result> hooks;
+
         private Integer iteration = 1;
 
         public TestMethod(String feature, Scenario scenario) {

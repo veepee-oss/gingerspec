@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.stratio.qa.specs;
 
 import com.ning.http.client.AsyncHttpClient;
@@ -45,9 +46,13 @@ import static org.testng.Assert.fail;
 public class HookGSpec extends BaseGSpec {
 
     public static final int ORDER_10 = 10;
+
     public static final int ORDER_20 = 20;
+
     public static final int PAGE_LOAD_TIMEOUT = 120;
+
     public static final int IMPLICITLY_WAIT = 10;
+
     public static final int SCRIPT_TIMEOUT = 30;
 
     /**

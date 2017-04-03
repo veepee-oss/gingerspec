@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.stratio.qa.data;
 
 import com.google.common.collect.Lists;
@@ -33,8 +34,11 @@ import java.util.regex.Pattern;
 
 
 public final class BrowsersDataProvider {
+
     public static final int DEFAULT_TIMEOUT = 20000;
+
     public static final int DEFAULT_LESS_LENGTH = 4;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(BrowsersDataProvider.class);
 
     private BrowsersDataProvider() {

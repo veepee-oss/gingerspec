@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.stratio.qa.cucumber.testng;
 
 import cucumber.api.CucumberOptions;
@@ -39,7 +40,9 @@ import java.util.Set;
 public class CucumberRunner {
 
     private final cucumber.runtime.Runtime runtime;
+
     private ClassLoader classLoader;
+
     private RuntimeOptions runtimeOptions;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass()

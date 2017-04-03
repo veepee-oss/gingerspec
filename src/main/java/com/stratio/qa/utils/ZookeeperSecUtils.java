@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.stratio.qa.utils;
 
 import org.apache.curator.framework.CuratorFramework;
@@ -29,13 +30,21 @@ import java.nio.charset.StandardCharsets;
 public class ZookeeperSecUtils {
 
     private final Logger logger = LoggerFactory.getLogger(ZookeeperSecUtils.class);
+
     private static final String DEFAULT_ZK_HOSTS = "0.0.0.0:2181";
+
     private static final String DEFAULT_ZK_SESSION_TIMEOUT = "30000";
+
     private static final String DEFAULT_ZK_PRINCIPAL = "zookeeper/zookeeper-plugin-agent@DEMO.STRATIO.COM";
+
     private String zk_hosts;
+
     private int timeout;
+
     private ExponentialBackoffRetry retryPolicy;
+
     private CuratorFramework curatorZkClient;
+
     private Stat st;
 
     public ZookeeperSecUtils() {

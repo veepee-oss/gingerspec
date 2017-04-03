@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.stratio.qa.aspects;
 
 import cucumber.runtime.io.Resource;
@@ -60,18 +61,18 @@ public class LoopTagAspect {
                 paramReplace = lines.get(s).substring((lines.get(s).lastIndexOf("(") + 1), (lines.get(s).length()) - 1).split(",")[1];
                 lines.set(s, " ");
                 while (!(lines.get(s).toUpperCase().contains("SCENARIO:"))) {
-                    s ++;
+                    s++;
                 }
-                lines.set(s,lines.get(s).replaceAll("Scenario", "Scenario Outline"));
+                lines.set(s, lines.get(s).replaceAll("Scenario", "Scenario Outline"));
                 s++;
-                while ( s < lines.size()) {
+                while (s < lines.size()) {
                     if ((lines.get(s).toUpperCase().contains("SCENARIO")) || lines.get(s).matches(".*@[^\\{].*")) {
                         break;
                     }
                     s++;
                 }
                 lines.add(s, "Examples:");
-                exampleLines(paramReplace, elems, lines,  s +1);
+                exampleLines(paramReplace, elems, lines,  s + 1);
                 s = s + elems.length;
             }
         }

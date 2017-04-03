@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.stratio.qa.aspects;
 
 import com.stratio.qa.cucumber.testng.CucumberReporter;
@@ -38,8 +39,8 @@ import java.util.List;
 @Aspect
 public class ReplacementAspect {
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass()
-            .getCanonicalName());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
+
     private String lastEchoedStep = "";
 
 
@@ -53,7 +54,7 @@ public class ReplacementAspect {
 
         BasicStatement scenario = (BasicStatement) jp.getThis();
         String scenarioName = scenario.getName();
-        String newScenarioName = replacedElement(scenarioName , jp);
+        String newScenarioName = replacedElement(scenarioName, jp);
 
         if (!scenarioName.equals(newScenarioName)) {
             Field field = null;
@@ -61,8 +62,8 @@ public class ReplacementAspect {
             do {
                 try {
                     field = current.getDeclaredField("name");
-                } catch(Exception e) {}
-            } while((current = current.getSuperclass()) != null);
+                } catch (Exception e) { }
+            } while ((current = current.getSuperclass()) != null);
 
             field.setAccessible(true);
             field.set(scenario, replacedElement(name, jp));
@@ -75,9 +76,9 @@ public class ReplacementAspect {
     }
 
     @Before(value = "replacementStar(featurePath, step, reporter, i18n)")
-    public void aroundReplacementStar(JoinPoint jp, String featurePath, Step step, Reporter reporter, I18n i18n) throws Throwable{
+    public void aroundReplacementStar(JoinPoint jp, String featurePath, Step step, Reporter reporter, I18n i18n) throws Throwable {
         DocString docString = step.getDocString();
-        List<DataTableRow> rows= step.getRows();
+        List<DataTableRow> rows = step.getRows();
         if (docString != null) {
             String value = replacedElement(docString.getValue(), jp);
             Field field = docString.getClass().getField("value");
@@ -93,7 +94,7 @@ public class ReplacementAspect {
         }
 
         String stepName = step.getName();
-        String newName = replacedElement(stepName , jp);
+        String newName = replacedElement(stepName, jp);
         if (!stepName.equals(newName)) {
             //field up to BasicStatement, from Step and ExampleStep
             Field field = null;
@@ -101,8 +102,8 @@ public class ReplacementAspect {
             do {
                 try {
                     field = current.getDeclaredField("name");
-                } catch(Exception e) {}
-            } while((current = current.getSuperclass()) != null);
+                } catch (Exception e) { }
+            } while ((current = current.getSuperclass()) != null);
 
             field.setAccessible(true);
             field.set(step, newName);

@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.stratio.qa.utils;
 
 import kafka.admin.AdminOperationException;
@@ -49,16 +50,27 @@ public class KafkaUtils {
             .getLogger(KafkaUtils.class);
 
     private ZkUtils zkUtils;
+
     private int partitions;
+
     private int replication;
+
     private Properties topicConfig;
+
     private String zookeeperConnect;
+
     private int sessionTimeoutMs;
+
     private int connectionTimeoutMs;
+
     private boolean isSecureKafkaCluster;
+
     private RackAwareMode rackAwareMode;
+
     private Properties props;
+
     private Properties propsConsumer;
+
     private ZkClient zkClient;
 
     /**
@@ -102,8 +114,7 @@ public class KafkaUtils {
                 sessionTimeoutMs,
                 connectionTimeoutMs,
                 ZKStringSerializer$.MODULE$);
-        this.zkUtils = new ZkUtils(zkClient
-                , new ZkConnection(zookeeperConnect), isSecureKafkaCluster);
+        this.zkUtils = new ZkUtils(zkClient, new ZkConnection(zookeeperConnect), isSecureKafkaCluster);
     }
 
     public void setZkHost(String host, String port, String zkPath) {
