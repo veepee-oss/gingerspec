@@ -15,10 +15,7 @@
  */
 package com.stratio.qa.specs;
 
-import com.datastax.driver.core.ColumnDefinitions;
-import com.datastax.driver.core.DataType;
-import com.datastax.driver.core.ResultSet;
-import com.datastax.driver.core.Row;
+import com.datastax.driver.core.*;
 import com.stratio.qa.exceptions.DBException;
 import com.stratio.qa.utils.ThreadProperty;
 import cucumber.api.DataTable;
@@ -82,6 +79,11 @@ public class CassandraToolsIT extends BaseGSpec {
     }
 
     @Test
+    public void test_assertTableExistance() {
+        assertThat(commonspec.getCassandraClient().existsTable(this.keySpace,this.tableName,false)).isEqualTo(true);
+    }
+
+        @Test
     public void test_assertValuesOfTable_success() {
 
         // USE of Keyspace
@@ -125,7 +127,7 @@ public class CassandraToolsIT extends BaseGSpec {
     }
 
     @Test
-    public void test_assertValuesOfTable_completeTable() throws InterruptedException {
+    public void test_assertValuesOfTable_completeTable() throws InterruptedException, DBException {
         //  USE of Keyspace
         commonspec.getLogger().debug("Verifying if the keyspace {} exists", this.keySpace);
         commonspec.getCassandraClient().useKeyspace(this.keySpace);
@@ -149,6 +151,12 @@ public class CassandraToolsIT extends BaseGSpec {
                     .substring(VALUE_SUBSTRING)).as("The resultSet is not as expected").isEqualTo(this.dataTableComparison.raw().get(index).toString());
             index++;
         }
+    }
+
+    @Test
+    public void testCassandraMetaData() throws DBException {
+        Metadata metaData = commonspec.getCassandraClient().getMetadata();
+        assert metaData.getClusterName().equals("Stratio cluster");
     }
 
     @AfterClass

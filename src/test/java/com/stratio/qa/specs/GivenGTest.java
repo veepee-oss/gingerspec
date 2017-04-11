@@ -24,9 +24,6 @@ import java.nio.file.Paths;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
-/**
- * Created by carlosgarcia on 29/07/16.
- */
 public class GivenGTest {
 
     @Test
@@ -51,4 +48,15 @@ public class GivenGTest {
         assertThat(ThreadProperty.get(envVar)).as("Not correctly ordered").isEqualTo("stratiopaaslogs-2016-07-26");
     }
 
+
+    @Test
+    public void testSaveDCOSCookie() throws Exception {
+        ThreadProperty.set("class", this.getClass().getCanonicalName());
+        CommonG commong = new CommonG();
+        GivenGSpec giveng = new GivenGSpec(commong);
+        String email = "admin@demo.stratio.com";
+        String dcosSecret = "04uth_jwt_s3cr3t";
+
+        giveng.setDCOSCookie(dcosSecret,email);
+    }
 }

@@ -19,12 +19,13 @@ package com.stratio.qa.aspects;
 import com.stratio.qa.exceptions.IncludeException;
 import org.testng.annotations.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 
 
-/**
- * Created by mpenate on 24/11/15.
- */
 public class IncludeTagAspectTest {
     public IncludeTagAspect inctag = new IncludeTagAspect();
 
@@ -59,4 +60,12 @@ public class IncludeTagAspectTest {
         assertThat(inctag.checkParams(lineOfParams, tonsOfKeys)).as("Test that include parameters match the number of them at the scenario outline included").isFalse();
     }
 
+    @Test
+    public void testTagIterationSkip() throws Exception {
+        String path = "";
+        List<String> lines = new ArrayList<>();
+        lines.add("@include(testCheckParams)");
+
+        assertThatExceptionOfType(Exception.class).isThrownBy(() -> inctag.parseLines(lines, path));
+    }
 }

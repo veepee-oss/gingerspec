@@ -245,11 +245,7 @@ public class GivenGSpec extends BaseGSpec {
 
         String value = commonspec.getJSONPathString(json, parsedElement, position);
 
-        if (value == null) {
-            throw new Exception("Element to be saved: " + element + " is null");
-        } else {
-            ThreadProperty.set(envVar, value);
-        }
+        ThreadProperty.set(envVar, value);
     }
 
 
@@ -258,15 +254,10 @@ public class GivenGSpec extends BaseGSpec {
      *
      * @param value  value to be saved
      * @param envVar thread environment variable where to store the value
-     * @throws Exception
      */
     @Given("^I save \'(.+?)\' in variable \'(.+?)\'$")
-    public void saveInEnvironment(String value, String envVar) throws Exception {
-        if (envVar.isEmpty()) {
-            throw new Exception("Environment variable must be specified!");
-        } else {
-            ThreadProperty.set(envVar, value);
-        }
+    public void saveInEnvironment(String value, String envVar) {
+        ThreadProperty.set(envVar, value);
     }
 
 
@@ -327,17 +318,6 @@ public class GivenGSpec extends BaseGSpec {
     @Given("^I drop an elasticsearch index named '(.+?)'$")
     public void dropElasticsearchIndex(String index) {
         commonspec.getElasticSearchClient().dropSingleIndex(index);
-    }
-
-    /**
-     * Execute a cql file over a Cassandra keyspace.
-     *
-     * @param filename
-     * @param keyspace
-     */
-    @Given("I load a Cassandra script with name '(.+?)' into the keyspace '(.+?)'$")
-    public void insertDataOnCassandraFromFile(String filename, String keyspace) {
-        commonspec.getCassandraClient().loadTestData(keyspace, "/scripts/" + filename);
     }
 
     /**
@@ -433,7 +413,6 @@ public class GivenGSpec extends BaseGSpec {
     @Given("^My app is running in '([^:]+?)(:.+?)?'$")
     public void setupApp(String host, String port) {
         assertThat(host).isNotEmpty();
-        assertThat(port).isNotEmpty();
 
         if (port == null) {
             port = ":80";
@@ -443,27 +422,6 @@ public class GivenGSpec extends BaseGSpec {
         commonspec.setWebPort(port);
         commonspec.setRestHost(host);
         commonspec.setRestPort(port);
-    }
-
-
-    /**
-     * Browse to {@code webHost, @code webPort} using the current browser.
-     *
-     * @param webHost
-     * @param webPort
-     * @throws MalformedURLException
-     */
-    @Given("^I set web base url to '([^:]+?)(:.+?)?'$")
-    public void setupWeb(String webHost, String webPort) throws MalformedURLException {
-        assertThat(webHost).isNotEmpty();
-        assertThat(webPort).isNotEmpty();
-
-        if (webPort == null) {
-            webPort = ":80";
-        }
-
-        commonspec.setWebHost(webHost);
-        commonspec.setWebPort(webPort);
     }
 
     /**
@@ -498,7 +456,7 @@ public class GivenGSpec extends BaseGSpec {
      * Maximizes current browser window. Mind the current resolution could break a test.
      */
     @Given("^I maximize the browser$")
-    public void seleniumMaximize(String url) {
+    public void seleniumMaximize() {
         commonspec.getDriver().manage().window().maximize();
     }
 
@@ -586,25 +544,20 @@ public class GivenGSpec extends BaseGSpec {
     * @param pemFile (required if password null)
     *
     */
-    @Given("^I authenticate to DCOS cluster '(.+?)' with email '(.+?)', user '(.+?)'( and password '(.*?)')?( using pem file '(.+?)')$")
-    public void authenticateDCOSpem(String remoteHost, String email, String user, String foo, String password, String bar, String pemFile) throws Exception {
-        String DCOSsecret = null;
-        if ((pemFile == null) || (pemFile.equals("none"))) {
-            if ((password.equals("")) || (password == null)) {
-                throw new Exception("You have to provide a password or a pem file to be used for connection");
-            }
-            commonspec.setRemoteSSHConnection(new RemoteSSHConnection(user, password, remoteHost, null));
-            commonspec.getRemoteSSHConnection().runCommand("sudo cat /var/lib/dcos/dcos-oauth/auth-token-secret");
-            DCOSsecret = commonspec.getRemoteSSHConnection().getResult().trim();
+    @Given("^I authenticate to DCOS cluster '(.+?)' using email '(.+?)'( with user '(.+?)'( and password '(.+?)'| and pem file '(.+?)'))?$")
+    public void authenticateDCOSpem(String remoteHost, String email, String foo, String user, String bar, String password, String pemFile) throws Exception {
+        String DCOSsecret;
+        if (foo == null) {
+            commonspec.setRemoteSSHConnection(new RemoteSSHConnection("root", "stratio", remoteHost, null));
         } else {
-            File pem = new File(pemFile);
-            if (!pem.exists()) {
-                throw new Exception("Pem file: " + pemFile + " does not exist");
-            }
-            commonspec.setRemoteSSHConnection(new RemoteSSHConnection(user, null, remoteHost, pemFile));
-            commonspec.getRemoteSSHConnection().runCommand("sudo cat /var/lib/dcos/dcos-oauth/auth-token-secret");
-            DCOSsecret = commonspec.getRemoteSSHConnection().getResult().trim();
+            commonspec.setRemoteSSHConnection(new RemoteSSHConnection(user, password, remoteHost, pemFile));
         }
+        commonspec.getRemoteSSHConnection().runCommand("sudo cat /var/lib/dcos/dcos-oauth/auth-token-secret");
+        DCOSsecret = commonspec.getRemoteSSHConnection().getResult().trim();
+        setDCOSCookie(DCOSsecret, email);
+    }
+
+    public void setDCOSCookie(String DCOSsecret, String email) throws Exception {
         final JWTSigner signer = new JWTSigner(DCOSsecret);
         final HashMap<String, Object> claims = new HashMap();
         claims.put("uid", email);
@@ -613,36 +566,6 @@ public class GivenGSpec extends BaseGSpec {
         List<Cookie> cookieList = new ArrayList<Cookie>();
         cookieList.add(cookie);
         commonspec.setCookies(cookieList);
-        commonspec.getLogger().debug("DCOS cookie was set: {}", cookie);
-
-    }
-
-    /*
-    * Authenticate in a DCOS cluster
-    *
-    * @param dcosHost
-    * @param user
-    *
-    */
-    @Given("^I authenticate to DCOS cluster '(.+?)' with email '(.+?)'.$")
-    public void authenticateDCOS(String dcosCluster, String user) throws Exception {
-        commonspec.setRemoteSSHConnection(new RemoteSSHConnection("root", "stratio", dcosCluster, null));
-        commonspec.getRemoteSSHConnection().runCommand("cat /var/lib/dcos/dcos-oauth/auth-token-secret");
-        String DCOSsecret = commonspec.getRemoteSSHConnection().getResult().trim();
-
-        final JWTSigner signer = new JWTSigner(DCOSsecret);
-        final HashMap<String, Object> claims = new HashMap();
-        claims.put("uid", user);
-
-        final String jwt = signer.sign(claims);
-
-        Cookie cookie = new Cookie("dcos-acs-auth-cookie", jwt, false, "", "", 99999, false, false);
-        List<Cookie> cookieList = new ArrayList<Cookie>();
-
-        cookieList.add(cookie);
-
-        commonspec.setCookies(cookieList);
-
     }
 
     /*
@@ -761,16 +684,13 @@ public class GivenGSpec extends BaseGSpec {
      * Connect to Kafka.
      *
      * @param zkHost
-     * @param zkPort
      * @param zkPath
      */
-    @Given("^I connect to kafka at '(.+)':'(.+)' using path '(.+)'$")
-    public void connectKafka(String zkHost, String zkPort, String zkPath) throws UnknownHostException {
-        if (System.getenv("DCOS_CLUSTER") != null) {
-            commonspec.getKafkaUtils().setZkHost(zkHost, zkPort, zkPath);
-        } else {
-            commonspec.getKafkaUtils().setZkHost(zkHost, zkPort, "dcos-service-" + zkPath);
-        }
+    @Given("^I connect to kafka at '(.+)' using path '(.+)'$")
+    public void connectKafka(String zkHost, String zkPath) throws UnknownHostException {
+        String zkPort = zkHost.split(":")[1];
+        zkHost = zkHost.split(":")[0];
+        commonspec.getKafkaUtils().setZkHost(zkHost, zkPort, zkPath);
         commonspec.getKafkaUtils().connect();
     }
 }

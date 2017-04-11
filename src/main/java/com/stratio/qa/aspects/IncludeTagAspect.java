@@ -52,12 +52,18 @@ public class IncludeTagAspect {
         String path = resource.getPath();
         int endIndex = path.lastIndexOf("/") + 1;
         path = path.substring(0, endIndex);
+        List<String> lines = Files.readAllLines(Paths.get(resource.getPath()), StandardCharsets.UTF_8);
+
+        return parseLines(lines, path);
+    }
+
+    public String parseLines(List<String> lines, String path) throws IncludeException {
         String featureName;
         String scenarioName;
-        List<String> lines = Files.readAllLines(Paths.get(resource.getPath()), StandardCharsets.UTF_8);
-        String nwsource = "";
-        boolean marked = false;
         String[] params;
+        boolean marked = false;
+        String nwsource = "";
+
 
         for (int lineOriginalFeature = 0; lineOriginalFeature < lines.size(); lineOriginalFeature++) {
             if (lines.get(lineOriginalFeature).contains("@include")) {
@@ -103,7 +109,6 @@ public class IncludeTagAspect {
             logger.debug("New line written into source:\n" + lines.get(lineOriginalFeature));
         }
         logger.debug("Final feature source: \n" + nwsource);
-
         return nwsource;
     }
 

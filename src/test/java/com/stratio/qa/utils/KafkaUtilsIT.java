@@ -17,6 +17,8 @@ package com.stratio.qa.utils;
 
 import com.google.common.base.Joiner;
 import kafka.admin.AdminUtils;
+import kafka.common.KafkaException;
+import kafka.utils.ZkUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.BeforeMethod;
@@ -26,6 +28,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 
 public class KafkaUtilsIT {
     private final Logger logger = LoggerFactory
@@ -90,4 +93,24 @@ public class KafkaUtilsIT {
         kafka_utils.deleteTopic("testPartitions");
     }
 
+    @Test
+    public void modifyPartitionsNotKnownTopicTest() {
+        if (AdminUtils.topicExists(kafka_utils.getZkUtils(), "testPartitions2")) {
+            kafka_utils.deleteTopic("testPartitions2");
+        }
+        kafka_utils.modifyTopicPartitioning("testPartitions2", 2);
+    }
+
+    @Test
+    public void setZkHostTest() {
+        ZkUtils zkOpts = kafka_utils.getZkUtils();
+        kafka_utils.setZkHost(zkOpts.zkConnection().getServers(),"2181","/");
+    }
+
+    @Test
+    public void sendMessageTopicTest() {
+        kafka_utils.createTopic("testMessage");
+        kafka_utils.sendMessage("hello, its me", "testMessage");
+        assertThat(kafka_utils.readTopicFromBeginning("testMessage")).contains("hello, its me");
+    }
 }

@@ -15,9 +15,14 @@
  */
 package com.stratio.qa.aspects;
 
+import gherkin.formatter.model.Tag;
 import org.testng.annotations.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 
 public class RunOnEnvTagAspectTest {
 
@@ -39,5 +44,45 @@ public class RunOnEnvTagAspectTest {
     public void testCheckParams_2() throws Exception {
         System.setProperty("HELLO_KO","KO");
         assertThat(false).as("Params are correctly checked 2").isEqualTo(runontag.checkParams(runontag.getParams("@runOnEnv(HELLO_KO,BYE_KO)")));
+    }
+    @Test
+    public void testCheckEmptyParams() throws Exception {
+        assertThatExceptionOfType(Exception.class).isThrownBy(() -> runontag.checkParams(runontag.getParams("@runOnEnv()")))
+                .withMessage("Error while parsing params. Params must be at least one");
+    }
+    @Test
+    public void testGetEmptyParams() throws Exception {
+        assertThatExceptionOfType(Exception.class).isThrownBy(() -> runontag.getParams("@runOnEnv"))
+                .withMessage("Error while parsing params. Format is: \"runOnEnv(PARAM)\", but found: " + "@runOnEnv");
+    }
+
+    @Test
+    public void testTagIterationRun() throws Exception {
+        System.setProperty("HELLO","OK");
+        List<Tag> tagList = new ArrayList<>();
+        tagList.add(new Tag("@runOnEnv(HELLO)", 1));
+        assertThat(false).isEqualTo(runontag.tagsIteration(tagList,1));
+    }
+
+    @Test
+    public void testTagIterationIgnoreRun() throws Exception {
+        List<Tag> tagList = new ArrayList<>();
+        tagList.add(new Tag("@runOnEnv(BYE)", 1));
+        assertThat(true).isEqualTo(runontag.tagsIteration(tagList,1));
+    }
+
+    @Test
+    public void testTagIterationSkip() throws Exception {
+        List<Tag> tagList = new ArrayList<>();
+        tagList.add(new Tag("@skipOnEnv(HELLO_NO)", 1));
+        assertThat(false).isEqualTo(runontag.tagsIteration(tagList,1));
+    }
+
+    @Test
+    public void testTagIterationIgnoreSkip() throws Exception {
+        System.setProperty("HELLO","OK");
+        List<Tag> tagList = new ArrayList<>();
+        tagList.add(new Tag("@skipOnEnv(HELLO)", 1));
+        assertThat(true).isEqualTo(runontag.tagsIteration(tagList,1));
     }
 }

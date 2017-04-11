@@ -55,31 +55,6 @@ public class CassandraUtils {
         this.host = System.getProperty("CASSANDRA_HOST", "127.0.0.1");
     }
 
-    /**
-     * Load the lines of a CQL script containing one statement per line into a
-     * list. l
-     *
-     * @param path The path of the CQL script.
-     * @return The contents of the script.
-     */
-    public static List<String> loadScript(String path) {
-        List<String> result = new ArrayList<String>();
-        URL url = CassandraUtils.class.getResource(path);
-        LOGGER.debug(url.toString());
-        LOGGER.info("Loading script from: " + url);
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(
-                url.openStream(), "UTF8"))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                if (line.length() > 0 && !line.startsWith("#")) {
-                    result.add(line);
-                }
-            }
-        } catch (IOException e) {
-            LOGGER.error("IO Exception loading a cql script", e);
-        }
-        return result;
-    }
 
     /**
      * Connect to Cassandra host.
@@ -225,15 +200,11 @@ public class CassandraUtils {
      */
     public boolean existsKeyspace(String keyspace, boolean showLog) {
         this.metadata = cluster.getMetadata();
-        if (this.metadata.getKeyspaces().isEmpty()) {
-            return false;
-        }
-        for (KeyspaceMetadata k : metadata.getKeyspaces()) {
-            if (showLog) {
-                LOGGER.debug(k.getName());
-            }
-            if (k.getName().equals(keyspace)) {
-                return true;
+        if (!(this.metadata.getKeyspaces().isEmpty())) {
+            for (KeyspaceMetadata k : metadata.getKeyspaces()) {
+                if (k.getName().equals(keyspace)) {
+                    return true;
+                }
             }
         }
         return false;
@@ -247,11 +218,10 @@ public class CassandraUtils {
     public List<String> getKeyspaces() {
         ArrayList<String> result = new ArrayList<String>();
         this.metadata = this.cluster.getMetadata();
-        if (metadata.getKeyspaces().isEmpty()) {
-            return result;
-        }
-        for (KeyspaceMetadata k : this.metadata.getKeyspaces()) {
-            result.add(k.getName());
+        if (!(metadata.getKeyspaces().isEmpty())) {
+            for (KeyspaceMetadata k : this.metadata.getKeyspaces()) {
+                result.add(k.getName());
+            }
         }
         return result;
     }
@@ -297,15 +267,11 @@ public class CassandraUtils {
     public boolean existsTable(String keyspace, String table, boolean showLog) {
         this.metadata = this.cluster.getMetadata();
 
-        if (this.metadata.getKeyspace(keyspace).getTables().isEmpty()) {
-            return false;
-        }
-        for (TableMetadata t : this.metadata.getKeyspace(keyspace).getTables()) {
-            if (showLog && (t.getName() != null)) {
-                LOGGER.debug(t.getName());
-            }
-            if (t.getName().equals(table)) {
-                return true;
+        if (!(this.metadata.getKeyspace(keyspace).getTables().isEmpty())) {
+            for (TableMetadata t : this.metadata.getKeyspace(keyspace).getTables()) {
+                if (t.getName().equals(table)) {
+                    return true;
+                }
             }
         }
         return false;
@@ -320,12 +286,9 @@ public class CassandraUtils {
     public List<String> getTables(String keyspace) {
         ArrayList<String> result = new ArrayList<String>();
         this.metadata = this.cluster.getMetadata();
-        if (!existsKeyspace(keyspace, false)) {
-            return result;
-        }
-        if (this.metadata.getKeyspace(keyspace).getTables().isEmpty()) {
-            return result;
-        }
+        assert existsKeyspace(keyspace, false);
+        assert !(this.metadata.getKeyspace(keyspace).getTables().isEmpty());
+
         for (TableMetadata t : this.metadata.getKeyspace(keyspace).getTables()) {
             result.add(t.getName());
         }
@@ -348,30 +311,6 @@ public class CassandraUtils {
      */
     public void truncateTable(String table) {
         executeQuery(this.cassandraqueryUtils.truncateTableQuery(false, table));
-    }
-
-    /**
-     * Load a {@code keyspace} in Cassandra using the CQL sentences in the
-     * script path. The script is executed if the keyspace does not exists in
-     * Cassandra.
-     *
-     * @param keyspace The name of the keyspace.
-     * @param path     The path of the CQL script.
-     */
-    public void loadTestData(String keyspace, String path) {
-        KeyspaceMetadata md = session.getCluster().getMetadata()
-                .getKeyspace(keyspace);
-        if (md == null) {
-            LOGGER.info("Creating keyspace {} using {}", keyspace, path);
-            createKeyspace(keyspace);
-        }
-        List<String> scriptLines = loadScript(path);
-        LOGGER.info("Executing {} lines ", scriptLines.size());
-        for (String cql : scriptLines) {
-            ResultSet result = session.execute(cql);
-            LOGGER.debug("Executing: {}", cql);
-        }
-        LOGGER.info("Using existing keyspace {}", keyspace);
     }
 
 }

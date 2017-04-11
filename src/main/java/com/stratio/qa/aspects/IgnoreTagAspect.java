@@ -37,6 +37,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static com.stratio.qa.aspects.IgnoreTagAspect.ignoreReasons.*;
+
 @Aspect
 public class IgnoreTagAspect {
 
@@ -66,47 +68,16 @@ public class IgnoreTagAspect {
         tt.setAccessible(true);
         Set<Tag> tags = (Set<Tag>) tt.invoke(scen);
 
-        Boolean ignore = false;
-        Boolean ignoreReason = false;
-
         List<String> tagList = new ArrayList<>();
+        String scenarioName = scenario.getName();
         tagList = tags.stream().map(Tag::getName).collect(Collectors.toList());
 
-
-        if (tagList.contains("@ignore")) {
-            ignore = true;
-            for (String tag: tagList) {
-                Pattern pattern = Pattern.compile("@tillfixed\\((.*?)\\)");
-                Matcher matcher = pattern.matcher(tag);
-                if (matcher.find()) {
-                    String ticket = matcher.group(1);
-                    logger.warn("Scenario '" + scenario.getName() + "' ignored because of ticket: " + ticket);
-                    ignoreReason = true;
-                    break;
-                }
-            }
-            if (tagList.contains("@envCondition")) {
-                ignoreReason = true;
-            }
-            if (tagList.contains("@unimplemented")) {
-                logger.warn("Scenario '" + scenario.getName() + "' ignored because it is not yet implemented.");
-                ignoreReason = true;
-            }
-            if (tagList.contains("@manual")) {
-                logger.warn("Scenario '" + scenario.getName() + "' ignored because it is marked as manual test.");
-                ignoreReason = true;
-            }
-            if (tagList.contains("@toocomplex")) {
-                logger.warn("Scenario '" + scenario.getName() + "' ignored because the test is too complex.");
-                ignoreReason = true;
-            }
-        }
-
-        if (ignore && !ignoreReason) {
+        ignoreReasons exitReason = manageTags(tagList, scenarioName);
+        if (exitReason.equals(NOREASON)) {
             logger.error("Scenario '" + scenario.getName() + "' failed due to wrong use of the @ignore tag. ");
         }
 
-        if (ignore) {
+        if ((!(exitReason.equals(NOTIGNORED))) && (!(exitReason.equals(NOREASON)))) {
             runtime.buildBackendWorlds(reporter, tags, scenario.getName());
             formatter.startOfScenarioLifeCycle(scenario);
             formatter.endOfScenarioLifeCycle(scenario);
@@ -115,4 +86,38 @@ public class IgnoreTagAspect {
             pjp.proceed();
         }
     }
+
+    public ignoreReasons manageTags(List<String> tagList, String scenarioName) {
+        ignoreReasons exit = NOTIGNORED;
+        if (tagList.contains("@ignore")) {
+            exit = ignoreReasons.NOREASON;
+            for (String tag: tagList) {
+                Pattern pattern = Pattern.compile("@tillfixed\\((.*?)\\)");
+                Matcher matcher = pattern.matcher(tag);
+                if (matcher.find()) {
+                    String ticket = matcher.group(1);
+                    logger.warn("Scenario '" + scenarioName + "' ignored because of ticket: " + ticket);
+                    exit = ignoreReasons.JIRATICKET;
+                }
+            }
+            if (tagList.contains("@envCondition")) {
+                exit = ignoreReasons.ENVCONDITION;
+            }
+            if (tagList.contains("@unimplemented")) {
+                logger.warn("Scenario '" + scenarioName + "' ignored because it is not yet implemented.");
+                exit = ignoreReasons.UNIMPLEMENTED;
+            }
+            if (tagList.contains("@manual")) {
+                logger.warn("Scenario '" + scenarioName + "' ignored because it is marked as manual test.");
+                exit = ignoreReasons.MANUAL;
+            }
+            if (tagList.contains("@toocomplex")) {
+                logger.warn("Scenario '" + scenarioName + "' ignored because the test is too complex.");
+                exit = ignoreReasons.TOOCOMPLEX;
+            }
+        }
+        return exit;
+    }
+
+    public enum ignoreReasons { NOTIGNORED, ENVCONDITION, UNIMPLEMENTED, MANUAL, TOOCOMPLEX, JIRATICKET, NOREASON }
 }

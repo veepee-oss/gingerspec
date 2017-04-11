@@ -378,39 +378,7 @@ public class CommonG {
         return wel;
     }
 
-    /**
-     * Looks for webelements inside a selenium context. This search will be made
-     * by id, name and xpath expression matching an {@code locator} value
-     *
-     * @param element
-     * @throws Exception return List<WebElement>
-     */
-    public List<WebElement> locateElements(String method, String element) {
-
-        List<WebElement> wel = null;
-
-        if ("id".equals(method)) {
-            logger.debug("Locating {} by id", element);
-            wel = this.getDriver().findElements(By.id(element));
-        } else if ("name".equals(method)) {
-            logger.debug("Locating {} by name", element);
-            wel = this.getDriver().findElements(By.name(element));
-        } else if ("class".equals(method)) {
-            logger.debug("Locating {} by class", element);
-            wel = this.getDriver().findElements(By.className(element));
-        } else if ("xpath".equals(method)) {
-            logger.debug("Locating {} by xpath", element);
-            wel = this.getDriver().findElements(By.xpath(element));
-        } else if ("css".equals(method)) {
-            wel = this.getDriver().findElements(By.cssSelector(element));
-        } else {
-            fail("Unknown search method: " + method);
-        }
-
-        return wel;
-    }
-
-    /**
+     /**
      * Capture a snapshot or an evidence in the driver
      *
      * @param driver
@@ -973,7 +941,7 @@ public class CommonG {
      * Eliminates null occurrences, replacing them with "TO_BE_NULL"
      *
      * @param object JsonObject containing json where to replace null ocurrences
-     * @return
+     * @return JsonObject
      */
     public JsonObject removeNulls(JsonObject object) {
         for (int j = 0; j < object.names().size(); j++) {

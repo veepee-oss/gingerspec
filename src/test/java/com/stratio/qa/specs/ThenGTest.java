@@ -24,9 +24,6 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * Created by carlosgarcia on 28/06/16.
- */
 public class ThenGTest {
 
     @Test

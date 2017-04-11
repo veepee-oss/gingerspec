@@ -26,7 +26,9 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import scala.util.parsing.combinator.testing.Str;
 
+import javax.swing.tree.ExpandVetoException;
 import java.util.List;
 
 @Aspect
@@ -78,45 +80,51 @@ public class RunOnTagAspect {
     public void aroundAddRunOnTagPointcut(ProceedingJoinPoint pjp, List<Comment> comments, List<Tag> tags,
                                                   String keyword, String name, String description, Integer line, String id) throws Throwable {
 
+        Scenario linescn = (Scenario) pjp.getTarget();
+        Boolean exit = tagsIteration(tags, line);
 
+        if (exit) {
+            ThreadProperty.set("skippedOnParams" + pjp.getArgs()[3].toString() + linescn.getLine(), "true");
+        }
+    }
+
+    public boolean tagsIteration(List<Tag> tags, Integer line) throws Exception {
         for (Tag tag : tags) {
             if (tag.getName().contains("@runOnEnv")) {
                 if (!checkParams(getParams(tag.getName()))) {
                     tags.add(new Tag("@ignore", line));
                     tags.add(new Tag("@envCondition", line));
-                    Scenario linescn = (Scenario) pjp.getTarget();
-                    ThreadProperty.set("skippedOnParams" + pjp.getArgs()[3].toString() + linescn.getLine(), "true");
-                    break;
+                    return true;
                 }
             } else if (tag.getName().contains("@skipOnEnv")) {
                 if (checkParams(getParams(tag.getName()))) {
-                    Scenario linescn = (Scenario) pjp.getTarget();
                     tags.add(new Tag("@ignore", line));
                     tags.add(new Tag("@envCondition", line));
-                    ThreadProperty.set("skippedOnParams" + pjp.getArgs()[3].toString() + linescn.getLine(), "true");
-                    break;
+                    return true;
                 }
             }
         }
+        return false;
     }
 
     /*
     * Returns a string array of params
     */
     public String[] getParams(String s) throws Exception {
-        String[] vals;
-        if (s.isEmpty()) {
-            throw new Exception("-> Error while parsing params. Params must be at least one");
-        } else {
-            vals = s.substring((s.lastIndexOf("(") + 1), (s.length()) - 1).split(",");
+        String[] val = s.substring((s.lastIndexOf("(") + 1), (s.length()) - 1).split(",");
+        if (val[0].startsWith("@")) {
+            throw new Exception ("Error while parsing params. Format is: \"runOnEnv(PARAM)\", but found: " + s);
         }
-        return vals;
+        return val;
     }
 
    /*
     * Checks if every param in the array of strings is defined
     */
-    public boolean checkParams(String[] params) {
+    public boolean checkParams(String[] params) throws Exception {
+        if ("".equals(params[0])) {
+            throw new Exception("Error while parsing params. Params must be at least one");
+        }
         for (int i = 0; i < params.length; i++) {
             if (System.getProperty(params[i], "").isEmpty()) {
                 return false;

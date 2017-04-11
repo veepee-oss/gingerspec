@@ -15,8 +15,13 @@
  */
 package com.stratio.qa.specs;
 
+import com.ning.http.client.AsyncHttpClient;
+import com.ning.http.client.Response;
+import com.stratio.qa.utils.RemoteSSHConnection;
 import com.stratio.qa.utils.ThreadProperty;
 import cucumber.api.DataTable;
+import cucumber.runtime.table.TableConverter;
+import gherkin.formatter.model.DataTableRow;
 import org.hjson.JsonValue;
 import org.hjson.ParseException;
 import org.json.JSONArray;
@@ -31,9 +36,12 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Future;
+import java.util.regex.Pattern;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 
 public class CommonGTest {
 
@@ -959,6 +967,131 @@ public class CommonGTest {
 
         assertThat(exitstatus).as("Running nonexistent command 'shur' locally").isEqualTo(127);
     }
+
+    @Test
+    public void testGetSSHConnection() throws Exception {
+        ThreadProperty.set("class", this.getClass().getCanonicalName());
+        CommonG commong = new CommonG();
+        commong.getRemoteSSHConnection();
+    }
+
+    @Test
+    public void testGetWebHostPort() throws Exception {
+        ThreadProperty.set("class", this.getClass().getCanonicalName());
+        CommonG commong = new CommonG();
+        commong.getWebHost();
+        commong.getWebPort();
+    }
+
+    @Test
+    public void testGetExceptionList() throws Exception {
+        ThreadProperty.set("class", this.getClass().getCanonicalName());
+        CommonG commong = new CommonG();
+        commong.getExceptions();
+        commong.getTextFieldCondition();
+    }
+
+    @Test
+    public void testGetClients() throws Exception {
+        ThreadProperty.set("class", this.getClass().getCanonicalName());
+        CommonG commong = new CommonG();
+        commong.getCassandraClient();
+        commong.getElasticSearchClient();
+        commong.getKafkaUtils();
+        commong.getMongoDBClient();
+        commong.getZookeeperSecClient();
+    }
+
+    @Test
+    public void testRegexMatcher() throws Exception {
+        String expectedMsg = "regex:tag";
+        ThreadProperty.set("class", this.getClass().getCanonicalName());
+
+        assertThat("tag").as("Regex matcher").isEqualTo(CommonG.matchesOrContains(expectedMsg).toString());
+    }
+
+    @Test
+    public void testRegexContains() throws Exception {
+        String expectedMsg = "tag";
+        ThreadProperty.set("class", this.getClass().getCanonicalName());
+        String exit = Pattern.compile(Pattern.quote(expectedMsg)).toString();
+
+        assertThat(exit).as("Regex matcher").isEqualTo(CommonG.matchesOrContains(expectedMsg).toString());
+    }
+
+
+    @Test
+    public void testGETRequest() throws Exception {
+        ThreadProperty.set("class", this.getClass().getCanonicalName());
+        CommonG commong = new CommonG();
+
+        commong.setClient(new AsyncHttpClient());
+        commong.setRestHost("jenkins.stratio.com");
+        commong.setRestPort(":80");
+        Future<Response> response = commong.generateRequest("GET", false, "bdt", "bdt", "/monitoring", "", "");
+
+        assertThat(401).as("GET Request with exit code status 401").isEqualTo(response.get().getStatusCode());
+    }
+
+    @Test
+    public void testPOSTRequest() throws Exception {
+        ThreadProperty.set("class", this.getClass().getCanonicalName());
+        CommonG commong = new CommonG();
+
+        commong.setClient(new AsyncHttpClient());
+        commong.setRestHost("jenkins.stratio.com");
+        commong.setRestPort(":80");
+        String data = "{j_username=user&j_password=pass";
+
+        Future<Response> response = commong.generateRequest("POST", false, "bdt", "bdt", "/j_acegi_security_check", data, "");
+
+        assertThat(401).as("GET Request with exit code status 401").isEqualTo(response.get().getStatusCode());
+    }
+
+    @Test
+    public void testDELETERequest() throws Exception {
+        ThreadProperty.set("class", this.getClass().getCanonicalName());
+        CommonG commong = new CommonG();
+
+        commong.setClient(new AsyncHttpClient());
+        commong.setRestHost("jenkins.stratio.com");
+        commong.setRestPort(":80");
+        String data = "{j_username=user&j_password=pass";
+
+        Future<Response> response = commong.generateRequest("DELETE", false, "bdt", "bdt", "/j_acegi_security_check", data, "");
+
+        assertThat(401).as("GET Request with exit code status 401").isEqualTo(response.get().getStatusCode());
+    }
+
+    @Test
+    public void testPUTRequest() throws Exception {
+        ThreadProperty.set("class", this.getClass().getCanonicalName());
+        CommonG commong = new CommonG();
+
+        commong.setClient(new AsyncHttpClient());
+        commong.setRestHost("jenkins.stratio.com");
+        commong.setRestPort(":80");
+        String data = "{j_username=user&j_password=pass";
+
+        Future<Response> response = commong.generateRequest("PUT", false, "bdt", "bdt", "/j_acegi_security_check", data, "");
+
+        assertThat(401).as("GET Request with exit code status 401").isEqualTo(response.get().getStatusCode());
+    }
+
+    @Test
+    public void testGetClientsResults() throws Exception {
+        ThreadProperty.set("class", this.getClass().getCanonicalName());
+        CommonG commong = new CommonG();
+
+        commong.getCassandraResults();
+        commong.getElasticsearchResults();
+        commong.getCSVResults();
+        commong.getMongoResults();
+        commong.getResultsType();
+        commong.getSeleniumCookies();
+        commong.getHeaders();
+    }
+
 
     @Test
     public void testParseJSONFragments() throws Exception {

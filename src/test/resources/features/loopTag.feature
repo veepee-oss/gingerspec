@@ -24,7 +24,7 @@ Feature: Feature used in testing loop tag aspect
 
   @skipOnEnv(AGENT_LIST)
   Scenario: This scenario should be omitted.
-    Given I run '[ "SHOULDNT_RUN" = "FAIL OTHERWISE" ]' locally
+    Given I run '[ "!{VAR_NOT_DEFINED}" = "{"a":{}}" ]' locally
 
   @runOnEnv(AGENT_LIST)
   Scenario: This scenario should be executed.

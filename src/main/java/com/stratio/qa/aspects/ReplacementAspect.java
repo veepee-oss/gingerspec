@@ -113,7 +113,7 @@ public class ReplacementAspect {
         logger.info("  {}{}", step.getKeyword(), step.getName());
     }
 
-    private String replacedElement(String el, JoinPoint jp) throws NonReplaceableException {
+    protected String replacedElement(String el, JoinPoint jp) throws NonReplaceableException {
         if (el.contains("${")) {
             el = replaceEnvironmentPlaceholders(el, jp);
         }

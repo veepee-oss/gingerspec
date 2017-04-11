@@ -42,12 +42,20 @@ hose {
                  'KAFKA_DELETE_TOPIC_ENABLE=true'],
            'sleep': 30,       
            'healthcheck': 9300]],
+	['CHROME': [
+	   'image': 'stratio/selenium-chrome:48',
+           'volumes': [
+		 '/dev/shm:/dev/shm'],
+           'env': [
+		 'SELENIUM_GRID=selenium.cd','ID=%%JUID']]],
         ['UBUNTU': [
            'image': 'stratio/ubuntu-base:16.04',
            'ssh': true]],
     ]
     
     ITPARAMETERS = """
+	| -DSELENIUM_GRID=selenium.cd:4444 
+	| -DFORCE_BROWSER=chrome_48%%JUID
         | -DMONGO_HOST=%%MONGODB
         | -DCASSANDRA_HOST=%%CASSANDRA#0
         | -DES_NODE=%%ELASTICSEARCH#0

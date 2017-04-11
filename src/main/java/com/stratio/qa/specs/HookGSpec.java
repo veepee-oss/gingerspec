@@ -72,43 +72,6 @@ public class HookGSpec extends BaseGSpec {
         commonspec.getExceptions().clear();
     }
 
-    /**
-     * Connect to Cassandra.
-     */
-    @Before(order = ORDER_10, value = "@C*")
-    public void cassandraSetup() {
-        commonspec.getLogger().debug("Setting up C* client");
-        commonspec.getCassandraClient().connect();
-    }
-
-    /**
-     * Connect to MongoDB.
-     */
-    @Before(order = ORDER_10, value = "@MongoDB")
-    public void mongoSetup() {
-        commonspec.getLogger().debug("Setting up MongoDB client");
-        try {
-            commonspec.getMongoDBClient().connect();
-        } catch (DBException e) {
-            fail(e.toString());
-        }
-    }
-
-    /**
-     * Connect to ElasticSearch.
-     */
-    @Before(order = ORDER_10, value = "@elasticsearch")
-    public void elasticsearchSetup() {
-        commonspec.getLogger().debug("Setting up elasticsearch client");
-        LinkedHashMap<String, Object> settings_map = new LinkedHashMap<String, Object>();
-        settings_map.put("cluster.name", System.getProperty("ES_CLUSTER", "elasticsearch"));
-        commonspec.getElasticSearchClient().setSettings(settings_map);
-        try {
-            commonspec.getElasticSearchClient().connect();
-        } catch (UnknownHostException e) {
-            fail(e.toString());
-        }
-    }
 
     /**
      * Connect to selenium.
@@ -149,13 +112,8 @@ public class HookGSpec extends BaseGSpec {
                 capabilities = DesiredCapabilities.phantomjs();
                 break;
             case "iphone":
-                capabilities = DesiredCapabilities.iphone();
-                capabilities.setCapability("platformName", "iOS");
-                capabilities.setCapability("platformVersion", "8.1");
-                capabilities.setCapability("deviceName", "iPhone Simulator");
-                break;
             case "safari":
-                capabilities = DesiredCapabilities.safari();
+                capabilities = DesiredCapabilities.iphone();
                 capabilities.setCapability("platformName", "iOS");
                 capabilities.setCapability("platformVersion", "8.1");
                 capabilities.setCapability("deviceName", "iPhone Simulator");
@@ -200,41 +158,6 @@ public class HookGSpec extends BaseGSpec {
             commonspec.getLogger().debug("Shutdown Selenium client");
             commonspec.getDriver().close();
             commonspec.getDriver().quit();
-        }
-    }
-
-    /**
-     * Close cassandra connection.
-     */
-    @After(order = ORDER_20, value = "@C*")
-    public void cassandraTeardown() {
-        commonspec.getLogger().debug("Shutdown  C* client");
-        try {
-            commonspec.getCassandraClient().disconnect();
-        } catch (DBException e) {
-            fail(e.toString());
-        }
-    }
-
-    /**
-     * Close MongoDB Connection.
-     */
-    @After(order = ORDER_20, value = "@MongoDB")
-    public void mongoTeardown() {
-        commonspec.getLogger().debug("Shutdown MongoDB client");
-        commonspec.getMongoDBClient().disconnect();
-    }
-
-    /**
-     * Close ElasticSearch connection.
-     */
-    @After(order = ORDER_20, value = "@elasticsearch")
-    public void elasticsearchTeardown() {
-        commonspec.getLogger().debug("Shutdown elasticsearch client");
-        try {
-            commonspec.getElasticSearchClient().getClient().close();
-        } catch (Exception e) {
-            fail(e.toString());
         }
     }
 

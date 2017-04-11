@@ -250,6 +250,19 @@ public class ThenGSpec extends BaseGSpec {
     }
 
     /**
+     * Verifies that a webelement previously found has {@code text} as text
+     *
+     * @param index
+     * @param text
+     */
+    @Then("^the element on index '(\\d+?)' has '(.+?)' as text$")
+    public void assertSeleniumTextOnElementPresent(Integer index, String text) {
+        assertThat(commonspec.getPreviousWebElements()).as("There are less found elements than required")
+                .hasAtLeast(index);
+        assertThat(commonspec.getPreviousWebElements().getPreviousWebElements().get(index)).contains(text);
+    }
+
+    /**
      * Checks if a text exists in the source of an already loaded URL.
      *
      * @param text
@@ -257,19 +270,6 @@ public class ThenGSpec extends BaseGSpec {
     @Then("^this text exists:$")
     public void assertSeleniumTextInSource(String text) {
         assertThat(this.commonspec, commonspec.getDriver()).as("Expected text not found at page").contains(text);
-    }
-
-    /**
-     * Verifies that a webelement previously found has {@code text} as text
-     *
-     * @param index
-     * @param text
-     */
-    @Then("^the element on index '(\\d+?)' has this text:$")
-    public void assertSeleniumTextOnElementPresent(Integer index, String text) {
-        assertThat(commonspec.getPreviousWebElements()).as("There are less found elements than required")
-                .hasAtLeast(index);
-        assertThat(commonspec.getPreviousWebElements().getPreviousWebElements().get(index)).contains(text);
     }
 
     /**
@@ -669,7 +669,7 @@ public class ThenGSpec extends BaseGSpec {
      * @param service
      * @throws Exception
      */
-    @Then("^I modify the enviroment variable '(.+?)' with value '(.+?)' for service '(.+?)'?$")
+    @Then("^I modify marathon environment variable '(.+?)' with value '(.+?)' for service '(.+?)'?$")
     public void setMarathonProperty(String key, String value, String service) throws Exception {
         commonspec.runCommandAndGetResult("touch " + service + "-env.json && dcos marathon app show " + service + " > /dcos/" + service + "-env.json");
         commonspec.runCommandAndGetResult("cat /dcos/" + service + "-env.json");
