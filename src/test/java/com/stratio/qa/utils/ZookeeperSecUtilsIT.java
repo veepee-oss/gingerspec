@@ -86,6 +86,7 @@ public class ZookeeperSecUtilsIT extends BaseGSpec {
 
         // Connect
         zkUtils.connectZk();
+        System.setProperty("SECURIZED_ZOOKEEPER", "false");
 
         // createNonEphemeralZnode
         String znodePath = "/mypath";
@@ -133,6 +134,5 @@ public class ZookeeperSecUtilsIT extends BaseGSpec {
 
         // Disconnect
         zkUtils.disconnect();
-        System.setProperty("SECURIZED_ZOOKEEPER", "false");
     }
 }

@@ -55,8 +55,8 @@ public class ZookeeperSecUtils {
         this.curatorZkClient = CuratorFrameworkFactory.builder().connectString(this.zk_hosts).retryPolicy(this.retryPolicy).connectionTimeoutMs(this.timeout).build();
 
         if ("true".equals(System.getProperty("SECURIZED_ZOOKEEPER", "true"))) {
-            System.setProperty("java.security.auth.login.config", System.getProperty("JAAS", "/tmp/jaas.conf"));
-            System.setProperty("java.security.krb5.conf", System.getProperty("KRB5", "/tmp/krb5.conf"));
+            System.setProperty("java.security.auth.login.config", System.getProperty("JAAS", "schemas/jaas.conf"));
+            System.setProperty("java.security.krb5.conf", System.getProperty("KRB5", "schemas/krb5.conf"));
         }
     }
 
