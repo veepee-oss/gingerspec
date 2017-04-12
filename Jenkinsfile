@@ -85,6 +85,7 @@ hose {
             doDoc(config)
         }, QC: {
             doStaticAnalysis(config)
+	    doCoverallsAnalysis(config)
         }, DEPLOY: {
             doDeploy(config)
         }, failFast: config.FAILFAST)
