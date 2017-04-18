@@ -313,4 +313,53 @@ public class CassandraUtils {
         executeQuery(this.cassandraqueryUtils.truncateTableQuery(false, table));
     }
 
+
+    /**
+     * Load a {@code keyspace} in Cassandra using the CQL sentences in the
+     * script path. The script is executed if the keyspace does not exists in
+     * Cassandra.
+     *
+     * @param keyspace The name of the keyspace.
+     * @param path     The path of the CQL script.
+     */
+    public void loadTestData(String keyspace, String path) {
+        KeyspaceMetadata md = session.getCluster().getMetadata().getKeyspace(keyspace);
+        if (md == null) {
+            LOGGER.info("Creating keyspace {} using {}", keyspace, path);
+            createKeyspace(keyspace);
+        }
+        List<String> scriptLines = loadScript(path);
+        LOGGER.info("Executing {} lines ", scriptLines.size());
+        for (String cql : scriptLines) {
+            ResultSet result = session.execute(cql);
+            LOGGER.debug("Executing: {}", cql);
+        }
+        LOGGER.info("Using existing keyspace {}", keyspace);
+    }
+
+    /**
+     * Load the lines of a CQL script containing one statement per line into a
+     * list. l
+     *
+     * @param path The path of the CQL script.
+     * @return The contents of the script.
+     */
+    public static List<String> loadScript(String path) {
+        List<String> result = new ArrayList<String>();
+        URL url = CassandraUtils.class.getResource(path);
+        LOGGER.debug(url.toString());
+        LOGGER.info("Loading script from: " + url);
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(
+                url.openStream(), "UTF8"))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                if (line.length() > 0 && !line.startsWith("#")) {
+                    result.add(line);
+                }
+            }
+        } catch (IOException e) {
+            LOGGER.error("IO Exception loading a cql script", e);
+        }
+        return result;
+    }
 }
