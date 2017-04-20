@@ -286,9 +286,9 @@ public class CassandraUtils {
     public List<String> getTables(String keyspace) {
         ArrayList<String> result = new ArrayList<String>();
         this.metadata = this.cluster.getMetadata();
-        assert existsKeyspace(keyspace, false);
-        assert !(this.metadata.getKeyspace(keyspace).getTables().isEmpty());
-
+        if ((!existsKeyspace(keyspace, false)) || (this.metadata.getKeyspace(keyspace).getTables().isEmpty())) {
+            return result;
+        }
         for (TableMetadata t : this.metadata.getKeyspace(keyspace).getTables()) {
             result.add(t.getName());
         }
