@@ -444,7 +444,11 @@ public class GivenGSpec extends BaseGSpec {
         }
 
         if (restPort == null) {
-            restPort = ":80";
+            if (isSecured == null)  {
+                restPort = ":80";
+            } else {
+                restPort = ":443";
+            }
         }
 
         commonspec.setRestProtocol(restProtocol);

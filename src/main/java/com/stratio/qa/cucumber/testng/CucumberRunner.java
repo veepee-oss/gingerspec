@@ -109,6 +109,7 @@ public class CucumberRunner {
         uniqueGlue.add("classpath:com/stratio/intelligence/testsAT/specs");
         uniqueGlue.add("classpath:com/stratio/postgresbd/testsAT/specs");
         uniqueGlue.add("classpath:com/stratio/universe/testsAT/specs");
+        uniqueGlue.add("classpath:com/stratio/paas/confluentkafkaAT/specs");
         runtimeOptions.getGlue().clear();
         runtimeOptions.getGlue().addAll(uniqueGlue);
 
