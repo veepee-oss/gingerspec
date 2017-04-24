@@ -2,6 +2,10 @@
 
 Only listing significant user-visible, not internal code cleanups and minor bug fixes.
 
+## 0.6.0 (upcoming)
+
+* Pending changelog
+
 ## 0.5.0 (upcoming)
 
 * [QA-342] New cucumber tag @loop to multiple scenario executions
