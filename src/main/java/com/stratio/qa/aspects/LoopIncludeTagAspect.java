@@ -107,7 +107,7 @@ public class LoopIncludeTagAspect {
 
 
         for (int lineOriginalFeature = 0; lineOriginalFeature < lines.size(); lineOriginalFeature++) {
-            if (lines.get(lineOriginalFeature).contains("@include")) {
+            if (lines.get(lineOriginalFeature).matches("\\s*@include.*")) {
                 String lineToinclude = "";
                 for (int linesWithInclude = lineOriginalFeature; linesWithInclude < lines.size() && lines.get(linesWithInclude).contains("@include"); linesWithInclude++) {
                     featureName = getFeatureName(lines.get(linesWithInclude));

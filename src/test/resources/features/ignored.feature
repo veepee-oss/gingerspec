@@ -20,5 +20,9 @@ Feature: Every scenario should be ignored, not failing the tests
     Given I run '[ "SHOULD_RUN" = "SHOULD_RUN" ]' locally
 
   @include(feature:ignored.feature,scenario:included_scenario)
-  Scenario: Include Ignored scenario (too complex)
+  Scenario: Including scenario
+    Given I run '[ "SHOULD_RUN" = "SHOULD_RUN" ]' locally
+
+#  @include(feature:non_existant.feature,scenario:non_existant_scenario)
+  Scenario: Ignoring include tag so non scenanrio is included.
     Given I run '[ "SHOULD_RUN" = "SHOULD_RUN" ]' locally
