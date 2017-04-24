@@ -27,7 +27,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOf
 
 
 public class IncludeTagAspectTest {
-    public IncludeTagAspect inctag = new IncludeTagAspect();
+    public LoopIncludeTagAspect inctag = new LoopIncludeTagAspect();
 
     @Test
     public void testGetFeature() {

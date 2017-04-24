@@ -34,28 +34,69 @@ import java.nio.file.Paths;
 import java.util.List;
 
 @Aspect
-public class IncludeTagAspect {
+public class LoopIncludeTagAspect {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
 
 
     @Pointcut("execution (private * cucumber.runtime.FeatureBuilder.read(..)) &&" + "args (resource)")
-    protected void addIncludeTagPointcutScenario(Resource resource) {
+    protected void featureBuilderRead(Resource resource) {
     }
 
     /**
      * @param resource
      * @throws Throwable
      */
-    @Around(value = "addIncludeTagPointcutScenario(resource)")
-    public String aroundAddIncludeTagPointcutScenario(Resource resource) throws Throwable {
+    @Around(value = "featureBuilderRead(resource)")
+    public String aroundAddLoopTagPointcutScenario(Resource resource) throws Throwable {
+        List<String> lines = Files.readAllLines(Paths.get(resource.getPath()), StandardCharsets.UTF_8);
+        String listParams;
+        String paramReplace;
         String path = resource.getPath();
         int endIndex = path.lastIndexOf("/") + 1;
         path = path.substring(0, endIndex);
-        List<String> lines = Files.readAllLines(Paths.get(resource.getPath()), StandardCharsets.UTF_8);
 
-        return parseLines(lines, path);
+
+        for (int s = 0; s < lines.size(); s++) {
+            String[] elems;
+            if (lines.get(s).matches("\\s*@loop.*")) {
+                listParams = lines.get(s).substring((lines.get(s).lastIndexOf("(") + 1), (lines.get(s).length()) - 1).split(",")[0];
+                try {
+                    elems = System.getProperty(listParams).split(",");
+                } catch (Exception e) {
+                    logger.error("-> Error while parsing params. {} is not defined.", listParams);
+                    throw new Exception("-> Error while parsing params. {} is not defined." + listParams);
+                }
+                paramReplace = lines.get(s).substring((lines.get(s).lastIndexOf("(") + 1), (lines.get(s).length()) - 1).split(",")[1];
+                lines.set(s, " ");
+                while (!(lines.get(s).toUpperCase().contains("SCENARIO:"))) {
+                    s++;
+                }
+                lines.set(s, lines.get(s).replaceAll("Scenario", "Scenario Outline"));
+                s++;
+                while (s < lines.size()) {
+                    if ((lines.get(s).toUpperCase().contains("SCENARIO")) || lines.get(s).matches(".*@[^\\{].*")) {
+                        break;
+                    }
+                    s++;
+                }
+                lines.add(s, "Examples:");
+                exampleLines(paramReplace, elems, lines,  s + 1);
+                s = s + elems.length;
+            }
+        }
+        parseLines(lines, path);
+        return String.join("\n", lines);
     }
+
+    public void exampleLines (String name, String[] params, List<String> lines, int num) {
+        lines.add(num, "| " + name + " | " + name + ".id |");
+        for (int i = 0; i < params.length; i++) {
+            num++;
+            lines.add(num, "| " + params[i] + " | " + i + " |");
+        }
+    }
+
 
     public String parseLines(List<String> lines, String path) throws IncludeException {
         String featureName;
@@ -242,6 +283,4 @@ public class IncludeTagAspect {
 
         return checker;
     }
-
-
 }

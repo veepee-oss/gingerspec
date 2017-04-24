@@ -19,14 +19,12 @@
 <aspectj>
     <aspects>
         <aspect name="com.stratio.qa.aspects.RunOnTagAspect"/>
-        <aspect name="com.stratio.qa.aspects.LoopTagAspect"/>
-        <aspect name="com.stratio.qa.aspects.CoordinationAspect"/>
+        <aspect name="com.stratio.qa.aspects.LoopIncludeTagAspect"/>
         <aspect name="com.stratio.qa.aspects.ReplacementAspect"/>
         <aspect name="com.stratio.qa.aspects.IgnoreTagAspect"/>
         <aspect name="com.stratio.qa.aspects.AssertJAspect"/>
         <aspect name="com.stratio.qa.aspects.SeleniumAspect"/>
         <aspect name="com.stratio.qa.aspects.BrowsersDataProviderAspect"/>
-        <aspect name="com.stratio.qa.aspects.IncludeTagAspect"/>
     </aspects>
     <weaver
             options="-Xlint:ignore -Xset:weaveJavaPackages=true,weaveJavaxPackages=true">

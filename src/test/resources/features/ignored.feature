@@ -15,3 +15,10 @@ Feature: Every scenario should be ignored, not failing the tests
 #  @ignore @tillfixed(QA-357)
 #  Scenario: Ignored scenario (till ticket fixed)
 #    Given I run '[ "THIS SHOULDNT HAVE BEEN RUN" = "" ]' locally
+
+  Scenario: included_scenario
+    Given I run '[ "SHOULD_RUN" = "SHOULD_RUN" ]' locally
+
+  @include(feature:ignored.feature,scenario:included_scenario)
+  Scenario: Include Ignored scenario (too complex)
+    Given I run '[ "SHOULD_RUN" = "SHOULD_RUN" ]' locally
