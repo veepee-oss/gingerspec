@@ -458,33 +458,31 @@ public class ThenGSpec extends BaseGSpec {
                 .endsWith(webURL.toLowerCase() + url);
     }
 
-    @Then("^the service response status must be '(.*?)'.$")
-    public void assertResponseStatus(Integer expectedStatus) {
-        assertThat(commonspec.getResponse().getStatusCode()).isEqualTo(expectedStatus);
-    }
-
     @Then("^the service response must contain the text '(.*?)'$")
     public void assertResponseMessage(String expectedText) throws ClassNotFoundException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
         Pattern pattern = CommonG.matchesOrContains(expectedText);
         assertThat(commonspec.getResponse().getResponse()).containsPattern(pattern);
     }
 
-    @Then("^the service response status must be '(.*?)' and its response must contain the text '(.*?)'$")
-    public void assertResponseStatusMessage(Integer expectedStatus, String expectedText) throws ClassNotFoundException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
-        WritableAssertionInfo assertionInfo = new WritableAssertionInfo();
-        Pattern pattern = CommonG.matchesOrContains(expectedText);
-        assertThat(Optional.of(commonspec.getResponse())).hasValueSatisfying(r -> {
-            assertThat(r.getStatusCode()).isEqualTo(expectedStatus);
-            assertThat(r.getResponse()).containsPattern(pattern);
-        });
-    }
-
-    @Then("^the service response status must be '(.*?)' and its response length must be '(.*?)'$")
-    public void assertResponseStatusLength(Integer expectedStatus, Integer expectedLength) {
-        assertThat(Optional.of(commonspec.getResponse())).hasValueSatisfying(r -> {
-            assertThat(r.getStatusCode()).isEqualTo(expectedStatus);
-            assertThat((new JSONArray(r.getResponse())).length()).isEqualTo(expectedLength);
-        });
+    @Then("^the service response status must be '(.*?)'( and its response length must be '(.*?)' | and its response must contain the text '(.*?)')?$")
+    public void assertResponseStatusLength(Integer expectedStatus, String foo, Integer expectedLength, String expectedText) {
+        if (foo != null) {
+            if (foo.contains("length")) {
+                assertThat(Optional.of(commonspec.getResponse())).hasValueSatisfying(r -> {
+                    assertThat(r.getStatusCode()).isEqualTo(expectedStatus);
+                    assertThat((new JSONArray(r.getResponse())).length()).isEqualTo(expectedLength);
+                });
+            } else  if (foo.contains("text")) {
+                WritableAssertionInfo assertionInfo = new WritableAssertionInfo();
+                Pattern pattern = CommonG.matchesOrContains(expectedText);
+                assertThat(Optional.of(commonspec.getResponse())).hasValueSatisfying(r -> {
+                    assertThat(r.getStatusCode()).isEqualTo(expectedStatus);
+                    assertThat(r.getResponse()).containsPattern(pattern);
+                });
+            }
+        } else {
+            assertThat(commonspec.getResponse().getStatusCode()).isEqualTo(expectedStatus);
+        }
     }
 
     /**
