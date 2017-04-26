@@ -1,4 +1,4 @@
-@Library('libpipelines@feature/gradle') _
+@Library('libpipelines@master') _
 
 hose {
     EMAIL = 'qa'
@@ -11,7 +11,7 @@ hose {
     MAXITRETRIES = 2
     FOSS = true
     BUILDTOOL = 'maven'
-    BUILDTOOLVERSION = '3.2.5'
+    BUILDTOOLVERSION = '3.5.0'
 
     ITSERVICES = [
         ['ZOOKEEPER': [
