@@ -7,7 +7,7 @@ Only listing significant user-visible, not internal code cleanups and minor bug 
 * [QA-189] Removed extra dot in 'service response status' step. Old step removed.
 * [QA-152] New aspect merging 'include' and 'loop'. Old aspects removed.
 
-## 0.5.0 (upcoming)
+## 0.5.0 (June 12, 2017)
 
 * [QA-342] New cucumber tag @loop to multiple scenario executions
 
