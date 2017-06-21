@@ -20,6 +20,9 @@ import org.testng.annotations.Test;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
+import cucumber.api.DataTable;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
@@ -85,6 +88,48 @@ public class WhenGTest {
         String value = ThreadProperty.get(envVar);
 
         assertThat(value).as("Not correctly ordered").isEqualTo(jsonStringDescending);
+    }
+
+    @Test
+    public void testReadFileToVariableJSON() throws Exception {
+        ThreadProperty.set("class", this.getClass().getCanonicalName());
+
+        String baseData = "schemas/testCreateFile.json";
+        String type = "json";
+        String envVar = "myjson";
+        List<List<String>> rawData = Arrays.asList(Arrays.asList("key1", "UPDATE", "new_value", "n/a"), Arrays.asList("key2", "ADDTO", "[\"new_value\"]", "array"));
+        DataTable modifications = DataTable.create(rawData);
+
+        CommonG commong = new CommonG();
+        WhenGSpec wheng = new WhenGSpec(commong);
+
+        wheng.readFileToVariable(baseData, type, envVar, modifications);
+
+        String envVarResult = ThreadProperty.get(envVar);
+        String expectedResult = "{\"key1\":\"new_value\",\"key2\":[[\"new_value\"]],\"key3\":{\"key3_2\":\"value3_2\",\"key3_1\":\"value3_1\"}}";
+
+        assertThat(envVarResult).as("Not as expected").isEqualTo(expectedResult);
+    }
+
+    @Test
+    public void testReadFileToVariableString() throws Exception {
+        ThreadProperty.set("class", this.getClass().getCanonicalName());
+
+        String baseData = "schemas/krb5.conf";
+        String type = "string";
+        String envVar = "mystring";
+        List<List<String>> rawData = Arrays.asList(Arrays.asList("foo", "REPLACE", "bar", "n/a"));
+        DataTable modifications = DataTable.create(rawData);
+
+        CommonG commong = new CommonG();
+        WhenGSpec wheng = new WhenGSpec(commong);
+
+        wheng.readFileToVariable(baseData, type, envVar, modifications);
+
+        String envVarResult = ThreadProperty.get(envVar);
+        String expectedResult = "bar = bar";
+
+        assertThat(envVarResult).as("Not as expected").isEqualTo(expectedResult);
     }
 
 }
