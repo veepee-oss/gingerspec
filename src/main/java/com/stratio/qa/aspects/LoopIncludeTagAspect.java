@@ -64,8 +64,8 @@ public class LoopIncludeTagAspect {
                 try {
                     elems = System.getProperty(listParams).split(",");
                 } catch (Exception e) {
-                    logger.error("-> Error while parsing params. {} is not defined.", listParams);
-                    throw new Exception("-> Error while parsing params. {} is not defined." + listParams);
+                    logger.debug("-> {} is not defined. Exception captured till scenario execution.", listParams);
+                    elems = "error,error".split(",");
                 }
                 paramReplace = lines.get(s).substring((lines.get(s).lastIndexOf("(") + 1), (lines.get(s).length()) - 1).split(",")[1];
                 lines.set(s, " ");

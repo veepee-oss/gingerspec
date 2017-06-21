@@ -37,3 +37,12 @@ Feature: Feature used in testing loop tag aspect
       | $.a | REPLACE | @{JSON.schemas/empty.json}     | object   |
     Given I save '@{JSON.testSOATtag<VAR_NAME.id>B.json}' in variable 'VAR'
     Then I run '[ "!{VAR}" = "{"a":{}}" ]' locally
+
+  @runOnEnv(NO_VAR)
+  @loop(NO_VAR,VAR_NAME)
+  Scenario: With scenarios outlines and datatables
+    Given I create file 'testSOATtag<VAR_NAME.id>B.json' based on 'schemas/simple<VAR_NAME>.json' as 'json' with:
+      | $.a | REPLACE | @{JSON.schemas/empty.json}     | object   |
+    Given I save '@{JSON.testSOATtag<VAR_NAME.id>B.json}' in variable 'VAR'
+    Then I run '[ "!{VAR}" = "{"a":{}}" ]' locally
+
