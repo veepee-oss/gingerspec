@@ -794,4 +794,25 @@ public class WhenGSpec extends BaseGSpec {
 
         Assertions.assertThat(new File(absolutePathFile).isFile());
     }
+
+    /**
+     * Read the file passed as parameter, perform the modifications specified and save the result in the environment
+     * variable passed as parameter.
+     * @param baseData      file to read
+     * @param type          whether the info in the file is a 'json' or a simple 'string'
+     * @param envVar        name of the variable where to store the result
+     * @param modifications modifications to perform in the content of the file
+     */
+    @When("^I read file '(.+?)' as '(.+?)' and save it in environment variable '(.+?)' with:$")
+    public void readFileToVariable(String baseData, String type, String envVar, DataTable modifications) throws Exception {
+        // Retrieve data
+        String retrievedData = commonspec.retrieveData(baseData, type);
+
+        // Modify data
+        commonspec.getLogger().debug("Modifying data {} as {}", retrievedData, type);
+        String modifiedData = commonspec.modifyData(retrievedData, type, modifications).toString();
+
+        // Save in environment variable
+        ThreadProperty.set(envVar, modifiedData);
+    }
 }
