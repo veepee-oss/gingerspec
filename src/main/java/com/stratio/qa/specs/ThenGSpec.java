@@ -781,5 +781,18 @@ public class ThenGSpec extends BaseGSpec {
         Assertions.assertThat(commonspec.getKafkaUtils().readTopicFromBeginning(topic).contains(content)).as("Topic {} contains {}", topic, content).withFailMessage("{} not found", content);
     }
 
+    /**
+     * Takes the content of a webElement and stores it in the thread environment variable passed as parameter
+     * @param index position of the element in the array of webElements found
+     * @param envVar name of the thread environment variable where to store the text
+     */
+    @Then("^I save content of element in index '(\\d+?)' in environment variable '(.+?)'$")
+    public void saveContentWebElementInEnvVar(Integer index, String envVar) {
+        assertThat(this.commonspec, commonspec.getPreviousWebElements()).as("There are less found elements than required")
+                .hasAtLeast(index);
+        String text = commonspec.getPreviousWebElements().getPreviousWebElements().get(index).getText();
+        ThreadProperty.set(envVar, text);
+    }
+
 }
 

@@ -815,4 +815,20 @@ public class WhenGSpec extends BaseGSpec {
         // Save in environment variable
         ThreadProperty.set(envVar, modifiedData);
     }
+
+    /**
+     * Read the file passed as parameter and save the result in the environment
+     * variable passed as parameter.
+     * @param baseData      file to read
+     * @param type          whether the info in the file is a 'json' or a simple 'string'
+     * @param envVar        name of the variable where to store the result
+     */
+    @When("^I read file '(.+?)' as '(.+?)' and save it in environment variable '(.+?)'$")
+    public void readFileToVariableNoDataTable(String baseData, String type, String envVar) throws Exception {
+        // Retrieve data
+        String retrievedData = commonspec.retrieveData(baseData, type);
+
+        // Save in environment variable
+        ThreadProperty.set(envVar, retrievedData);
+    }
 }
