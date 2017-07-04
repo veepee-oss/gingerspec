@@ -1,4 +1,5 @@
 [![Coverage Status](https://coveralls.io/repos/github/Stratio/bdt/badge.svg?branch=master)](https://coveralls.io/github/Stratio/bdt?branch=master)
+[![Maven central](https://maven-badges.herokuapp.com/maven-central/com.stratio.qa/bdt/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.stratio.qa/bdt)
 
 Stratio bdt
 ===========

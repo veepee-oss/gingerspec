@@ -9,6 +9,10 @@ Only listing significant user-visible, not internal code cleanups and minor bug 
 * [QATM-74] New step to store text in a webElement in environment variable.
 * [QATM-73] New step to read file, modify according to parameters and store in environment variable.
 
+## 0.5.1 (upcoming)
+
+* [QATM-78] Fix public releasing in maven central
+
 ## 0.5.0 (June 12, 2017)
 
 * [QA-342] New cucumber tag @loop to multiple scenario executions
