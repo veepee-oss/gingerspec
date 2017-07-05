@@ -4,6 +4,7 @@ Only listing significant user-visible, not internal code cleanups and minor bug 
 
 ## 0.6.0 (upcoming)
 
+* [QATM-70] New background tag
 * [QA-189] Removed extra dot in 'service response status' step. Old step removed.
 * [QA-152] New aspect merging 'include' and 'loop'. Old aspects removed.
 * [QATM-74] New step to store text in a webElement in environment variable.
