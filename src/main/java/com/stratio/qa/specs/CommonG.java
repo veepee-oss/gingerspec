@@ -124,7 +124,7 @@ public class CommonG {
     /**
      * Checks if a given string matches a regular expression or contains a string
      *
-     * @param expectedMessage
+     * @param expectedMessage message used for comparing
      * @return boolean
      */
     public static Pattern matchesOrContains(String expectedMessage) {
@@ -166,7 +166,7 @@ public class CommonG {
     /**
      * Set the REST host.
      *
-     * @param restHost
+     * @param restHost api host
      */
     public void setRestHost(String restHost) {
         this.restHost = restHost;
@@ -184,7 +184,7 @@ public class CommonG {
     /**
      * Set the REST port.
      *
-     * @param restPort
+     * @param restPort api port
      */
     public void setRestPort(String restPort) {
         this.restPort = restPort;
@@ -202,7 +202,7 @@ public class CommonG {
     /**
      * Set the WEB host.
      *
-     * @param webHost
+     * @param webHost host where app is running
      */
     public void setWebHost(String webHost) {
         this.webHost = webHost;
@@ -220,7 +220,7 @@ public class CommonG {
     /**
      * Set the WEB port.
      *
-     * @param webPort
+     * @param webPort port where app is running
      */
     public void setWebPort(String webPort) {
         this.webPort = webPort;
@@ -238,7 +238,7 @@ public class CommonG {
     /**
      * Get the exception list.
      *
-     * @return List<Exception>
+     * @return List(Exception)
      */
     public List<Exception> getExceptions() {
         return ExceptionList.INSTANCE.getExceptions();
@@ -247,7 +247,7 @@ public class CommonG {
     /**
      * Get the textFieldCondition list.
      *
-     * @return List<Exception>
+     * @return List(Exception)
      */
     public Condition<WebElement> getTextFieldCondition() {
         return Conditions.INSTANCE.getTextFieldCondition();
@@ -310,7 +310,7 @@ public class CommonG {
     /**
      * Set the remoteDriver.
      *
-     * @param driver
+     * @param driver driver to be used for testing
      */
     public void setDriver(RemoteWebDriver driver) {
         this.driver = driver;
@@ -328,7 +328,7 @@ public class CommonG {
     /**
      * Set the browser name.
      *
-     * @param browserName
+     * @param browserName browser to be used for testing
      */
     public void setBrowserName(String browserName) {
         this.browserName = browserName;
@@ -338,14 +338,15 @@ public class CommonG {
      * Looks for webelements inside a selenium context. This search will be made
      * by id, name and xpath expression matching an {@code locator} value
      *
-     * @param element
-     * @return List<WebElement>
-     * @throws Exception
-     * @throws IllegalAccessException
-     * @throws IllegalArgumentException
-     * @throws SecurityException
-     * @throws NoSuchFieldException
-     * @throws ClassNotFoundException
+     * @param method class of element to be searched
+     * @param element webElement searched in selenium context
+     * @param expectedCount integer. Expected number of elements.
+     * @return List(WebElement)
+     * @throws IllegalAccessException exception
+     * @throws IllegalArgumentException exception
+     * @throws SecurityException exception
+     * @throws NoSuchFieldException exception
+     * @throws ClassNotFoundException exception
      */
     public List<WebElement> locateElement(String method, String element,
                                           Integer expectedCount) throws ClassNotFoundException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
@@ -381,8 +382,8 @@ public class CommonG {
      /**
      * Capture a snapshot or an evidence in the driver
      *
-     * @param driver
-     * @param type
+     * @param driver driver used for testing
+     * @param type type
      * @return String
      */
     public String captureEvidence(WebDriver driver, String type) {
@@ -392,9 +393,9 @@ public class CommonG {
     /**
      * Capture a snapshot or an evidence in the driver
      *
-     * @param driver
-     * @param type
-     * @param suffix
+     * @param driver driver used for testing
+     * @param type type
+     * @param suffix suffix
      * @return String
      */
     public String captureEvidence(WebDriver driver, String type, String suffix) {
@@ -589,7 +590,7 @@ public class CommonG {
     /**
      * Returns the previous webElement
      *
-     * @return List<WebElement>
+     * @return List(WebElement)
      */
     public PreviousWebElements getPreviousWebElements() {
         return previousWebElements;
@@ -646,7 +647,6 @@ public class CommonG {
      * @param baseData path to file to be read
      * @param type     type of information, it can be: json|string
      * @return String
-     * @throws Exception
      */
     public String retrieveData(String baseData, String type) {
         String result;
@@ -699,6 +699,7 @@ public class CommonG {
      * @param modifications modifications to apply with a format:
      *                      WHERE,ACTION,VALUE
      *                      <p>
+     *                      {@code
      *                      DELETE: Delete the key in json or string in current value
      *                      in case of DELETE action modifications is |key1|DELETE|N/A|
      *                      and with json {"key1":"value1","key2":{"key3":null}}
@@ -706,7 +707,9 @@ public class CommonG {
      *                      Example 2:
      *                      {"key1":"val1", "key2":"val2"} -> | key1 | DELETE | N/A | -> {"key2":"val2"}
      *                      "mystring" -> | str | DELETE | N/A | -> "mying"
+     *                      }
      *                      <p>
+     *                      {@code
      *                      ADD: Add new key to json or append string to current value.
      *                      in case of ADD action is  |N/A|ADD|&config=config|,
      *                      and with data  username=username&password=password
@@ -714,7 +717,9 @@ public class CommonG {
      *                      Example 2:
      *                      {"key1":"val1", "key2":"val2"} -> | key3 | ADD | val3 | -> {"key1":"val1", "key2":"val2", "key3":"val3"}
      *                      "mystring" -> | N/A | ADD | new | -> "mystringnew"
+     *                      }
      *                      <p>
+     *                      {@code
      *                      UPDATE: Update value in key or modify part of string.
      *                      in case of UPDATE action is |username=username|UPDATE|username=NEWusername|,
      *                      and with data username=username&password=password
@@ -722,7 +727,9 @@ public class CommonG {
      *                      Example 2:
      *                      {"key1":"val1", "key2":"val2"} -> | key1 | UPDATE | newval1 | -> {"key1":"newval1", "key2":"val2"}
      *                      "mystring" -> | str | UPDATE | mod | -> "mymoding"
+     *                      }
      *                      <p>
+     *                      {@code
      *                      PREPEND: Prepend value to key value or to string
      *                      in case of PREPEND action is |username=username|PREPEND|key1=value1&|,
      *                      and with data username=username&password=password
@@ -730,15 +737,18 @@ public class CommonG {
      *                      Example 2:
      *                      {"key1":"val1", "key2":"val2"} -> | key1 | PREPEND | new | -> {"key1":"newval1", "key2":"val2"}
      *                      "mystring" -> | N/A | PREPEND | new | -> "newmystring"
+     *                      }
      *                      <p>
-     *                      <p>
+     *                      {@code
      *                      REPLACE: Update value in key or modify part of string.
      *                      in case of REPLACE action is |key2.key3|REPLACE|lu->REPLACE|
      *                      and with json {"key1":"value1","key2":{"key3":"value3"}}
      *                      returns {"key1":"value1","key2":{"key3":"vaREPLACEe3"}}
      *                      the  format is (WHERE,  ACTION,  CHANGE FROM -> TO).
      *                      REPLACE replaces a string or its part per other string
+     *                      }
      *                      <p>
+     *                      {@code
      *                      if modifications has fourth argument, the replacement is effected per special json object
      *                      the format is:
      *                      (WHERE,   ACTION,    CHANGE_TO, JSON_TYPE),
@@ -747,21 +757,26 @@ public class CommonG {
      *                      JSON_TYPE is the type of jason object,
      *                      there are 5 special cases of json object replacements:
      *                      array|object|number|boolean|null
+     *                      }
      *                      <p>
+     *                      {@code
      *                      example1: |key2.key3|REPLACE|5|number|
      *                      with json {"key1":"value1","key2":{"key3":"value3"}}
      *                      returns {"key1":"value1","key2":{"key3":5}}
      *                      in this case it replaces value of key3
      *                      per jason number
-     *                      <p>
+     *                      }<p>
+     *                      {@code
      *                      example2: |key2.key3|REPLACE|{}|object|
      *                      with json  {"key1":"value1","key2":{"key3":"value3"}}
      *                      returns  {"key1":"value1","key2":{"key3":{}}}
      *                      in this case it replaces per empty json object
-     *                      <p>
+     *                      }<p>
+     *                      {@code
      *                      APPEND: Append value to key value or to string
      *                      {"key1":"val1", "key2":"val2"} -> | key1 | APPEND | new | -> {"key1":"val1new", "key2":"val2"}
      *                      "mystring" -> | N/A | APPEND | new | -> "mystringnew"
+     *                      }
      * @return String
      * @throws Exception
      */
@@ -967,7 +982,7 @@ public class CommonG {
      * @param data        to be sent for PUT/POST requests
      * @param type        type of data to be sent (json|string)
      * @param codeBase64  XXX
-     * @throws Exception
+     * @throws Exception exception
      */
     @Deprecated
     public Future<Response> generateRequest(String requestType, boolean secure, String user, String password, String endPoint, String data, String type, String codeBase64) throws Exception {
@@ -984,7 +999,7 @@ public class CommonG {
      * @param endPoint    end point to sent the request to
      * @param data        to be sent for PUT/POST requests
      * @param type        type of data to be sent (json|string)
-     * @throws Exception
+     * @throws Exception exception
      */
     public Future<Response> generateRequest(String requestType, boolean secure, String user, String password, String endPoint, String data, String type) throws Exception {
 
@@ -1190,7 +1205,7 @@ public class CommonG {
      * @param endPoint    end point to sent the request to
      * @param data        to be sent for PUT/POST requests
      * @param type        type of data to be sent (json|string)
-     * @throws Exception
+     * @throws Exception exception
      */
     @Deprecated
     public Future<Response> generateRequest(String requestType, boolean secure, String endPoint, String data, String type, String codeBase64) throws Exception {
@@ -1203,14 +1218,14 @@ public class CommonG {
      *
      * @param element attribute in class where to store the value
      * @param value   value to be stored
-     * @throws NoSuchFieldException
-     * @throws SecurityException
-     * @throws IllegalArgumentException
-     * @throws IllegalAccessException
-     * @throws InstantiationException
-     * @throws ClassNotFoundException
-     * @throws NoSuchMethodException
-     * @throws InvocationTargetException
+     * @throws NoSuchFieldException exception
+     * @throws SecurityException exception
+     * @throws IllegalArgumentException exception
+     * @throws IllegalAccessException exception
+     * @throws InstantiationException exception
+     * @throws ClassNotFoundException exception
+     * @throws NoSuchMethodException exception
+     * @throws InvocationTargetException exception
      */
 
     public void setPreviousElement(String element, String value) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, InstantiationException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException {
@@ -1295,7 +1310,7 @@ public class CommonG {
      *                        |2.5     | 2.6      |Stratio   |0           |
      *                        |12.5    |13.7      |Sevilla   |1           |
      *                        IMPORTANT: All columns must exist
-     * @throws Exception
+     * @throws Exception exception
      */
     public void resultsMustBeCSV(DataTable expectedResults) throws Exception {
         if (getCSVResults() != null) {
@@ -1369,7 +1384,7 @@ public class CommonG {
      *                        |2.5     | 2.6      |Stratio   |0           |
      *                        |12.5    |13.7      |Sevilla   |1           |
      *                        IMPORTANT: All columns must exist
-     * @throws Exception
+     * @throws Exception exception
      */
     public void resultsMustBeCassandra(DataTable expectedResults) throws Exception {
         if (getCassandraResults() != null) {
@@ -1459,7 +1474,7 @@ public class CommonG {
      *                        |2.5     | 2.6      |Stratio   |0           |
      *                        |12.5    |13.7      |Sevilla   |1           |
      *                        IMPORTANT: All columns must exist
-     * @throws Exception
+     * @throws Exception exception
      */
     public void resultsMustBeMongo(DataTable expectedResults) throws Exception {
         if (getMongoResults() != null) {
@@ -1545,7 +1560,7 @@ public class CommonG {
      *                        |2.5     | 2.6      |Stratio   |0           |
      *                        |12.5    |13.7      |Sevilla   |1           |
      *                        IMPORTANT: All columns must exist
-     * @throws Exception
+     * @throws Exception exception
      */
     public void resultsMustBeElasticsearch(DataTable expectedResults) throws Exception {
         if (getElasticsearchResults() != null) {
@@ -1575,7 +1590,7 @@ public class CommonG {
     /**
      * Runs a command locally
      *
-     * @param command
+     * @param command command used to be run locally
      */
     public void runLocalCommand(String command) throws Exception {
 
@@ -1631,7 +1646,7 @@ public class CommonG {
     /**
      * Set the REST host.
      *
-     * @param restProtocol
+     * @param restProtocol api protocol "http or https"
      */
     public void setRestProtocol(String restProtocol) {
         this.restProtocol = restProtocol;

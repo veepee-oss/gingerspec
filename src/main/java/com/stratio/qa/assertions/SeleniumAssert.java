@@ -36,7 +36,7 @@ public class SeleniumAssert extends AbstractAssert<SeleniumAssert, Object> {
     /**
      * Constructor with WebElement.
      *
-     * @param actual
+     * @param actual webElement used in assert
      */
     public SeleniumAssert(WebElement actual) {
         super(actual, SeleniumAssert.class);
@@ -45,7 +45,7 @@ public class SeleniumAssert extends AbstractAssert<SeleniumAssert, Object> {
     /**
      * Constructor with a list of WebElements.
      *
-     * @param actual
+     * @param actual webElement used in assert
      */
     public SeleniumAssert(List<WebElement> actual) {
         super(actual, SeleniumAssert.class);
@@ -54,7 +54,7 @@ public class SeleniumAssert extends AbstractAssert<SeleniumAssert, Object> {
     /**
      * Constructor with WebDriver.
      *
-     * @param actual
+     * @param actual webElement used in assert
      */
     public SeleniumAssert(WebDriver actual) {
         super(actual, SeleniumAssert.class);
@@ -64,8 +64,8 @@ public class SeleniumAssert extends AbstractAssert<SeleniumAssert, Object> {
     /**
      * Constructor with CommonG and WebDriver.
      *
-     * @param commong
-     * @param actual
+     * @param commong common object that contains relevant execution info common object
+     * @param actual webElement used in assert
      */
     public SeleniumAssert(CommonG commong, WebDriver actual) {
         super(actual, SeleniumAssert.class);
@@ -76,8 +76,8 @@ public class SeleniumAssert extends AbstractAssert<SeleniumAssert, Object> {
     /**
      * Constructor with CommonG and WebElement.
      *
-     * @param commong
-     * @param actual
+     * @param commong common object that contains relevant execution info common object
+     * @param actual webElement used in assert
      */
     public SeleniumAssert(CommonG commong, WebElement actual) {
         super(actual, SeleniumAssert.class);
@@ -86,10 +86,10 @@ public class SeleniumAssert extends AbstractAssert<SeleniumAssert, Object> {
 
 
     /**
-     * Constructor with CommonG and List<WebElement>.
+     * Constructor with CommonG and {@code List<WebElement>}.
      *
-     * @param commong
-     * @param actual
+     * @param commong common object that contains relevant execution info common object
+     * @param actual webElement used in assert
      */
     public SeleniumAssert(CommonG commong, List<WebElement> actual) {
         super(actual, SeleniumAssert.class);
@@ -100,8 +100,8 @@ public class SeleniumAssert extends AbstractAssert<SeleniumAssert, Object> {
     /**
      * Constructor with CommonG and previousWebElements.
      *
-     * @param commong
-     * @param actual
+     * @param commong common object that contains relevant execution info common object
+     * @param actual webElement used in assert
      */
     public SeleniumAssert(CommonG commong, PreviousWebElements actual) {
         super(actual, SeleniumAssert.class);
@@ -112,8 +112,8 @@ public class SeleniumAssert extends AbstractAssert<SeleniumAssert, Object> {
     /**
      * Constructor with CommonG and boolean.
      *
-     * @param commong
-     * @param actual
+     * @param commong common object that contains relevant execution info common object
+     * @param actual webElement used in assert
      */
     public SeleniumAssert(CommonG commong, boolean actual) {
         super(actual, SeleniumAssert.class);
@@ -124,8 +124,8 @@ public class SeleniumAssert extends AbstractAssert<SeleniumAssert, Object> {
     /**
      * Constructor with CommonG and String.
      *
-     * @param commong
-     * @param actual
+     * @param commong common object that contains relevant execution info common object
+     * @param actual webElement used in assert
      */
     public SeleniumAssert(CommonG commong, String actual) {
         super(actual, SeleniumAssert.class);
@@ -135,7 +135,7 @@ public class SeleniumAssert extends AbstractAssert<SeleniumAssert, Object> {
     /**
      * Checks a selenium WebElement.
      *
-     * @param actual
+     * @param actual webElement used in assert
      * @return SeleniumAssert
      */
     public static SeleniumAssert assertThat(WebElement actual) {
@@ -145,7 +145,7 @@ public class SeleniumAssert extends AbstractAssert<SeleniumAssert, Object> {
     /**
      * Checks a selenium a list of WebElements.
      *
-     * @param actual
+     * @param actual webElement used in assert
      * @return SeleniumAssert
      */
     public static SeleniumAssert assertThat(List<WebElement> actual) {
@@ -155,7 +155,7 @@ public class SeleniumAssert extends AbstractAssert<SeleniumAssert, Object> {
     /**
      * Checks a selenium WebDriver.
      *
-     * @param actual
+     * @param actual webElement used in assert
      * @return SeleniumAssert
      */
     public static SeleniumAssert assertThat(WebDriver actual) {
@@ -165,8 +165,8 @@ public class SeleniumAssert extends AbstractAssert<SeleniumAssert, Object> {
     /**
      * Checks a selenium WebDriver.
      *
-     * @param commong
-     * @param actual
+     * @param commong common object that contains relevant execution info
+     * @param actual webElement used in assert
      * @return SeleniumAssert
      */
     public static SeleniumAssert assertThat(CommonG commong, WebDriver actual) {
@@ -176,8 +176,8 @@ public class SeleniumAssert extends AbstractAssert<SeleniumAssert, Object> {
     /**
      * Checks a PreviousWebElements.
      *
-     * @param commong
-     * @param actual
+     * @param commong common object that contains relevant execution info
+     * @param actual webElement used in assert
      * @return SeleniumAssert
      */
     public static SeleniumAssert assertThat(CommonG commong, PreviousWebElements actual) {
@@ -187,8 +187,8 @@ public class SeleniumAssert extends AbstractAssert<SeleniumAssert, Object> {
     /**
      * Checks a selenium WebElement.
      *
-     * @param commong
-     * @param actual
+     * @param commong common object that contains relevant execution info
+     * @param actual webElement used in assert
      * @return SeleniumAssert
      */
     public static SeleniumAssert assertThat(CommonG commong, WebElement actual) {
@@ -198,8 +198,8 @@ public class SeleniumAssert extends AbstractAssert<SeleniumAssert, Object> {
     /**
      * Checks a selenium list of WebElements.
      *
-     * @param commong
-     * @param actual
+     * @param commong common object that contains relevant execution info
+     * @param actual webElement used in assert
      * @return SeleniumAssert
      */
     public static SeleniumAssert assertThat(CommonG commong, List<WebElement> actual) {
@@ -209,8 +209,8 @@ public class SeleniumAssert extends AbstractAssert<SeleniumAssert, Object> {
     /**
      * Checks a boolean.
      *
-     * @param commong
-     * @param actual
+     * @param commong common object that contains relevant execution info
+     * @param actual webElement used in assert
      * @return SeleniumAssert
      */
     public static SeleniumAssert assertThat(CommonG commong, boolean actual) {
@@ -220,8 +220,8 @@ public class SeleniumAssert extends AbstractAssert<SeleniumAssert, Object> {
     /**
      * Checks a String.
      *
-     * @param commong
-     * @param actual
+     * @param commong common object that contains relevant execution info
+     * @param actual webElement used in assert
      * @return SeleniumAssert
      */
     public static SeleniumAssert assertThat(CommonG commong, String actual) {
@@ -240,7 +240,7 @@ public class SeleniumAssert extends AbstractAssert<SeleniumAssert, Object> {
     /**
      * Checks if a webDriver or WebElement has values.
      *
-     * @param values
+     * @param values char sequence compared
      * @return SeleniumAssert
      */
     public SeleniumAssert contains(CharSequence... values) {
@@ -258,7 +258,7 @@ public class SeleniumAssert extends AbstractAssert<SeleniumAssert, Object> {
     /**
      * Checks if a WebElement is a TextField.
      *
-     * @param cond
+     * @param cond webElement used in condition
      * @return SeleniumAssert
      */
     public SeleniumAssert isTextField(Condition<WebElement> cond) {
@@ -270,9 +270,9 @@ public class SeleniumAssert extends AbstractAssert<SeleniumAssert, Object> {
 
 
     /**
-     * Checks if a List<WebElement> has at least @size elements.
+     * Checks if a {@code List<WebElement>} has at least @size elements.
      *
-     * @param size
+     * @param size integer used in size condition
      * @return SeleniumAssert
      */
     public SeleniumAssert hasAtLeast(Integer size) {
@@ -286,9 +286,9 @@ public class SeleniumAssert extends AbstractAssert<SeleniumAssert, Object> {
 
 
     /**
-     * Checks if a List<WebElement> has size @size.
+     * Checks if a {@code List<WebElement>} has size @size.
      *
-     * @param size
+     * @param size integer used in size condition
      * @return SeleniumAssert
      */
     public SeleniumAssert hasSize(Integer size) {
@@ -302,7 +302,7 @@ public class SeleniumAssert extends AbstractAssert<SeleniumAssert, Object> {
     /**
      * Checks boolean value.
      *
-     * @param value
+     * @param value boolean used in compare condition
      * @return SeleniumAssert
      */
     public SeleniumAssert isEqualTo(boolean value) {
@@ -314,7 +314,7 @@ public class SeleniumAssert extends AbstractAssert<SeleniumAssert, Object> {
     /**
      * Checks boolean value.
      *
-     * @param value
+     * @param value integer used in size condition
      * @return SeleniumAssert
      */
     public SeleniumAssert isEqualTo(String value) {
@@ -337,7 +337,7 @@ public class SeleniumAssert extends AbstractAssert<SeleniumAssert, Object> {
     /**
      * Checks string matches value.
      *
-     * @param value
+     * @param value String used in compare condition
      * @return SeleniumAssert
      */
     public SeleniumAssert matches(String value) {

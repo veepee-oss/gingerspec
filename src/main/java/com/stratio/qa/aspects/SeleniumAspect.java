@@ -50,9 +50,9 @@ public class SeleniumAspect extends BaseGSpec {
      * If an exception has thrown by selenium, this methods save a screen
      * capture.
      *
-     * @param pjp
-     * @return Object
-     * @throws Throwable
+     * @param pjp ProceedingJoinPoint
+     * @return Object object
+     * @throws Throwable exception
      */
     @Around(value = "exceptionCallPointcut()")
     public Object aroundExceptionCalls(ProceedingJoinPoint pjp)

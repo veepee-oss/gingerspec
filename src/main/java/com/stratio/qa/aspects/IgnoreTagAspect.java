@@ -50,11 +50,11 @@ public class IgnoreTagAspect {
     }
 
     /**
-     * @param pjp
-     * @param formatter
-     * @param reporter
-     * @param runtime
-     * @throws Throwable
+     * @param pjp ProceedingJoinPoint
+     * @param formatter formatter
+     * @param reporter reporter
+     * @param runtime runtime
+     * @throws Throwable exception
      */
     @Around(value = "addIgnoreTagPointcutScenario(formatter, reporter, runtime)")
     public void aroundAddIgnoreTagPointcut(ProceedingJoinPoint pjp, Formatter formatter, Reporter reporter,

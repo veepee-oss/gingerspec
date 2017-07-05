@@ -43,9 +43,9 @@ public class BrowsersDataProviderAspect extends BaseGSpec {
      * If a System property with FORCE_BROWSER exists then Methods in
      * BrowsersDataProvider will return its value.
      *
-     * @param pjp
+     * @param pjp ProceedingJoinPoint
      * @return Object
-     * @throws Throwable
+     * @throws Throwable exception
      */
     @Around(value = "availableBrowsersCallPointcut()")
     public Object availableBrowsersCalls(ProceedingJoinPoint pjp)

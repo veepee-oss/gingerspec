@@ -34,9 +34,9 @@ public class AssertJAspect {
     }
 
     /**
-     * @param pjp
+     * @param pjp ProceedingJoinPoint
      * @return AssertionError
-     * @throws Throwable
+     * @throws Throwable exception
      */
     @Around("logAssertJFailurePointcut()")
     public AssertionError aroundLogAssertJFailurePointcut(

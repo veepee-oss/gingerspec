@@ -141,9 +141,10 @@ public class ReplacementAspect {
      * - FILE: We expect it to be followed by '.' + path_to_file (relative to src/test/resources or
      * target/test-classes). The file is read and its content is returned as a string
      *
-     * @param element
+     * @param element element to be replaced
+     * @param pjp JoinPoint
      * @return String
-     * @throws Exception
+     * @throws NonReplaceableException exception
      */
     protected String replaceCodePlaceholders(String element, JoinPoint pjp) throws NonReplaceableException {
         String newVal = element;
@@ -206,13 +207,10 @@ public class ReplacementAspect {
      * Replaces every placeholded element, enclosed in !{} with the
      * corresponding attribute value in local Common class
      *
-     * @param element
+     * @param element element to be replaced
+     * @param pjp JoinPoint
      * @return String
-     * @throws ClassNotFoundException
-     * @throws NoSuchFieldException
-     * @throws SecurityException
-     * @throws IllegalArgumentException
-     * @throws IllegalAccessException
+     * @throws NonReplaceableException exception
      */
     protected String replaceReflectionPlaceholders(String element, JoinPoint pjp) throws NonReplaceableException {
         String newVal = element;
@@ -240,8 +238,10 @@ public class ReplacementAspect {
      * Replaces every placeholded element, enclosed in ${} with the
      * corresponding java property
      *
-     * @param element
+     * @param element element to be replaced
+     * @param jp JoinPoint
      * @return String
+     * @throws NonReplaceableException exception
      */
     protected String replaceEnvironmentPlaceholders(String element, JoinPoint jp) throws NonReplaceableException {
         String newVal = element;

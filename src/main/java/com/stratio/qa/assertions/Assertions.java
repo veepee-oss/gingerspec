@@ -30,8 +30,8 @@ public class Assertions extends org.assertj.core.api.Assertions {
     /**
      * Check if two WebElements are equals.
      *
-     * @param actual
-     * @return SeleniumAssert
+     * @param actual actual webElement
+     * @return SeleniumAssert assertion
      */
     public static SeleniumAssert assertThat(WebElement actual) {
         return new SeleniumAssert(actual);
@@ -45,8 +45,8 @@ public class Assertions extends org.assertj.core.api.Assertions {
     /**
      * Check if two WebDrivers are equals.
      *
-     * @param actual
-     * @return SeleniumAssert
+     * @param actual webElement
+     * @return SeleniumAssert assert
      */
     public static SeleniumAssert assertThat(WebDriver actual) {
         return new SeleniumAssert(actual);

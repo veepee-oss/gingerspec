@@ -108,7 +108,7 @@ public class MongoDBUtils {
     /**
      * Get a list of collections of a database.
      *
-     * @return Set<String>
+     * @return {@code Set<String>}
      */
     public Set<String> getMongoDBCollections() {
         return dataBase.getCollectionNames();
@@ -232,7 +232,7 @@ public class MongoDBUtils {
      *
      * @param collection
      * @param table
-     * @return List<DBObjects>
+     * @return {@code List<DBObjects>}
      */
     public List<DBObject> readFromMongoDBCollection(String collection,
                                                     DataTable table) {

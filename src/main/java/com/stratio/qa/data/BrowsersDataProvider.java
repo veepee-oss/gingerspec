@@ -47,10 +47,10 @@ public final class BrowsersDataProvider {
     /**
      * Get the browsers available in a selenium grid.
      *
-     * @param context
-     * @param testConstructor
+     * @param context context
+     * @param testConstructor testConstructor
      * @return an iterator
-     * @throws Exception
+     * @throws Exception exception
      */
     @DataProvider(parallel = true)
     public static Iterator<String[]> availableBrowsers(ITestContext context, Constructor<?> testConstructor)
@@ -66,10 +66,10 @@ public final class BrowsersDataProvider {
     /**
      * Get unique browsers available in a selenium grid.
      *
-     * @param context
-     * @param testConstructor
+     * @param context context
+     * @param testConstructor testConstructor
      * @return an iterator
-     * @throws Exception
+     * @throws Exception exception
      */
     @DataProvider(parallel = true)
     public static Iterator<String[]> availableUniqueBrowsers(ITestContext context, Constructor<?> testConstructor)
@@ -89,8 +89,8 @@ public final class BrowsersDataProvider {
     /**
      * Get the browsers available with "iOS" as platformName in a selenium grid.
      *
-     * @param context
-     * @param testConstructor
+     * @param context context
+     * @param testConstructor testConstructor
      * @return an iterator
      * @throws Exception
      */
@@ -108,8 +108,8 @@ public final class BrowsersDataProvider {
     /**
      * Get the browsers available with "Android" or "iOS" as platformName in a selenium grid.
      *
-     * @param context
-     * @param testConstructor
+     * @param context context
+     * @param testConstructor testConstructor
      * @return an iterator
      * @throws Exception
      */
@@ -127,7 +127,7 @@ public final class BrowsersDataProvider {
     /**
      * Build an String Iterator from String List.
      *
-     * @param browsers
+     * @param browsers browsers
      * @return an iterator
      */
     private static Iterator<String[]> buildIterator(List<String> browsers) {
@@ -149,7 +149,7 @@ public final class BrowsersDataProvider {
      * Return available grid browsers applying filter defined by Map content.
      * Filter -> Regexp as: "filter.key()=filter.value(key)[,|}]"
      *
-     * @param filter
+     * @param filter browser selected for test execution
      * @return browsers list
      */
     private static List<String> gridBrowsers(Map<String, String> filter) {

@@ -27,7 +27,7 @@ public final class SeleniumExtractor implements Extractor<WebElement, String> {
     /**
      * Get selenium extractor.
      *
-     * @return Extractor<WebElement, String>
+     * @return {@code Extractor<WebElement, String>}
      */
     public static Extractor<WebElement, String> linkText() {
         return new SeleniumExtractor();

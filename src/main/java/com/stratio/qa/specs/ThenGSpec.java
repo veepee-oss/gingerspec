@@ -41,7 +41,7 @@ import static com.stratio.qa.assertions.Assertions.assertThat;
 
 /**
  * Generic Then Specs.
- * @see <a href="ThenGSpec-annotations.html">Then Steps & Matching Regex</a>
+ * @see <a href="ThenGSpec-annotations.html">Then Steps &amp; Matching Regex</a>
  */
 public class ThenGSpec extends BaseGSpec {
 

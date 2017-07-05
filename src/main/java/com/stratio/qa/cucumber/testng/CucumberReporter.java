@@ -121,9 +121,9 @@ public class CucumberReporter implements Formatter, Reporter {
     /**
      * Constructor of cucumberReporter.
      *
-     * @param url
-     * @param cClass
-     * @throws IOException
+     * @param url url
+     * @param cClass class
+     * @throws IOException exception
      */
     public CucumberReporter(String url, String cClass, String additional) throws IOException {
         this.url = url;
@@ -421,8 +421,7 @@ public class CucumberReporter implements Formatter, Reporter {
         /**
          * Checks the passed by ticket parameter validity against a Attlasian Jira account
          *
-         * @param ticket
-
+         * @param ticket Jira ticket
          */
         private boolean isValidJiraTicket (String ticket) {
             String userJira = System.getProperty("usernamejira");
@@ -470,10 +469,15 @@ public class CucumberReporter implements Formatter, Reporter {
          * Builds a test result xml document, builds exception messages on non valid ignore causes such as
          * \@tillfixed without an in progress Stratio's Jira ticker
          *
-         * @param doc
-         * @param element
-         * @param position
-         * @param tags
+         * @param doc report document
+         * @param element scenario execution result
+         * @param position position of element in document
+         * @param tags tags that performs conditional inclusion of element
+         * @param docJunit docJunit report document
+         * @param Junit Junit scenario execution result
+         * @throws ExecutionException exception
+         * @throws InterruptedException exception
+         * @throws IOException exception
          */
         public void finish(Document doc, Element element, Integer position, List<Tag> tags, Document docJunit,
                            Element Junit) throws ExecutionException, InterruptedException, IOException {

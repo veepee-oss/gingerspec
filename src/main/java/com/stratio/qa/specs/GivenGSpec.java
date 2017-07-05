@@ -40,7 +40,7 @@ import static com.stratio.qa.assertions.Assertions.assertThat;
 
 /**
  * Generic Given Specs.
- * @see <a href="GivenGSpec-annotations.html">Given Steps & Matching Regex</a>
+ * @see <a href="GivenGSpec-annotations.html">Given Steps &amp; Matching Regex</a>
  */
 public class GivenGSpec extends BaseGSpec {
 
@@ -51,7 +51,7 @@ public class GivenGSpec extends BaseGSpec {
     /**
      * Generic constructor.
      *
-     * @param spec
+     * @param spec object
      */
     public GivenGSpec(CommonG spec) {
         this.commonspec = spec;
@@ -65,7 +65,7 @@ public class GivenGSpec extends BaseGSpec {
      * @param table      the table where index will be created.
      * @param column     the column where index will be saved
      * @param keyspace   keyspace used
-     * @throws Exception
+     * @throws Exception exception
      */
     @Given("^I create a Cassandra index named '(.+?)' in table '(.+?)' using magic_column '(.+?)' using keyspace '(.+?)'$")
     public void createBasicMapping(String index_name, String table, String column, String keyspace) throws Exception {
@@ -76,7 +76,7 @@ public class GivenGSpec extends BaseGSpec {
     /**
      * Create a Cassandra Keyspace.
      *
-     * @param keyspace
+     * @param keyspace cassandra keyspace
      */
     @Given("^I create a Cassandra keyspace named '(.+)'$")
     public void createCassandraKeyspace(String keyspace) {
@@ -113,14 +113,14 @@ public class GivenGSpec extends BaseGSpec {
     /**
      * Connect to ElasticSearch using custom parameters
      *
-     * @param host
-     * @param foo
-     * @param nativePort
-     * @param bar
-     * @param clusterName
-     * @throws DBException
-     * @throws UnknownHostException
-     * @throws NumberFormatException
+     * @param host ES host
+     * @param foo regex needed to match method
+     * @param nativePort ES port
+     * @param bar regex needed to match method
+     * @param clusterName ES clustername
+     * @throws DBException exception
+     * @throws UnknownHostException exception
+     * @throws NumberFormatException exception
      */
     @Given("^I connect to Elasticsearch cluster at host '(.+?)'( using native port '(.+?)')?( using cluster name '(.+?)')?$")
     public void connectToElasticSearch(String host, String foo, String nativePort, String bar, String clusterName) throws DBException, UnknownHostException, NumberFormatException {
@@ -143,10 +143,9 @@ public class GivenGSpec extends BaseGSpec {
     /**
      * Create table
      *
-     * @param table
-     * @param datatable
-     * @param keyspace
-     * @throws Exception
+     * @param table Cassandra table
+     * @param datatable datatable used for parsing elements
+     * @param keyspace Cassandra keyspace
      */
     @Given("^I create a Cassandra table named '(.+?)' using keyspace '(.+?)' with:$")
     public void createTableWithData(String table, String keyspace, DataTable datatable) {
@@ -177,10 +176,9 @@ public class GivenGSpec extends BaseGSpec {
     /**
      * Insert Data
      *
-     * @param table
-     * @param datatable
-     * @param keyspace
-     * @throws Exception
+     * @param table Cassandra table
+     * @param datatable datatable used for parsing elements
+     * @param keyspace Cassandra keyspace
      */
     @Given("^I insert in keyspace '(.+?)' and table '(.+?)' with:$")
     public void insertData(String keyspace, String table, DataTable datatable) {
@@ -218,14 +216,14 @@ public class GivenGSpec extends BaseGSpec {
      * @param position position from a search result
      * @param element  key in the json response to be saved
      * @param envVar   thread environment variable where to store the value
-     * @throws IllegalAccessException
-     * @throws IllegalArgumentException
-     * @throws SecurityException
-     * @throws NoSuchFieldException
-     * @throws ClassNotFoundException
-     * @throws InstantiationException
-     * @throws InvocationTargetException
-     * @throws NoSuchMethodException
+     * @throws IllegalAccessException exception
+     * @throws IllegalArgumentException exception
+     * @throws SecurityException exception
+     * @throws NoSuchFieldException exception
+     * @throws ClassNotFoundException exception
+     * @throws InstantiationException exception
+     * @throws InvocationTargetException exception
+     * @throws NoSuchMethodException exception
      */
     @Given("^I save element (in position \'(.+?)\' in )?\'(.+?)\' in environment variable \'(.+?)\'$")
     public void saveElementEnvironment(String foo, String position, String element, String envVar) throws Exception {
@@ -267,14 +265,14 @@ public class GivenGSpec extends BaseGSpec {
      * @param host   elasticsearch connection
      * @param port   elasticsearch port
      * @param envVar thread variable where to store the value
-     * @throws IllegalAccessException
-     * @throws IllegalArgumentException
-     * @throws SecurityException
-     * @throws NoSuchFieldException
-     * @throws ClassNotFoundException
-     * @throws InstantiationException
-     * @throws InvocationTargetException
-     * @throws NoSuchMethodException
+     * @throws IllegalAccessException exception
+     * @throws IllegalArgumentException exception
+     * @throws SecurityException exception
+     * @throws NoSuchFieldException exception
+     * @throws ClassNotFoundException exception
+     * @throws InstantiationException exception
+     * @throws InvocationTargetException exception
+     * @throws NoSuchMethodException exception
      */
     @Given("^I obtain elasticsearch cluster name in '([^:]+?)(:.+?)?' and save it in variable '(.+?)'?$")
     public void saveElasticCluster(String host, String port, String envVar) throws Exception {
@@ -313,7 +311,7 @@ public class GivenGSpec extends BaseGSpec {
     /**
      * Drop an specific index of ElasticSearch.
      *
-     * @param index
+     * @param index ES index
      */
     @Given("^I drop an elasticsearch index named '(.+?)'$")
     public void dropElasticsearchIndex(String index) {
@@ -323,7 +321,7 @@ public class GivenGSpec extends BaseGSpec {
     /**
      * Drop a Cassandra Keyspace.
      *
-     * @param keyspace
+     * @param keyspace Cassandra keyspace
      */
     @Given("^I drop a Cassandra keyspace '(.+)'$")
     public void dropCassandraKeyspace(String keyspace) {
@@ -333,7 +331,7 @@ public class GivenGSpec extends BaseGSpec {
     /**
      * Create a MongoDB dataBase.
      *
-     * @param databaseName
+     * @param databaseName Mongo database
      */
     @Given("^I create a MongoDB dataBase '(.+?)'$")
     public void createMongoDBDataBase(String databaseName) {
@@ -344,7 +342,7 @@ public class GivenGSpec extends BaseGSpec {
     /**
      * Drop MongoDB Database.
      *
-     * @param databaseName
+     * @param databaseName mongo database
      */
     @Given("^I drop a MongoDB database '(.+?)'$")
     public void dropMongoDBDataBase(String databaseName) {
@@ -354,9 +352,9 @@ public class GivenGSpec extends BaseGSpec {
     /**
      * Insert data in a MongoDB table.
      *
-     * @param dataBase
-     * @param tabName
-     * @param table
+     * @param dataBase Mongo database
+     * @param tabName Mongo table
+     * @param table Datatable used for insert elements
      */
     @Given("^I insert into a MongoDB database '(.+?)' and table '(.+?)' this values:$")
     public void insertOnMongoTable(String dataBase, String tabName, DataTable table) {
@@ -367,8 +365,8 @@ public class GivenGSpec extends BaseGSpec {
     /**
      * Truncate table in MongoDB.
      *
-     * @param database
-     * @param table
+     * @param database Mongo database
+     * @param table Mongo table
      */
     @Given("^I drop every document at a MongoDB database '(.+?)' and table '(.+?)'")
     public void truncateTableInMongo(String database, String table) {
@@ -379,8 +377,8 @@ public class GivenGSpec extends BaseGSpec {
     /**
      * Browse to {@code url} using the current browser.
      *
-     * @param path
-     * @throws Exception
+     * @param path path of running app
+     * @throws Exception exception
      */
     @Given("^I( securely)? browse to '(.+?)'$")
     public void seleniumBrowse(String isSecured, String path) throws Exception {
@@ -407,8 +405,8 @@ public class GivenGSpec extends BaseGSpec {
     /**
      * Set app host and port {@code host, @code port}
      *
-     * @param host
-     * @param port
+     * @param host host where app is running
+     * @param port port where app is running
      */
     @Given("^My app is running in '([^:]+?)(:.+?)?'$")
     public void setupApp(String host, String port) {
@@ -427,8 +425,8 @@ public class GivenGSpec extends BaseGSpec {
     /**
      * Send requests to {@code restHost @code restPort}.
      *
-     * @param restHost
-     * @param restPort
+     * @param restHost host where api is running
+     * @param restPort port where api is running
      */
     @Given("^I( securely)? send requests to '([^:]+?)(:.+?)?'$")
     public void setupRestClient(String isSecured, String restHost, String restPort) {
@@ -480,7 +478,10 @@ public class GivenGSpec extends BaseGSpec {
     /**
      * Swith to the iFrame where id matches idframe
      *
-     * @param idframe
+     * @param idframe iframe to swith to
+     * @throws IllegalAccessException exception
+     * @throws NoSuchFieldException exception
+     * @throws ClassNotFoundException exception
      */
     @Given("^I switch to iframe with '([^:]*?):([^:]*?)'$")
     public void seleniumIdFrame(String method, String idframe) throws IllegalAccessException, NoSuchFieldException, ClassNotFoundException {
@@ -510,13 +511,14 @@ public class GivenGSpec extends BaseGSpec {
     }
 
 
-    /*
+    /**
      * Opens a ssh connection to remote host
      *
-     * @param remoteHost
-     * @param user
+     * @param remoteHost remote host
+     * @param user remote user
      * @param password (required if pemFile null)
      * @param pemFile (required if password null)
+     * @throws Exception exception
      *
      */
     @Given("^I open a ssh connection to '(.+?)' with user '(.+?)'( and password '(.+?)')?( using pem file '(.+?)')?$")
@@ -538,14 +540,16 @@ public class GivenGSpec extends BaseGSpec {
     }
 
 
-    /*
+    /**
     * Authenticate in a DCOS cluster
     *
-    * @param remoteHost
-    * @param email
-    * @param user
+    * @param remoteHost remote host
+    * @param email email for JWT singing
+    * @param user remote user
     * @param password (required if pemFile null)
     * @param pemFile (required if password null)
+    * @throws Exception exception
+    *
     *
     */
     @Given("^I authenticate to DCOS cluster '(.+?)' using email '(.+?)'( with user '(.+?)'( and password '(.+?)'| and pem file '(.+?)'))?$")
@@ -572,11 +576,12 @@ public class GivenGSpec extends BaseGSpec {
         commonspec.setCookies(cookieList);
     }
 
-    /*
+    /**
      * Copies file/s from remote system into local system
      *
-     * @param remotePath
-     * @param localPath
+     * @param remotePath path where file is going to be copy
+     * @param localPath path where file is located
+     * @throws Exception exception
      *
      */
     @Given("^I inbound copy '(.+?)' through a ssh connection to '(.+?)'$")
@@ -585,12 +590,12 @@ public class GivenGSpec extends BaseGSpec {
     }
 
 
-    /*
+    /**
      * Copies file/s from local system to remote system
      *
-     * @param localPath
-     * @param remotePath
-     *
+     * @param remotePath path where file is going to be copy
+     * @param localPath path where file is located
+     * @throws Exception exception
      */
     @Given("^I outbound copy '(.+?)' through a ssh connection to '(.+?)'$")
     public void copyToRemoteFile(String localPath, String remotePath) throws Exception {
@@ -601,7 +606,12 @@ public class GivenGSpec extends BaseGSpec {
     /**
      * Executes the command specified in local system
      *
-     * @param command
+     * @param command command to be run locally
+     * @param foo regex needed to match method
+     * @param exitStatus command exit status
+     * @param bar regex needed to match method
+     * @param envVar environment variable name
+     * @throws Exception exception
      **/
     @Given("^I run '(.+?)' locally( with exit status '(.+?)')?( and save the value in environment variable '(.+?)')?$")
     public void executeLocalCommand(String command, String foo, Integer exitStatus, String bar, String envVar) throws Exception {
@@ -618,7 +628,12 @@ public class GivenGSpec extends BaseGSpec {
     /**
      * Executes the command specified in remote system
      *
-     * @param command
+     * @param command command to be run locally
+     * @param foo regex needed to match method
+     * @param exitStatus command exit status
+     * @param bar regex needed to match method
+     * @param envVar environment variable name
+     * @throws Exception exception
      **/
     @Given("^I run '(.+?)' in the ssh connection( with exit status '(.+?)')?( and save the value in environment variable '(.+?)')?$")
     public void executeCommand(String command, String foo, Integer exitStatus, String bar, String envVar) throws Exception {
@@ -639,9 +654,9 @@ public class GivenGSpec extends BaseGSpec {
     /**
      * Insert document in a MongoDB table.
      *
-     * @param dataBase
-     * @param collection
-     * @param document
+     * @param dataBase Mongo database
+     * @param collection Mongo collection
+     * @param document document used for schema
      */
     @Given("^I insert into MongoDB database '(.+?)' and collection '(.+?)' the document from schema '(.+?)'$")
     public void insertOnMongoTable(String dataBase, String collection, String document) throws Exception {
@@ -666,6 +681,7 @@ public class GivenGSpec extends BaseGSpec {
      * Connect to zookeeper.
      *
      * @param zookeeperHosts as host:port (comma separated)
+     * @throws InterruptedException exception
      */
     @Given("^I connect to Zookeeper at '(.+)'$")
     public void connectToZk(String zookeeperHosts) throws InterruptedException {
@@ -687,8 +703,9 @@ public class GivenGSpec extends BaseGSpec {
     /**
      * Connect to Kafka.
      *
-     * @param zkHost
-     * @param zkPath
+     * @param zkHost ZK host
+     * @param zkPath ZK port
+     * @throws UnknownHostException exception
      */
     @Given("^I connect to kafka at '(.+)' using path '(.+)'$")
     public void connectKafka(String zkHost, String zkPath) throws UnknownHostException {

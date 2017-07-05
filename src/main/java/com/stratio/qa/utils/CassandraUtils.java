@@ -120,7 +120,7 @@ public class CassandraUtils {
      * Get the metadata of the Cassandra Cluster.
      *
      * @return Metadata
-     * @throws Exception
+     * @throws DBException
      */
     public Metadata getMetadata() throws DBException {
         if (!this.cluster.isClosed()) {
@@ -213,7 +213,7 @@ public class CassandraUtils {
     /**
      * Get a list of the existing keyspaces in Cassandra.
      *
-     * @return List<String>
+     * @return {@code List<String>}
      */
     public List<String> getKeyspaces() {
         ArrayList<String> result = new ArrayList<String>();
@@ -281,7 +281,7 @@ public class CassandraUtils {
      * Get tables of a keyspace.
      *
      * @param keyspace
-     * @return List<String>
+     * @return {@code List<String>}
      */
     public List<String> getTables(String keyspace) {
         ArrayList<String> result = new ArrayList<String>();

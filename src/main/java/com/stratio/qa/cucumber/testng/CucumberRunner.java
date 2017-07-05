@@ -51,14 +51,14 @@ public class CucumberRunner {
     /**
      * Default constructor for cucumber Runner.
      *
-     * @param clazz
-     * @param feature
-     * @throws IOException
-     * @throws ClassNotFoundException
-     * @throws InstantiationException
-     * @throws IllegalAccessException
-     * @throws NoSuchMethodException
-     * @throws InvocationTargetException
+     * @param clazz class
+     * @param feature feature to execute
+     * @throws IOException exception
+     * @throws ClassNotFoundException exception
+     * @throws InstantiationException exception
+     * @throws IllegalAccessException exception
+     * @throws NoSuchMethodException exception
+     * @throws InvocationTargetException exception
      */
     @SuppressWarnings("unused")
     public CucumberRunner(Class<?> clazz, String... feature) throws IOException, ClassNotFoundException,
@@ -131,7 +131,10 @@ public class CucumberRunner {
     /**
      * Run the testclases(Features).
      *
-     * @throws IOException
+     * @throws IOException exception
+     * @throws NoSuchMethodException exception
+     * @throws InvocationTargetException exception
+     * @throws IllegalAccessException exception
      */
     public void runCukes() throws IOException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
 

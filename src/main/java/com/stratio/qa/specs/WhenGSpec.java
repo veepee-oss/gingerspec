@@ -49,7 +49,7 @@ import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
 /**
  * Generic When Specs.
- * @see <a href="WhenGSpec-annotations.html">When Steps & Matching Regex</a>
+ * @see <a href="WhenGSpec-annotations.html">When Steps &amp; Matching Regex</a>
  */
 public class WhenGSpec extends BaseGSpec {
 
@@ -239,7 +239,9 @@ public class WhenGSpec extends BaseGSpec {
      * @param type          element to read from file (element should contain a json)
      * @param modifications DataTable containing the modifications to be done to the
      *                      base schema element. Syntax will be:
+     *                      {@code
      *                      | <key path> | <type of modification> | <new value> |
+     *                      }
      *                      where:
      *                      key path: path to the key to be modified
      *                      type of modification: DELETE|ADD|UPDATE
@@ -384,7 +386,6 @@ public class WhenGSpec extends BaseGSpec {
      * @param magic_column  magic column where index will be saved. If you don't need index, you can add the word "empty"
      * @param keyspace      keyspace used
      * @param modifications all data in "where" clause. Where schema is "empty", query has not a where clause. So it is necessary to provide an empty table. Example:  ||.
-     * @throws Exception
      */
     @When("^I execute a query over fields '(.+?)' with schema '(.+?)' of type '(json|string)' with magic_column '(.+?)' from table: '(.+?)' using keyspace: '(.+?)' with:$")
     public void sendQueryOfType(String fields, String schema, String type, String magic_column, String table, String keyspace, DataTable modifications) {
@@ -735,7 +736,9 @@ public class WhenGSpec extends BaseGSpec {
      * @param modifications DataTable containing the modifications to be done to the base schema element
      *                      <p>
      *                      - Syntax will be:
+     *                      {@code
      *                      | <key path> | <type of modification> | <new value> |
+     *                      }
      *                      for DELETE/ADD/UPDATE/APPEND/PREPEND
      *                      where:
      *                      key path: path to the key to be modified
@@ -743,7 +746,9 @@ public class WhenGSpec extends BaseGSpec {
      *                      new value: new value to be used
      *                      <p>
      *                      - Or:
+     *                      {@code
      *                      | <key path> | <type of modification> | <new value> | <new value type> |
+     *                      }
      *                      for REPLACE
      *                      where:
      *                      key path: path to the key to be modified
