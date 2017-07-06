@@ -12,6 +12,7 @@ hose {
     FOSS = true
     BUILDTOOL = 'maven'
     BUILDTOOLVERSION = '3.5.0'
+    FORCETICKETONPRS = true
 
     ITSERVICES = [
         ['ZOOKEEPER': [

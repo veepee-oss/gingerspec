@@ -16,7 +16,7 @@ Stratio Acceptance Test library
 Testing runtime to rule over Stratio's acceptance tests
 
 
-[Javadoc always live](http://stratiodocs.s3.amazonaws.com/bdt/0.6.0-SNAPSHOT/index.html)
+[Javadoc always live](http://stratiodocs.s3.amazonaws.com/bdt/index.html)
 
 
 
