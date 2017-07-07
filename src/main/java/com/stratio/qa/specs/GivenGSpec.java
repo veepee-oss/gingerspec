@@ -20,6 +20,7 @@ import com.auth0.jwt.JWTSigner;
 import com.ning.http.client.Response;
 import com.ning.http.client.cookie.Cookie;
 import com.stratio.qa.exceptions.DBException;
+import com.stratio.qa.utils.GosecSSOUtils;
 import com.stratio.qa.utils.RemoteSSHConnection;
 import com.stratio.qa.utils.ThreadProperty;
 import cucumber.api.DataTable;
@@ -29,7 +30,6 @@ import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
-import java.net.MalformedURLException;
 import java.net.UnknownHostException;
 import java.util.*;
 import java.util.concurrent.Future;
@@ -577,6 +577,34 @@ public class GivenGSpec extends BaseGSpec {
     }
 
     /**
+     * Generate token to authenticate in gosec SSO
+     * @param ssoHost current sso host
+     * @param userName username
+     * @param passWord password
+     * @throws Exception exception
+     */
+    @Given("^I set sso token using host '(.+?)' with user '(.+?)' and password '(.+?)'$")
+    public void setGoSecSSOCookie(String ssoHost, String userName, String passWord) throws Exception {
+        HashMap<String, String> ssoCookies = new GosecSSOUtils(ssoHost, userName, passWord).ssoTokenGenerator();
+        String[] tokenList = {"user", "dcos-acs-auth-cookie"};
+        List<Cookie> cookiesAtributes = addSsoToken(ssoCookies, tokenList);
+
+        commonspec.setCookies(cookiesAtributes);
+    }
+
+    public List<Cookie> addSsoToken(HashMap<String, String> ssoCookies, String[] tokenList) {
+        List<Cookie> cookiesAttributes = new ArrayList<>();
+
+        for (String tokenKey : tokenList) {
+            cookiesAttributes.add(new Cookie(tokenKey, ssoCookies.get(tokenKey),
+                    false, null,
+                    null, 999999, false, false));
+        }
+        return cookiesAttributes;
+    }
+
+
+    /*
      * Copies file/s from remote system into local system
      *
      * @param remotePath path where file is going to be copy
