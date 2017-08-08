@@ -166,9 +166,7 @@ public class LoopIncludeTagAspect {
 
             }
             nwsource += lines.get(lineOriginalFeature) + "\n";
-            logger.debug("New line written into source:\n" + lines.get(lineOriginalFeature));
         }
-        logger.debug("Final feature source: \n" + nwsource);
         return nwsource;
     }
 
