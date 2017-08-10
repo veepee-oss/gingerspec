@@ -51,6 +51,7 @@
         <logger name="org.elasticsearch.plugins" level="WARN"/>
         <logger name="com.datastax.driver.core" level="OFF"/>
         <logger name="kafka.admin" level="OFF"/>
+        <logger name="org.elasticsearch.client.transport" level="OFF"/>
         <logger name="com.ning.http.client.AsyncHttpClientAsyncHttpClient" level="ERROR"/>
 
     </Loggers>

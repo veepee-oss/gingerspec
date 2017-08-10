@@ -715,7 +715,7 @@ public class WhenGSpec extends BaseGSpec {
      */
     @When("^I send a message '(.+?)' to the kafka topic named '(.+?)'")
     public void sendAMessage(String message, String topic_name) throws Exception {
-        commonspec.getKafkaUtils().sendMessage(topic_name, message);
+        commonspec.getKafkaUtils().sendMessage(message, topic_name);
     }
 
     /**

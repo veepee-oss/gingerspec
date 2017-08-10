@@ -619,23 +619,19 @@ public class ThenGSpec extends BaseGSpec {
      * @param zNode    path at zookeeper
      * @param document expected content of znode
      */
-    @Then("^the  zNode '(.+?)' exists( and contains '(.+?)')?$")
+    @Then("^the zNode '(.+?)' exists( and contains '(.+?)')?$")
     public void checkZnodeExists(String zNode, String foo, String document)  throws Exception {
         if (document == null) {
             String breakpoint = commonspec.getZookeeperSecClient().zRead(zNode);
-            Assertions.assertThat(commonspec.getZookeeperSecClient().zRead(zNode))
-                    .withFailMessage("The zNode does not exist")
-                    .as("zNode exists").isEqualTo("");
+            assert breakpoint.equals("") : "The zNode does not exist";
         } else {
-            Assertions.assertThat(commonspec.getZookeeperSecClient().zRead(zNode))
-                    .withFailMessage("The zNode does not exist or the content does not match")
-                    .as("ZNode contains {} ", document).contains(document);
+            assert commonspec.getZookeeperSecClient().zRead(zNode).contains(document) : "The zNode does not exist or the content does not match";
         }
     }
 
     @Then("^the zNode '(.+?)' does not exist")
     public void checkZnodeNotExist(String zNode) throws Exception {
-        Assertions.assertThat(!commonspec.getZookeeperSecClient().exists(zNode)).withFailMessage("The zNode exists");
+        assert !commonspec.getZookeeperSecClient().exists(zNode) : "The zNode exists";
     }
 
     /**
@@ -645,7 +641,7 @@ public class ThenGSpec extends BaseGSpec {
      */
     @Then("^A kafka topic named '(.+?)' exists")
     public void kafkaTopicExist(String topic_name) throws KeeperException, InterruptedException {
-        Assertions.assertThat(commonspec.getKafkaUtils().listTopics().contains(topic_name)).withFailMessage("There is no topic with that name");
+        assert commonspec.getKafkaUtils().getZkUtils().pathExists("/" + topic_name) : "There is no topic with that name";
     }
 
     /**
@@ -653,9 +649,9 @@ public class ThenGSpec extends BaseGSpec {
      *
      * @param topic_name name of topic
      */
-    @Then("^A kafka topic named '(.+?)' not exists")
+    @Then("^A kafka topic named '(.+?)' does not exist")
     public void kafkaTopicNotExist(String topic_name) throws KeeperException, InterruptedException {
-        Assertions.assertThat(!commonspec.getKafkaUtils().listTopics().contains(topic_name)).withFailMessage("There is no topic with that name");
+        assert !commonspec.getKafkaUtils().getZkUtils().pathExists("/" + topic_name) : "There is a topic with that name";
     }
 
 
@@ -702,8 +698,7 @@ public class ThenGSpec extends BaseGSpec {
      */
     @Then("^An elasticsearch index named '(.+?)' exists")
     public void elasticSearchIndexExist(String indexName) {
-        Assertions.assertThat(commonspec.getElasticSearchClient().indexExists(indexName)).isTrue()
-                .withFailMessage("There is no index with that name");
+        assert (commonspec.getElasticSearchClient().indexExists(indexName)) : "There is no index with that name";
     }
 
     /**
@@ -713,8 +708,7 @@ public class ThenGSpec extends BaseGSpec {
      */
     @Then("^An elasticsearch index named '(.+?)' does not exist")
     public void elasticSearchIndexDoesNotExist(String indexName) {
-        Assertions.assertThat(commonspec.getElasticSearchClient().indexExists(indexName)).isFalse()
-                .withFailMessage("There is an index with that name");
+        assert !commonspec.getElasticSearchClient().indexExists(indexName) : "There is an index with that name";
     }
 
     /**
@@ -778,7 +772,7 @@ public class ThenGSpec extends BaseGSpec {
 
     @Then("^The kafka topic '(.*?)' has a message containing '(.*?)'$")
     public void checkMessages(String topic, String content) {
-        Assertions.assertThat(commonspec.getKafkaUtils().readTopicFromBeginning(topic).contains(content)).as("Topic {} contains {}", topic, content).withFailMessage("{} not found", content);
+        assert commonspec.getKafkaUtils().readTopicFromBeginning(topic).contains(content) : "Topic does not exist or the content does not match";
     }
 
     /**

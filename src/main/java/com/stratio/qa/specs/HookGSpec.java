@@ -189,14 +189,4 @@ public class HookGSpec extends BaseGSpec {
             commonspec.getRemoteSSHConnection().getSession().disconnect();
         }
     }
-
-    @After(order = 10)
-    public void zkConnectionTeardown() throws Exception {
-        if (!"".equals(System.getProperty("ZOOKEEPER_HOSTS", ""))) {
-            commonspec.getLogger().debug("Closing zookeeper connection");
-            if (commonspec.getZookeeperSecClient().isConnected()) {
-                commonspec.getZookeeperSecClient().disconnect();
-            }
-        }
-    }
 }
