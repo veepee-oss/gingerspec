@@ -116,4 +116,20 @@ public class ReplacementAspectTest {
         assertThat(repAspect.replaceReflectionPlaceholders(repAspect.replaceEnvironmentPlaceholders("${STRATIOBDD_ENV2}:!{STRATIOBDD_LOCAL1}", pjp), pjp))
                 .as("Unexpected replacement").isEqualTo("aa:LOCAL");
     }
+
+    @Test
+    public void replaceDefaultValue() throws Exception {
+        ThreadProperty.set("class", this.getClass().getCanonicalName());
+        ProceedingJoinPoint pjp = null;
+        ReplacementAspect repAspect = new ReplacementAspect();
+        System.setProperty("STRATIOBDD_ENV1", "aa");
+        System.setProperty("STRATIOBDD_ENV3", "cc");
+
+        assertThat(repAspect.replaceEnvironmentPlaceholders("${STRATIOBDD_ENV1:-bb}", pjp)).as("Unexpected replacement").isEqualTo("aa");
+        assertThat(repAspect.replaceEnvironmentPlaceholders("${STRATIOBDD_ENV2:-bb}", pjp)).as("Unexpected replacement").isEqualTo("bb");
+        assertThat(repAspect.replaceEnvironmentPlaceholders("${STRATIOBDD_ENV2:-bb}${STRATIOBDD_ENV4:-dd}", pjp)).as("Unexpected replacement").isEqualTo("bbdd");
+        assertThat(repAspect.replaceEnvironmentPlaceholders("${STRATIOBDD_ENV2:-bb}${STRATIOBDD_ENV1}", pjp)).as("Unexpected replacement").isEqualTo("bbaa");
+        assertThat(repAspect.replaceEnvironmentPlaceholders("${STRATIOBDD_ENV1}${STRATIOBDD_ENV2:-bb}", pjp)).as("Unexpected replacement").isEqualTo("aabb");
+        assertThat(repAspect.replaceEnvironmentPlaceholders("${STRATIOBDD_ENV1}${STRATIOBDD_ENV2:-bb}${STRATIOBDD_ENV3}", pjp)).as("Unexpected replacement").isEqualTo("aabbcc");
+    }
 }

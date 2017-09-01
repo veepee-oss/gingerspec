@@ -250,15 +250,31 @@ public class ReplacementAspect {
                     newVal.indexOf("}", newVal.indexOf("${")) + 1);
             String modifier = "";
             String sysProp;
+            String defaultValue = "";
+            String prop;
+
+            if (placeholder.contains(":-")) {
+                defaultValue = placeholder.substring(placeholder.indexOf(":-") + 2,
+                        placeholder.length() - 1);
+            }
+
             if (placeholder.contains(".")) {
                 sysProp = placeholder.substring(2, placeholder.indexOf("."));
                 modifier = placeholder.substring(placeholder.indexOf(".") + 1,
                         placeholder.length() - 1);
             } else {
-                sysProp = placeholder.substring(2, placeholder.length() - 1);
+                if (defaultValue.isEmpty()) {
+                    sysProp = placeholder.substring(2, placeholder.length() - 1);
+                } else {
+                    sysProp = placeholder.substring(2, placeholder.indexOf(":-"));
+                }
             }
 
-            String prop = System.getProperty(sysProp);
+            if (defaultValue.isEmpty()) {
+                prop = System.getProperty(sysProp);
+            } else {
+                prop = System.getProperty(sysProp, defaultValue);
+            }
 
             if (prop == null && (jp.getThis() instanceof CucumberReporter.TestMethod)) {
                 return element;
