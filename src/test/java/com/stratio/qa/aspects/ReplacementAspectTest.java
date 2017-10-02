@@ -131,5 +131,11 @@ public class ReplacementAspectTest {
         assertThat(repAspect.replaceEnvironmentPlaceholders("${STRATIOBDD_ENV2:-bb}${STRATIOBDD_ENV1}", pjp)).as("Unexpected replacement").isEqualTo("bbaa");
         assertThat(repAspect.replaceEnvironmentPlaceholders("${STRATIOBDD_ENV1}${STRATIOBDD_ENV2:-bb}", pjp)).as("Unexpected replacement").isEqualTo("aabb");
         assertThat(repAspect.replaceEnvironmentPlaceholders("${STRATIOBDD_ENV1}${STRATIOBDD_ENV2:-bb}${STRATIOBDD_ENV3}", pjp)).as("Unexpected replacement").isEqualTo("aabbcc");
+        assertThat(repAspect.replaceEnvironmentPlaceholders("${STRATIOBDD_ENV1.toUpper}${STRATIOBDD_ENV2:-bb}${STRATIOBDD_ENV3}", pjp)).as("Unexpected replacement").isEqualTo("AAbbcc");
+        assertThat(repAspect.replaceEnvironmentPlaceholders("${STRATIOBDD_ENV1}${STRATIOBDD_ENV2.toUpper:-bb}${STRATIOBDD_ENV3}", pjp)).as("Unexpected replacement").isEqualTo("aaBBcc");
+        assertThat(repAspect.replaceEnvironmentPlaceholders("${STRATIOBDD_ENV1}${STRATIOBDD_ENV2:-bb}${STRATIOBDD_ENV3:-aa}", pjp)).as("Unexpected replacement").isEqualTo("aabbcc");
+        assertThat(repAspect.replaceEnvironmentPlaceholders("${STRATIOBDD_ENV1}${STRATIOBDD_ENV2:-bb}${STRATIOBDD_ENV3.toUpper:-aa}", pjp)).as("Unexpected replacement").isEqualTo("aabbCC");
+        assertThat(repAspect.replaceEnvironmentPlaceholders("${STRATIOBDD_ENV1}${STRATIOBDD_ENV2:-bb.bb}${STRATIOBDD_ENV3:-aa}", pjp)).as("Unexpected replacement").isEqualTo("aabb.bbcc");
+        assertThat(repAspect.replaceEnvironmentPlaceholders("${STRATIOBDD_ENV1}${STRATIOBDD_ENV2:-bb}${STRATIOBDD_ENV3:-aa.aa}", pjp)).as("Unexpected replacement").isEqualTo("aabbcc");
     }
 }
