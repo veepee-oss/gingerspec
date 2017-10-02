@@ -20,7 +20,7 @@ import com.stratio.qa.utils.BaseGTest;
 import cucumber.api.CucumberOptions;
 import org.testng.annotations.Test;
 
-@CucumberOptions(features = {"src/test/resources/features/jsonReplacements.feature"})
+@CucumberOptions(format = "json:target/cucumber.json", features = {"src/test/resources/features/jsonReplacements.feature"})
 public class JsonReplacementsIT extends BaseGTest {
     @Test
     public void simpleTest() throws Exception {

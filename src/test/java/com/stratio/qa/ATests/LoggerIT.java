@@ -20,7 +20,7 @@ import com.stratio.qa.utils.BaseGTest;
 import cucumber.api.CucumberOptions;
 import org.testng.annotations.Test;
 
-@CucumberOptions(features = {
+@CucumberOptions(format = "json:target/cucumber.json", features = {
         "src/test/resources/features/titlesReplacements.feature",
         "src/test/resources/features/logger.feature",
         "src/test/resources/features/backgroundlogger.feature",
