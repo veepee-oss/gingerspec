@@ -89,30 +89,6 @@ public class CucumberRunner {
 
         List<String> uniqueGlue = new ArrayList<String>();
         uniqueGlue.add("classpath:com/stratio/qa/specs");
-        uniqueGlue.add("classpath:com/stratio/sparta/testsAT/specs");
-        uniqueGlue.add("classpath:com/stratio/gosecsso/testsAT/specs");
-        uniqueGlue.add("classpath:com/stratio/dcos/crossdata/testsAT/specs");
-        uniqueGlue.add("classpath:com/stratio/crossdata/testsAT/specs");
-        uniqueGlue.add("classpath:com/stratio/streaming/testsAT/specs");
-        uniqueGlue.add("classpath:com/stratio/ingestion/testsAT/specs");
-        uniqueGlue.add("classpath:com/stratio/datavis/testsAT/specs");
-        uniqueGlue.add("classpath:com/stratio/connectors/testsAT/specs");
-        uniqueGlue.add("classpath:com/stratio/admin/testsAT/specs");
-        uniqueGlue.add("classpath:com/stratio/explorer/testsAT/specs");
-        uniqueGlue.add("classpath:com/stratio/manager/testsAT/specs");
-        uniqueGlue.add("classpath:com/stratio/viewer/testsAT/specs");
-        uniqueGlue.add("classpath:com/stratio/decision/testsAT/specs");
-        uniqueGlue.add("classpath:com/stratio/paas/testsAT/specs");
-        uniqueGlue.add("classpath:com/stratio/cassandra/lucene/testsAT/specs");
-        uniqueGlue.add("classpath:com/stratio/analytic/testsAT/specs");
-        uniqueGlue.add("classpath:com/stratio/exhibitor/testsAT/specs");
-        uniqueGlue.add("classpath:com/stratio/intelligence/testsAT/specs");
-        uniqueGlue.add("classpath:com/stratio/postgresbd/testsAT/specs");
-        uniqueGlue.add("classpath:com/stratio/universe/testsAT/specs");
-        uniqueGlue.add("classpath:com/stratio/paas/confluentkafkaAT/specs");
-        uniqueGlue.add("classpath:com/stratio/paas/dcoselasticserviceAT/specs");
-        uniqueGlue.add("classpath:com/stratio/paas/cassandraframeworkAT/specs");
-        uniqueGlue.add("classpath:com/stratio/paas/hdfsframeworkAT/specs");
         runtimeOptions.getGlue().clear();
         runtimeOptions.getGlue().addAll(uniqueGlue);
 
