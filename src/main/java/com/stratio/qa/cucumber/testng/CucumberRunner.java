@@ -89,7 +89,7 @@ public class CucumberRunner {
 
         List<String> uniqueGlue = new ArrayList<String>();
         uniqueGlue.add("classpath:com/stratio/qa/specs");
-        runtimeOptions.getGlue().clear();
+        //runtimeOptions.getGlue().clear();
         runtimeOptions.getGlue().addAll(uniqueGlue);
 
         runtimeOptions.addFormatter(reporterTestNG);
