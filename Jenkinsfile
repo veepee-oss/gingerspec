@@ -1,11 +1,11 @@
-@Library('libpipelines@master') _
+//@Library('libpipelines@master') _
 
 hose {
     EMAIL = 'qa'
     LANG = 'java'
     MODULE = 'bdt'
-    REPOSITORY = 'github.com/bdt'
-    SLACKTEAM = 'stratioqa'
+    REPOSITORY = '----'
+    SLACKTEAM = '----'
     DEVTIMEOUT = 30
     RELEASETIMEOUT = 30
     MAXITRETRIES = 2
