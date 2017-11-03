@@ -88,12 +88,12 @@ public class CucumberRunner {
         }
 
         List<String> uniqueGlue = new ArrayList<String>();
-        uniqueGlue.add("classpath:com/stratio/qa/specs");
+        uniqueGlue.add("classpath:com/privalia/qa/specs");
         //runtimeOptions.getGlue().clear();
         runtimeOptions.getGlue().addAll(uniqueGlue);
 
         runtimeOptions.addFormatter(reporterTestNG);
-        Set<Class<? extends ICucumberFormatter>> implementers = new Reflections("com.stratio.qa.utils")
+        Set<Class<? extends ICucumberFormatter>> implementers = new Reflections("com.privalia.qa.utils")
                 .getSubTypesOf(ICucumberFormatter.class);
 
         for (Class<? extends ICucumberFormatter> implementerClazz : implementers) {
