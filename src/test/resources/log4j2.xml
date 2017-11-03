@@ -36,10 +36,10 @@
             <AppenderRef ref="Console"/>
         </Root>
 
-        <logger name="com.stratio.qa.aspects.ReplacementAspect" level="INFO" additivity="false">
+        <logger name="com.privalia.qa.aspects.ReplacementAspect" level="INFO" additivity="false">
             <appender-ref ref="Steps"/>
         </logger>
-        <logger name="com.stratio.qa.utils.CukesGHooks" level="INFO" additivity="false">
+        <logger name="com.privalia.qa.utils.CukesGHooks" level="INFO" additivity="false">
             <appender-ref ref="Hooks"/>
         </logger>
         <logger name="com.stratio.specs" level="DEBUG" additivity="false"/>

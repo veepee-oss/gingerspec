@@ -189,7 +189,7 @@
                         <phase>package</phase>
                         <configuration>
                             <doclet>
-                                com.stratio.qa.doclet.AnnotationsDoclet
+                                AnnotationsDoclet
                             </doclet>
                             <docletPath>
                                 ../../classes
