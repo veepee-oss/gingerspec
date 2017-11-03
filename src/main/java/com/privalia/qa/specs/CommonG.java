@@ -1228,7 +1228,7 @@ public class CommonG {
      */
 
     public void setPreviousElement(String element, String value) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, InstantiationException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException {
-        Reflections reflections = new Reflections("com.stratio");
+        Reflections reflections = new Reflections("com.privalia");
         Set classes = reflections.getSubTypesOf(CommonG.class);
 
         Object pp = (classes.toArray())[0];
