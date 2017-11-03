@@ -37,6 +37,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static com.privalia.qa.aspects.IgnoreTagAspect.ignoreReasons.NOREASON;
+import static com.privalia.qa.aspects.IgnoreTagAspect.ignoreReasons.NOTIGNORED;
+
 @Aspect
 public class IgnoreTagAspect {
 
@@ -88,7 +91,7 @@ public class IgnoreTagAspect {
     public ignoreReasons manageTags(List<String> tagList, String scenarioName) {
         ignoreReasons exit = NOTIGNORED;
         if (tagList.contains("@ignore")) {
-            exit = ignoreReasons.NOREASON;
+            exit = NOREASON;
             for (String tag: tagList) {
                 Pattern pattern = Pattern.compile("@tillfixed\\((.*?)\\)");
                 Matcher matcher = pattern.matcher(tag);
