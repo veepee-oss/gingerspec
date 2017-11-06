@@ -435,7 +435,7 @@ public class CucumberReporter implements Formatter, Reporter {
                 Logger logger = LoggerFactory.getLogger(ThreadProperty.get("class"));
 
                 comm.setRestProtocol("https://");
-                comm.setRestHost("stratio.atlassian.net");
+                comm.setRestHost("jira.privalia.pin");
                 comm.setRestPort("");
                 comm.setClient(client);
                 String endpoint = "/rest/api/2/issue/" + ticket;
