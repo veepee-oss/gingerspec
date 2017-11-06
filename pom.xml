@@ -5,12 +5,12 @@
     <parent>
         <groupId>com.privalia</groupId>
         <artifactId>parent</artifactId>
-        <version>0.10.0-SNAPSHOT</version>
+        <version>0.1.0-SNAPSHOT</version>
     </parent>
 
     <groupId>com.privalia</groupId>
     <artifactId>bdt-lib</artifactId>
-    <version>0.6.0-SNAPSHOT</version>
+    <version>0.1.0-SNAPSHOT</version>
 
     <name>Privalia BDT framework</name>
     <url>http://gitlab.privalia.pin/som-qa/bdt-lib</url>
