@@ -1,10 +1,10 @@
 [![Coverage Status](https://coveralls.io/repos/github/Stratio/bdt/badge.svg?branch=master)](https://coveralls.io/github/Stratio/bdt?branch=master)
 [![Maven central](https://maven-badges.herokuapp.com/maven-central/com.stratio.qa/bdt/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.stratio.qa/bdt)
 
-Stratio bdt
+Privalia bdt-lib
 ===========
 
-Stratio Acceptance Test library
+Privalia Acceptance Test library
 
  * Cucumber for test definition 
  * TestNG for execution
@@ -13,12 +13,13 @@ Stratio Acceptance Test library
  * JSONPath
  * AssertJ
 
-Testing runtime to rule over Stratio's acceptance tests
+Testing runtime to rule over Privalia's acceptance tests
 
 
 [Javadoc always live](http://stratiodocs.s3.amazonaws.com/bdt/index.html)
 
-
+After modifying, to check changes in your local project do:
+mvn clean install -Dmaven.test.skip=true (tests skip temporarily)
 
 ## EXECUTION
 

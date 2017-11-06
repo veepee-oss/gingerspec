@@ -3,21 +3,21 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>com.stratio</groupId>
+        <groupId>com.privalia</groupId>
         <artifactId>parent</artifactId>
-        <version>0.9.0</version>
+        <version>0.1.0-SNAPSHOT</version>
     </parent>
 
-    <groupId>com.stratio.qa</groupId>
-    <artifactId>bdt</artifactId>
-    <version>0.6.0-SNAPSHOT</version>
+    <groupId>com.privalia</groupId>
+    <artifactId>bdt-lib</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
 
-    <name>Stratio BDT framework</name>
-    <url>https://github.com/Stratio/bdt</url>
+    <name>Privalia BDT framework</name>
+    <url>http://gitlab.privalia.pin/som-qa/bdt-lib</url>
     <scm>
-        <url>https://github.com/Stratio/bdt</url>
-        <connection>scm:git:git@github.com:Stratio/bdt.git</connection>
-        <developerConnection>scm:git:git@github.com:Stratio/bdt.git
+        <url>http://gitlab.privalia.pin/som-qa/bdt-lib</url>
+        <connection>scm:git:git@gitlab.privalia.pin:som-qa/bdt-lib.git</connection>
+        <developerConnection>scm:git:git@gitlab.privalia.pin:som-qa/bdt-lib.git
         </developerConnection>
         <tag>HEAD</tag>
     </scm>
@@ -165,6 +165,7 @@
                     </execution>
                 </executions>
             </plugin>
+            <!--
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
@@ -188,7 +189,7 @@
                         <phase>package</phase>
                         <configuration>
                             <doclet>
-                                com.stratio.qa.doclet.AnnotationsDoclet
+                                AnnotationsDoclet
                             </doclet>
                             <docletPath>
                                 ../../classes
@@ -197,6 +198,7 @@
                     </execution>
                 </executions>
             </plugin>
+            -->
         </plugins>
     </build>
     <dependencies>
