@@ -412,12 +412,18 @@ public class GivenGSpec extends BaseGSpec {
     public void setupApp(String host, String port) {
         assertThat(host).isNotEmpty();
 
+        String restProtocol = "http://";
+        if ("443".equals(port.substring(1))) {
+            restProtocol = "https://";
+        }
+
         if (port == null) {
             port = ":80";
         }
 
         commonspec.setWebHost(host);
         commonspec.setWebPort(port);
+        commonspec.setRestProtocol(restProtocol);
         commonspec.setRestHost(host);
         commonspec.setRestPort(port);
     }
