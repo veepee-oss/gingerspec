@@ -1184,6 +1184,46 @@ public class CommonG {
                 }
             case "CONNECT":
             case "PATCH":
+                if (data == null) {
+                    Exception missingFields = new Exception("Missing fields in request.");
+                    throw missingFields;
+                } else {
+                    request = this.getClient().preparePatch(restURL + endPoint).setBody(data);
+                    if ("json".equals(type)) {
+                        request = request.setHeader("Content-Type", "application/json");
+                    } else if ("string".equals(type)) {
+                        this.getLogger().debug("Sending request as: {}", type);
+                        request = request.setHeader("Content-Type", "application/x-www-form-urlencoded");
+                    }
+
+                    if (this.getResponse() != null) {
+                        request = request.setCookies(this.getResponse().getCookies());
+                    }
+
+                    if (this.getSeleniumCookies().size() > 0) {
+                        for (org.openqa.selenium.Cookie cookie : this.getSeleniumCookies()) {
+                            request.addCookie(new Cookie(cookie.getName(), cookie.getValue(),
+                                    false, cookie.getDomain(), cookie.getPath(), 99, false, false));
+                        }
+                    }
+
+                    for (Cookie cook : this.getCookies()) {
+                        request = request.addCookie(cook);
+                    }
+
+                    if (!this.headers.isEmpty()) {
+                        for (Map.Entry<String, String> header : headers.entrySet()) {
+                            request = request.setHeader(header.getKey(), header.getValue());
+                        }
+                    }
+
+                    if (user != null) {
+                        request = request.setRealm(realm);
+                    }
+
+                    response = this.getClient().executeRequest(request.build());
+                    break;
+                }
             case "HEAD":
             case "OPTIONS":
             case "REQUEST":
