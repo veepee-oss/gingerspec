@@ -15,6 +15,8 @@
  */
 
 package com.privalia.qa.specs;
+
+import com.jayway.jsonpath.PathNotFoundException;
 import com.ning.http.client.Response;
 import com.ning.http.client.cookie.Cookie;
 import com.privalia.qa.exceptions.DBException;
@@ -237,7 +239,15 @@ public class GivenGSpec extends BaseGSpec {
             parsedElement = element;
         }
 
-        String value = commonspec.getJSONPathString(json, parsedElement, position);
+        String value = "";
+        try {
+            value = commonspec.getJSONPathString(json, parsedElement, position);
+        } catch (PathNotFoundException pe) {
+            commonspec.getLogger().error(pe.getLocalizedMessage());
+        }
+
+        assertThat(value).as("json result is empty").isNotEqualTo("");
+        ThreadProperty.set(envVar, value);
 
         ThreadProperty.set(envVar, value);
     }
