@@ -20,12 +20,10 @@ import com.auth0.jwt.JWTSigner;
 import com.ning.http.client.Response;
 import com.ning.http.client.cookie.Cookie;
 import com.privalia.qa.exceptions.DBException;
-import com.privalia.qa.utils.GosecSSOUtils;
 import com.privalia.qa.utils.RemoteSSHConnection;
 import com.privalia.qa.utils.ThreadProperty;
 import cucumber.api.DataTable;
 import cucumber.api.java.en.Given;
-import org.assertj.core.api.Assertions;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
@@ -546,58 +544,6 @@ public class GivenGSpec extends BaseGSpec {
     }
 
 
-    /**
-    * Authenticate in a DCOS cluster
-    *
-    * @param remoteHost remote host
-    * @param email email for JWT singing
-    * @param user remote user
-    * @param password (required if pemFile null)
-    * @param pemFile (required if password null)
-    * @throws Exception exception
-    *
-    *
-    */
-    @Given("^I authenticate to DCOS cluster '(.+?)' using email '(.+?)'( with user '(.+?)'( and password '(.+?)'| and pem file '(.+?)'))?$")
-    public void authenticateDCOSpem(String remoteHost, String email, String foo, String user, String bar, String password, String pemFile) throws Exception {
-        String DCOSsecret;
-        if (foo == null) {
-            commonspec.setRemoteSSHConnection(new RemoteSSHConnection("root", "stratio", remoteHost, null));
-        } else {
-            commonspec.setRemoteSSHConnection(new RemoteSSHConnection(user, password, remoteHost, pemFile));
-        }
-        commonspec.getRemoteSSHConnection().runCommand("sudo cat /var/lib/dcos/dcos-oauth/auth-token-secret");
-        DCOSsecret = commonspec.getRemoteSSHConnection().getResult().trim();
-        setDCOSCookie(DCOSsecret, email);
-    }
-
-    public void setDCOSCookie(String DCOSsecret, String email) throws Exception {
-        final JWTSigner signer = new JWTSigner(DCOSsecret);
-        final HashMap<String, Object> claims = new HashMap();
-        claims.put("uid", email);
-        final String jwt = signer.sign(claims);
-        Cookie cookie = new Cookie("dcos-acs-auth-cookie", jwt, false, "", "", 99999, false, false);
-        List<Cookie> cookieList = new ArrayList<Cookie>();
-        cookieList.add(cookie);
-        commonspec.setCookies(cookieList);
-    }
-
-    /**
-     * Generate token to authenticate in gosec SSO
-     * @param ssoHost current sso host
-     * @param userName username
-     * @param passWord password
-     * @throws Exception exception
-     */
-    @Given("^I set sso token using host '(.+?)' with user '(.+?)' and password '(.+?)'$")
-    public void setGoSecSSOCookie(String ssoHost, String userName, String passWord) throws Exception {
-        HashMap<String, String> ssoCookies = new GosecSSOUtils(ssoHost, userName, passWord).ssoTokenGenerator();
-        String[] tokenList = {"user", "dcos-acs-auth-cookie"};
-        List<Cookie> cookiesAtributes = addSsoToken(ssoCookies, tokenList);
-
-        commonspec.setCookies(cookiesAtributes);
-    }
-
     public List<Cookie> addSsoToken(HashMap<String, String> ssoCookies, String[] tokenList) {
         List<Cookie> cookiesAttributes = new ArrayList<>();
 
@@ -656,7 +602,7 @@ public class GivenGSpec extends BaseGSpec {
         commonspec.runLocalCommand(command);
         commonspec.runCommandLoggerAndEnvVar(exitStatus, envVar, Boolean.TRUE);
 
-        Assertions.assertThat(commonspec.getCommandExitStatus()).isEqualTo(exitStatus);
+        assertThat(commonspec.getCommandExitStatus()).isEqualTo(exitStatus);
     }
 
     /**
@@ -681,7 +627,7 @@ public class GivenGSpec extends BaseGSpec {
         commonspec.setCommandExitStatus(commonspec.getRemoteSSHConnection().getExitStatus());
         commonspec.runCommandLoggerAndEnvVar(exitStatus, envVar, Boolean.FALSE);
 
-        Assertions.assertThat(commonspec.getRemoteSSHConnection().getExitStatus()).isEqualTo(exitStatus);
+        assertThat(commonspec.getRemoteSSHConnection().getExitStatus()).isEqualTo(exitStatus);
     }
 
 
@@ -707,7 +653,7 @@ public class GivenGSpec extends BaseGSpec {
     public void seleniumGetwindows() {
         Set<String> wel = commonspec.getDriver().getWindowHandles();
 
-        Assertions.assertThat(wel).as("Element count doesnt match").hasSize(2);
+        assertThat(wel).as("Element count doesnt match").hasSize(2);
     }
 
 

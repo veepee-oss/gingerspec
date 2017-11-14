@@ -28,7 +28,6 @@ import cucumber.api.DataTable;
 import cucumber.api.java.en.Then;
 import gherkin.formatter.model.DataTableRow;
 import org.apache.zookeeper.KeeperException;
-import org.assertj.core.api.Assertions;
 import org.assertj.core.api.Fail;
 import org.assertj.core.api.WritableAssertionInfo;
 import org.json.JSONArray;
@@ -585,33 +584,6 @@ public class ThenGSpec extends BaseGSpec {
         }
     }
 
-    /**
-     * A PUT request over the body value.
-     *
-     * @param key
-     * @param value
-     * @param service
-     * @throws Exception
-     */
-    @Then("^I add a new DCOS label with key '(.+?)' and value '(.+?)' to the service '(.+?)'?$")
-    public void sendAppendRequest(String key, String value, String service) throws Exception {
-        commonspec.runCommandAndGetResult("touch " + service + ".json && dcos marathon app show " + service + " > /dcos/" + service + ".json");
-        commonspec.runCommandAndGetResult("cat /dcos/" + service + ".json");
-
-        String configFile = commonspec.getRemoteSSHConnection().getResult();
-        String myValue = commonspec.getJSONPathString(configFile, ".labels", "0");
-        String myJson = commonspec.updateMarathonJson(commonspec.removeJSONPathElement(configFile, ".labels"));
-
-        String newValue = myValue.replaceFirst("}", ", \"" + key + "\": \"" + value + "\"}");
-        newValue = "\"labels\":" + newValue;
-        String myFinalJson = myJson.replaceFirst("\\{", "{" + newValue + ",");
-        String test = myFinalJson.replaceAll("\"uris\"", "\"none\"");
-
-        commonspec.runCommandAndGetResult("echo '" + test + "' > /dcos/final" + service + ".json");
-        commonspec.runCommandAndGetResult("dcos marathon app update " + service + " < /dcos/final" + service + ".json");
-
-        commonspec.setCommandExitStatus(commonspec.getRemoteSSHConnection().getExitStatus());
-    }
 
     /**
      * Read zPath
@@ -656,29 +628,6 @@ public class ThenGSpec extends BaseGSpec {
 
 
     /**
-     * Set a environment variable in marathon and deploy again.
-     *
-     * @param key
-     * @param value
-     * @param service
-     * @throws Exception
-     */
-    @Then("^I modify marathon environment variable '(.+?)' with value '(.+?)' for service '(.+?)'?$")
-    public void setMarathonProperty(String key, String value, String service) throws Exception {
-        commonspec.runCommandAndGetResult("touch " + service + "-env.json && dcos marathon app show " + service + " > /dcos/" + service + "-env.json");
-        commonspec.runCommandAndGetResult("cat /dcos/" + service + "-env.json");
-
-        String configFile = commonspec.getRemoteSSHConnection().getResult();
-        String myJson1 = commonspec.replaceJSONPathElement(configFile, key, value);
-        String myJson4 = commonspec.updateMarathonJson(myJson1);
-        String myJson = myJson4.replaceAll("\"uris\"", "\"none\"");
-
-        commonspec.runCommandAndGetResult("echo '" + myJson + "' > /dcos/final" + service + "-env.json");
-        commonspec.runCommandAndGetResult("dcos marathon app update " + service + " < /dcos/final" + service + "-env.json");
-        commonspec.setCommandExitStatus(commonspec.getRemoteSSHConnection().getExitStatus());
-    }
-
-    /**
      * Check that the number of partitions is like expected.
      *
      * @param topic_name      Name of kafka topic
@@ -687,7 +636,7 @@ public class ThenGSpec extends BaseGSpec {
      */
     @Then("^The number of partitions in topic '(.+?)' should be '(.+?)''?$")
     public void checkNumberOfPartitions(String topic_name, int numOfPartitions) throws Exception {
-        Assertions.assertThat(commonspec.getKafkaUtils().getPartitions(topic_name)).isEqualTo(numOfPartitions);
+        assertThat(commonspec.getKafkaUtils().getPartitions(topic_name)).isEqualTo(numOfPartitions);
 
     }
 
@@ -720,7 +669,7 @@ public class ThenGSpec extends BaseGSpec {
      */
     @Then("^The Elasticsearch index named '(.+?)' and mapping '(.+?)' contains a column named '(.+?)' with the value '(.+?)'$")
     public void elasticSearchIndexContainsDocument(String indexName, String mappingName, String columnName, String columnValue) throws Exception {
-        Assertions.assertThat((commonspec.getElasticSearchClient().searchSimpleFilterElasticsearchQuery(
+        assertThat((commonspec.getElasticSearchClient().searchSimpleFilterElasticsearchQuery(
                 indexName,
                 mappingName,
                 columnName,
@@ -740,30 +689,30 @@ public class ThenGSpec extends BaseGSpec {
     public void checkValue(String envVar, String operation, String value) throws Exception {
         switch (operation.toLowerCase()) {
             case "is":
-                Assertions.assertThat(envVar).isEqualTo(value);
+                assertThat(envVar).isEqualTo(value);
                 break;
             case "matches":
-                Assertions.assertThat(envVar).matches(value);
+                assertThat(envVar).matches(value);
                 break;
             case "is higher than":
                 if (envVar.matches("^-?\\d+$") && value.matches("^-?\\d+$")) {
-                    Assertions.assertThat(Integer.parseInt(envVar)).isGreaterThan(Integer.parseInt(value));
+                    assertThat(Integer.parseInt(envVar)).isGreaterThan(Integer.parseInt(value));
                 } else {
                     Fail.fail("A number should be provided in order to perform a valid comparison.");
                 }
                 break;
             case "is lower than":
                 if (envVar.matches("^-?\\d+$") && value.matches("^-?\\d+$")) {
-                    Assertions.assertThat(Integer.parseInt(envVar)).isLessThan(Integer.parseInt(value));
+                    assertThat(Integer.parseInt(envVar)).isLessThan(Integer.parseInt(value));
                 } else {
                     Fail.fail("A number should be provided in order to perform a valid comparison.");
                 }
                 break;
             case "contains":
-                Assertions.assertThat(envVar).contains(value);
+                assertThat(envVar).contains(value);
                 break;
             case "is different from":
-                Assertions.assertThat(envVar).isNotEqualTo(value);
+                assertThat(envVar).isNotEqualTo(value);
                 break;
             default:
                 Fail.fail("Not a valid comparison. Valid ones are: is | matches | is higher than | is lower than | contains | is different from");

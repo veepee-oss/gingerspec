@@ -28,7 +28,6 @@ import com.privalia.qa.cucumber.converter.NullableStringConverter;
 import cucumber.api.DataTable;
 import cucumber.api.Transform;
 import cucumber.api.java.en.When;
-import org.assertj.core.api.Assertions;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.hjson.JsonArray;
 import org.hjson.JsonValue;
@@ -818,7 +817,7 @@ public class WhenGSpec extends BaseGSpec {
             out.close();
         }
 
-        Assertions.assertThat(new File(absolutePathFile).isFile());
+        assertThat(new File(absolutePathFile).isFile());
     }
 
     /**
