@@ -315,6 +315,50 @@ public class WhenGSpec extends BaseGSpec {
         commonspec.setResponse(requestType, response.get());
     }
 
+    /**
+     * Send a request of the type specified with custom headers
+     *
+     * @param requestType   type of request to be sent. Possible values:
+     *                      GET|DELETE|POST|PUT|CONNECT|PATCH|HEAD|OPTIONS|REQUEST|TRACE
+     * @param endPoint      end point to be used
+     * @param type          Possible values: json|string. Depending on type, the Content-Type header is set automatically
+     *                      If not specified, defaults to json
+     * @param modifications DataTable containing the custom set of headers to be
+     *                      added to the request. Syntax will be:
+     *                      {@code
+     *                      | <key> | <value> |
+     *                      }
+     *                      where:
+     *                      key: header key name
+     *                      value: value for tue key
+     *                      for example:
+     *                      if we want to add the header "token" with value "12345678", to the request header
+     *                      the modification will be:
+     *                      | token | 12345678 |
+     * @throws Exception
+     */
+    @When("^I send a '(.+?)' request to '(.+?)' as '(json|string)'? with headers:$")
+    public void sendRequestHeaders(String requestType, String endPoint, String type, DataTable modifications) throws Throwable {
+
+        //Correct Content-Type header is set automatically at generateRequest method based on type
+        LinkedHashMap jsonAsMap = new LinkedHashMap();
+        for (int i = 0; i < modifications.raw().size(); i++) {
+            String key = modifications.raw().get(i).get(0);
+            String value = modifications.raw().get(i).get(1);
+            commonspec.getHeaders().put(key, value);
+        }
+
+
+        commonspec.getLogger().debug("Generating request {} to {} as {}", requestType, endPoint, type);
+
+        Future<Response> response = commonspec.generateRequest(requestType, false, endPoint, null, type, "");
+
+        // Save response
+        commonspec.getLogger().debug("Saving response");
+        commonspec.setResponse(requestType, response.get());
+
+    }
+
 
     /**
      * Same sendRequest, but in this case, the rersponse is checked until it contains the expected value
