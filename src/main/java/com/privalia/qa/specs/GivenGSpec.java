@@ -15,8 +15,6 @@
  */
 
 package com.privalia.qa.specs;
-
-import com.auth0.jwt.JWTSigner;
 import com.ning.http.client.Response;
 import com.ning.http.client.cookie.Cookie;
 import com.privalia.qa.exceptions.DBException;
@@ -242,6 +240,34 @@ public class GivenGSpec extends BaseGSpec {
         String value = commonspec.getJSONPathString(json, parsedElement, position);
 
         ThreadProperty.set(envVar, value);
+    }
+
+    /**
+     * Specify a custom map of headers to be added to future requests
+     * @param modifications DataTable containing the custom set of headers to be
+     *                      added to the requests. Syntax will be:
+     *                      {@code
+     *                      | <key> | <value> |
+     *                      }
+     *                      where:
+     *                      key: header key name
+     *                      value: value for tue key
+     *                      for example:
+     *                      if we want to add the header "token" with value "12345678", to the request header
+     *                      the modification will be:
+     *                      | token | 12345678 |
+     * @throws Exception
+     */
+    @Given("^I set headers:$")
+    public void setHeaders(DataTable modifications) throws Throwable {
+
+        LinkedHashMap jsonAsMap = new LinkedHashMap();
+        for (int i = 0; i < modifications.raw().size(); i++) {
+            String key = modifications.raw().get(i).get(0);
+            String value = modifications.raw().get(i).get(1);
+            commonspec.getHeaders().put(key, value);
+        }
+
     }
 
 
