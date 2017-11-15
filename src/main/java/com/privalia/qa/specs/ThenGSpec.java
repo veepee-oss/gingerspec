@@ -25,7 +25,6 @@ import com.privalia.qa.assertions.DBObjectsAssert;
 import com.privalia.qa.utils.PreviousWebElements;
 import com.privalia.qa.utils.ThreadProperty;
 import cucumber.api.DataTable;
-import cucumber.api.java.en.And;
 import cucumber.api.java.en.Then;
 import gherkin.formatter.model.DataTableRow;
 import org.apache.zookeeper.KeeperException;
