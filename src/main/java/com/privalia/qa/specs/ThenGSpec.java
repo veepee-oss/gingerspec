@@ -25,6 +25,7 @@ import com.privalia.qa.assertions.DBObjectsAssert;
 import com.privalia.qa.utils.PreviousWebElements;
 import com.privalia.qa.utils.ThreadProperty;
 import cucumber.api.DataTable;
+import cucumber.api.java.en.And;
 import cucumber.api.java.en.Then;
 import gherkin.formatter.model.DataTableRow;
 import org.apache.zookeeper.KeeperException;
@@ -735,6 +736,16 @@ public class ThenGSpec extends BaseGSpec {
                 .hasAtLeast(index);
         String text = commonspec.getPreviousWebElements().getPreviousWebElements().get(index).getText();
         ThreadProperty.set(envVar, text);
+    }
+
+    /**
+     * Clears the headers set by any previous request. A request will reuse the headers/cookies
+     * that were set in any previous call within the same scenario
+     * @throws Throwable
+     */
+    @Then("^I clear headers from previous request$")
+    public void clearHeaders() throws Throwable {
+        commonspec.getHeaders().clear();
     }
 
 }
