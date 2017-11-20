@@ -436,7 +436,6 @@ public class CommonG {
      * @return          a By which locates elements by the method specified
      */
     private By getByType(String method, String element) {
-
         if ("id".equals(method)) {
             return By.id(element);
         } else if ("name".equals(method)) {
@@ -461,7 +460,6 @@ public class CommonG {
      * @return                  A selenium Alert object
      */
     public Alert waitAlertWithPooling(int poolingInterval, int poolMaxTime) {
-
         Wait wait = new FluentWait(driver)
                 .withTimeout(poolMaxTime, SECONDS)
                 .pollingEvery(poolingInterval, SECONDS)
@@ -479,7 +477,6 @@ public class CommonG {
      * Dismiss any existing alert message in the current selenium context
      */
     public void dismissSeleniumAlert() {
-
         if (this.getSeleniumAlert() == null) {
             fail("There is not an alert present in the page");
         }
@@ -492,7 +489,6 @@ public class CommonG {
      * Accepts any existing alert message in the current selenium context
      */
     public void acceptSeleniumAlert() {
-
         if (this.getSeleniumAlert() == null) {
             fail("There is not an alert present in the page");
         }
