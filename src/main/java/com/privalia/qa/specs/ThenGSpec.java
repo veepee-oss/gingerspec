@@ -16,18 +16,11 @@
 
 package com.privalia.qa.specs;
 
-import com.datastax.driver.core.ColumnDefinitions;
-import com.datastax.driver.core.DataType;
-import com.datastax.driver.core.ResultSet;
-import com.datastax.driver.core.Row;
-import com.mongodb.DBObject;
-import com.privalia.qa.assertions.DBObjectsAssert;
 import com.privalia.qa.utils.PreviousWebElements;
 import com.privalia.qa.utils.ThreadProperty;
 import cucumber.api.DataTable;
 import cucumber.api.java.en.Then;
 import gherkin.formatter.model.DataTableRow;
-import org.apache.zookeeper.KeeperException;
 import org.assertj.core.api.Fail;
 import org.assertj.core.api.WritableAssertionInfo;
 import org.json.JSONArray;
@@ -44,7 +37,6 @@ import static com.privalia.qa.assertions.Assertions.assertThat;
  */
 public class ThenGSpec extends BaseGSpec {
 
-    public static final int VALUE_SUBSTRING = 3;
 
     /**
      * Class constructor.
@@ -83,169 +75,6 @@ public class ThenGSpec extends BaseGSpec {
 
             commonspec.getExceptions().clear();
         }
-    }
-
-    /**
-     * Checks if a keyspaces exists in Cassandra.
-     *
-     * @param keyspace
-     */
-    @Then("^a Cassandra keyspace '(.+?)' exists$")
-    public void assertKeyspaceOnCassandraExists(String keyspace) {
-        assertThat(commonspec.getCassandraClient().getKeyspaces()).as("The keyspace " + keyspace + "exists on cassandra").contains(keyspace);
-    }
-
-    /**
-     * Checks if a cassandra keyspace contains a table.
-     *
-     * @param keyspace
-     * @param tableName
-     */
-    @Then("^a Cassandra keyspace '(.+?)' contains a table '(.+?)'$")
-    public void assertTableExistsOnCassandraKeyspace(String keyspace, String tableName) {
-        assertThat(commonspec.getCassandraClient().getTables(keyspace)).as("The table " + tableName + "exists on cassandra").contains(tableName);
-    }
-
-    /**
-     * Checks the number of rows in a cassandra table.
-     *
-     * @param keyspace
-     * @param tableName
-     * @param numberRows
-     */
-    @Then("^a Cassandra keyspace '(.+?)' contains a table '(.+?)' with '(.+?)' rows$")
-    public void assertRowNumberOfTableOnCassandraKeyspace(String keyspace, String tableName, String numberRows) {
-        Long numberRowsLong = Long.parseLong(numberRows);
-        commonspec.getCassandraClient().useKeyspace(keyspace);
-        assertThat(commonspec.getCassandraClient().executeQuery("SELECT COUNT(*) FROM " + tableName + ";").all().get(0).getLong(0)).as("The table " + tableName + "exists on cassandra").
-                isEqualTo(numberRowsLong);
-    }
-
-    /**
-     * Checks if a cassandra table contains the values of a DataTable.
-     *
-     * @param keyspace
-     * @param tableName
-     * @param data
-     * @throws InterruptedException
-     */
-    @Then("^a Cassandra keyspace '(.+?)' contains a table '(.+?)' with values:$")
-    public void assertValuesOfTable(String keyspace, String tableName, DataTable data) throws InterruptedException {
-        //  USE of Keyspace
-        commonspec.getCassandraClient().useKeyspace(keyspace);
-        // Obtain the types and column names of the datatable
-        // to return in a hashmap,
-        Map<String, String> dataTableColumns = extractColumnNamesAndTypes(data.raw().get(0));
-        // check if the table has columns
-        String query = "SELECT * FROM " + tableName + " LIMIT 1;";
-        ResultSet res = commonspec.getCassandraClient().executeQuery(query);
-        equalsColumns(res.getColumnDefinitions(), dataTableColumns);
-        //receiving the string from the select with the columns
-        // that belong to the dataTable
-        List<String> selectQueries = giveQueriesList(data, tableName, columnNames(data.raw().get(0)));
-        //Check the data  of cassandra with different queries
-        int index = 1;
-        for (String execQuery : selectQueries) {
-            res = commonspec.getCassandraClient().executeQuery(execQuery);
-            List<Row> resAsList = res.all();
-            assertThat(resAsList.size()).as("The query " + execQuery + " not return any result on Cassandra").isGreaterThan(0);
-            assertThat(resAsList.get(0).toString()
-                    .substring(VALUE_SUBSTRING)).as("The resultSet is not as expected").isEqualTo(data.raw().get(index).toString());
-            index++;
-        }
-    }
-
-    @SuppressWarnings("rawtypes")
-    private void equalsColumns(ColumnDefinitions resCols, Map<String, String> dataTableColumns) {
-        Iterator it = dataTableColumns.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry e = (Map.Entry) it.next();
-            assertThat(resCols.toString()).as("The table not contains the column.").contains(e.getKey().toString());
-            DataType type = resCols.getType(e.getKey().toString());
-            assertThat(type.getName().toString()).as("The column type is not equals.").isEqualTo(e.getValue().toString());
-        }
-    }
-
-    private List<String> giveQueriesList(DataTable data, String tableName, String colNames) {
-        List<String> queryList = new ArrayList<String>();
-        for (int i = 1; i < data.raw().size(); i++) {
-            String query = "SELECT " + colNames + " FROM " + tableName;
-            List<String> row = data.raw().get(i);
-            query += conditionWhere(row, colNames.split(",")) + ";";
-            queryList.add(query);
-        }
-        return queryList;
-    }
-
-    private String conditionWhere(List<String> values, String[] columnNames) {
-        StringBuilder condition = new StringBuilder();
-        condition.append(" WHERE ");
-        Pattern numberPat = Pattern.compile("^\\d+(\\.*\\d*)?");
-        Pattern booleanPat = Pattern.compile("true|false");
-        for (int i = 0; i < values.size() - 1; i++) {
-            condition.append(columnNames[i]).append(" =");
-            if (numberPat.matcher(values.get(i)).matches() || booleanPat.matcher(values.get(i)).matches()) {
-                condition.append(" ").append(values.get(i)).append(" AND ");
-            } else {
-                condition.append(" '").append(values.get(i)).append("' AND ");
-            }
-        }
-        condition.append(columnNames[columnNames.length - 1]).append(" =");
-        if (numberPat.matcher(values.get(values.size() - 1)).matches()
-                || booleanPat.matcher(values.get(values.size() - 1)).matches()) {
-            condition.append(" ").append(values.get(values.size() - 1));
-        } else {
-            condition.append(" '").append(values.get(values.size() - 1)).append("'");
-        }
-        return condition.toString();
-    }
-
-    private String columnNames(List<String> firstRow) {
-        StringBuilder columnNamesForQuery = new StringBuilder();
-        for (String s : firstRow) {
-            String[] aux = s.split("-");
-            columnNamesForQuery.append(aux[0]).append(",");
-        }
-        return columnNamesForQuery.toString().substring(0, columnNamesForQuery.length() - 1);
-    }
-
-    private Map<String, String> extractColumnNamesAndTypes(List<String> firstRow) {
-        HashMap<String, String> columns = new HashMap<String, String>();
-        for (String s : firstRow) {
-            String[] aux = s.split("-");
-            columns.put(aux[0], aux[1]);
-        }
-        return columns;
-    }
-
-
-    /**
-     * Checks the values of a MongoDB table.
-     *
-     * @param dataBase
-     * @param tableName
-     * @param data
-     */
-    @Then("^a Mongo dataBase '(.+?)' contains a table '(.+?)' with values:")
-    public void assertValuesOfTableMongo(String dataBase, String tableName, DataTable data) {
-        commonspec.getMongoDBClient().connectToMongoDBDataBase(dataBase);
-        ArrayList<DBObject> result = (ArrayList<DBObject>) commonspec.getMongoDBClient().readFromMongoDBCollection(
-                tableName, data);
-        DBObjectsAssert.assertThat(result).containedInMongoDBResult(data);
-
-    }
-
-    /**
-     * Checks if a MongoDB database contains a table.
-     *
-     * @param database
-     * @param tableName
-     */
-    @Then("^a Mongo dataBase '(.+?)' doesnt contains a table '(.+?)'$")
-    public void aMongoDataBaseContainsaTable(String database, String tableName) {
-        commonspec.getMongoDBClient().connectToMongoDBDataBase(database);
-        Set<String> collectionsNames = commonspec.getMongoDBClient().getMongoDBCollections();
-        assertThat(collectionsNames).as("The Mongo dataBase contains the table").doesNotContain(tableName);
     }
 
     /**
@@ -364,7 +193,6 @@ public class ThenGSpec extends BaseGSpec {
         }
         commonspec.getLogger().info("Command output found after " + timeout + " seconds");
     }
-
 
     /**
      * Verifies that a webelement previously found {@code isDisplayed}
@@ -584,100 +412,6 @@ public class ThenGSpec extends BaseGSpec {
         }
     }
 
-
-    /**
-     * Read zPath
-     *
-     * @param zNode    path at zookeeper
-     * @param document expected content of znode
-     */
-    @Then("^the zNode '(.+?)' exists( and contains '(.+?)')?$")
-    public void checkZnodeExists(String zNode, String foo, String document)  throws Exception {
-        if (document == null) {
-            String breakpoint = commonspec.getZookeeperSecClient().zRead(zNode);
-            assert breakpoint.equals("") : "The zNode does not exist";
-        } else {
-            assert commonspec.getZookeeperSecClient().zRead(zNode).contains(document) : "The zNode does not exist or the content does not match";
-        }
-    }
-
-    @Then("^the zNode '(.+?)' does not exist")
-    public void checkZnodeNotExist(String zNode) throws Exception {
-        assert !commonspec.getZookeeperSecClient().exists(zNode) : "The zNode exists";
-    }
-
-    /**
-     * Check that a kafka topic exist
-     *
-     * @param topic_name name of topic
-     */
-    @Then("^A kafka topic named '(.+?)' exists")
-    public void kafkaTopicExist(String topic_name) throws KeeperException, InterruptedException {
-        assert commonspec.getKafkaUtils().getZkUtils().pathExists("/" + topic_name) : "There is no topic with that name";
-    }
-
-    /**
-     * Check that a kafka topic not exist
-     *
-     * @param topic_name name of topic
-     */
-    @Then("^A kafka topic named '(.+?)' does not exist")
-    public void kafkaTopicNotExist(String topic_name) throws KeeperException, InterruptedException {
-        assert !commonspec.getKafkaUtils().getZkUtils().pathExists("/" + topic_name) : "There is a topic with that name";
-    }
-
-
-    /**
-     * Check that the number of partitions is like expected.
-     *
-     * @param topic_name      Name of kafka topic
-     * @param numOfPartitions Number of partitions
-     * @throws Exception
-     */
-    @Then("^The number of partitions in topic '(.+?)' should be '(.+?)''?$")
-    public void checkNumberOfPartitions(String topic_name, int numOfPartitions) throws Exception {
-        assertThat(commonspec.getKafkaUtils().getPartitions(topic_name)).isEqualTo(numOfPartitions);
-
-    }
-
-    /**
-     * Check that the ElasticSearch index exists.
-     *
-     * @param indexName
-     */
-    @Then("^An elasticsearch index named '(.+?)' exists")
-    public void elasticSearchIndexExist(String indexName) {
-        assert (commonspec.getElasticSearchClient().indexExists(indexName)) : "There is no index with that name";
-    }
-
-    /**
-     * Check that the ElasticSearch index does not exist.
-     *
-     * @param indexName
-     */
-    @Then("^An elasticsearch index named '(.+?)' does not exist")
-    public void elasticSearchIndexDoesNotExist(String indexName) {
-        assert !commonspec.getElasticSearchClient().indexExists(indexName) : "There is an index with that name";
-    }
-
-    /**
-     * Check that an elasticsearch index contains a specific document
-     *
-     * @param indexName
-     * @param columnName
-     * @param columnValue
-     */
-    @Then("^The Elasticsearch index named '(.+?)' and mapping '(.+?)' contains a column named '(.+?)' with the value '(.+?)'$")
-    public void elasticSearchIndexContainsDocument(String indexName, String mappingName, String columnName, String columnValue) throws Exception {
-        assertThat((commonspec.getElasticSearchClient().searchSimpleFilterElasticsearchQuery(
-                indexName,
-                mappingName,
-                columnName,
-                columnValue,
-                "equals"
-        ).size()) > 0).isTrue().withFailMessage("The index does not contain that document");
-    }
-
     /*
      * Check value stored in environment variable "is|matches|is higher than|is lower than|contains|is different from" to value provided
      *
@@ -717,11 +451,6 @@ public class ThenGSpec extends BaseGSpec {
             default:
                 Fail.fail("Not a valid comparison. Valid ones are: is | matches | is higher than | is lower than | contains | is different from");
         }
-    }
-
-    @Then("^The kafka topic '(.*?)' has a message containing '(.*?)'$")
-    public void checkMessages(String topic, String content) {
-        assert commonspec.getKafkaUtils().readTopicFromBeginning(topic).contains(content) : "Topic does not exist or the content does not match";
     }
 
     /**

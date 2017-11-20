@@ -17,10 +17,6 @@
 package com.privalia.qa.specs;
 
 import com.csvreader.CsvReader;
-import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
-import com.mongodb.DBObject;
-import com.mongodb.util.JSON;
 import com.ning.http.client.Response;
 import com.privalia.qa.cucumber.converter.ArrayListConverter;
 import com.privalia.qa.utils.ThreadProperty;
@@ -28,7 +24,6 @@ import com.privalia.qa.cucumber.converter.NullableStringConverter;
 import cucumber.api.DataTable;
 import cucumber.api.Transform;
 import cucumber.api.java.en.When;
-import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.hjson.JsonArray;
 import org.hjson.JsonValue;
 import org.openqa.selenium.By;
@@ -43,7 +38,6 @@ import java.util.concurrent.Future;
 import java.util.regex.Pattern;
 
 import static com.privalia.qa.assertions.Assertions.assertThat;
-import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
 /**
  * Generic When Specs.
@@ -129,7 +123,6 @@ public class WhenGSpec extends BaseGSpec {
 
         commonspec.getPreviousWebElements().getPreviousWebElements().get(index).clear();
     }
-
 
     /**
      * Type a {@code text} on an numbered {@code index} previously found element.
@@ -396,161 +389,6 @@ public class WhenGSpec extends BaseGSpec {
     }
 
     /**
-     * Execute a query with schema over a cluster
-     *
-     * @param fields        columns on which the query is executed. Example: "latitude,longitude" or "*" or "count(*)"
-     * @param schema        the file of configuration (.conf) with the options of mappin. If schema is the word "empty", method will not add a where clause.
-     * @param type          type of the changes in schema (string or json)
-     * @param table         table for create the index
-     * @param magic_column  magic column where index will be saved. If you don't need index, you can add the word "empty"
-     * @param keyspace      keyspace used
-     * @param modifications all data in "where" clause. Where schema is "empty", query has not a where clause. So it is necessary to provide an empty table. Example:  ||.
-     */
-    @When("^I execute a query over fields '(.+?)' with schema '(.+?)' of type '(json|string)' with magic_column '(.+?)' from table: '(.+?)' using keyspace: '(.+?)' with:$")
-    public void sendQueryOfType(String fields, String schema, String type, String magic_column, String table, String keyspace, DataTable modifications) {
-        try {
-            commonspec.setResultsType("cassandra");
-            commonspec.getCassandraClient().useKeyspace(keyspace);
-            commonspec.getLogger().debug("Starting a query of type " + commonspec.getResultsType());
-
-            String query = "";
-
-            if (schema.equals("empty") && magic_column.equals("empty")) {
-
-                query = "SELECT " + fields + " FROM " + table + ";";
-
-            } else if (!schema.equals("empty") && magic_column.equals("empty")) {
-                String retrievedData = commonspec.retrieveData(schema, type);
-                String modifiedData = commonspec.modifyData(retrievedData, type, modifications).toString();
-                query = "SELECT " + fields + " FROM " + table + " WHERE " + modifiedData + ";";
-
-
-            } else {
-                String retrievedData = commonspec.retrieveData(schema, type);
-                String modifiedData = commonspec.modifyData(retrievedData, type, modifications).toString();
-                query = "SELECT " + fields + " FROM " + table + " WHERE " + magic_column + " = '" + modifiedData + "';";
-
-            }
-            commonspec.getLogger().debug("query: {}", query);
-            commonspec.setCassandraResults(commonspec.getCassandraClient().executeQuery(query));
-        } catch (Exception e) {
-            commonspec.getLogger().debug("Exception captured");
-            commonspec.getLogger().debug(e.toString());
-            commonspec.getExceptions().add(e);
-        }
-
-
-    }
-
-    /**
-     * Execute a query on (mongo) database
-     *
-     * @param query         path to query
-     * @param type          type of data in query (string or json)
-     * @param collection    collection in database
-     * @param modifications modifications to perform in query
-     */
-    @When("^I execute a query '(.+?)' of type '(json|string)' in mongo '(.+?)' database using collection '(.+?)' with:$")
-    public void sendQueryOfType(String query, String type, String database, String collection, DataTable modifications) throws Exception {
-        try {
-            commonspec.setResultsType("mongo");
-            String retrievedData = commonspec.retrieveData(query, type);
-            String modifiedData = commonspec.modifyData(retrievedData, type, modifications);
-            commonspec.getMongoDBClient().connectToMongoDBDataBase(database);
-            DBCollection dbCollection = commonspec.getMongoDBClient().getMongoDBCollection(collection);
-            DBObject dbObject = (DBObject) JSON.parse(modifiedData);
-            DBCursor cursor = dbCollection.find(dbObject);
-            commonspec.setMongoResults(cursor);
-        } catch (Exception e) {
-            commonspec.getExceptions().add(e);
-        }
-    }
-
-    /**
-     * Execute query with filter over elasticsearch
-     *
-     * @param indexName
-     * @param mappingName
-     * @param columnName
-     * @param filterType  it could be equals, gt, gte, lt and lte.
-     * @param value       value of the column to be filtered.
-     */
-    @When("^I execute an elasticsearch query over index '(.*?)' and mapping '(.*?)' and column '(.*?)' with value '(.*?)' to '(.*?)'$")
-    public void elasticSearchQueryWithFilter(String indexName, String mappingName, String
-            columnName, String filterType, String value) {
-        try {
-            commonspec.setResultsType("elasticsearch");
-            commonspec.setElasticsearchResults(
-                    commonspec.getElasticSearchClient()
-                            .searchSimpleFilterElasticsearchQuery(indexName, mappingName, columnName,
-                                    value, filterType)
-            );
-        } catch (Exception e) {
-            commonspec.getLogger().debug("Exception captured");
-            commonspec.getLogger().debug(e.toString());
-            commonspec.getExceptions().add(e);
-        }
-    }
-
-
-    /**
-     * Create a Cassandra index.
-     *
-     * @param index_name    index name
-     * @param schema        the file of configuration (.conf) with the options of mappin
-     * @param type          type of the changes in schema (string or json)
-     * @param table         table for create the index
-     * @param magic_column  magic column where index will be saved
-     * @param keyspace      keyspace used
-     * @param modifications data introduced for query fields defined on schema
-     */
-    @When("^I create a Cassandra index named '(.+?)' with schema '(.+?)' of type '(json|string)' in table '(.+?)' using magic_column '(.+?)' using keyspace '(.+?)' with:$")
-    public void createCustomMapping(String index_name, String schema, String type, String table, String magic_column, String keyspace, DataTable modifications) throws Exception {
-        String retrievedData = commonspec.retrieveData(schema, type);
-        String modifiedData = commonspec.modifyData(retrievedData, type, modifications).toString();
-        String query = "CREATE CUSTOM INDEX " + index_name + " ON " + keyspace + "." + table + "(" + magic_column + ") "
-                + "USING 'com.stratio.cassandra.lucene.Index' WITH OPTIONS = " + modifiedData;
-        commonspec.getLogger().debug("Will execute a cassandra query: {}", query);
-        commonspec.getCassandraClient().executeQuery(query);
-    }
-
-    /**
-     * Drop table
-     *
-     * @param table
-     * @param keyspace
-     */
-    @When("^I drop a Cassandra table named '(.+?)' using keyspace '(.+?)'$")
-    public void dropTableWithData(String table, String keyspace) {
-        try {
-            commonspec.getCassandraClient().useKeyspace(keyspace);
-            commonspec.getCassandraClient().dropTable(table);
-        } catch (Exception e) {
-            commonspec.getLogger().debug("Exception captured");
-            commonspec.getLogger().debug(e.toString());
-            commonspec.getExceptions().add(e);
-        }
-    }
-
-    /**
-     * Truncate table
-     *
-     * @param table
-     * @param keyspace
-     */
-    @When("^I truncate a Cassandra table named '(.+?)' using keyspace '(.+?)'$")
-    public void truncateTable(String table, String keyspace) {
-        try {
-            commonspec.getCassandraClient().useKeyspace(keyspace);
-            commonspec.getCassandraClient().truncateTable(table);
-        } catch (Exception e) {
-            commonspec.getLogger().debug("Exception captured");
-            commonspec.getLogger().debug(e.toString());
-            commonspec.getExceptions().add(e);
-        }
-    }
-
-    /**
      * Read csv file and store result in list of maps
      *
      * @param csvFile
@@ -579,7 +417,6 @@ public class WhenGSpec extends BaseGSpec {
         commonspec.setResultsType("csv");
         commonspec.setCSVResults(results);
     }
-
 
     /**
      * Change current window to another opened window.
@@ -643,107 +480,6 @@ public class WhenGSpec extends BaseGSpec {
         ThreadProperty.set(envVar, jsonValues.toString());
     }
 
-    /**
-     * Create a Kafka topic.
-     *
-     * @param topic_name topic name
-     */
-    @When("^I create a Kafka topic named '(.+?)'")
-    public void createKafkaTopic(String topic_name) throws Exception {
-        commonspec.getKafkaUtils().createTopic(topic_name);
-    }
-
-    /**
-     * Delete a Kafka topic.
-     *
-     * @param topic_name topic name
-     */
-    @When("^I delete a Kafka topic named '(.+?)'")
-    public void deleteKafkaTopic(String topic_name) throws Exception {
-        commonspec.getKafkaUtils().deleteTopic(topic_name);
-    }
-
-
-    /**
-     * Delete zPath, it should be empty
-     *
-     * @param zNode path at zookeeper
-     */
-    @When("^I remove the zNode '(.+?)'$")
-    public void removeZNode(String zNode) throws Exception {
-        commonspec.getZookeeperSecClient().delete(zNode);
-    }
-
-
-    /**
-     * Create zPath and domcument
-     *
-     * @param path      path at zookeeper
-     * @param foo       a dummy match group
-     * @param content   if it has content it should be defined
-     * @param ephemeral if it's created as ephemeral or not
-     */
-    @When("^I create the zNode '(.+?)'( with content '(.+?)')? which (IS|IS NOT) ephemeral$")
-    public void createZNode(String path, String foo, String content, boolean ephemeral) throws Exception {
-        if (content != null) {
-            commonspec.getZookeeperSecClient().zCreate(path, content, ephemeral);
-        } else {
-            commonspec.getZookeeperSecClient().zCreate(path, ephemeral);
-        }
-    }
-
-    /**
-     * Modify partitions in a Kafka topic.
-     *
-     * @param topic_name    topic name
-     * @param numPartitions number of partitions
-     */
-    @When("^I increase '(.+?)' partitions in a Kafka topic named '(.+?)'")
-    public void modifyPartitions(int numPartitions, String topic_name) throws Exception {
-        commonspec.getKafkaUtils().modifyTopicPartitioning(topic_name, numPartitions);
-    }
-
-
-    /**
-     * Sending a message in a Kafka topic.
-     *
-     * @param topic_name topic name
-     * @param message    string that you send to topic
-     */
-    @When("^I send a message '(.+?)' to the kafka topic named '(.+?)'")
-    public void sendAMessage(String message, String topic_name) throws Exception {
-        commonspec.getKafkaUtils().sendMessage(message, topic_name);
-    }
-
-    /**
-     * Create an elasticsearch index.
-     *
-     * @param index
-     */
-    @When("^I create an elasticsearch index named '(.+?)'( removing existing index if exist)?$")
-    public void createElasticsearchIndex(String index, String removeIndex) {
-        if (removeIndex != null && commonspec.getElasticSearchClient().indexExists(index)) {
-            commonspec.getElasticSearchClient().dropSingleIndex(index);
-        }
-        commonspec.getElasticSearchClient().createSingleIndex(index);
-    }
-
-    /**
-     * Index a document within a mapping type.
-     *
-     * @param indexName
-     * @param mappingName
-     * @param key
-     * @param value
-     * @throws Exception
-     */
-    @When("^I index a document in the index named '(.+?)' using the mapping named '(.+?)' with key '(.+?)' and value '(.+?)'$")
-    public void indexElasticsearchDocument(String indexName, String mappingName, String key, String value) throws Exception {
-        ArrayList<XContentBuilder> mappingsource = new ArrayList<XContentBuilder>();
-        XContentBuilder builder = jsonBuilder().startObject().field(key, value).endObject();
-        mappingsource.add(builder);
-        commonspec.getElasticSearchClient().createMapping(indexName, mappingName, mappingsource);
-    }
 
     /**
      * Create a JSON in resources directory with given name, so for using it you've to reference it as:

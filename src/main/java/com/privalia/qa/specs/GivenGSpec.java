@@ -17,9 +17,7 @@
 package com.privalia.qa.specs;
 
 import com.jayway.jsonpath.PathNotFoundException;
-import com.ning.http.client.Response;
 import com.ning.http.client.cookie.Cookie;
-import com.privalia.qa.exceptions.DBException;
 import com.privalia.qa.utils.RemoteSSHConnection;
 import com.privalia.qa.utils.ThreadProperty;
 import cucumber.api.DataTable;
@@ -28,9 +26,7 @@ import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
-import java.net.UnknownHostException;
 import java.util.*;
-import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -42,9 +38,6 @@ import static com.privalia.qa.assertions.Assertions.assertThat;
  */
 public class GivenGSpec extends BaseGSpec {
 
-    public static final Integer ES_DEFAULT_NATIVE_PORT = 9300;
-
-    public static final String ES_DEFAULT_CLUSTER_NAME = "elasticsearch";
 
     /**
      * Generic constructor.
@@ -55,150 +48,6 @@ public class GivenGSpec extends BaseGSpec {
         this.commonspec = spec;
 
     }
-
-    /**
-     * Create a basic Index.
-     *
-     * @param index_name index name
-     * @param table      the table where index will be created.
-     * @param column     the column where index will be saved
-     * @param keyspace   keyspace used
-     * @throws Exception exception
-     */
-    @Given("^I create a Cassandra index named '(.+?)' in table '(.+?)' using magic_column '(.+?)' using keyspace '(.+?)'$")
-    public void createBasicMapping(String index_name, String table, String column, String keyspace) throws Exception {
-        String query = "CREATE INDEX " + index_name + " ON " + table + " (" + column + ");";
-        commonspec.getCassandraClient().executeQuery(query);
-    }
-
-    /**
-     * Create a Cassandra Keyspace.
-     *
-     * @param keyspace cassandra keyspace
-     */
-    @Given("^I create a Cassandra keyspace named '(.+)'$")
-    public void createCassandraKeyspace(String keyspace) {
-        commonspec.getCassandraClient().createKeyspace(keyspace);
-    }
-
-    /**
-     * Connect to cluster.
-     *
-     * @param clusterType DB type (Cassandra|Mongo|Elasticsearch)
-     * @param url         url where is started Cassandra cluster
-     */
-    @Given("^I connect to '(Cassandra|Mongo|Elasticsearch)' cluster at '(.+)'$")
-    public void connect(String clusterType, String url) throws DBException, UnknownHostException {
-        switch (clusterType) {
-            case "Cassandra":
-                commonspec.getCassandraClient().buildCluster();
-                commonspec.getCassandraClient().connect();
-                break;
-            case "Mongo":
-                commonspec.getMongoDBClient().connect();
-                break;
-            case "Elasticsearch":
-                LinkedHashMap<String, Object> settings_map = new LinkedHashMap<String, Object>();
-                settings_map.put("cluster.name", System.getProperty("ES_CLUSTER", ES_DEFAULT_CLUSTER_NAME));
-                commonspec.getElasticSearchClient().setSettings(settings_map);
-                commonspec.getElasticSearchClient().connect();
-                break;
-            default:
-                throw new DBException("Unknown cluster type");
-        }
-    }
-
-    /**
-     * Connect to ElasticSearch using custom parameters
-     *
-     * @param host ES host
-     * @param foo regex needed to match method
-     * @param nativePort ES port
-     * @param bar regex needed to match method
-     * @param clusterName ES clustername
-     * @throws DBException exception
-     * @throws UnknownHostException exception
-     * @throws NumberFormatException exception
-     */
-    @Given("^I connect to Elasticsearch cluster at host '(.+?)'( using native port '(.+?)')?( using cluster name '(.+?)')?$")
-    public void connectToElasticSearch(String host, String foo, String nativePort, String bar, String clusterName) throws DBException, UnknownHostException, NumberFormatException {
-        LinkedHashMap<String, Object> settings_map = new LinkedHashMap<String, Object>();
-        if (clusterName != null) {
-            settings_map.put("cluster.name", clusterName);
-        } else {
-            settings_map.put("cluster.name", ES_DEFAULT_CLUSTER_NAME);
-        }
-        commonspec.getElasticSearchClient().setSettings(settings_map);
-        if (nativePort != null) {
-            commonspec.getElasticSearchClient().setNativePort(Integer.valueOf(nativePort));
-        } else {
-            commonspec.getElasticSearchClient().setNativePort(ES_DEFAULT_NATIVE_PORT);
-        }
-        commonspec.getElasticSearchClient().setHost(host);
-        commonspec.getElasticSearchClient().connect();
-    }
-
-    /**
-     * Create table
-     *
-     * @param table Cassandra table
-     * @param datatable datatable used for parsing elements
-     * @param keyspace Cassandra keyspace
-     */
-    @Given("^I create a Cassandra table named '(.+?)' using keyspace '(.+?)' with:$")
-    public void createTableWithData(String table, String keyspace, DataTable datatable) {
-        try {
-            commonspec.getCassandraClient().useKeyspace(keyspace);
-            int attrLength = datatable.getGherkinRows().get(0).getCells().size();
-            Map<String, String> columns = new HashMap<String, String>();
-            ArrayList<String> pk = new ArrayList<String>();
-
-            for (int i = 0; i < attrLength; i++) {
-                columns.put(datatable.getGherkinRows().get(0).getCells().get(i),
-                        datatable.getGherkinRows().get(1).getCells().get(i));
-                if ((datatable.getGherkinRows().size() == 3) && datatable.getGherkinRows().get(2).getCells().get(i).equalsIgnoreCase("PK")) {
-                    pk.add(datatable.getGherkinRows().get(0).getCells().get(i));
-                }
-            }
-            if (pk.isEmpty()) {
-                throw new Exception("A PK is needed");
-            }
-            commonspec.getCassandraClient().createTableWithData(table, columns, pk);
-        } catch (Exception e) {
-            commonspec.getLogger().debug("Exception captured");
-            commonspec.getLogger().debug(e.toString());
-            commonspec.getExceptions().add(e);
-        }
-    }
-
-    /**
-     * Insert Data
-     *
-     * @param table Cassandra table
-     * @param datatable datatable used for parsing elements
-     * @param keyspace Cassandra keyspace
-     */
-    @Given("^I insert in keyspace '(.+?)' and table '(.+?)' with:$")
-    public void insertData(String keyspace, String table, DataTable datatable) {
-        try {
-            commonspec.getCassandraClient().useKeyspace(keyspace);
-            int attrLength = datatable.getGherkinRows().get(0).getCells().size();
-            Map<String, Object> fields = new HashMap<String, Object>();
-            for (int e = 1; e < datatable.getGherkinRows().size(); e++) {
-                for (int i = 0; i < attrLength; i++) {
-                    fields.put(datatable.getGherkinRows().get(0).getCells().get(i), datatable.getGherkinRows().get(e).getCells().get(i));
-
-                }
-                commonspec.getCassandraClient().insertData(keyspace + "." + table, fields);
-
-            }
-        } catch (Exception e) {
-            commonspec.getLogger().debug("Exception captured");
-            commonspec.getLogger().debug(e.toString());
-            commonspec.getExceptions().add(e);
-        }
-    }
-
 
     /**
      * Save value for future use.
@@ -280,7 +129,6 @@ public class GivenGSpec extends BaseGSpec {
 
     }
 
-
     /**
      * Save value for future use.
      *
@@ -290,122 +138,6 @@ public class GivenGSpec extends BaseGSpec {
     @Given("^I save \'(.+?)\' in variable \'(.+?)\'$")
     public void saveInEnvironment(String value, String envVar) {
         ThreadProperty.set(envVar, value);
-    }
-
-
-    /**
-     * Save clustername of elasticsearch in an environment varible for future use.
-     *
-     * @param host   elasticsearch connection
-     * @param port   elasticsearch port
-     * @param envVar thread variable where to store the value
-     * @throws IllegalAccessException exception
-     * @throws IllegalArgumentException exception
-     * @throws SecurityException exception
-     * @throws NoSuchFieldException exception
-     * @throws ClassNotFoundException exception
-     * @throws InstantiationException exception
-     * @throws InvocationTargetException exception
-     * @throws NoSuchMethodException exception
-     */
-    @Given("^I obtain elasticsearch cluster name in '([^:]+?)(:.+?)?' and save it in variable '(.+?)'?$")
-    public void saveElasticCluster(String host, String port, String envVar) throws Exception {
-
-        setupRestClient(null, host, port);
-
-        Future<Response> response;
-
-        response = commonspec.generateRequest("GET", false, null, null, "/", "", "json", "");
-        commonspec.setResponse("GET", response.get());
-
-        String json;
-        String parsedElement;
-        json = commonspec.getResponse().getResponse();
-        parsedElement = "$..cluster_name";
-
-        String json2 = "[" + json + "]";
-        String value = commonspec.getJSONPathString(json2, parsedElement, "0");
-
-        if (value == null) {
-            throw new Exception("No cluster name is found");
-        } else {
-            ThreadProperty.set(envVar, value);
-        }
-    }
-
-
-    /**
-     * Drop all the ElasticSearch indexes.
-     */
-    @Given("^I drop every existing elasticsearch index$")
-    public void dropElasticsearchIndexes() {
-        commonspec.getElasticSearchClient().dropAllIndexes();
-    }
-
-    /**
-     * Drop an specific index of ElasticSearch.
-     *
-     * @param index ES index
-     */
-    @Given("^I drop an elasticsearch index named '(.+?)'$")
-    public void dropElasticsearchIndex(String index) {
-        commonspec.getElasticSearchClient().dropSingleIndex(index);
-    }
-
-    /**
-     * Drop a Cassandra Keyspace.
-     *
-     * @param keyspace Cassandra keyspace
-     */
-    @Given("^I drop a Cassandra keyspace '(.+)'$")
-    public void dropCassandraKeyspace(String keyspace) {
-        commonspec.getCassandraClient().dropKeyspace(keyspace);
-    }
-
-    /**
-     * Create a MongoDB dataBase.
-     *
-     * @param databaseName Mongo database
-     */
-    @Given("^I create a MongoDB dataBase '(.+?)'$")
-    public void createMongoDBDataBase(String databaseName) {
-        commonspec.getMongoDBClient().connectToMongoDBDataBase(databaseName);
-
-    }
-
-    /**
-     * Drop MongoDB Database.
-     *
-     * @param databaseName mongo database
-     */
-    @Given("^I drop a MongoDB database '(.+?)'$")
-    public void dropMongoDBDataBase(String databaseName) {
-        commonspec.getMongoDBClient().dropMongoDBDataBase(databaseName);
-    }
-
-    /**
-     * Insert data in a MongoDB table.
-     *
-     * @param dataBase Mongo database
-     * @param tabName Mongo table
-     * @param table Datatable used for insert elements
-     */
-    @Given("^I insert into a MongoDB database '(.+?)' and table '(.+?)' this values:$")
-    public void insertOnMongoTable(String dataBase, String tabName, DataTable table) {
-        commonspec.getMongoDBClient().connectToMongoDBDataBase(dataBase);
-        commonspec.getMongoDBClient().insertIntoMongoDBCollection(tabName, table);
-    }
-
-    /**
-     * Truncate table in MongoDB.
-     *
-     * @param database Mongo database
-     * @param table Mongo table
-     */
-    @Given("^I drop every document at a MongoDB database '(.+?)' and table '(.+?)'")
-    public void truncateTableInMongo(String database, String table) {
-        commonspec.getMongoDBClient().connectToMongoDBDataBase(database);
-        commonspec.getMongoDBClient().dropAllDataMongoDBCollection(table);
     }
 
     /**
@@ -550,7 +282,6 @@ public class GivenGSpec extends BaseGSpec {
         commonspec.getDriver().switchTo().frame(commonspec.getParentWindow());
     }
 
-
     /**
      * Opens a ssh connection to remote host
      *
@@ -579,7 +310,6 @@ public class GivenGSpec extends BaseGSpec {
         }
     }
 
-
     public List<Cookie> addSsoToken(HashMap<String, String> ssoCookies, String[] tokenList) {
         List<Cookie> cookiesAttributes = new ArrayList<>();
 
@@ -590,7 +320,6 @@ public class GivenGSpec extends BaseGSpec {
         }
         return cookiesAttributes;
     }
-
 
     /*
      * Copies file/s from remote system into local system
@@ -605,7 +334,6 @@ public class GivenGSpec extends BaseGSpec {
         commonspec.getRemoteSSHConnection().copyFrom(remotePath, localPath);
     }
 
-
     /**
      * Copies file/s from local system to remote system
      *
@@ -617,7 +345,6 @@ public class GivenGSpec extends BaseGSpec {
     public void copyToRemoteFile(String localPath, String remotePath) throws Exception {
         commonspec.getRemoteSSHConnection().copyTo(localPath, remotePath);
     }
-
 
     /**
      * Executes the command specified in local system
@@ -666,22 +393,6 @@ public class GivenGSpec extends BaseGSpec {
         assertThat(commonspec.getRemoteSSHConnection().getExitStatus()).isEqualTo(exitStatus);
     }
 
-
-    /**
-     * Insert document in a MongoDB table.
-     *
-     * @param dataBase Mongo database
-     * @param collection Mongo collection
-     * @param document document used for schema
-     */
-    @Given("^I insert into MongoDB database '(.+?)' and collection '(.+?)' the document from schema '(.+?)'$")
-    public void insertOnMongoTable(String dataBase, String collection, String document) throws Exception {
-        String retrievedDoc = commonspec.retrieveData(document, "json");
-        commonspec.getMongoDBClient().connectToMongoDBDataBase(dataBase);
-        commonspec.getMongoDBClient().insertDocIntoMongoDBCollection(collection, retrievedDoc);
-    }
-
-
     /**
      * Get all opened windows and store it.
      */
@@ -690,44 +401,5 @@ public class GivenGSpec extends BaseGSpec {
         Set<String> wel = commonspec.getDriver().getWindowHandles();
 
         assertThat(wel).as("Element count doesnt match").hasSize(2);
-    }
-
-
-    /**
-     * Connect to zookeeper.
-     *
-     * @param zookeeperHosts as host:port (comma separated)
-     * @throws InterruptedException exception
-     */
-    @Given("^I connect to Zookeeper at '(.+)'$")
-    public void connectToZk(String zookeeperHosts) throws InterruptedException {
-        commonspec.getZookeeperSecClient().setZookeeperSecConnection(zookeeperHosts, 3000);
-        commonspec.getZookeeperSecClient().connectZk();
-    }
-
-
-    /**
-     * Disconnect from zookeeper.
-     *
-     */
-    @Given("^I disconnect from Zookeeper$")
-    public void disconnectFromZk() throws InterruptedException {
-        commonspec.getZookeeperSecClient().disconnect();
-    }
-
-
-    /**
-     * Connect to Kafka.
-     *
-     * @param zkHost ZK host
-     * @param zkPath ZK port
-     * @throws UnknownHostException exception
-     */
-    @Given("^I connect to kafka at '(.+)' using path '(.+)'$")
-    public void connectKafka(String zkHost, String zkPath) throws UnknownHostException {
-        String zkPort = zkHost.split(":")[1];
-        zkHost = zkHost.split(":")[0];
-        commonspec.getKafkaUtils().setZkHost(zkHost, zkPort, zkPath);
-        commonspec.getKafkaUtils().connect();
     }
 }
