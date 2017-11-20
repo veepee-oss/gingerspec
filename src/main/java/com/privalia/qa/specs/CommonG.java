@@ -45,9 +45,12 @@ import org.hjson.JsonValue;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.openqa.selenium.*;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.internal.Locatable;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.support.ui.*;
+import org.openqa.selenium.By;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,6 +68,8 @@ import java.util.regex.Pattern;
 
 import static com.privalia.qa.assertions.Assertions.assertThat;
 import static org.testng.Assert.fail;
+
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class CommonG {
 
@@ -119,6 +124,8 @@ public class CommonG {
     private String restProtocol;
 
     private ZookeeperSecUtils zkSecClient;
+
+    private Alert SeleniumAlert;
 
     /**
      * Checks if a given string matches a regular expression or contains a string
@@ -376,6 +383,122 @@ public class CommonG {
         }
 
         return wel;
+    }
+
+    /**
+     * Similar to {@link CommonG#locateElement(String, String, Integer)}. Looks for webelements inside a selenium context
+     * but with a wait condition. Instead of returning immediately a fail if the element is not found, the method waits a
+     * maximum time (poolMaxTime) in which the condition is checked in intervals (poolingInterval).
+     * The method also verify if the required elements are of the type specified.
+     *
+     * @param poolingInterval   Time between consecutive condition evaluations
+     * @param poolMaxTime       Maximum time to wait for the condition to be true
+     * @param method            class of element to be searched
+     * @param element           webElement searched in selenium context
+     * @param expectedCount     integer. Expected number of elements.
+     * @param type              The expected style of the element: visible, clickable, present, hidden
+     * @return                  List(WebElement)
+     * @throws ClassNotFoundException
+     * @throws NoSuchFieldException
+     * @throws IllegalAccessException
+     */
+    public List<WebElement> locateElementWithPooling(int poolingInterval, int poolMaxTime, String method, String element,
+                                          Integer expectedCount, String type) throws ClassNotFoundException, NoSuchFieldException, IllegalAccessException {
+
+        Wait wait = new FluentWait(driver)
+                .withTimeout(poolMaxTime, SECONDS)
+                .pollingEvery(poolingInterval, SECONDS)
+                .ignoring(NoSuchElementException.class)
+                .ignoring(StaleElementReferenceException.class)
+                .ignoring(ElementNotVisibleException.class);
+
+        logger.debug("Waiting for {} elements by xpath to be {}", expectedCount, type);
+        if ("visible".matches(type)) {
+            wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(getByType(method, element)));
+        } else if ("clickable".matches(type)) {
+            wait.until(ExpectedConditions.elementToBeClickable(getByType(method, element)));
+        } else if ("present".matches(type)) {
+            wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(getByType(method, element)));
+        } else if ("hidden".matches(type)) {
+            wait.until(ExpectedConditions.invisibilityOfElementLocated(getByType(method, element)));
+        } else {
+            fail("Unknown type: " + type);
+        }
+
+
+        return locateElement(method, element, expectedCount);
+    }
+
+    /**
+     * Locates an element within a document given a method and an element reference
+     * @param method    class of element to be searched (id, name, class, xpath, css)
+     * @param element   webElement searched in selenium context
+     * @return          a By which locates elements by the method specified
+     */
+    private By getByType(String method, String element) {
+
+        if ("id".equals(method)) {
+            return By.id(element);
+        } else if ("name".equals(method)) {
+            return By.name(element);
+        } else if ("class".equals(method)) {
+            return By.className(element);
+        } else if ("xpath".equals(method)) {
+            return By.xpath(element);
+        } else if ("css".equals(method)) {
+            return By.className(element);
+        }
+
+        fail("Unknown method: " + method);
+        return null;
+    }
+
+    /**
+     * Similar to {@link CommonG#locateElementWithPooling(int, int, String, String, Integer, String)}, looks for an alert message
+     * inside a selenium context. The method waits a maximum time (poolMaxTime) in which the condition is checked in intervals (poolingInterval).
+     * @param poolingInterval   Time between consecutive condition evaluations
+     * @param poolMaxTime       Maximum time to wait for the condition to be true
+     * @return                  A selenium Alert object
+     */
+    public Alert waitAlertWithPooling(int poolingInterval, int poolMaxTime) {
+
+        Wait wait = new FluentWait(driver)
+                .withTimeout(poolMaxTime, SECONDS)
+                .pollingEvery(poolingInterval, SECONDS)
+                .ignoring(NoSuchElementException.class)
+                .ignoring(java.util.NoSuchElementException.class)
+                .ignoring(StaleElementReferenceException.class)
+                .ignoring(ElementNotVisibleException.class);
+
+        logger.debug("Waiting for {} seconds for an alert to appear", poolMaxTime);
+        return (Alert) wait.until(ExpectedConditions.alertIsPresent());
+
+    }
+
+    /**
+     * Dismiss any existing alert message in the current selenium context
+     */
+    public void dismissSeleniumAlert() {
+
+        if (this.getSeleniumAlert() == null) {
+            fail("There is not an alert present in the page");
+        }
+
+        this.getSeleniumAlert().dismiss();
+
+    }
+
+    /**
+     * Accepts any existing alert message in the current selenium context
+     */
+    public void acceptSeleniumAlert() {
+
+        if (this.getSeleniumAlert() == null) {
+            fail("There is not an alert present in the page");
+        }
+
+        this.getSeleniumAlert().accept();
+
     }
 
      /**
@@ -1899,6 +2022,14 @@ public class CommonG {
                 this.getLogger().debug("Command complete stdout:\n{}", this.getCommandResult());
             }
         }
+    }
+
+    public Alert getSeleniumAlert() {
+        return SeleniumAlert;
+    }
+
+    public void setSeleniumAlert(Alert seleniumAlert) {
+        SeleniumAlert = seleniumAlert;
     }
 
 }
