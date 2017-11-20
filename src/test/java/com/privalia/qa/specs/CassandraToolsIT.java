@@ -33,7 +33,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 // with equalsColumns comparison
 public class CassandraToolsIT extends BaseGSpec {
     public static final int VALUE_SUBSTRING = 3;
-    GivenGSpec commonspecG;
+    BigDataGSpec commonspecG;
     //for table creation
     List<List<String>> dataCreation = Arrays.asList(Arrays.asList("col1", "col2"),
             Arrays.asList("text", "int"),
@@ -67,7 +67,7 @@ public class CassandraToolsIT extends BaseGSpec {
     public CassandraToolsIT() {
         ThreadProperty.set("class", this.getClass().getCanonicalName());
         this.commonspec = new CommonG();
-        commonspecG = new GivenGSpec(this.commonspec);
+        commonspecG = new BigDataGSpec(this.commonspec);
     }
 
     @BeforeClass
