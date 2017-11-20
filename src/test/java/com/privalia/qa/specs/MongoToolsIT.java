@@ -23,8 +23,6 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 
 public class MongoToolsIT extends BaseGSpec {
     GivenGSpec commonspecG;
