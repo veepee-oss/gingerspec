@@ -24,12 +24,16 @@ import gherkin.formatter.model.DataTableRow;
 import org.assertj.core.api.Fail;
 import org.assertj.core.api.WritableAssertionInfo;
 import org.json.JSONArray;
+import org.junit.Assert;
 import org.openqa.selenium.WebElement;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
+import static com.jayway.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchema;
 import static com.privalia.qa.assertions.Assertions.assertThat;
+
 
 /**
  * Generic Then Specs.
@@ -291,8 +295,8 @@ public class ThenGSpec extends BaseGSpec {
         assertThat(commonspec.getResponse().getResponse()).containsPattern(pattern);
     }
 
-    @Then("^the service response status must be '(.*?)'( and its response length must be '(.*?)' | and its response must contain the text '(.*?)')?$")
-    public void assertResponseStatusLength(Integer expectedStatus, String foo, Integer expectedLength, String expectedText) {
+    @Then("^the service response status must be '(.*?)'( and its response length must be '(.*?)' | and its response must contain the text '(.*?)' | and its response matches the schema in '(.+?)')?$")
+    public void assertResponseStatusLength(Integer expectedStatus, String foo, Integer expectedLength, String expectedText, String expectedSchema) {
         if (foo != null) {
             if (foo.contains("length")) {
                 assertThat(Optional.of(commonspec.getResponse())).hasValueSatisfying(r -> {
@@ -306,6 +310,12 @@ public class ThenGSpec extends BaseGSpec {
                     assertThat(r.getStatusCode()).isEqualTo(expectedStatus);
                     assertThat(r.getResponse()).containsPattern(pattern);
                 });
+            } else if (foo.contains("schema")) {
+                assertThat(commonspec.getResponse().getStatusCode()).isEqualTo(expectedStatus);
+                String responseBody = commonspec.getResponse().getResponse();
+                String schemaData = commonspec.retrieveData(expectedSchema, "json");
+                Assert.assertThat(responseBody, matchesJsonSchema(schemaData));
+
             }
         } else {
             assertThat(commonspec.getResponse().getStatusCode()).isEqualTo(expectedStatus);
