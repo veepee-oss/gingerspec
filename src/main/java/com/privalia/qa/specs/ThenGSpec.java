@@ -295,6 +295,15 @@ public class ThenGSpec extends BaseGSpec {
         assertThat(commonspec.getResponse().getResponse()).containsPattern(pattern);
     }
 
+    /**
+     * Verifies the HTTP code of the service response. Additionally, the step can also verify if the returned response
+     * has an specific length, contains a string or matches a json schema.
+     * @param expectedStatus    Expected HTTP response code
+     * @param foo               regex needed to match method
+     * @param expectedLength    Expected lenght of the response
+     * @param expectedText      Text to look for in the response
+     * @param expectedSchema    Json schema to match the response (i.e. schemas/test-schema.json)
+     */
     @Then("^the service response status must be '(.*?)'( and its response length must be '(.*?)' | and its response must contain the text '(.*?)' | and its response matches the schema in '(.+?)')?$")
     public void assertResponseStatusLength(Integer expectedStatus, String foo, Integer expectedLength, String expectedText, String expectedSchema) {
         if (foo != null) {
