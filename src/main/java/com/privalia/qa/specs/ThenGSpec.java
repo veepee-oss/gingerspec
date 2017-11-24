@@ -323,6 +323,8 @@ public class ThenGSpec extends BaseGSpec {
                 assertThat(commonspec.getResponse().getStatusCode()).isEqualTo(expectedStatus);
                 String responseBody = commonspec.getResponse().getResponse();
                 String schemaData = commonspec.retrieveData(expectedSchema, "json");
+
+                /*The following assert uses the typical junit Assert (org.junit.Assert) instead of assertj (used abode)*/
                 Assert.assertThat(responseBody, matchesJsonSchema(schemaData));
 
             }
