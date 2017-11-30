@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.ITestContext;
 
+import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.List;
 
@@ -35,8 +36,9 @@ public class BrowsersDataProviderAspect extends BaseGSpec {
     private final Logger logger = LoggerFactory.getLogger(this.getClass()
             .getCanonicalName());
 
-    @Pointcut("execution (static * BrowsersDataProvider.available*(..)) ")
-    protected void availableBrowsersCallPointcut() {
+    @Pointcut("execution (public static * com.privalia.qa.data.BrowsersDataProvider.availableUniqueBrowsers(..))  && "
+            + "args (context, testConstructor)")
+    protected void availableBrowsersCallPointcut(ITestContext context, Constructor<?> testConstructor) {
     }
 
     /**
@@ -47,7 +49,7 @@ public class BrowsersDataProviderAspect extends BaseGSpec {
      * @return Object
      * @throws Throwable exception
      */
-    @Around(value = "availableBrowsersCallPointcut()")
+    @Around(value = "availableBrowsersCallPointcut(context, testConstructor)")
     public Object availableBrowsersCalls(ProceedingJoinPoint pjp)
             throws Throwable {
 
