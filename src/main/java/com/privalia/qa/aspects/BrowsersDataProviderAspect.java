@@ -36,7 +36,7 @@ public class BrowsersDataProviderAspect extends BaseGSpec {
     private final Logger logger = LoggerFactory.getLogger(this.getClass()
             .getCanonicalName());
 
-    @Pointcut("execution (public static * com.privalia.qa.data.BrowsersDataProvider.availableUniqueBrowsers(..))  && "
+    @Pointcut("execution (public static * com.privalia.qa.data.BrowsersDataProvider.available*(..))  &&"
             + "args (context, testConstructor)")
     protected void availableBrowsersCallPointcut(ITestContext context, Constructor<?> testConstructor) {
     }
@@ -50,7 +50,7 @@ public class BrowsersDataProviderAspect extends BaseGSpec {
      * @throws Throwable exception
      */
     @Around(value = "availableBrowsersCallPointcut(context, testConstructor)")
-    public Object availableBrowsersCalls(ProceedingJoinPoint pjp)
+    public Object availableBrowsersCalls(ProceedingJoinPoint pjp, ITestContext context, Constructor<?> testConstructor)
             throws Throwable {
 
         if (pjp.getArgs().length > 0) {
