@@ -17,6 +17,7 @@ package com.privalia.qa.specs;
 
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Response;
+import com.privalia.qa.utils.JsonUtils;
 import com.privalia.qa.utils.ThreadProperty;
 import cucumber.api.DataTable;
 import org.hjson.JsonValue;
@@ -234,10 +235,10 @@ public class CommonGTest {
     @Test
     public void removeNullsTest() throws Exception {
         ThreadProperty.set("class", this.getClass().getCanonicalName());
-        CommonG commong = new CommonG();
+        JsonUtils jsonUtils = new JsonUtils();
         String expectedData = "{\"key1\":\"TO_BE_NULL\",\"key2\":{\"key3\":\"TO_BE_NULL\"}}";
 
-        JsonObject nullsRemoved = commong.removeNulls(jsonObject20);
+        JsonObject nullsRemoved = jsonUtils.removeNulls(jsonObject20);
         JSONAssert.assertEquals(expectedData, nullsRemoved.toString(), false);
 
     }
@@ -245,10 +246,10 @@ public class CommonGTest {
     @Test
     public void removeNullsNoNullsTest() throws Exception {
         ThreadProperty.set("class", this.getClass().getCanonicalName());
-        CommonG commong = new CommonG();
+        JsonUtils jsonUtils = new JsonUtils();
         String expectedData = "{\"key1\":\"value1\",\"key2\":{\"key3\":\"value3\"}}";
 
-        JsonObject nullsRemoved = commong.removeNulls(jsonObject21);
+        JsonObject nullsRemoved = jsonUtils.removeNulls(jsonObject21);
         JSONAssert.assertEquals(expectedData, nullsRemoved.toString(), false);
 
     }
