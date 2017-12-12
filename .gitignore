@@ -12,3 +12,4 @@ target/*
 *.log
 _ajdump/
 testOutput.txt
+/target/
