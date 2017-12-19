@@ -33,6 +33,7 @@ public class CukesGHooks extends BaseGSpec implements ICucumberReporter, ICucumb
 
     public Scenario scenario;
 
+
     public CukesGHooks() {
     }
 
@@ -72,13 +73,16 @@ public class CukesGHooks extends BaseGSpec implements ICucumberReporter, ICucumb
     @Override
     public void feature(Feature feature) {
         this.feature = feature;
+        logger.info("");
+        logger.info("Feature: {}", feature.getName());
+        logger.info("");
         ThreadProperty.set("feature", feature.getName());
     }
 
     @Override
     public void scenario(Scenario scenario) {
         this.scenario = scenario;
-        logger.info("Feature/Scenario: {}/{} ", feature.getName(), scenario.getName());
+        logger.info("Scenario: {}", scenario.getName());
         ThreadProperty.set("scenario", scenario.getName());
     }
 
@@ -92,6 +96,7 @@ public class CukesGHooks extends BaseGSpec implements ICucumberReporter, ICucumb
 
     @Override
     public void endOfScenarioLifeCycle(Scenario scenario) {
+        logger.info("");
         logger.info(""); //empty line to split scenarios
     }
 
