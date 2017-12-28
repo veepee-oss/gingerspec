@@ -304,13 +304,13 @@ public class ThenGSpec extends BaseGSpec {
      * @param expectedText      Text to look for in the response
      * @param expectedSchema    Json schema to match the response (i.e. schemas/test-schema.json)
      */
-    @Then("^the service response status must be '(.*?)'( and its response length must be '(.*?)' | and its response must contain the text '(.*?)' | and its response matches the schema in '(.+?)')?$")
+    @Then("^the service response status must be '(.*?)'( and its response length must be '(.*?)'| and its response must contain the text '(.*?)'| and its response matches the schema in '(.*?)')?$")
     public void assertResponseStatusLength(Integer expectedStatus, String foo, Integer expectedLength, String expectedText, String expectedSchema) {
         if (foo != null) {
             if (foo.contains("length")) {
                 assertThat(Optional.of(commonspec.getResponse())).hasValueSatisfying(r -> {
                     assertThat(r.getStatusCode()).isEqualTo(expectedStatus);
-                    assertThat((new JSONArray(r.getResponse())).length()).isEqualTo(expectedLength);
+                    assertThat((r.getResponse()).length()).isEqualTo(expectedLength);
                 });
             } else  if (foo.contains("text")) {
                 WritableAssertionInfo assertionInfo = new WritableAssertionInfo();
