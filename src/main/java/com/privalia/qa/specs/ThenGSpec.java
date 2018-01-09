@@ -283,7 +283,7 @@ public class ThenGSpec extends BaseGSpec {
             throw new Exception("Web port has not been set");
         }
 
-        String webURL = commonspec.getWebHost() + commonspec.getWebPort();
+        String webURL = commonspec.getWebHost();
 
         assertThat(commonspec.getDriver().getCurrentUrl()).as("We are not in the expected url: " + webURL.toLowerCase() + url)
                 .endsWith(webURL.toLowerCase() + url);
