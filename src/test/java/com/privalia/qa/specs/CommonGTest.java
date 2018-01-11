@@ -1022,7 +1022,7 @@ public class CommonGTest {
         CommonG commong = new CommonG();
 
         commong.setClient(new AsyncHttpClient());
-        commong.setRestHost("jenkins.stratio.com");
+        commong.setRestHost("jenkins-ci.privalia.pin");
         commong.setRestPort(":80");
         Future<Response> response = commong.generateRequest("GET", false, "bdt", "bdt", "/monitoring", "", "");
 
@@ -1035,7 +1035,7 @@ public class CommonGTest {
         CommonG commong = new CommonG();
 
         commong.setClient(new AsyncHttpClient());
-        commong.setRestHost("jenkins.stratio.com");
+        commong.setRestHost("jenkins-ci.privalia.pin");
         commong.setRestPort(":80");
         String data = "{j_username=user&j_password=pass";
 
@@ -1050,7 +1050,7 @@ public class CommonGTest {
         CommonG commong = new CommonG();
 
         commong.setClient(new AsyncHttpClient());
-        commong.setRestHost("jenkins.stratio.com");
+        commong.setRestHost("jenkins-ci.privalia.pin");
         commong.setRestPort(":80");
         String data = "{j_username=user&j_password=pass";
 
@@ -1065,7 +1065,7 @@ public class CommonGTest {
         CommonG commong = new CommonG();
 
         commong.setClient(new AsyncHttpClient());
-        commong.setRestHost("jenkins.stratio.com");
+        commong.setRestHost("jenkins-ci.privalia.pin");
         commong.setRestPort(":80");
         String data = "{j_username=user&j_password=pass";
 

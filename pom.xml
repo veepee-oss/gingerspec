@@ -61,6 +61,16 @@
 			<name>Pedro Bedia</name>
 			<email>pbedia at stratio dot com</email>
 		</developer>
+		<developer>
+			<id>otarasyuk-privalia</id>
+			<name>Pedro Bedia</name>
+			<email>otarasyuk at privalia.pin</email>
+		</developer>
+		<developer>
+			<id>jfernandez-privalia</id>
+			<name>Pedro Bedia</name>
+			<email>jfernandez at privalia.pin</email>
+		</developer>
 	</developers>
 
 	<properties>

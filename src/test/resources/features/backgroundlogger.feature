@@ -3,7 +3,7 @@
 Feature: Simple logger test with background
 
   Background:
-    Given My app is running in 'jenkins.stratio.com:80'
+    Given My app is running in 'jenkins-ci.privalia.pin:80'
 
   Scenario: Some simple request
     When I send a 'GET' request to '/'

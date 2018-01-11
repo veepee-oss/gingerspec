@@ -1,3 +1,4 @@
+@ignore @toocomplex
 @web
 Feature: Selenium wait with pooling
 

@@ -1,3 +1,4 @@
+@ignore @toocomplex
 Feature: Mongo steps test
 
   Scenario: Connect to Mongo

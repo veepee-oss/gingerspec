@@ -1,3 +1,4 @@
+@ignore @toocomplex
 Feature: Zookeeper steps test
 
   Scenario: Connection to Zk

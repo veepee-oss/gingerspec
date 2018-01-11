@@ -1,3 +1,4 @@
+@ignore @toocomplex
 Feature: Cassandra steps test
 
   Scenario: Connect to Cassandra

@@ -1,4 +1,5 @@
-Feature: Backgorund aspect tests
+@ignore @toocomplex
+Feature: Background aspect tests
 
   Background:
   @BACKGROUND(WAIT)

@@ -1,7 +1,7 @@
 Feature: Simple run test
 
   Background: Connect to bootstrap machine
-    Given I open a ssh connection to '${SSH}' with user 'root' and password 'stratio'
+    Given I open a ssh connection to '${SSH}' with user 'privalia' and password 'temporal'
 
   Scenario: Default exit status - Successful (0)
     Then I run 'ls /tmp' in the ssh connection
@@ -20,6 +20,7 @@ Feature: Simple run test
     When I run 'lss /tmp' in the ssh connection with exit status '127' and save the value in environment variable 'CUSEXSTAT'
     Then '!{CUSEXSTAT}' contains 'lss'
 
+  @ignore @toocomplex
   Scenario: Outbound Inbound file
     When I outbound copy 'exampleJSON.conf' through a ssh connection to '/tmp/exampleJSON.conf'
     Then I inbound copy '/tmp/exampleJSON.conf' through a ssh connection to 'fileFromSsh.conf'
