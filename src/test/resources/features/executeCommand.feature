@@ -1,7 +1,8 @@
+@ignore @toocomplex
 Feature: Simple run test
 
   Background: Connect to bootstrap machine
-    Given I open a ssh connection to '${SSH}' with user 'privalia' and password 'temporal'
+    Given I open a ssh connection to '${SSH}' with user 'root' and password 'temporal'
 
   Scenario: Default exit status - Successful (0)
     Then I run 'ls /tmp' in the ssh connection

@@ -1,7 +1,8 @@
+@ignore @toocomplex
 Feature: Simple check values test
 
   Background: Connect to remote host machine
-    Given I open a ssh connection to '${SSH}' with user 'privalia' and password 'temporal'
+    Given I open a ssh connection to '${SSH}' with user 'root' and password 'temporal'
 
   Scenario: is
     When I run 'echo "EqualTo"' in the ssh connection and save the value in environment variable 'EVAR'

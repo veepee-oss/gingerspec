@@ -1,3 +1,4 @@
+@ignore @toocomplex
 @rest
 
 Feature: Simple logger test with background

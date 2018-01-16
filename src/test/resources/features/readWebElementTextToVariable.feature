@@ -1,3 +1,4 @@
+@ignore @toocomplex
 @web
 Feature: Get webElement text and store in environment variable
 

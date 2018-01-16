@@ -1,3 +1,4 @@
+@ignore @toocomplex
 Feature: Further replacements
 
   Scenario Outline: With scenarios outlines #fails

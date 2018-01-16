@@ -1,3 +1,4 @@
+@ignore @toocomplex
 Feature: Create file test
 
   Scenario: Create JSON file (simple)
