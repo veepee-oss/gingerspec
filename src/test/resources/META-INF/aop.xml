@@ -28,5 +28,6 @@
     </aspects>
     <weaver
             options="-Xlint:ignore -Xset:weaveJavaPackages=true,weaveJavaxPackages=true">
+        !--<dump within="com.privalia.specs..*" beforeandafter="true"/>-->
     </weaver>
 </aspectj>
