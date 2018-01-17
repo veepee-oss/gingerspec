@@ -22,7 +22,8 @@ import org.testng.annotations.Test;
 import org.testng.annotations.Factory;
 import com.privalia.qa.data.BrowsersDataProvider;
 
-@CucumberOptions(format = "json:target/cucumber.json", features = {"src/test/resources/features/readWebElementTextToVariable.feature"})
+@CucumberOptions(format = "json:target/cucumber.json", features = {"src/test/resources/features/readWebElementTextToVariable.feature"},
+        glue = "classpath:com/privalia/qa/specs/*")
 public class ThenGIT extends BaseTest {
 
     @Factory(enabled = false, dataProviderClass = BrowsersDataProvider.class, dataProvider = "availableUniqueBrowsers")

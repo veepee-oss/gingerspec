@@ -21,7 +21,8 @@ import cucumber.api.CucumberOptions;
 import org.testng.annotations.Test;
 
 @CucumberOptions(format = "json:target/cucumber.json", features = {"src/test/resources/features/createJSONFile.feature",
-                             "src/test/resources/features/readFileToVariable.feature"})
+                             "src/test/resources/features/readFileToVariable.feature"},
+        glue = "classpath:com/privalia/qa/specs/*")
 public class WhenGIT extends BaseGTest {
 
     @Test

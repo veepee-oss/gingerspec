@@ -21,8 +21,8 @@ import cucumber.api.CucumberOptions;
 import org.testng.annotations.Test;
 
 @CucumberOptions(format = "json:target/cucumber.json", features = {
-        "src/test/resources/features/replacementScenarioOutline.feature",
-})
+        "src/test/resources/features/replacementScenarioOutline.feature"},
+        glue = "classpath:com/privalia/qa/specs/*")
 public class ReplacementScenarioOutlineIT extends BaseGTest {
 
     @Test

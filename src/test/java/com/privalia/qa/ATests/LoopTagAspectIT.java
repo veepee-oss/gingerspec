@@ -22,8 +22,8 @@ import cucumber.api.CucumberOptions;
 import org.testng.annotations.Test;
 
 @CucumberOptions(format = "json:target/cucumber.json", features = {
-        "src/test/resources/features/loopTag.feature"
-})
+        "src/test/resources/features/loopTag.feature"},
+        glue = "classpath:com/privalia/qa/specs/*")
 public class LoopTagAspectIT extends BaseGTest {
 
     @Test

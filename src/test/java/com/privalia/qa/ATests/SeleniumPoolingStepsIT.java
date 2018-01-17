@@ -8,7 +8,8 @@ import org.testng.annotations.Factory;
 import org.testng.annotations.Test;
 
 @CucumberOptions(format = "json:target/cucumber.json",
-        features = {"src/test/resources/features/seleniumPoolingSteps.feature"})
+        features = {"src/test/resources/features/seleniumPoolingSteps.feature"},
+        glue = "classpath:com/privalia/qa/specs/*")
 public class SeleniumPoolingStepsIT extends BaseTest {
 
     @Factory( dataProviderClass = BrowsersDataProvider.class, dataProvider = "availableUniqueBrowsers")

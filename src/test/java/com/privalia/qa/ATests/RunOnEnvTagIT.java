@@ -21,8 +21,8 @@ import cucumber.api.CucumberOptions;
 import org.testng.annotations.Test;
 
 @CucumberOptions(format = "json:target/cucumber.json", features = {
-        "src/test/resources/features/runOnEnvTag.feature"
-})
+        "src/test/resources/features/runOnEnvTag.feature"},
+        glue = "classpath:com/privalia/qa/specs/*")
 public class RunOnEnvTagIT extends BaseGTest {
 
     @Test

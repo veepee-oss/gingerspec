@@ -23,7 +23,8 @@ import cucumber.api.CucumberOptions;
 import org.testng.annotations.Factory;
 import org.testng.annotations.Test;
 
-@CucumberOptions(format = "json:target/cucumber.json", features = {"src/test/resources/features/selenium.feature"})
+@CucumberOptions(format = "json:target/cucumber.json", features = {"src/test/resources/features/selenium.feature"},
+        glue = "classpath:com/privalia/qa/specs/*")
 public class HookGIT extends BaseTest {
 
     @Factory(enabled = false, dataProviderClass = BrowsersDataProvider.class, dataProvider = "availableUniqueBrowsers")

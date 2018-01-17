@@ -20,7 +20,8 @@ import com.privalia.qa.utils.BaseGTest;
 import cucumber.api.CucumberOptions;
 import org.testng.annotations.Test;
 
-@CucumberOptions(format = "json:target/cucumber.json", features = {"src/test/resources/features/executeCommand.feature"})
+@CucumberOptions(format = "json:target/cucumber.json", features = {"src/test/resources/features/executeCommand.feature"},
+        glue = "classpath:com/privalia/qa/specs/*")
 public class GivenGIT extends BaseGTest {
 
     @Test(expectedExceptions = {})

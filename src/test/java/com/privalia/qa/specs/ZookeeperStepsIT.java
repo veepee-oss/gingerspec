@@ -21,7 +21,8 @@ import com.privalia.qa.utils.BaseTest;
 import cucumber.api.CucumberOptions;
 import org.testng.annotations.Test;
 
-@CucumberOptions(format = "json:target/cucumber.json", features = {"src/test/resources/features/zookeeperSteps.feature"})
+@CucumberOptions(format = "json:target/cucumber.json", features = {"src/test/resources/features/zookeeperSteps.feature"},
+        glue = "classpath:com/privalia/qa/specs/*")
 public class ZookeeperStepsIT extends BaseTest {
 
     @Test

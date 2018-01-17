@@ -20,7 +20,9 @@ import com.privalia.qa.utils.BaseGTest;
 import cucumber.api.CucumberOptions;
 import org.testng.annotations.Test;
 
-@CucumberOptions(format = "json:target/cucumber.json", features = {"src/test/resources/features/ignored.feature"})
+@CucumberOptions(format = "json:target/cucumber.json", features = {"src/test/resources/features/ignored.feature"},
+        glue = "classpath:com/privalia/qa/specs/*"
+)
 public class IgnoreTagAspectIT extends BaseGTest {
     @Test
     public void simpleTest() throws Exception {

@@ -23,7 +23,8 @@ import org.testng.annotations.Test;
 
 @CucumberOptions(format = "json:target/cucumber.json", features = {"src/test/resources/features/backgroundTag1.feature",
                              "src/test/resources/features/backgroundTag2.feature",
-                             "src/test/resources/features/backgroundTag3.feature"})
+                             "src/test/resources/features/backgroundTag3.feature"},
+        glue = "classpath:com/privalia/qa/specs/*")
 public class BackgroundTagIT extends BaseGTest {
     @Test
     public void backgroundTagIt() throws Exception {

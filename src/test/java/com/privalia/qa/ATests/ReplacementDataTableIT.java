@@ -21,8 +21,8 @@ import cucumber.api.CucumberOptions;
 import org.testng.annotations.Test;
 
 @CucumberOptions(format = "json:target/cucumber.json", features = {
-        "src/test/resources/features/replacementDataTable.feature",
-})
+        "src/test/resources/features/replacementDataTable.feature"},
+        glue = "classpath:com/privalia/qa/specs/*")
 public class ReplacementDataTableIT extends BaseGTest {
 
     @Test

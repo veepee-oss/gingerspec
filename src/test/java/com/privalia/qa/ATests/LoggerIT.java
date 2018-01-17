@@ -24,8 +24,8 @@ import org.testng.annotations.Test;
         "src/test/resources/features/titlesReplacements.feature",
         "src/test/resources/features/logger.feature",
         "src/test/resources/features/backgroundlogger.feature",
-        "src/test/resources/features/outlineReplacements.feature",
-})
+        "src/test/resources/features/outlineReplacements.feature"},
+        glue = "classpath:com/privalia/qa/specs/*")
 public class LoggerIT extends BaseGTest {
 
     @Test(expectedExceptions = {})
