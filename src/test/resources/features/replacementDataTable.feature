@@ -1,3 +1,4 @@
+@ignore @toocomplex
 @rest
 Feature: Datatable replacements
 
