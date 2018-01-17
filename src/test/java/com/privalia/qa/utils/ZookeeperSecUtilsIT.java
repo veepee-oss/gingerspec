@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class ZookeeperSecUtilsIT extends BaseGSpec {
 
-    @Test
+    @Test(enabled = false)
     public void zookeeperSecTest() throws Exception {
         ZookeeperSecUtils zkUtils = new ZookeeperSecUtils();
 

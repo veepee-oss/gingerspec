@@ -35,13 +35,13 @@ public class MongoToolsIT extends BaseGSpec {
         commonspecG = new GivenGSpec(this.commonspec);
     }
 
-    @BeforeClass
+    @BeforeClass(enabled = false)
     public void prepareMongo() throws DBException {
         commonspec.getMongoDBClient().connect();
         commonspec.getMongoDBClient().connectToMongoDBDataBase(db);
     }
 
-    @Test
+    @Test(enabled = false)
     public void insertionAtMongo_success() {
         doc = "{\n" +
                 "  \"id\":\"id\",\n" +
@@ -62,14 +62,14 @@ public class MongoToolsIT extends BaseGSpec {
     }
 
 
-    @Test(expectedExceptions = com.mongodb.util.JSONParseException.class)
+    @Test(enabled = false, expectedExceptions = com.mongodb.util.JSONParseException.class)
     public void insertionAtMongo_malformedFail() {
         doc = "}";
         commonspec.getLogger().debug("Verifying document can't be malformed");
         commonspec.getMongoDBClient().insertDocIntoMongoDBCollection(collection, doc);
     }
 
-    @Test(expectedExceptions = java.lang.IllegalArgumentException.class)
+    @Test(enabled = false, expectedExceptions = java.lang.IllegalArgumentException.class)
     public void insertionAtMongo_nullFail() {
         doc = "";
         commonspec.getLogger().debug("Verifying document cant be null");
@@ -77,7 +77,7 @@ public class MongoToolsIT extends BaseGSpec {
     }
 
 
-    @AfterClass
+    @AfterClass(enabled = false)
     public void cleanMongo() {
         commonspec.getMongoDBClient().dropMongoDBDataBase(db);
         commonspec.getMongoDBClient().disconnect();

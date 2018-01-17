@@ -20,7 +20,8 @@ import com.privalia.qa.utils.BaseGTest;
 import cucumber.api.CucumberOptions;
 import org.testng.annotations.Test;
 
-@CucumberOptions(format = "json:target/cucumber.json", features = {"src/test/resources/features/checkValue.feature"})
+@CucumberOptions(format = "json:target/cucumber.json", features = {"src/test/resources/features/checkValue.feature"},
+        glue = "classpath:com/privalia/qa/specs/*")
 public class ThenGCheckValueIT extends BaseGTest {
 
     @Test(expectedExceptions = {})

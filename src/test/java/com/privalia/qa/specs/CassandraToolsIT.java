@@ -70,7 +70,7 @@ public class CassandraToolsIT extends BaseGSpec {
         commonspecG = new BigDataGSpec(this.commonspec);
     }
 
-    @BeforeClass
+    @BeforeClass(enabled = false)
     public void prepareCassandra() {
         commonspec.getCassandraClient().connect();
         commonspec.getCassandraClient().createKeyspace(this.keySpace);
@@ -78,12 +78,12 @@ public class CassandraToolsIT extends BaseGSpec {
         commonspecG.insertData(this.keySpace, this.tableName, dataTable1Insertion);
     }
 
-    @Test
+    @Test(enabled = false)
     public void test_assertTableExistance() {
         assertThat(commonspec.getCassandraClient().existsTable(this.keySpace,this.tableName,false)).isEqualTo(true);
     }
 
-        @Test
+    @Test(enabled = false)
     public void test_assertValuesOfTable_success() {
 
         // USE of Keyspace
@@ -106,7 +106,7 @@ public class CassandraToolsIT extends BaseGSpec {
         }
     }
 
-    @Test
+    @Test(enabled = false)
     public void test_assertValuesOfTable_fail() {
         // USE of Keyspace
         commonspec.getLogger().debug("Verifying if the keyspace {} exists", this.keySpace);
@@ -126,7 +126,7 @@ public class CassandraToolsIT extends BaseGSpec {
         }
     }
 
-    @Test
+    @Test(enabled = false)
     public void test_assertValuesOfTable_completeTable() throws InterruptedException, DBException {
         //  USE of Keyspace
         commonspec.getLogger().debug("Verifying if the keyspace {} exists", this.keySpace);
@@ -153,13 +153,13 @@ public class CassandraToolsIT extends BaseGSpec {
         }
     }
 
-    @Test
+    @Test(enabled = false)
     public void testCassandraMetaData() throws DBException {
         Metadata metaData = commonspec.getCassandraClient().getMetadata();
         assert metaData.getClusterName().equals("Stratio cluster");
     }
 
-    @AfterClass
+    @AfterClass(enabled = false)
     public void freeCassandra() {
         commonspec.getCassandraClient().dropKeyspace(this.keySpace);
         //connect(String "Cassandra", String ${CASSANDRA_HOST});

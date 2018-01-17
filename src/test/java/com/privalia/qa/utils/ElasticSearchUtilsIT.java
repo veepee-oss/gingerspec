@@ -37,7 +37,7 @@ public class ElasticSearchUtilsIT {
 
     private ElasticSearchUtils es_utils;
 
-    @BeforeMethod
+    @BeforeMethod(enabled = false)
     public void setSettingsTest() {
         es_utils = new ElasticSearchUtils();
         LinkedHashMap<String, Object> settings_map = new LinkedHashMap<String, Object>();
@@ -47,14 +47,14 @@ public class ElasticSearchUtilsIT {
                 .getProperty("ES_CLUSTER", "elasticsearch"));
     }
 
-    @Test
+    @Test(enabled = false)
     public void connectTest() throws UnknownHostException {
         es_utils.connect();
         assertThat(es_utils.getClient().admin().cluster().prepareNodesInfo().all().execute()).isNotNull();
         es_utils.getClient().close();
     }
 
-    @Test
+    @Test(enabled = false)
     public void createIndexTest() throws UnknownHostException {
         es_utils.connect();
         if (es_utils.indexExists("testindex")) {
@@ -64,7 +64,7 @@ public class ElasticSearchUtilsIT {
         assertThat(es_utils.indexExists("testindex")).isTrue();
     }
 
-    @Test
+    @Test(enabled = false)
     public void dropIndexTest() throws UnknownHostException {
         es_utils.connect();
         if (!es_utils.indexExists("testindex")) {
@@ -75,7 +75,7 @@ public class ElasticSearchUtilsIT {
         es_utils.getClient().close();
     }
 
-    @Test
+    @Test(enabled = false)
     public void createMappingTest() throws UnknownHostException, IOException, InterruptedException {
         es_utils.connect();
         if (es_utils.indexExists("testindex")) {
@@ -98,7 +98,7 @@ public class ElasticSearchUtilsIT {
         es_utils.getClient().close();
     }
 
-    @Test
+    @Test(enabled = false)
     public void searchFilterEquals() throws UnknownHostException, IOException, InterruptedException {
         es_utils.connect();
         if (es_utils.indexExists("testindex")) {
@@ -139,7 +139,7 @@ public class ElasticSearchUtilsIT {
         es_utils.getClient().close();
     }
 
-    @Test
+    @Test(enabled = false)
     public void indexDocument() throws UnknownHostException, IOException {
         es_utils.connect();
         if (es_utils.indexExists("testindex")) {
@@ -169,7 +169,7 @@ public class ElasticSearchUtilsIT {
         }
     }
 
-    @Test
+    @Test(enabled = false)
     public void deleteDocument() throws UnknownHostException, IOException {
         es_utils.connect();
         if (es_utils.indexExists("testindex")) {

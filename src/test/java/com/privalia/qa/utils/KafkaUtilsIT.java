@@ -34,13 +34,13 @@ public class KafkaUtilsIT {
 
     private KafkaUtils kafka_utils;
 
-    @BeforeMethod
+    @BeforeMethod(enabled = false)
     public void setSettingsTest() {
         kafka_utils = new KafkaUtils();
         kafka_utils.connect();
     }
 
-    @Test
+    @Test(enabled = false)
     public void createTopicTest() {
         if (AdminUtils.topicExists(kafka_utils.getZkUtils(), "testTopic")) {
             kafka_utils.deleteTopic("testTopic");
@@ -50,7 +50,7 @@ public class KafkaUtilsIT {
         kafka_utils.deleteTopic("testTopic");
     }
 
-    @Test
+    @Test(enabled = false)
     public void listTopicsTest() {
         if (AdminUtils.topicExists(kafka_utils.getZkUtils(), "testList")) {
             kafka_utils.deleteTopic("testList");
@@ -64,7 +64,7 @@ public class KafkaUtilsIT {
         kafka_utils.deleteTopic("testList2");
     }
 
-    @Test
+    @Test(enabled = false)
     public void writeAndReadKafkaTest() throws InterruptedException, ExecutionException, TimeoutException {
         String topic = "kafkaTest";
         String oneMessage = "Opening message";
@@ -79,7 +79,7 @@ public class KafkaUtilsIT {
         kafka_utils.deleteTopic(topic);
     }
 
-    @Test
+    @Test(enabled = false)
     public void modifyPartitionsTest() {
         if (AdminUtils.topicExists(kafka_utils.getZkUtils(), "testPartitions")) {
             kafka_utils.deleteTopic("testPartitions");
@@ -91,7 +91,7 @@ public class KafkaUtilsIT {
         kafka_utils.deleteTopic("testPartitions");
     }
 
-    @Test
+    @Test(enabled = false)
     public void modifyPartitionsNotKnownTopicTest() {
         if (AdminUtils.topicExists(kafka_utils.getZkUtils(), "testPartitions2")) {
             kafka_utils.deleteTopic("testPartitions2");
@@ -99,13 +99,13 @@ public class KafkaUtilsIT {
         kafka_utils.modifyTopicPartitioning("testPartitions2", 2);
     }
 
-    @Test
+    @Test(enabled = false)
     public void setZkHostTest() {
         ZkUtils zkOpts = kafka_utils.getZkUtils();
         kafka_utils.setZkHost(zkOpts.zkConnection().getServers(),"2181","/");
     }
 
-    @Test
+    @Test(enabled = false)
     public void sendMessageTopicTest() {
         kafka_utils.createTopic("testMessage");
         kafka_utils.sendMessage("hello, its me", "testMessage");

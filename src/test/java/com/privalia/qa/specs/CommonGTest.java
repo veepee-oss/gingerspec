@@ -987,7 +987,7 @@ public class CommonGTest {
         commong.getTextFieldCondition();
     }
 
-    @Test
+    @Test(enabled = false)
     public void testGetClients() throws Exception {
         ThreadProperty.set("class", this.getClass().getCanonicalName());
         CommonG commong = new CommonG();
