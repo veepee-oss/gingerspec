@@ -294,6 +294,15 @@ public class CommonG {
     }
 
     /**
+     * Get the SQL utils.
+     *
+     * @return SqlUtils
+     */
+    public SqlUtils getSqlClient() {
+        return SqlUtil.INSTANCE.getSqlUtils();
+    }
+
+    /**
      * Get the Zookeeper Sec utils.
      *
      * @return ZookeperSecUtils
