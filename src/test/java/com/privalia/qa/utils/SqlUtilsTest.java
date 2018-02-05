@@ -13,7 +13,8 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Uses the mysql and postgresql docker images for testing
+ * Uses the mysql and postgresql docker images for testing. Create the containers with this parameters
+ * before running this test suite
  *
  * docker pull mysql
  * docker run -d -p 3306:3306 --name mysql -e MYSQL_ROOT_PASSWORD=mysql -d mysql:latest
@@ -45,7 +46,7 @@ public class SqlUtilsTest {
     public void executeQueryMysqlTest() throws SQLException, ClassNotFoundException {
 
         this.connectToMysqlDb();
-        int result = this.sql.executeQuery("CREATE TABLE weather1 (city varchar(80), temp_lo int, temp_hi int, prcp real, date date);");
+        int result = this.sql.executeQuery("CREATE TABLE IF NOT EXISTS weather1 (city varchar(80), temp_lo int, temp_hi int, prcp real, date date);");
         assertThat(result).isEqualTo(0);
     }
 
@@ -53,7 +54,7 @@ public class SqlUtilsTest {
     public void executeQueryPostgreTest() throws SQLException, ClassNotFoundException {
 
         this.connectPostgresTest();
-        int result = this.sql.executeQuery("CREATE TABLE weather1 (city varchar(80), temp_lo int, temp_hi int, prcp real, date date);");
+        int result = this.sql.executeQuery("CREATE TABLE IF NOT EXISTS weather1 (city varchar(80), temp_lo int, temp_hi int, prcp real, date date);");
         assertThat(result).isEqualTo(0);
     }
 
@@ -61,25 +62,27 @@ public class SqlUtilsTest {
     public void executeSelectQueryMysqlTest() throws SQLException, ClassNotFoundException {
 
         this.connectToMysqlDb();
-        this.sql.executeQuery("CREATE TABLE IF NOT EXISTS mysql.weather1 (city varchar(80), temp_lo int, temp_hi int, prcp real, date date);");
-        this.sql.executeQuery("INSERT INTO mysql.weather1 (city, temp_lo, temp_hi, prcp, date) VALUES ('San Francisco', 15, 43, 0.0, '2004-11-29');");
-        this.sql.executeQuery("INSERT INTO mysql.weather1 (city, temp_lo, temp_hi, prcp, date) VALUES ('Kyiv', 5, 37, 0.4, '2014-11-29');");
-        this.sql.executeQuery("INSERT INTO mysql.weather1 (city, temp_lo, temp_hi, prcp, date) VALUES ('Paris', 8, 37, 0.4, '2016-11-30');");
+        this.sql.executeQuery("CREATE TABLE IF NOT EXISTS weather1 (city varchar(80), temp_lo int, temp_hi int, prcp real, date date);");
+        this.sql.executeQuery("TRUNCATE weather1");
+        this.sql.executeQuery("INSERT INTO weather1 (city, temp_lo, temp_hi, prcp, date) VALUES ('San Francisco', 15, 43, 0.0, '2004-11-29');");
+        this.sql.executeQuery("INSERT INTO weather1 (city, temp_lo, temp_hi, prcp, date) VALUES ('Kyiv', 5, 37, 0.4, '2014-11-29');");
+        this.sql.executeQuery("INSERT INTO weather1 (city, temp_lo, temp_hi, prcp, date) VALUES ('Paris', 8, 37, 0.4, '2016-11-30');");
 
         List<Map<String, Object>> result = this.sql.executeSelectQuery("SELECT * FROM mysql.weather1;");
         assertThat(result.size()).isEqualTo(3);
 
-        this.sql.executeQuery("TRUNCATE mysql.weather1");
-        result = this.sql.executeSelectQuery("SELECT * FROM mysql.weather1;");
+        this.sql.executeQuery("TRUNCATE weather1");
+        result = this.sql.executeSelectQuery("SELECT * FROM weather1;");
         assertThat(result.size()).isEqualTo(0);
 
     }
 
-    @Test
+    @Test(enabled = false)
     public void executeSelectQueryPostgreTest() throws SQLException, ClassNotFoundException {
 
         this.connectPostgresTest();
         this.sql.executeQuery("CREATE TABLE IF NOT EXISTS weather1 (city varchar(80), temp_lo int, temp_hi int, prcp real, date date);");
+        this.sql.executeQuery("TRUNCATE weather1");
         this.sql.executeQuery("INSERT INTO weather1 (city, temp_lo, temp_hi, prcp, date) VALUES ('San Francisco', 15, 43, 0.0, '2004-11-29');");
         this.sql.executeQuery("INSERT INTO weather1 (city, temp_lo, temp_hi, prcp, date) VALUES ('Kyiv', 5, 37, 0.4, '2014-11-29');");
         this.sql.executeQuery("INSERT INTO weather1 (city, temp_lo, temp_hi, prcp, date) VALUES ('Paris', 8, 37, 0.4, '2016-11-30');");
@@ -93,17 +96,37 @@ public class SqlUtilsTest {
 
     }
 
+    @Test(enabled = false)
+    public void verifyTableExistsMysqlTest() throws SQLException, ClassNotFoundException {
+
+        this.connectMySqlTest();
+        this.sql.executeQuery("CREATE TABLE IF NOT EXISTS weather1 (city varchar(80), temp_lo int, temp_hi int, prcp real, date date);");
+        assertThat(this.sql.verifyTable("weather1")).isTrue();
+        this.sql.executeQuery("DROP TABLE weather1;");
+        assertThat(this.sql.verifyTable("weather1")).isFalse();
+    }
+
+    @Test(enabled = false)
+    public void verifyTableExistsPostgreTest() throws SQLException, ClassNotFoundException {
+
+        this.connectPostgresTest();
+        this.sql.executeQuery("CREATE TABLE IF NOT EXISTS weather1 (city varchar(80), temp_lo int, temp_hi int, prcp real, date date);");
+        assertThat(this.sql.verifyTable("weather1")).isTrue();
+        this.sql.executeQuery("DROP TABLE weather1;");
+        assertThat(this.sql.verifyTable("weather1")).isFalse();
+    }
+
 
     private void connectToMysqlDb() throws SQLException, ClassNotFoundException {
         logger.debug(String.format("Connecting to %s DB", "mysql"));
-        this.sql = new SqlUtils("172.17.0.1", 3306, "mysql", "mysql", false, "root", "mysql");
-        this.sql.connect();
+        this.sql = new SqlUtils();
+        this.sql.connect("172.17.0.1", 3306, "mysql", "mysql", false, "root", "mysql");
     }
 
     private void connectToPostgreDb() throws SQLException, ClassNotFoundException {
         logger.debug(String.format("Connecting to %s DB", "postgres"));
-        this.sql = new SqlUtils("172.17.0.1", 5432, "postgresql", "postgres", false, "postgres", "postgres");
-        this.sql.connect();
+        this.sql = new SqlUtils();
+        this.sql.connect("172.17.0.1", 5432, "postgresql", "postgres", false, "postgres", "postgres");
     }
 
     @AfterMethod

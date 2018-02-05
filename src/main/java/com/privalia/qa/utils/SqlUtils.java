@@ -1,14 +1,12 @@
 package com.privalia.qa.utils;
 
 
-import org.assertj.core.api.Assertions;
+import cucumber.api.DataTable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.sql.*;
 import java.util.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Generic operations on sql relational databases. Currently supports mysql/postgres
@@ -17,19 +15,19 @@ public class SqlUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SqlUtils.class);
 
-    private final String host;
+    private String host;
 
-    private final int port;
+    private int port;
 
-    private final String dataBaseType;
+    private String dataBaseType;
 
-    private final String dataBaseName;
+    private String dataBaseName;
 
-    private final Boolean security;
+    private Boolean security;
 
-    private final String user;
+    private String user;
 
-    private final String password;
+    private String password;
 
     private Connection sqlConnection;
 
@@ -47,36 +45,17 @@ public class SqlUtils {
     }
 
     /**
-     * Generic constructor
-     *
-     * @param host
-     * @param port
-     * @param dataBaseType
-     * @param dataBaseName
-     * @param security
-     * @param user
-     * @param password
-     */
-    public SqlUtils(String host, int port, String dataBaseType, String dataBaseName, Boolean security, String user, String password) {
-        this.host = host;
-        this.port = port;
-        this.dataBaseType = dataBaseType;
-        this.dataBaseName = dataBaseName;
-        this.security = security;
-        this.user = user;
-        this.password = password;
-    }
-
-    /**
      * Connect to the database
      */
-    public void connect() throws ClassNotFoundException, SQLException {
+    public void connect(String host, int port, String dataBaseType, String dataBaseName, Boolean security, String user, String password) throws ClassNotFoundException, SQLException {
 
         LOGGER.debug(String.format("Database type set to: %s", this.dataBaseType));
+        this.dataBaseType = dataBaseType;
+        this.dataBaseName = dataBaseName;
 
-        switch (dataBaseType) {
+        switch (dataBaseType.toUpperCase()) {
             case "MYSQL":
-                Class.forName("com.mysql.jdbc.Driver");
+                Class.forName("com.mysql.cj.jdbc.Driver");
                 break;
 
             case "POSTGRESQL":
@@ -90,7 +69,7 @@ public class SqlUtils {
 
 
         Properties props = new Properties();
-        String connectionString = "jdbc:" + this.dataBaseType.toLowerCase() + "://" + this.host + ":" + this.port + "/" + this.dataBaseName + "?user=" + this.user + "&password=" + this.password;
+        String connectionString = "jdbc:" + dataBaseType.toLowerCase() + "://" + host + ":" + port + "/" + dataBaseName + "?user=" + user + "&password=" + password;
         LOGGER.debug(String.format("Starting connection using %s", connectionString));
 
         if (this.security) {
@@ -106,27 +85,24 @@ public class SqlUtils {
 
             this.sqlConnection = DriverManager
                     .getConnection(connectionString, props);
+
             return;
         }
 
         this.sqlConnection = DriverManager
-                .getConnection(connectionString);
+                .getConnection(connectionString + "&useSSL=false");
 
     }
 
     public int executeQuery(String query) throws SQLException {
 
-        Statement myStatement = null;
         int result = 0;
 
-        try {
-            myStatement = this.sqlConnection.createStatement();
+        LOGGER.debug(String.format("Executing query %s", query));
+        try(Statement myStatement = this.sqlConnection.createStatement()) {
             result = myStatement.executeUpdate(query);
-        } finally {
-            myStatement.close();
             return result;
         }
-
     }
 
     /**
@@ -136,30 +112,19 @@ public class SqlUtils {
      * @return List of Maps
      * @throws SQLException
      */
-    public List<Map<String, Object>> executeSelectQuery(String query) {
+    public List<Map<String, Object>> executeSelectQuery(String query) throws SQLException {
 
-        Statement myStatement = null;
-        //postgres table
         List<String> sqlTable = new ArrayList<String>();
         List<String> sqlTableAux = new ArrayList<String>();
         Connection myConnection = this.sqlConnection;
         ResultSet rs = null;
 
-        try {
-            myStatement = myConnection.createStatement();
+        try (Statement myStatement = this.sqlConnection.createStatement()) {
+            LOGGER.debug(String.format("Executing query %s", query));
             rs = myStatement.executeQuery(query);
-            List<Map<String, Object>> result = this.resultSetToList(rs);
-
-            rs.close();
-            myStatement.close();
-
-            return result;
-
-        } catch (Exception e){
-            e.printStackTrace();
+            return this.resultSetToList(rs);
         }
 
-        return null;
     }
 
     /**
@@ -167,18 +132,26 @@ public class SqlUtils {
      * @param tableName Table name
      * @return true if the table exists, false otherwise
      */
-    private boolean verifyTable(String tableName){
+    public boolean verifyTable(String tableName) throws SQLException {
 
         Statement myStatement = null;
         Connection myConnection = this.sqlConnection;
         boolean exists = false;
 
-        String query = "SELECT * FROM pg_tables WHERE tablename = " + "\'" + tableName + "\'" + ";";
+        String query;
+
+        if (this.dataBaseType.toLowerCase().matches("mysql")) {
+            query = "SELECT * FROM information_schema.tables WHERE table_schema = '" + this.sqlConnection.getCatalog() + "' AND table_name = '" + tableName + "' LIMIT 1;";
+        } else {
+            query = "SELECT * FROM pg_tables WHERE tablename = " + "\'" + tableName + "\'" + ";";
+        }
+
+        LOGGER.debug(String.format("Verifying if table %s exists. Executing %s", tableName, query));
         try {
             myStatement = myConnection.createStatement();
             ResultSet rs = myStatement.executeQuery(query);
             //if there are no data row, table doesn't exists
-            if (rs.next() == true) {
+            if (rs.next()) {
                 exists = true;
             }
             rs.close();
@@ -193,6 +166,21 @@ public class SqlUtils {
     }
 
     /**
+     * Compares the output of a query (given in a List of Maps), to a cucumber datatable object
+     * and returns true if the contents match.
+     * @param result
+     * @param dataTable
+     * @return
+     */
+    public boolean verifyResult(List<Map<String, Object>> result, DataTable dataTable) {
+
+
+
+
+        return false;
+    }
+
+    /**
      * Convert the ResultSet to a List of Maps, where each Map represents a row with columnNames and columValues
      * @param rs
      * @return
@@ -201,10 +189,10 @@ public class SqlUtils {
     private List<Map<String, Object>> resultSetToList(ResultSet rs) throws SQLException {
         ResultSetMetaData md = rs.getMetaData();
         int columns = md.getColumnCount();
-        List<Map<String, Object>> rows = new ArrayList<Map<String, Object>>();
-        while (rs.next()){
-            Map<String, Object> row = new HashMap<String, Object>(columns);
-            for(int i = 1; i <= columns; ++i){
+        List<Map<String, Object>> rows = new ArrayList<>();
+        while (rs.next()) {
+            Map<String, Object> row = new HashMap<>(columns);
+            for (int i = 1; i <= columns; ++i) {
                 row.put(md.getColumnName(i), rs.getObject(i));
             }
             rows.add(row);
@@ -217,9 +205,16 @@ public class SqlUtils {
      *
      * @return
      */
-    public boolean connectionStatus() throws SQLException {
+    public boolean connectionStatus() {
 
-        return !this.sqlConnection.isClosed();
+        LOGGER.debug("Checking DB connection status");
+        boolean status = false;
+        try {
+            status = !this.sqlConnection.isClosed();
+            return status;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     /**
@@ -227,6 +222,7 @@ public class SqlUtils {
      */
     public void disconnect() throws SQLException {
 
+        LOGGER.debug(String.format("Closing connection to DB %s in %s:%s", this.dataBaseName, this.host, this.port));
         this.sqlConnection.close();
     }
 
