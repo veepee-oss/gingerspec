@@ -7,9 +7,8 @@ import cucumber.api.java.en.When;
 
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class SqlDatabaseGSpec extends BaseGSpec {
 
@@ -87,9 +86,10 @@ public class SqlDatabaseGSpec extends BaseGSpec {
     @When("^I query the database with '(.+?)'$")
     public void executeSelectQuery(String query) {
 
-        List<Map<String, Object>> result = null;
+        List<List<String>> result = null;
         try {
             result = this.commonspec.getSqlClient().executeSelectQuery(query);
+            this.commonspec.setPreviousSqlResult(result);
         } catch (SQLException e) {
             assertThat(e.getMessage()).as("A problem was found while executing the query").isEmpty();
         }
@@ -97,9 +97,22 @@ public class SqlDatabaseGSpec extends BaseGSpec {
     }
 
     @Then("^I check that result is:$")
-    public void compareTable(String tableName, DataTable dataTable){
+    public void compareTable(DataTable dataTable){
 
+        List<List<String>> previousResult = this.commonspec.getPreviousSqlResult();
+        assertThat(previousResult).as("The last SQL query returned a null result").isNotNull();
+        assertThat(previousResult.size()).as("The last SQL query did not returned any rows").isNotEqualTo(0);
 
+        assertThat(dataTable.raw()).as("The returned and the expected results do not match.").isEqualTo(previousResult);
+
+    }
+
+    @Then("^I check that table '(.+?)' is iqual to$")
+    public void verifyTableContent(String tableName, DataTable dataTable){
+
+        this.verifyTable(tableName);
+        this.executeSelectQuery("SELECT * FROM " + tableName);
+        this.compareTable(dataTable);
 
     }
 

@@ -68,12 +68,12 @@ public class SqlUtilsTest {
         this.sql.executeQuery("INSERT INTO weather1 (city, temp_lo, temp_hi, prcp, date) VALUES ('Kyiv', 5, 37, 0.4, '2014-11-29');");
         this.sql.executeQuery("INSERT INTO weather1 (city, temp_lo, temp_hi, prcp, date) VALUES ('Paris', 8, 37, 0.4, '2016-11-30');");
 
-        List<Map<String, Object>> result = this.sql.executeSelectQuery("SELECT * FROM mysql.weather1;");
-        assertThat(result.size()).isEqualTo(3);
+        List<List<String>> result = this.sql.executeSelectQuery("SELECT * FROM weather1;");
+        assertThat(result.size()).isEqualTo(4); //-> 3 Lists of results plus 1 List of column names
 
         this.sql.executeQuery("TRUNCATE weather1");
         result = this.sql.executeSelectQuery("SELECT * FROM weather1;");
-        assertThat(result.size()).isEqualTo(0);
+        assertThat(result.size()).isEqualTo(1);// returns only the list of column names
 
     }
 
@@ -87,12 +87,12 @@ public class SqlUtilsTest {
         this.sql.executeQuery("INSERT INTO weather1 (city, temp_lo, temp_hi, prcp, date) VALUES ('Kyiv', 5, 37, 0.4, '2014-11-29');");
         this.sql.executeQuery("INSERT INTO weather1 (city, temp_lo, temp_hi, prcp, date) VALUES ('Paris', 8, 37, 0.4, '2016-11-30');");
 
-        List<Map<String, Object>> result = this.sql.executeSelectQuery("SELECT * FROM weather1;");
-        assertThat(result.size()).isEqualTo(3);
+        List<List<String>> result = this.sql.executeSelectQuery("SELECT * FROM weather1;");
+        assertThat(result.size()).isEqualTo(4);  //-> 3 Lists of results plus 1 List of column names
 
         this.sql.executeQuery("TRUNCATE weather1");
         result = this.sql.executeSelectQuery("SELECT * FROM weather1;");
-        assertThat(result.size()).isEqualTo(0);
+        assertThat(result.size()).isEqualTo(1);// returns only the list of column names
 
     }
 

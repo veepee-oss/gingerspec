@@ -125,6 +125,8 @@ public class CommonG {
 
     private Alert SeleniumAlert;
 
+    private List<List<String>> previousSqlResult;
+
     /**
      * Checks if a given string matches a regular expression or contains a string
      *
@@ -140,6 +142,22 @@ public class CommonG {
             pattern = Pattern.compile(Pattern.quote(expectedMessage));
         }
         return pattern;
+    }
+
+    /**
+     * Get the SQL result from the last step
+     * @return
+     */
+    public List<List<String>> getPreviousSqlResult() {
+        return previousSqlResult;
+    }
+
+    /**
+     * Sets the result of the SQL sentence
+     * @param previousSqlResult
+     */
+    public void setPreviousSqlResult(List<List<String>> previousSqlResult) {
+        this.previousSqlResult = previousSqlResult;
     }
 
     /**

@@ -1,7 +1,5 @@
 package com.privalia.qa.utils;
 
-
-import cucumber.api.DataTable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.sql.*;
@@ -107,22 +105,44 @@ public class SqlUtils {
 
     /**
      * Executes a SELECT type query on the DB connection. Instead of a resultset, this method
-     * returns a List of Maps, where each Map represents a row with columnNames and columValues
+     * returns a List of lists (List<List<String>>). This method will return in the first list the
+     * columns name, and the remaining lists are the rows (if the query returned any). So, this method
+     * will always return at least 1 List (size 1).
+     * This way of representing a resulset is very similar to the structure of a datatable in
+     * cucumber, making the comparison easier
      * @param query SELECT query to execute
      * @return List of Maps
      * @throws SQLException
      */
-    public List<Map<String, Object>> executeSelectQuery(String query) throws SQLException {
+    public List<List<String>> executeSelectQuery(String query) throws SQLException {
 
-        List<String> sqlTable = new ArrayList<String>();
-        List<String> sqlTableAux = new ArrayList<String>();
-        Connection myConnection = this.sqlConnection;
+        List<List<String>> sqlTable = new ArrayList<>();
         ResultSet rs = null;
 
         try (Statement myStatement = this.sqlConnection.createStatement()) {
             LOGGER.debug(String.format("Executing query %s", query));
             rs = myStatement.executeQuery(query);
-            return this.resultSetToList(rs);
+
+            ResultSetMetaData resultSetMetaData = rs.getMetaData();
+            int count = resultSetMetaData.getColumnCount();
+
+            /*Store the column names*/
+            List<String> columnHeader = new LinkedList<>();
+            for (int i = 1; i <= count; i++) {
+                columnHeader.add(resultSetMetaData.getColumnName(i));
+            }
+            sqlTable.add(columnHeader);
+
+            /*Store the values*/
+            while (rs.next()) {
+                List<String> sqlTableAux = new LinkedList<>();
+                for (int i = 1; i <= count; i++) {
+                    sqlTableAux.add(rs.getObject(i).toString());
+                }
+                sqlTable.add(sqlTableAux);
+            }
+
+            return sqlTable;
         }
 
     }
@@ -147,7 +167,7 @@ public class SqlUtils {
         }
 
         LOGGER.debug(String.format("Verifying if table %s exists. Executing %s", tableName, query));
-        try {
+        try  {
             myStatement = myConnection.createStatement();
             ResultSet rs = myStatement.executeQuery(query);
             //if there are no data row, table doesn't exists
@@ -163,41 +183,6 @@ public class SqlUtils {
         }
 
         return false;
-    }
-
-    /**
-     * Compares the output of a query (given in a List of Maps), to a cucumber datatable object
-     * and returns true if the contents match.
-     * @param result
-     * @param dataTable
-     * @return
-     */
-    public boolean verifyResult(List<Map<String, Object>> result, DataTable dataTable) {
-
-
-
-
-        return false;
-    }
-
-    /**
-     * Convert the ResultSet to a List of Maps, where each Map represents a row with columnNames and columValues
-     * @param rs
-     * @return
-     * @throws SQLException
-     */
-    private List<Map<String, Object>> resultSetToList(ResultSet rs) throws SQLException {
-        ResultSetMetaData md = rs.getMetaData();
-        int columns = md.getColumnCount();
-        List<Map<String, Object>> rows = new ArrayList<>();
-        while (rs.next()) {
-            Map<String, Object> row = new HashMap<>(columns);
-            for (int i = 1; i <= columns; ++i) {
-                row.put(md.getColumnName(i), rs.getObject(i));
-            }
-            rows.add(row);
-        }
-        return rows;
     }
 
     /**
