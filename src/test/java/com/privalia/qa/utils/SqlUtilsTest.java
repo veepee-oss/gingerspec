@@ -8,7 +8,6 @@ import org.testng.annotations.Test;
 
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -46,7 +45,7 @@ public class SqlUtilsTest {
     public void executeQueryMysqlTest() throws SQLException, ClassNotFoundException {
 
         this.connectToMysqlDb();
-        int result = this.sql.executeQuery("CREATE TABLE IF NOT EXISTS weather1 (city varchar(80), temp_lo int, temp_hi int, prcp real, date date);");
+        int result = this.sql.executeUpdateQuery("CREATE TABLE IF NOT EXISTS weather1 (city varchar(80), temp_lo int, temp_hi int, prcp real, date date);");
         assertThat(result).isEqualTo(0);
     }
 
@@ -54,7 +53,7 @@ public class SqlUtilsTest {
     public void executeQueryPostgreTest() throws SQLException, ClassNotFoundException {
 
         this.connectPostgresTest();
-        int result = this.sql.executeQuery("CREATE TABLE IF NOT EXISTS weather1 (city varchar(80), temp_lo int, temp_hi int, prcp real, date date);");
+        int result = this.sql.executeUpdateQuery("CREATE TABLE IF NOT EXISTS weather1 (city varchar(80), temp_lo int, temp_hi int, prcp real, date date);");
         assertThat(result).isEqualTo(0);
     }
 
@@ -62,16 +61,16 @@ public class SqlUtilsTest {
     public void executeSelectQueryMysqlTest() throws SQLException, ClassNotFoundException {
 
         this.connectToMysqlDb();
-        this.sql.executeQuery("CREATE TABLE IF NOT EXISTS weather1 (city varchar(80), temp_lo int, temp_hi int, prcp real, date date);");
-        this.sql.executeQuery("TRUNCATE weather1");
-        this.sql.executeQuery("INSERT INTO weather1 (city, temp_lo, temp_hi, prcp, date) VALUES ('San Francisco', 15, 43, 0.0, '2004-11-29');");
-        this.sql.executeQuery("INSERT INTO weather1 (city, temp_lo, temp_hi, prcp, date) VALUES ('Kyiv', 5, 37, 0.4, '2014-11-29');");
-        this.sql.executeQuery("INSERT INTO weather1 (city, temp_lo, temp_hi, prcp, date) VALUES ('Paris', 8, 37, 0.4, '2016-11-30');");
+        this.sql.executeUpdateQuery("CREATE TABLE IF NOT EXISTS weather1 (city varchar(80), temp_lo int, temp_hi int, prcp real, date date);");
+        this.sql.executeUpdateQuery("TRUNCATE weather1");
+        this.sql.executeUpdateQuery("INSERT INTO weather1 (city, temp_lo, temp_hi, prcp, date) VALUES ('San Francisco', 15, 43, 0.0, '2004-11-29');");
+        this.sql.executeUpdateQuery("INSERT INTO weather1 (city, temp_lo, temp_hi, prcp, date) VALUES ('Kyiv', 5, 37, 0.4, '2014-11-29');");
+        this.sql.executeUpdateQuery("INSERT INTO weather1 (city, temp_lo, temp_hi, prcp, date) VALUES ('Paris', 8, 37, 0.4, '2016-11-30');");
 
         List<List<String>> result = this.sql.executeSelectQuery("SELECT * FROM weather1;");
         assertThat(result.size()).isEqualTo(4); //-> 3 Lists of results plus 1 List of column names
 
-        this.sql.executeQuery("TRUNCATE weather1");
+        this.sql.executeUpdateQuery("TRUNCATE weather1");
         result = this.sql.executeSelectQuery("SELECT * FROM weather1;");
         assertThat(result.size()).isEqualTo(1);// returns only the list of column names
 
@@ -81,16 +80,16 @@ public class SqlUtilsTest {
     public void executeSelectQueryPostgreTest() throws SQLException, ClassNotFoundException {
 
         this.connectPostgresTest();
-        this.sql.executeQuery("CREATE TABLE IF NOT EXISTS weather1 (city varchar(80), temp_lo int, temp_hi int, prcp real, date date);");
-        this.sql.executeQuery("TRUNCATE weather1");
-        this.sql.executeQuery("INSERT INTO weather1 (city, temp_lo, temp_hi, prcp, date) VALUES ('San Francisco', 15, 43, 0.0, '2004-11-29');");
-        this.sql.executeQuery("INSERT INTO weather1 (city, temp_lo, temp_hi, prcp, date) VALUES ('Kyiv', 5, 37, 0.4, '2014-11-29');");
-        this.sql.executeQuery("INSERT INTO weather1 (city, temp_lo, temp_hi, prcp, date) VALUES ('Paris', 8, 37, 0.4, '2016-11-30');");
+        this.sql.executeUpdateQuery("CREATE TABLE IF NOT EXISTS weather1 (city varchar(80), temp_lo int, temp_hi int, prcp real, date date);");
+        this.sql.executeUpdateQuery("TRUNCATE weather1");
+        this.sql.executeUpdateQuery("INSERT INTO weather1 (city, temp_lo, temp_hi, prcp, date) VALUES ('San Francisco', 15, 43, 0.0, '2004-11-29');");
+        this.sql.executeUpdateQuery("INSERT INTO weather1 (city, temp_lo, temp_hi, prcp, date) VALUES ('Kyiv', 5, 37, 0.4, '2014-11-29');");
+        this.sql.executeUpdateQuery("INSERT INTO weather1 (city, temp_lo, temp_hi, prcp, date) VALUES ('Paris', 8, 37, 0.4, '2016-11-30');");
 
         List<List<String>> result = this.sql.executeSelectQuery("SELECT * FROM weather1;");
         assertThat(result.size()).isEqualTo(4);  //-> 3 Lists of results plus 1 List of column names
 
-        this.sql.executeQuery("TRUNCATE weather1");
+        this.sql.executeUpdateQuery("TRUNCATE weather1");
         result = this.sql.executeSelectQuery("SELECT * FROM weather1;");
         assertThat(result.size()).isEqualTo(1);// returns only the list of column names
 
@@ -100,9 +99,9 @@ public class SqlUtilsTest {
     public void verifyTableExistsMysqlTest() throws SQLException, ClassNotFoundException {
 
         this.connectMySqlTest();
-        this.sql.executeQuery("CREATE TABLE IF NOT EXISTS weather1 (city varchar(80), temp_lo int, temp_hi int, prcp real, date date);");
+        this.sql.executeUpdateQuery("CREATE TABLE IF NOT EXISTS weather1 (city varchar(80), temp_lo int, temp_hi int, prcp real, date date);");
         assertThat(this.sql.verifyTable("weather1")).isTrue();
-        this.sql.executeQuery("DROP TABLE weather1;");
+        this.sql.executeUpdateQuery("DROP TABLE weather1;");
         assertThat(this.sql.verifyTable("weather1")).isFalse();
     }
 
@@ -110,9 +109,9 @@ public class SqlUtilsTest {
     public void verifyTableExistsPostgreTest() throws SQLException, ClassNotFoundException {
 
         this.connectPostgresTest();
-        this.sql.executeQuery("CREATE TABLE IF NOT EXISTS weather1 (city varchar(80), temp_lo int, temp_hi int, prcp real, date date);");
+        this.sql.executeUpdateQuery("CREATE TABLE IF NOT EXISTS weather1 (city varchar(80), temp_lo int, temp_hi int, prcp real, date date);");
         assertThat(this.sql.verifyTable("weather1")).isTrue();
-        this.sql.executeQuery("DROP TABLE weather1;");
+        this.sql.executeUpdateQuery("DROP TABLE weather1;");
         assertThat(this.sql.verifyTable("weather1")).isFalse();
     }
 

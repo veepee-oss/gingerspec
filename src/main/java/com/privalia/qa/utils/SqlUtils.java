@@ -7,7 +7,8 @@ import java.util.*;
 
 
 /**
- * Generic operations on sql relational databases. Currently supports mysql/postgres
+ * Generic operations on SQL relational databases. Currently supports mysql/postgres
+ * @author Jose Fernandez
  */
 public class SqlUtils {
 
@@ -29,6 +30,16 @@ public class SqlUtils {
 
     private Connection sqlConnection;
 
+    private List<List<String>> previousSqlResult;
+
+    public List<List<String>> getPreviousSqlResult() {
+        return previousSqlResult;
+    }
+
+    private void setPreviousSqlResult(List<List<String>> previousSqlResult) {
+        this.previousSqlResult = previousSqlResult;
+    }
+
     /**
      * Generic constructor.
      */
@@ -42,8 +53,18 @@ public class SqlUtils {
         this.password = System.getProperty("SQLDB_PASSWORD", "mysql");
     }
 
+
     /**
-     * Connect to the database
+     * Attempts to establish a connection with the given parameters. The DriverManager attempts to select an appropriate driver from the set of registered JDBC drivers.
+     * @param host          URL of remote host
+     * @param port          Database port
+     * @param dataBaseType  Database type (currently MYSQL/POSTGRESQL)
+     * @param dataBaseName  Name of the remote database
+     * @param security      True if secure connection
+     * @param user          Database user
+     * @param password      Database password
+     * @throws ClassNotFoundException
+     * @throws SQLException
      */
     public void connect(String host, int port, String dataBaseType, String dataBaseName, Boolean security, String user, String password) throws ClassNotFoundException, SQLException {
 
@@ -73,14 +94,6 @@ public class SqlUtils {
         if (this.security) {
 
             // TODO: 1/02/18 Create case when using SSL, adding correct props
-//            props.setProperty("user", user);
-//            props.setProperty("password", password);
-//            props.setProperty("ssl", "true");
-//            props.setProperty("sslmode", "verify-full");
-//            props.setProperty("sslcert", "src/test/resources/credentials/postgres.crt");
-//            props.setProperty("sslkey", "src/test/resources/credentials/postgresql.pk8");
-//            props.setProperty("sslrootcert", "src/test/resources/credentials/stratio-ca.crt");
-
             this.sqlConnection = DriverManager
                     .getConnection(connectionString, props);
 
@@ -92,26 +105,35 @@ public class SqlUtils {
 
     }
 
-    public int executeQuery(String query) throws SQLException {
+    /**
+     * Executes the given SQL statement, which may be an INSERT, UPDATE, or DELETE statement
+     * or an SQL statement that returns nothing, such as an SQL DDL statement.
+     * @param query An SQL Data Manipulation Language (DML) statement, such as INSERT, UPDATE or DELETE;
+     *              or an SQL statement that returns nothing, such as a DDL statement.
+     * @return either (1) the row count for SQL Data Manipulation Language (DML) statements
+     * or (2) 0 for SQL statements that return nothing
+     * @throws SQLException
+     */
+    public int executeUpdateQuery(String query) throws SQLException {
 
         int result = 0;
 
         LOGGER.debug(String.format("Executing query %s", query));
-        try(Statement myStatement = this.sqlConnection.createStatement()) {
+        try (Statement myStatement = this.sqlConnection.createStatement()) {
             result = myStatement.executeUpdate(query);
             return result;
         }
     }
 
     /**
-     * Executes a SELECT type query on the DB connection. Instead of a resultset, this method
+     * Executes the given SQL statement, which returns a single ResultSet object. Instead of a ResultSet, this method
      * returns a List of lists (List<List<String>>). This method will return in the first list the
      * columns name, and the remaining lists are the rows (if the query returned any). So, this method
      * will always return at least 1 List (size 1).
-     * This way of representing a resulset is very similar to the structure of a datatable in
+     * This way of representing a ResultSet is very similar to the structure of a {@link cucumber.api.DataTable} in
      * cucumber, making the comparison easier
-     * @param query SELECT query to execute
-     * @return List of Maps
+     * @param query An SQL statement to be sent to the database, typically a static SQL SELECT statement
+     * @return A list of Lists
      * @throws SQLException
      */
     public List<List<String>> executeSelectQuery(String query) throws SQLException {
@@ -122,29 +144,63 @@ public class SqlUtils {
         try (Statement myStatement = this.sqlConnection.createStatement()) {
             LOGGER.debug(String.format("Executing query %s", query));
             rs = myStatement.executeQuery(query);
-
-            ResultSetMetaData resultSetMetaData = rs.getMetaData();
-            int count = resultSetMetaData.getColumnCount();
-
-            /*Store the column names*/
-            List<String> columnHeader = new LinkedList<>();
-            for (int i = 1; i <= count; i++) {
-                columnHeader.add(resultSetMetaData.getColumnName(i));
-            }
-            sqlTable.add(columnHeader);
-
-            /*Store the values*/
-            while (rs.next()) {
-                List<String> sqlTableAux = new LinkedList<>();
-                for (int i = 1; i <= count; i++) {
-                    sqlTableAux.add(rs.getObject(i).toString());
-                }
-                sqlTable.add(sqlTableAux);
-            }
-
-            return sqlTable;
+            return this.resultSetToList(rs);
         }
 
+    }
+
+    /**
+     * Transforms the given ResultSet to a List<List<String>>
+     * @param resultSet
+     * @return
+     */
+    private List<List<String>> resultSetToList(ResultSet resultSet) throws SQLException {
+
+        List<List<String>> sqlTable = new ArrayList<>();
+
+        ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
+        int count = resultSetMetaData.getColumnCount();
+
+        /*Store the column names*/
+        List<String> columnHeader = new LinkedList<>();
+        for (int i = 1; i <= count; i++) {
+            columnHeader.add(resultSetMetaData.getColumnName(i));
+        }
+        sqlTable.add(columnHeader);
+
+        /*Store the values*/
+        while (resultSet.next()) {
+            List<String> sqlTableAux = new LinkedList<>();
+            for (int i = 1; i <= count; i++) {
+                sqlTableAux.add(resultSet.getObject(i).toString());
+            }
+            sqlTable.add(sqlTableAux);
+        }
+
+        return sqlTable;
+    }
+
+    /**
+     * Executes the given SQL statement, which may return multiple results
+     * If the SQL statement returned a ResultSet, it is converted to a List<List<String>> and stored
+     * in an accessible variable in case it needs to be used
+     * @param query Any SQL statement (SELECT or UPDATE type)
+     * @return true if the result is a ResultSet object; false if it is an update count or there are no results
+     * @throws SQLException
+     */
+    public boolean executeQuery(String query) throws SQLException {
+
+        LOGGER.debug(String.format("Executing query %s", query));
+        try (Statement myStatement = this.sqlConnection.createStatement()) {
+            boolean r = myStatement.execute(query);
+
+            if (r) {
+                ResultSet resultSet = myStatement.getResultSet();
+                this.setPreviousSqlResult(this.resultSetToList(resultSet));
+            }
+
+            return r;
+        }
     }
 
     /**
@@ -154,10 +210,7 @@ public class SqlUtils {
      */
     public boolean verifyTable(String tableName) throws SQLException {
 
-        Statement myStatement = null;
-        Connection myConnection = this.sqlConnection;
         boolean exists = false;
-
         String query;
 
         if (this.dataBaseType.toLowerCase().matches("mysql")) {
@@ -167,27 +220,21 @@ public class SqlUtils {
         }
 
         LOGGER.debug(String.format("Verifying if table %s exists. Executing %s", tableName, query));
-        try  {
-            myStatement = myConnection.createStatement();
+        try (Statement myStatement = this.sqlConnection.createStatement()) {
+
             ResultSet rs = myStatement.executeQuery(query);
             //if there are no data row, table doesn't exists
             if (rs.next()) {
                 exists = true;
             }
             rs.close();
-            myStatement.close();
             return exists;
-
-        } catch (Exception e) {
-            e.printStackTrace();
         }
 
-        return false;
     }
 
     /**
      * Verify the state of the connection
-     *
      * @return
      */
     public boolean connectionStatus() {

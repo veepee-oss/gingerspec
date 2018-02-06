@@ -90,3 +90,33 @@ Feature: SQL Database Steps
       | Barcelona      |   5	 |    37	|  0.4	|2014-11-29 |
       | Madrid	       |   8	 |    37	|  0.4	|2016-11-30 |
     And I close database connection
+
+  Scenario: Execute a query from a file in a MySQL database
+    Given I connect with JDBC to database 'mysql' type 'mysql' on host '172.17.0.1' and port '3306' with user 'root' and password 'mysql'
+    Then I execute query 'CREATE TABLE IF NOT EXISTS weather1 (city varchar(80), temp_lo int, temp_hi int, prcp real, date date);'
+    Then I execute query 'TRUNCATE weather1'
+    Then I execute query 'INSERT INTO weather1 (city, temp_lo, temp_hi, prcp, date) VALUES ('San Francisco', 15, 43, 0.0, '2004-11-29');'
+    Then I execute query 'INSERT INTO weather1 (city, temp_lo, temp_hi, prcp, date) VALUES ('Kyiv', 5, 37, 0.4, '2014-11-29');'
+    Then I execute query 'INSERT INTO weather1 (city, temp_lo, temp_hi, prcp, date) VALUES ('Paris', 8, 37, 0.4, '2016-11-30');'
+    When I execute query from 'schemas/mySQLfile.sql'
+    Then I check that result is:
+      | city           | temp_lo | temp_hi  | prcp  | date      |
+      | San Francisco  |  15	 |    43	|  0.0	|2004-11-29 |
+      | Kyiv	       |   5	 |    37	|  0.4	|2014-11-29 |
+      | Paris	       |   8	 |    37	|  0.4	|2016-11-30 |
+    And I close database connection
+
+  Scenario: Execute a query from a file in a PostgreSQL database
+    Given I connect with JDBC to database 'postgres' type 'postgresql' on host '172.17.0.1' and port '5432' with user 'postgres' and password 'postgres'
+    Then I execute query 'CREATE TABLE IF NOT EXISTS weather1 (city varchar(80), temp_lo int, temp_hi int, prcp real, date date);'
+    Then I execute query 'TRUNCATE weather1'
+    Then I execute query 'INSERT INTO weather1 (city, temp_lo, temp_hi, prcp, date) VALUES ('Caracas', 15, 43, 0.0, '2004-11-29');'
+    Then I execute query 'INSERT INTO weather1 (city, temp_lo, temp_hi, prcp, date) VALUES ('Barcelona', 5, 37, 0.4, '2014-11-29');'
+    Then I execute query 'INSERT INTO weather1 (city, temp_lo, temp_hi, prcp, date) VALUES ('Madrid', 8, 37, 0.4, '2016-11-30');'
+    When I execute query from 'schemas/mySQLfile.sql'
+    Then I check that result is:
+      | city           | temp_lo | temp_hi  | prcp  | date      |
+      | Caracas        |  15	 |    43	|  0.0	|2004-11-29 |
+      | Barcelona      |   5	 |    37	|  0.4	|2014-11-29 |
+      | Madrid	       |   8	 |    37	|  0.4	|2016-11-30 |
+    And I close database connection
