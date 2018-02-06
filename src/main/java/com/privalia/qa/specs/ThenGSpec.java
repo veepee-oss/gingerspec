@@ -329,7 +329,7 @@ public class ThenGSpec extends BaseGSpec {
 
             }
         } else {
-            assertThat(commonspec.getResponse().getStatusCode()).isEqualTo(expectedStatus);
+            assertThat(commonspec.getResponse().getStatusCode()).as(commonspec.getResponse().getResponse()).isEqualTo(expectedStatus);
         }
     }
 
