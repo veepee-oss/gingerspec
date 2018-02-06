@@ -39,10 +39,11 @@ public class SqlDatabaseGSpec extends BaseGSpec {
                 this.commonspec.getSqlClient().connect(host, Integer.parseInt(port), dataBaseType, database, Boolean.parseBoolean(isSecured), user, password);
             }
         } catch (ClassNotFoundException | SQLException e) {
-            commonspec.getLogger().error("There was a problem connecting to the DB\n{}", e.toString());
+            commonspec.getLogger().error("There was a problem connecting to the DB\n{}", e.getMessage());
+            commonspec.getExceptions().add(e);
         }
 
-        assertThat(this.commonspec.getSqlClient().connectionStatus()).isEqualTo(true);
+        assertThat(this.commonspec.getSqlClient().connectionStatus()).as(this.commonspec.getExceptions().toString()).isEqualTo(true);
 
     }
 
@@ -50,14 +51,15 @@ public class SqlDatabaseGSpec extends BaseGSpec {
      * Close the Database connection
      */
     @Then("^I close database connection$")
-    public void connectDatabase() {
+    public void disconnectDatabase() {
         try {
             this.commonspec.getSqlClient().disconnect();
         } catch (SQLException e) {
-            commonspec.getLogger().error("Could not close DB connection\n{}", e.toString());
+            commonspec.getLogger().error("Could not close DB connection\n{}", e.getMessage());
+            commonspec.getExceptions().add(e);
         }
 
-        assertThat(this.commonspec.getSqlClient().connectionStatus()).isEqualTo(false);
+        assertThat(this.commonspec.getSqlClient().connectionStatus()).as(this.commonspec.getExceptions().toString()).isEqualTo(false);
     }
 
     /**
