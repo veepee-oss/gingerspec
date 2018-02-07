@@ -87,8 +87,12 @@ public class SqlUtils {
         }
 
 
+        /**
+         * MySQL databases often fail when executing multiple queries separated by comma ";". This was causing problems when executing
+         * a bunch of SQL statements from an SQL file. To avoid this problem, we had to set allowMultiQueries = true
+         */
         Properties props = new Properties();
-        String connectionString = "jdbc:" + dataBaseType.toLowerCase() + "://" + host + ":" + port + "/" + dataBaseName + "?user=" + user + "&password=" + password;
+        String connectionString = "jdbc:" + dataBaseType.toLowerCase() + "://" + host + ":" + port + "/" + dataBaseName + "?user=" + user + "&password=" + password + "&allowMultiQueries=true";
         LOGGER.debug(String.format("Starting connection using %s", connectionString));
 
         if (this.security) {
