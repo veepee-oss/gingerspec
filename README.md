@@ -1,6 +1,3 @@
-[![Coverage Status](https://coveralls.io/repos/github/Stratio/bdt/badge.svg?branch=master)](https://coveralls.io/github/Stratio/bdt?branch=master)
-[![Maven central](https://maven-badges.herokuapp.com/maven-central/com.stratio.qa/bdt/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.stratio.qa/bdt)
-
 Privalia bdt-lib
 ===========
 
@@ -15,9 +12,6 @@ Privalia Acceptance Test library
 
 Testing runtime to rule over Privalia's acceptance tests
 
-
-[Javadoc always live](http://stratiodocs.s3.amazonaws.com/bdt/index.html)
-
 After modifying, to check changes in your local project do:
 mvn clean install -Dmaven.test.skip=true (tests skip temporarily)
 
@@ -31,7 +25,7 @@ Examples:
 
 _**single class execution**_
 
-` mvn verify -DSECS=AGENT_LIST=1,2 -Dit.test=com.stratio.qa.ATests.LoopTagAspectIT `
+` mvn verify -DSECS=AGENT_LIST=1,2 -Dit.test=com.privalia.qa.ATests.LoopTagAspectIT `
 
 _**group execution**_
 
