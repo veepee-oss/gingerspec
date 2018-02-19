@@ -13,3 +13,5 @@ pipeline:
       image: "spdc1k8sregistry11.privalia.pin/privalia-qa-worker:0.1.0"
       uid: '0'
       cmd: "mvn clean"
+      volumes:
+        m2-cache: '/root/.m2'
