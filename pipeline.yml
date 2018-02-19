@@ -1,40 +1,15 @@
 project:
-  # php, java or node (used for pipeline auto-updates)
   language: java
-  # OPTIONAL: Docker Compose variables that will be written in the production docker-compose.yml
-  #environments:  (optional)
-  #  APP_ENV: '%env%' #required for aws
-  #  APPDYNKEY: '%appdynkey%' #required for aws
-  #  TAG_APP: '%tagApp%' #required for aws
-  #  TAG_PROJECT: '%tagProject%' #required for aws
-  #  TAG_CONF: '%tagConf%' #required for aws
-  #  MYSQL_SERVER: 172.0.0.1
-  # OPTIONAL: Overwrite specific sonarqube settings.
-  #sonarqube:
-  #  variables:
-  #    SONAR_SOURCES: src/
-  #    SONAR_EXCLUSIONS: bin/**, tests/**
-  # OPTIONAL: Public port and container port (defaults to 80:8080)
-  #ports:
-  #  '80': '8080'
-# OPTIONAL: List of additional services that will be launched:
-#services:
-#  mysql:
-#    image: privalia/imageWhatever
-    # OPTIONAL. List the environments that are suitable to spin up this service (accepts: productive, test. By default all environments are enabled)
-#    type:
-#      - test
-#    environment:
-#      VAR1: foo
-#      VAR2: bar
 pipeline:
-  artifact_type: library
-#   stages:
-#    UnitTest:
-#      image: "spdc1k8sregistry2.privalia.pin/apisilex:unit5_testing"
-#    FunctionalTest:
-#      image: "spdc1k8sregistry2.privalia.pin/apisilex:functional5_testing"
-#    Build:
-#      image: "spdc1k8sregistry2.privalia.pin/composer-5:build"
-#    CleanRequirements:
-#      image: "spdc1k8sregistry2.privalia.pin/composer-5:clean"
+  artifact_type: "library"
+  stages:
+    Build:
+      image: "spdc1k8sregistry11.privalia.pin/privalia-qa-worker:0.1.0"
+      uid: '0'
+      cmd: "mvn clean install -Dmaven.test.skip=true"
+      volumes:
+        m2-cache: '/root/.m2'
+    CleanRequirements:
+      image: "spdc1k8sregistry11.privalia.pin/privalia-qa-worker:0.1.0"
+      uid: '0'
+      cmd: "mvn clean"
