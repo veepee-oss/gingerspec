@@ -5,13 +5,11 @@ pipeline:
   stages:
     Build:
       image: "spdc1k8sregistry11.privalia.pin/privalia-qa-worker:0.1.0"
-      uid: '0'
       cmd: "mvn clean install -Dmaven.test.skip=true"
       volumes:
-        m2-cache: '/root/.m2'
+        m2-cache: '/home/jenkins/.m2'
     CleanRequirements:
       image: "spdc1k8sregistry11.privalia.pin/privalia-qa-worker:0.1.0"
-      uid: '0'
       cmd: "mvn clean"
       volumes:
-        m2-cache: '/root/.m2'
+        m2-cache: '/home/jenkins/.m2'
