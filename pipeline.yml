@@ -1,5 +1,6 @@
 project:
   language: java
+
 pipeline:
   artifact_type: "library"
   stages:
