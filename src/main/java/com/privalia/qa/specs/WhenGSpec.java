@@ -38,6 +38,7 @@ import java.util.concurrent.Future;
 import java.util.regex.Pattern;
 
 import static com.privalia.qa.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 /**
  * Generic When Specs.
@@ -267,7 +268,14 @@ public class WhenGSpec extends BaseGSpec {
 
         // Save response
         commonspec.getLogger().debug("Saving response");
-        commonspec.setResponse(requestType, response.get());
+
+        try {
+            Response r = response.get();
+            commonspec.setResponse(requestType, response.get());
+        } catch (Exception e) {
+            fail("Unable to get a response from the remote server", e);
+        }
+
     }
 
     /**
