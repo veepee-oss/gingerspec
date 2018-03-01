@@ -313,7 +313,15 @@ public class WhenGSpec extends BaseGSpec {
         }
 
         // Save response
-        commonspec.setResponse(requestType, response.get());
+        commonspec.getLogger().debug("Saving response");
+
+        try {
+            Response r = response.get();
+            commonspec.setResponse(requestType, response.get());
+        } catch (Exception e) {
+            fail("Unable to get a response from the remote server", e);
+        }
+
     }
 
     /**
