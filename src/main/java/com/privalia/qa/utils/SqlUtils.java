@@ -92,7 +92,13 @@ public class SqlUtils {
          * a bunch of SQL statements from an SQL file. To avoid this problem, we had to set allowMultiQueries = true
          */
         Properties props = new Properties();
-        String connectionString = "jdbc:" + dataBaseType.toLowerCase() + "://" + host + ":" + port + "/" + dataBaseName + "?user=" + user + "&password=" + password + "&allowMultiQueries=true";
+        String connectionString = "jdbc:" + dataBaseType.toLowerCase() + "://" + host + ":" + port + "/" + dataBaseName + "?allowMultiQueries=true" + "&user=" + user;
+
+        /** You can use the step without password and a null will be passed to the password variable (for cases when the db does not use password)*/
+        if (password != null) {
+            connectionString = connectionString + "&password=" + password;
+        }
+
         LOGGER.debug(String.format("Starting connection using %s", connectionString));
 
         if (this.security) {
