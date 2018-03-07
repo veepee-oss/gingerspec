@@ -28,7 +28,7 @@ public class SqlDatabaseGSpec extends BaseGSpec {
      * @param user          Database user
      * @param password      Database password
      */
-    @Given("^I( securely)? connect with JDBC to database '(.+?)' type '(mysql|postgresql)' on host '(.+?)' and port '(.+?)' with user '(.+?)'( and password '(.+?))?'?$")
+    @Given("^I( securely)? connect with JDBC to database '(.+?)' type '(mysql|postgresql)' on host '(.+?)' and port '(.+?)' with user '(.+?)'( and password '(.+?)')?$")
     public void connectDatabase(String isSecured, String database, String dataBaseType, String host, String port, String user, String foo, String password) {
         try {
             if (isSecured != null) {
