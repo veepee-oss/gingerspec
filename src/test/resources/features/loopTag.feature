@@ -1,4 +1,4 @@
-@ignore @toocomplex
+
 Feature: Feature used in testing loop tag aspect
 
   Scenario: wipe test file.
