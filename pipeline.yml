@@ -1,6 +1,22 @@
 project:
   language: java
 
+
+services:
+  mysql:
+    image: mysql
+    type:
+      - testing
+    environment:
+      MYSQL_ROOT_PASSWORD: mysql
+  postgres:
+      image: postgres
+      type:
+        - testing
+      environment:
+        POSTGRES_PASSWORD: postgres
+
+
 pipeline:
   artifact_type: "library"
   stages:
