@@ -1,4 +1,3 @@
-@ignore @toocomplex
 Feature: JSON replacements
 
   Scenario: Simplest read

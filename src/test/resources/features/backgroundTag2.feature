@@ -1,4 +1,3 @@
-@ignore @toocomplex
 Feature: Background aspect tests 2
 
   Background:
