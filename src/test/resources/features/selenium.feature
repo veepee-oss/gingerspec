@@ -2,6 +2,13 @@
 @web
 Feature: Selenium run test
 
+  Scenario: Test a file picker
+    Given My app is running in 'demoqa.com'
+    When I browse to '/registration'
+    When '1' elements exists with 'id:profile_pic_10'
+    Then I assign the file in 'schemas/empty.json' to the element on index '0'
+    And I wait '5' seconds
+
   Scenario: Dummy scenario
     Given My app is running in 'www.google.com:80'
     When I browse to '/'
