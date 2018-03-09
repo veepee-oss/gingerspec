@@ -22,7 +22,6 @@ import com.privalia.qa.cucumber.converter.ArrayListConverter;
 import com.privalia.qa.utils.ThreadProperty;
 import com.privalia.qa.cucumber.converter.NullableStringConverter;
 import cucumber.api.DataTable;
-import cucumber.api.PendingException;
 import cucumber.api.Transform;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
@@ -35,7 +34,6 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.Select;
 
 import java.io.*;
-import java.net.URL;
 import java.util.*;
 import java.util.concurrent.Future;
 import java.util.regex.Pattern;
