@@ -1,26 +1,5 @@
 project:
   language: java
-  environments:
-      APP_ENV: '%env%'
-      APPDYNKEY: '%appdynkey%'
-      TAG_APP: '%tagApp%'
-      TAG_PROJECT: '%tagProject%'
-      TAG_CONF: '%tagConf%'
-
-services:
-  mysql:
-    image: spdc1k8sregistry11.privalia.pin/mysql
-    type:
-      - testing
-    environment:
-      MYSQL_USER: root
-      MYSQL_ROOT_PASSWORD: mysql
-  postgres:
-      image: postgres
-      type:
-        - testing
-      environment:
-        POSTGRES_PASSWORD: postgres
 
 
 pipeline:
