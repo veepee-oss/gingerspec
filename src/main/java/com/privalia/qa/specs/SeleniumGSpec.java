@@ -72,4 +72,23 @@ public class SeleniumGSpec extends BaseGSpec {
     public void iDismissTheAlert() throws Throwable {
         commonspec.acceptSeleniumAlert();
     }
+
+    /**
+     * Assigns the given file (relative to schemas/) to the web elements in the given index. This step
+     * is suitable for file selectors/file pickers (an input type=file), where the user must specify a
+     * file in the local computer as an input in a form
+     * @param fileName Name of the file relative to schemas folder (schemas/myFile.txt)
+     * @param index Index of the web element (file input)
+     * @throws Throwable
+     */
+    @Then("^I assign the file in '(.+?)' to the element on index '(\\d+)'$")
+    public void iSetTheFileInSchemasEmptyJsonToTheElementOnIndex(String fileName, int index) throws Throwable {
+
+        //Get file absolute path
+        String filePath = getClass().getClassLoader().getResource(fileName).getPath();
+
+        //Assign the file absolute path to the file picker element previously set
+        commonspec.getPreviousWebElements().getPreviousWebElements().get(index).sendKeys(filePath);
+
+    }
 }
