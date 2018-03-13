@@ -224,8 +224,9 @@ public class ReplacementAspect {
             if (prop == null && (pjp.getThis() instanceof CucumberReporter.TestMethod)) {
                 return element;
             } else if (prop == null) {
-                logger.error("{} -> {} local var has not been saved correctly previously.", element, attribute);
-                throw new NonReplaceableException("Unreplaceable placeholder: " + placeholder);
+                logger.warn("{} -> {} local var has not been saved correctly previously.", element, attribute);
+                newVal = newVal.replace(placeholder, "NULL");
+                //throw new NonReplaceableException("Unreplaceable placeholder: " + placeholder);
             } else {
                 newVal = newVal.replace(placeholder, prop);
             }
