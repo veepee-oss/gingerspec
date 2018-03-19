@@ -178,7 +178,7 @@ public class SqlDatabaseGSpec extends BaseGSpec {
 
         List<List<String>> previousResult = this.commonspec.getPreviousSqlResult();
         assertThat(previousResult).as("The last SQL query returned a null result").isNotNull();
-        assertThat(previousResult.size()).as("The last SQL query did not returned any rows").isNotEqualTo(0);
+        assertThat(previousResult.size()).as("The last SQL query did not return any rows").isNotEqualTo(0);
         assertThat(previousResult.get(0).contains(columnName)).as("The last SQL query did not have a column with name " + columnName).isTrue();
 
         int columnNUmber = previousResult.get(0).indexOf(columnName);
