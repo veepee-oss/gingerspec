@@ -151,3 +151,23 @@ Feature: SQL Database Steps
       | Caracas        |  15	 |    43	|  0.0	|2004-11-29 |
       | Barcelona      |   5	 |    37	|  0.4	|2014-11-29 |
     And I close database connection
+
+  Scenario: Store the value returned by a query in an environment variable
+    Given I connect with JDBC to database 'mysql' type 'mysql' on host '172.17.0.1' and port '3306' with user 'root' and password 'mysql'
+    When I execute query from 'sql/createWeather.sql'
+    When I execute query from 'sql/selectWeather.sql'
+    Then I save the value of the row number '1' and the column with name 'city' in environment variable 'CITY'
+    Then I save the value of the row number '2' and the column with name 'temp_hi' in environment variable 'TEMP_BARCELONA'
+    Then '!{CITY}' matches 'Caracas'
+    Then '!{TEMP_BARCELONA}' matches '37'
+    And I close database connection
+
+  Scenario: Store the value returned by a query in an environment variable
+    Given I connect with JDBC to database 'postgres' type 'postgresql' on host '172.17.0.1' and port '5432' with user 'postgres' and password 'postgres'
+    When I execute query from 'sql/createWeather.sql'
+    When I execute query from 'sql/selectWeather.sql'
+    Then I save the value of the row number '1' and the column with name 'city' in environment variable 'CITY'
+    Then I save the value of the row number '2' and the column with name 'temp_hi' in environment variable 'TEMP_BARCELONA'
+    Then '!{CITY}' matches 'Caracas'
+    Then '!{TEMP_BARCELONA}' matches '37'
+    And I close database connection

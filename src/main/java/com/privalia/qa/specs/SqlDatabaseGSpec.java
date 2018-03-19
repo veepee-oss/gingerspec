@@ -1,6 +1,8 @@
 package com.privalia.qa.specs;
 
+import com.privalia.qa.utils.ThreadProperty;
 import cucumber.api.DataTable;
+import cucumber.api.PendingException;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
@@ -167,6 +169,25 @@ public class SqlDatabaseGSpec extends BaseGSpec {
         }
     }
 
+    /**
+     *
+     * @throws Throwable
+     */
+    @Then("^I save the value of the row number '(\\d+?)' and the column with name '(.+?)' in environment variable '(.+?)'$")
+    public void saveSqlResultInVariable(int rowNumber, String columnName, String envVar) {
+
+        List<List<String>> previousResult = this.commonspec.getPreviousSqlResult();
+        assertThat(previousResult).as("The last SQL query returned a null result").isNotNull();
+        assertThat(previousResult.size()).as("The last SQL query did not returned any rows").isNotEqualTo(0);
+        assertThat(previousResult.get(0).contains(columnName)).as("The last SQL query did not have a column with name " + columnName).isTrue();
+
+        int columnNUmber = previousResult.get(0).indexOf(columnName);
+
+        assertThat(previousResult.size() - 1 >= rowNumber).as("The column " + columnName + " only contains " + (previousResult.size() - 1) + " elements").isTrue();
+        ThreadProperty.set(envVar, previousResult.get(rowNumber).get(columnNUmber).trim());
+
+    }
+
     private boolean verifyTable(String tableName) {
 
         boolean exists;
@@ -178,5 +199,4 @@ public class SqlDatabaseGSpec extends BaseGSpec {
         }
         return exists;
     }
-
 }
