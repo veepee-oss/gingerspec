@@ -36,7 +36,7 @@ public class SeleniumGSpec extends BaseGSpec {
      * @param type              The expected style of the element: visible, clickable, present, hidden
      * @throws Throwable
      */
-    @Then("^I check every '(\\d+)' seconds for at least '(\\d+)' seconds until '(\\d+)' elements exists with '([^:]*?):([^:]*?)' and is '(visible|clickable|present|hidden)'$")
+    @Then("^I check every '(\\d+)' seconds for at least '(\\d+)' seconds until '(\\d+)' elements exists with '([^:]*?):(.+?)' and is '(visible|clickable|present|hidden)'$")
     public void waitWebElementWithPooling(int poolingInterval, int poolMaxTime, int elementsCount, String method, String element, String type) throws Throwable {
         List<WebElement> wel = commonspec.locateElementWithPooling(poolingInterval, poolMaxTime, method, element, elementsCount, type);
         PreviousWebElements pwel = new PreviousWebElements(wel);

@@ -79,7 +79,7 @@ public class WhenGSpec extends BaseGSpec {
      * @throws NoSuchFieldException
      * @throws ClassNotFoundException
      */
-    @When("^I drag '([^:]*?):([^:]*?)' and drop it to '([^:]*?):([^:]*?)'$")
+    @When("^I drag '([^:]*?):(.+?)' and drop it to '([^:]*?):(.+?)'$")
     public void seleniumDrag(String smethod, String source, String dmethod, String destination) throws ClassNotFoundException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
         Actions builder = new Actions(commonspec.getDriver());
 

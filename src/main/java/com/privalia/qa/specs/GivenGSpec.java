@@ -256,7 +256,7 @@ public class GivenGSpec extends BaseGSpec {
      * @throws NoSuchFieldException exception
      * @throws ClassNotFoundException exception
      */
-    @Given("^I switch to iframe with '([^:]*?):([^:]*?)'$")
+    @Given("^I switch to iframe with '([^:]*?):(.+?)'$")
     public void seleniumIdFrame(String method, String idframe) throws IllegalAccessException, NoSuchFieldException, ClassNotFoundException {
         assertThat(commonspec.locateElement(method, idframe, 1));
 
