@@ -116,7 +116,7 @@ public class ThenGSpec extends BaseGSpec {
      * @throws NoSuchFieldException
      * @throws ClassNotFoundException
      */
-    @Then("^'(\\d+?)' elements? exists? with '([^:]*?):([^:]*?)'$")
+    @Then("^'(\\d+?)' elements? exists? with '([^:]*?):(.+?)'$")
     public void assertSeleniumNElementExists(Integer expectedCount, String method, String element) throws ClassNotFoundException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
         List<WebElement> wel = commonspec.locateElement(method, element, expectedCount);
         PreviousWebElements pwel = new PreviousWebElements(wel);
@@ -140,7 +140,7 @@ public class ThenGSpec extends BaseGSpec {
      * @throws NoSuchFieldException
      * @throws ClassNotFoundException
      */
-    @Then("^in less than '(\\d+?)' seconds, checking each '(\\d+?)' seconds, '(\\d+?)' elements exists with '([^:]*?):([^:]*?)'$")
+    @Then("^in less than '(\\d+?)' seconds, checking each '(\\d+?)' seconds, '(\\d+?)' elements exists with '([^:]*?):(.+?)'$")
     public void assertSeleniumNElementExistsOnTimeOut(Integer timeout, Integer wait, Integer expectedCount,
                                                       String method, String element) throws InterruptedException, ClassNotFoundException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
         List<WebElement> wel = null;
