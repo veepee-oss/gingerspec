@@ -35,6 +35,8 @@ import com.ning.http.client.cookie.Cookie;
 import com.privalia.qa.utils.*;
 import com.privalia.qa.conditions.Conditions;
 import cucumber.api.DataTable;
+import io.restassured.http.ContentType;
+import io.restassured.specification.RequestSpecification;
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.io.FileUtils;
 import org.assertj.core.api.Assertions;
@@ -65,6 +67,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.privalia.qa.assertions.Assertions.assertThat;
+import static io.restassured.RestAssured.given;
+import static io.restassured.http.ContentType.JSON;
+import static io.restassured.http.ContentType.fromContentType;
 import static org.testng.Assert.fail;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -127,6 +132,10 @@ public class CommonG {
 
     private List<List<String>> previousSqlResult;
 
+    private RequestSpecification RestRequest;
+
+    private io.restassured.response.Response RestResponse;
+
     /**
      * Checks if a given string matches a regular expression or contains a string
      *
@@ -142,6 +151,38 @@ public class CommonG {
             pattern = Pattern.compile(Pattern.quote(expectedMessage));
         }
         return pattern;
+    }
+
+    /**
+     * Get the previos Rest response (restassured)
+     * @return
+     */
+    public io.restassured.response.Response getRestResponse() {
+        return RestResponse;
+    }
+
+    /**
+     * Sets the Rest response (restassured)
+     * @param restResponse
+     */
+    public void setRestResponse(io.restassured.response.Response restResponse) {
+        RestResponse = restResponse;
+    }
+
+    /**
+     * Returns the Rest Request object (restassured)
+     * @return
+     */
+    public RequestSpecification getRestRequest() {
+        return RestRequest;
+    }
+
+    /***
+     * Sets the Rest request object (restassured)
+     * @param restRequest
+     */
+    public void setRestRequest(RequestSpecification restRequest) {
+        RestRequest = restRequest;
     }
 
     /**
@@ -1215,6 +1256,45 @@ public class CommonG {
     @Deprecated
     public Future<Response> generateRequest(String requestType, boolean secure, String endPoint, String data, String type, String codeBase64) throws Exception {
         return generateRequest(requestType, false, null, null, endPoint, data, type, "");
+    }
+
+    /**
+     * Generates a request to a REST endpoint
+     * @param requestType   Request type (GET, POST, PUT, DELETE, PATCH)
+     * @param endPoint      Final endpoint (i.e /user/1)
+     * @throws Exception
+     */
+    public void generateRestRequest(String requestType, String endPoint) throws Exception {
+
+        RequestSpecification request = this.getRestRequest().basePath(endPoint);
+        this.getLogger().debug("Generating " + requestType + " reauest to " + endPoint);
+
+        switch (requestType) {
+            case "GET":
+                this.setRestResponse(request.when().get());
+                break;
+
+            case "POST":
+                this.setRestResponse(request.when().post());
+                break;
+
+            case "PUT":
+                this.setRestResponse(request.when().put());
+                break;
+
+            case "DELETE":
+                this.setRestResponse(request.when().delete());
+                break;
+
+            case "PATCH":
+                this.setRestResponse(request.when().patch());
+                break;
+
+            default:
+                throw new Exception("Operation not implemented: " + requestType);
+
+        }
+
     }
 
 
