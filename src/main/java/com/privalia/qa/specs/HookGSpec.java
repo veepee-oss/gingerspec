@@ -22,6 +22,12 @@ import com.privalia.qa.utils.ThreadProperty;
 import com.thoughtworks.selenium.SeleniumException;
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
+import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.config.*;
+import io.restassured.filter.log.RequestLoggingFilter;
+import io.restassured.filter.log.ResponseLoggingFilter;
+import io.restassured.http.ContentType;
+import io.restassured.specification.RequestSpecification;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.CommandInfo;
@@ -38,6 +44,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
+import static io.restassured.RestAssured.given;
 import static org.testng.Assert.fail;
 
 public class HookGSpec extends BaseGSpec {
@@ -171,12 +178,16 @@ public class HookGSpec extends BaseGSpec {
 
         commonspec.setClient(new AsyncHttpClient(new AsyncHttpClientConfig.Builder().setAcceptAnyCertificate(true).setAllowPoolingConnections(false)
                 .build()));
+
+        RequestSpecification spec = new RequestSpecBuilder().setContentType(ContentType.JSON).build();
+        commonspec.setRestRequest(given().header("Content-Type", "application/json").spec(spec));
     }
 
     @After(order = 10, value = "@rest")
     public void restClientTeardown() throws IOException {
         commonspec.getLogger().debug("Shutting down REST client");
         commonspec.getClient().close();
+
     }
 
     @After(order = 10)
