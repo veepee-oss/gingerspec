@@ -12,7 +12,7 @@ services:
   postgres:
     image: 'postgres:latest'
     type:
-      - testing'
+      - testing
     environment:
       POSTGRES_PASSWORD: 'postgres'
 
