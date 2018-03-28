@@ -2,7 +2,7 @@
 Feature: SQL Database Steps
 
   Feature Steps related to working with SQL relational databases (currently supports postgresql and mysql)
-          You can use the Docker images of mysql and postgresql for testing this feature
+          You can use the Docker images of mysql and postgresql for testing this feature.
           docker pull mysql
           docker run -d -p 3306:3306 --name mysql -e MYSQL_ROOT_PASSWORD=mysql -d mysql:latest
 
