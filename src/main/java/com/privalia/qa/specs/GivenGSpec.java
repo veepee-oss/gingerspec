@@ -72,7 +72,7 @@ public class GivenGSpec extends BaseGSpec {
      * @throws InvocationTargetException exception
      * @throws NoSuchMethodException exception
      */
-    @Given("^I save element (in position \'(.+?)\' in )?\'(.+?)\' in environment variable \'(.+?)\'$")
+    @Given("^I save element (in position \'(.+?)\' in )?\'(.+?)\' in environment variable \'(.+?)\'.$")
     public void saveElementEnvironment(String foo, String position, String element, String envVar) throws Exception {
 
         Pattern pattern = Pattern.compile("^((.*)(\\.)+)(\\$.*)$");
@@ -117,7 +117,7 @@ public class GivenGSpec extends BaseGSpec {
      *                      | token | 12345678 |
      * @throws Exception
      */
-    @Given("^I set headers:$")
+    @Given("^I set headers:.$")
     public void setHeaders(DataTable modifications) throws Throwable {
 
         LinkedHashMap jsonAsMap = new LinkedHashMap();
@@ -174,7 +174,7 @@ public class GivenGSpec extends BaseGSpec {
      * @param host host where app is running
      * @param port port where app is running
      */
-    @Given("^My app is running in '([^:]+?)(:.+?)?'$")
+    @Given("^My app is running in '([^:]+?)(:.+?)?'.$")
     public void setupApp(String host, String port) {
         assertThat(host).isNotEmpty();
 
@@ -201,7 +201,7 @@ public class GivenGSpec extends BaseGSpec {
      * @param restHost host where api is running
      * @param restPort port where api is running
      */
-    @Given("^I( securely)? send requests to '([^:]+?)(:.+?)?'$")
+    @Given("^I( securely)? send requests to '([^:]+?)(:.+?)?'.$")
     public void setupRestClient(String isSecured, String restHost, String restPort) {
         String restProtocol = "http://";
 

@@ -52,7 +52,7 @@ public class RestSpec extends BaseGSpec {
      * @param restHost      Port where the API is running. Defaults to 80 if null
      * @param restPort      Remote host. Defaults to 'localhost' if null
      */
-    @Given("^I( securely)? send requests to '([^:]+?)(:.+?)?'.$")
+    @Given("^I( securely)? send requests to '([^:]+?)(:.+?)?'$")
     public void setupApp(String isSecured, String restHost, String restPort) {
         String restProtocol = "http://";
 
@@ -90,7 +90,7 @@ public class RestSpec extends BaseGSpec {
      * @param host      Remote host. Defaults to 'localhost' if null
      * @param port      Port where the API is running. Defaults to 80 if null
      */
-    @Given("^My app is running in '([^:]+?)(:.+?)?'.$")
+    @Given("^My app is running in '([^:]+?)(:.+?)?'$")
     public void setupApp(String host, String port) {
         assertThat(host).isNotEmpty();
 
@@ -125,7 +125,7 @@ public class RestSpec extends BaseGSpec {
      * @param type          If the content of the file should be read as string or json
      * @throws Exception
      */
-    @When("^I send a '(.+?)' request to '(.+?)'( with user and password '(.+:.+?)')?( based on '([^:]+?)')?( as '(json|string)')?.$")
+    @When("^I send a '(.+?)' request to '(.+?)'( with user and password '(.+:.+?)')?( based on '([^:]+?)')?( as '(json|string)')?$")
     public void sendRequestNoDataTable(String requestType, String endPoint, String foo, String loginInfo, String bar, String baseData, String baz, String type) throws Exception {
 
         String retrievedData;
@@ -175,7 +175,7 @@ public class RestSpec extends BaseGSpec {
      *                      being the result of the modification: {"key1": "value1", "key2": {"key3": "new value3"}}
      * @throws Exception
      */
-    @When("^I send a '(.+?)' request to '(.+?)'( with user and password '(.+:.+?)')? based on '([^:]+?)'( as '(json|string)')? with:.$")
+    @When("^I send a '(.+?)' request to '(.+?)'( with user and password '(.+:.+?)')? based on '([^:]+?)'( as '(json|string)')? with:$")
     public void sendRequestDataTable(String requestType, String endPoint, String foo, String loginInfo, String baseData, String baz, String type, DataTable modifications) throws Exception {
 
         String user = null;
@@ -212,7 +212,7 @@ public class RestSpec extends BaseGSpec {
      * @param expectedText      Expected text to be present in the body
      * @param expectedSchema    file that contains a valid json schema to match against the response body
      */
-    @Then("^the service response status must be '(.*?)'( and its response length must be '(.*?)'| and its response must contain the text '(.*?)'| and its response matches the schema in '(.*?)')?.$")
+    @Then("^the service response status must be '(.*?)'( and its response length must be '(.*?)'| and its response must contain the text '(.*?)'| and its response matches the schema in '(.*?)')?$")
     public void assertResponseStatusLength(Integer expectedStatus, String foo, Integer expectedLength, String expectedText, String expectedSchema) {
 
         commonspec.getRestResponse().then().statusCode(expectedStatus);
@@ -242,7 +242,7 @@ public class RestSpec extends BaseGSpec {
      * @throws SecurityException
      * @throws IllegalArgumentException
      */
-    @Then("^the service response must contain the text '(.*?)'.$")
+    @Then("^the service response must contain the text '(.*?)'$")
     public void assertResponseMessage(String expectedText) throws SecurityException, IllegalArgumentException {
         ResponseBody body = commonspec.getRestResponse().getBody();
         String bodyAsString = body.asString();
@@ -273,7 +273,7 @@ public class RestSpec extends BaseGSpec {
      * @throws InvocationTargetException    exception
      * @throws NoSuchMethodException        exception
      */
-    @Given("^I save element (in position \'(.+?)\' in )?\'(.+?)\' in environment variable \'(.+?)\'.$")
+    @Given("^I save element (in position \'(.+?)\' in )?\'(.+?)\' in environment variable \'(.+?)\'$")
     public void saveElementEnvironment(String foo, String position, String element, String envVar) throws Exception {
 
         Pattern pattern = Pattern.compile("^((.*)(\\.)+)(\\$.*)$");
@@ -316,7 +316,7 @@ public class RestSpec extends BaseGSpec {
      *                      | token | 12345678 |
      * @throws Exception
      */
-    @Given("^I set headers:.$")
+    @Given("^I set headers:$")
     public void setHeaders(DataTable modifications) throws Throwable {
 
         Map<String, String> headers = new HashMap<>();
@@ -348,7 +348,7 @@ public class RestSpec extends BaseGSpec {
      *                      | token | 12345678 |
      * @throws Exception
      */
-    @Given("^I set cookies:.$")
+    @Given("^I set cookies:$")
     public void setCookies(DataTable modifications) throws Throwable {
 
         Map<String, String> cookies = new HashMap<>();
@@ -369,7 +369,7 @@ public class RestSpec extends BaseGSpec {
      * that were set in any previous call within the same scenario
      * @throws Throwable
      */
-    @Then("^I clear headers from previous request.$")
+    @Then("^I clear headers from previous request$")
     public void clearHeaders() throws Throwable {
 
         /**
@@ -389,7 +389,7 @@ public class RestSpec extends BaseGSpec {
      * that were set in any previous call within the same scenario
      * @throws Throwable
      */
-    @Then("^I clear cookies from previous request.$")
+    @Then("^I clear cookies from previous request$")
     public void clearCookies() throws Throwable {
 
         /**
@@ -415,7 +415,7 @@ public class RestSpec extends BaseGSpec {
      * @param responseVal   Expected value to evaluate in the response body
      * @throws Exception
      */
-    @When("^in less than '(\\d+?)' seconds, checking each '(\\d+?)' seconds, I send a '(.+?)' request to '(.+?)' so that the response( does not)? contains '(.+?)'.$")
+    @When("^in less than '(\\d+?)' seconds, checking each '(\\d+?)' seconds, I send a '(.+?)' request to '(.+?)' so that the response( does not)? contains '(.+?)'$")
     public void sendRequestTimeout(Integer timeout, Integer wait, String requestType, String endPoint, String contains, String responseVal) throws Exception {
 
         Boolean searchUntilContains;
