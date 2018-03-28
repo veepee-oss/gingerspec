@@ -289,7 +289,7 @@ public class ThenGSpec extends BaseGSpec {
                 .endsWith(webURL.toLowerCase() + url);
     }
 
-    @Then("^the service response must contain the text '(.*?)'$")
+    @Then("^the service response must contain the text '(.*?)'.$")
     public void assertResponseMessage(String expectedText) throws ClassNotFoundException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
         Pattern pattern = CommonG.matchesOrContains(expectedText);
         assertThat(commonspec.getResponse().getResponse()).containsPattern(pattern);
@@ -304,7 +304,7 @@ public class ThenGSpec extends BaseGSpec {
      * @param expectedText      Text to look for in the response
      * @param expectedSchema    Json schema to match the response (i.e. schemas/test-schema.json)
      */
-    @Then("^the service response status must be '(.*?)'( and its response length must be '(.*?)'| and its response must contain the text '(.*?)'| and its response matches the schema in '(.*?)')?$")
+    @Then("^the service response status must be '(.*?)'( and its response length must be '(.*?)'| and its response must contain the text '(.*?)'| and its response matches the schema in '(.*?)')?.$")
     public void assertResponseStatusLength(Integer expectedStatus, String foo, Integer expectedLength, String expectedText, String expectedSchema) {
         if (foo != null) {
             if (foo.contains("length")) {
@@ -492,7 +492,7 @@ public class ThenGSpec extends BaseGSpec {
      * that were set in any previous call within the same scenario
      * @throws Throwable
      */
-    @Then("^I clear headers from previous request$")
+    @Then("^I clear headers from previous request.$")
     public void clearHeaders() throws Throwable {
         commonspec.getHeaders().clear();
     }
