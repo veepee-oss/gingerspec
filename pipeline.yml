@@ -2,10 +2,24 @@ project:
   language: java
 
 
+services:
+  mysql:
+    image: 'mysql:5.7'
+    type:
+      - testing
+    environment:
+      MYSQL_ROOT_PASSWORD: "mysql"
+  postgres:
+    image: 'postgres:latests'
+    type:
+      - testing'
+    environment:
+      POSTGRES_PASSWORD: 'postgres'
+
 pipeline:
   artifact_type: "library"
   stages:
-    Build:
+    UnitTest:
       image: "spdc1k8sregistry11.privalia.pin/privalia-qa-worker:0.1.0"
       cmd: "mvn clean install -DVERSION=1.0 -DSLEEPTEST=3 -DAGENT_LIST=1,2 -DVARNAME=foo"
       volumes:
