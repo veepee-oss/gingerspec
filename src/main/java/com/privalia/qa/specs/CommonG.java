@@ -110,6 +110,8 @@ public class CommonG {
 
     private Map<String, String> headers = new HashMap<>();
 
+    private Map<String, String> restCookies = new HashMap<>();
+
     private String restHost;
 
     private String restPort;
@@ -151,6 +153,22 @@ public class CommonG {
             pattern = Pattern.compile(Pattern.quote(expectedMessage));
         }
         return pattern;
+    }
+
+    /**
+     * Set the values of the cookies used when performing rest requests
+     * @return
+     */
+    public Map<String, String> getRestCookies() {
+        return restCookies;
+    }
+
+    /**
+     * Returns the values of the cookies used in the rest requests
+     * @param restCookies
+     */
+    public void setRestCookies(Map<String, String> restCookies) {
+        this.restCookies = restCookies;
     }
 
     /**
@@ -1861,16 +1879,25 @@ public class CommonG {
             String value = (String) o;
             switch (condition) {
                 case "equal":
-                    assertThat(value).as("Evaluate JSONPath does not match with proposed value").isEqualTo(result);
+                    assertThat(value).as("Evaluate JSONPath/value does not match with proposed value").isEqualTo(result);
                     break;
                 case "not equal":
-                    assertThat(value).as("Evaluate JSONPath match with proposed value").isNotEqualTo(result);
+                    assertThat(value).as("Evaluate JSONPath/value match with proposed value").isNotEqualTo(result);
                     break;
                 case "contains":
-                    assertThat(value).as("Evaluate JSONPath does not contain proposed value").contains(result);
+                    assertThat(value).as("Evaluate JSONPath/value does not contain proposed value").contains(result);
                     break;
                 case "does not contain":
-                    assertThat(value).as("Evaluate JSONPath contain proposed value").doesNotContain(result);
+                    assertThat(value).as("Evaluate JSONPath/value contain proposed value").doesNotContain(result);
+                    break;
+                case "length":
+                    assertThat(value).as("Evaluate JSONPath/value contain proposed value").hasSize(Integer.parseInt(result));
+                    break;
+                case "exists":
+                    assertThat(value).as("Evaluate JSONPath/value contain proposed value").isNotNull();
+                    break;
+                case "does not exists":
+                    assertThat(value).as("Evaluate JSONPath/value contain proposed value").isNull();
                     break;
                 case "size":
                     JsonValue jsonObject = JsonValue.readHjson(value);

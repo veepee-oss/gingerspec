@@ -3,16 +3,25 @@ package com.privalia.qa.specs;
 import com.jayway.jsonpath.PathNotFoundException;
 import com.privalia.qa.utils.ThreadProperty;
 import cucumber.api.DataTable;
+import cucumber.api.PendingException;
+import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
+import gherkin.formatter.model.DataTableRow;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
+import io.restassured.http.Cookies;
+import io.restassured.http.Headers;
 import io.restassured.response.ResponseBody;
 import io.restassured.specification.RequestSpecification;
+import org.assertj.core.api.Assertions;
+import org.hjson.JsonValue;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -310,13 +319,49 @@ public class RestSpec extends BaseGSpec {
     @Given("^I set headers:.$")
     public void setHeaders(DataTable modifications) throws Throwable {
 
+        Map<String, String> headers = new HashMap<>();
+
         LinkedHashMap jsonAsMap = new LinkedHashMap();
         for (int i = 0; i < modifications.raw().size(); i++) {
             String key = modifications.raw().get(i).get(0);
             String value = modifications.raw().get(i).get(1);
+            headers.put(key, value);
             commonspec.getRestRequest().header(key, value);
-
         }
+
+        commonspec.setHeaders(headers);
+    }
+
+    /**
+     * Specify a custom map of cookies to be added to future requests
+     * @param modifications DataTable containing the custom set of cookies to be
+     *                      added to the requests. Syntax will be:
+     *                      {@code
+     *                      | <key> | <value> |
+     *                      }
+     *                      where:
+     *                      key: cookie key name
+     *                      value: cookie for tue key
+     *                      for example:
+     *                      if we want to add the cookie "token" with value "12345678", to the request cookie
+     *                      the modification will be:
+     *                      | token | 12345678 |
+     * @throws Exception
+     */
+    @Given("^I set cookies:.$")
+    public void setCookies(DataTable modifications) throws Throwable {
+
+        Map<String, String> cookies = new HashMap<>();
+
+        LinkedHashMap jsonAsMap = new LinkedHashMap();
+        for (int i = 0; i < modifications.raw().size(); i++) {
+            String key = modifications.raw().get(i).get(0);
+            String value = modifications.raw().get(i).get(1);
+            cookies.put(key, value);
+            commonspec.getRestRequest().cookie(key, value);
+        }
+
+        commonspec.setRestCookies(cookies);
     }
 
     /**
@@ -331,8 +376,29 @@ public class RestSpec extends BaseGSpec {
          * Since there is no easy way to remove all headers from the request,
          * a new request object is created with the same configuration
          * */
+
+        commonspec.getHeaders().clear();
         RequestSpecification spec = new RequestSpecBuilder().setContentType(ContentType.JSON).build();
-        commonspec.setRestRequest(given().header("Content-Type", "application/json").spec(spec));
+        commonspec.setRestRequest(given().header("Content-Type", "application/json").cookies(commonspec.getRestCookies()).spec(spec));
+        this.setupApp(commonspec.getRestHost(), commonspec.getRestPort());
+
+    }
+
+    /**
+     * Clears the cookies set by any previous request. A request will reuse the headers/cookies
+     * that were set in any previous call within the same scenario
+     * @throws Throwable
+     */
+    @Then("^I clear cookies from previous request.$")
+    public void clearCookies() throws Throwable {
+
+        /**
+         * Since there is no easy way to remove all cookies from the request,
+         * a new request object is created with the same configuration
+         * */
+        commonspec.getRestCookies().clear();
+        RequestSpecification spec = new RequestSpecBuilder().setContentType(ContentType.JSON).build();
+        commonspec.setRestRequest(given().header("Content-Type", "application/json").headers(commonspec.getHeaders()).spec(spec));
         this.setupApp(commonspec.getRestHost(), commonspec.getRestPort());
 
     }
@@ -407,4 +473,48 @@ public class RestSpec extends BaseGSpec {
         }
     }
 
+    @And("^the service response headers match the following cases:$")
+    public void checkHeaders(DataTable table) throws Throwable {
+
+        for (DataTableRow row : table.getGherkinRows()) {
+            String header = row.getCells().get(0);
+            String condition = row.getCells().get(1);
+            String result = row.getCells().get(2);
+
+            String headerValue = commonspec.getRestResponse().getHeaders().getValue(header);
+            commonspec.evaluateJSONElementOperation(headerValue, condition, result);
+
+        }
+
+    }
+
+    @And("^the service response cookies match the following cases:$")
+    public void checkCookies(DataTable table) throws Throwable {
+
+        for (DataTableRow row : table.getGherkinRows()) {
+            String cookie = row.getCells().get(0);
+            String condition = row.getCells().get(1);
+            String result = row.getCells().get(2);
+
+            String cookieValue = commonspec.getRestResponse().getCookies().get(cookie);
+            commonspec.evaluateJSONElementOperation(cookieValue, condition, result);
+
+        }
+    }
+
+    @And("^I save the response header '(.+?)' in environment variable '(.+?)'$")
+    public void saveHeaderValue(String headerName, String varName) throws Throwable {
+
+        String headerValue = commonspec.getRestResponse().getHeaders().getValue(headerName);
+        assertThat(headerValue).as("The header " + headerName + " is not present in the response").isNotNull();
+        ThreadProperty.set(varName, headerValue);
+    }
+
+    @And("^I save the response cookie '(.+?)' in environment variable '(.+?)'$")
+    public void saveCookieValue(String cookieName, String varName) throws Throwable {
+
+        String cookieValue = commonspec.getRestResponse().getCookies().get(cookieName);
+        assertThat(cookieValue).as("The cookie " + cookieName + " is not present in the response").isNotNull();
+        ThreadProperty.set(varName, cookieValue);
+    }
 }
