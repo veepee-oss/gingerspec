@@ -1,8 +1,8 @@
-@ignore @toocomplex
+
 Feature: SQL Database Steps
 
   Feature Steps related to working with SQL relational databases (currently supports postgresql and mysql)
-          You can use the Docker images of mysql and postgresql for testing this feature
+          You can use the Docker images of mysql and postgresql for testing this feature.
           docker pull mysql
           docker run -d -p 3306:3306 --name mysql -e MYSQL_ROOT_PASSWORD=mysql -d mysql:latest
 
@@ -10,25 +10,25 @@ Feature: SQL Database Steps
           docker run -d -p 5432:5432 --name postgres -e POSTGRES_PASSWORD=postgres -d postgres:latest
 
   Scenario: Connect to mysql Database
-    Given I connect with JDBC to database 'mysql' type 'mysql' on host '172.17.0.1' and port '3306' with user 'root' and password 'mysql'
+    Given I connect with JDBC to database 'mysql' type 'mysql' on host '${MYSQL_HOST}' and port '3306' with user 'root' and password 'mysql'
     Then I close database connection
 
   Scenario: Connect to postgres Database
-    Given I connect with JDBC to database 'postgres' type 'postgresql' on host '172.17.0.1' and port '5432' with user 'postgres' and password 'postgres'
+    Given I connect with JDBC to database 'postgres' type 'postgresql' on host '${POSTGRES_HOST}' and port '5432' with user 'postgres' and password 'postgres'
     Then I close database connection
 
   Scenario: Executing a query on a MySQL database
-    Given I connect with JDBC to database 'mysql' type 'mysql' on host '172.17.0.1' and port '3306' with user 'root' and password 'mysql'
+    Given I connect with JDBC to database 'mysql' type 'mysql' on host '${MYSQL_HOST}' and port '3306' with user 'root' and password 'mysql'
     When I execute query 'CREATE TABLE IF NOT EXISTS weather1 (city varchar(80), temp_lo int, temp_hi int, prcp real, date date);'
     Then I close database connection
 
   Scenario: Executing a query on a PostgreSQL database
-    Given I connect with JDBC to database 'postgres' type 'postgresql' on host '172.17.0.1' and port '5432' with user 'postgres' and password 'postgres'
+    Given I connect with JDBC to database 'postgres' type 'postgresql' on host '${POSTGRES_HOST}' and port '5432' with user 'postgres' and password 'postgres'
     When I execute query 'CREATE TABLE IF NOT EXISTS weather1 (city varchar(80), temp_lo int, temp_hi int, prcp real, date date);'
     Then I close database connection
 
   Scenario: Verify if a table exists in a MySQL Database
-    Given I connect with JDBC to database 'mysql' type 'mysql' on host '172.17.0.1' and port '3306' with user 'root' and password 'mysql'
+    Given I connect with JDBC to database 'mysql' type 'mysql' on host '${MYSQL_HOST}' and port '3306' with user 'root' and password 'mysql'
     When I execute query 'CREATE TABLE IF NOT EXISTS weather1 (city varchar(80), temp_lo int, temp_hi int, prcp real, date date);'
     Then table 'weather1' exists
     Then table 'weather2' doesn't exists
@@ -40,7 +40,7 @@ Feature: SQL Database Steps
     Then I close database connection
 
   Scenario: Verify if a table exists in a PostgreSQL Database
-    Given I connect with JDBC to database 'postgres' type 'postgresql' on host '172.17.0.1' and port '5432' with user 'postgres' and password 'postgres'
+    Given I connect with JDBC to database 'postgres' type 'postgresql' on host '${POSTGRES_HOST}' and port '5432' with user 'postgres' and password 'postgres'
     When I execute query 'CREATE TABLE IF NOT EXISTS weather1 (city varchar(80), temp_lo int, temp_hi int, prcp real, date date);'
     Then table 'weather1' exists
     Then table 'weather2' doesn't exists
@@ -52,7 +52,7 @@ Feature: SQL Database Steps
     Then I close database connection
 
   Scenario: Executing SELECT statements on a MySQL database
-    Given I connect with JDBC to database 'mysql' type 'mysql' on host '172.17.0.1' and port '3306' with user 'root' and password 'mysql'
+    Given I connect with JDBC to database 'mysql' type 'mysql' on host '${MYSQL_HOST}' and port '3306' with user 'root' and password 'mysql'
     Then I execute query 'CREATE TABLE IF NOT EXISTS weather1 (city varchar(80), temp_lo int, temp_hi int, prcp real, date date);'
     Then I execute query 'TRUNCATE weather1'
     Then I execute query 'INSERT INTO weather1 (city, temp_lo, temp_hi, prcp, date) VALUES ('San Francisco', 15, 43, 0.0, '2004-11-29');'
@@ -73,7 +73,7 @@ Feature: SQL Database Steps
 
 
   Scenario: Executing SELECT statements on a PostgreSQL database
-    Given I connect with JDBC to database 'postgres' type 'postgresql' on host '172.17.0.1' and port '5432' with user 'postgres' and password 'postgres'
+    Given I connect with JDBC to database 'postgres' type 'postgresql' on host '${POSTGRES_HOST}' and port '5432' with user 'postgres' and password 'postgres'
     Then I execute query 'CREATE TABLE IF NOT EXISTS weather1 (city varchar(80), temp_lo int, temp_hi int, prcp real, date date);'
     Then I execute query 'TRUNCATE weather1'
     Then I execute query 'INSERT INTO weather1 (city, temp_lo, temp_hi, prcp, date) VALUES ('Caracas', 15, 43, 0.0, '2004-11-29');'
@@ -93,7 +93,7 @@ Feature: SQL Database Steps
     And I close database connection
 
   Scenario: Execute a SELECT query from a file in a MySQL database
-    Given I connect with JDBC to database 'mysql' type 'mysql' on host '172.17.0.1' and port '3306' with user 'root' and password 'mysql'
+    Given I connect with JDBC to database 'mysql' type 'mysql' on host '${MYSQL_HOST}' and port '3306' with user 'root' and password 'mysql'
     Then I execute query 'CREATE TABLE IF NOT EXISTS weather1 (city varchar(80), temp_lo int, temp_hi int, prcp real, date date);'
     Then I execute query 'TRUNCATE weather1'
     Then I execute query 'INSERT INTO weather1 (city, temp_lo, temp_hi, prcp, date) VALUES ('San Francisco', 15, 43, 0.0, '2004-11-29');'
@@ -108,7 +108,7 @@ Feature: SQL Database Steps
     And I close database connection
 
   Scenario: Execute a SELECT query from a file in a PostgreSQL database
-    Given I connect with JDBC to database 'postgres' type 'postgresql' on host '172.17.0.1' and port '5432' with user 'postgres' and password 'postgres'
+    Given I connect with JDBC to database 'postgres' type 'postgresql' on host '${POSTGRES_HOST}' and port '5432' with user 'postgres' and password 'postgres'
     Then I execute query 'CREATE TABLE IF NOT EXISTS weather1 (city varchar(80), temp_lo int, temp_hi int, prcp real, date date);'
     Then I execute query 'TRUNCATE weather1'
     Then I execute query 'INSERT INTO weather1 (city, temp_lo, temp_hi, prcp, date) VALUES ('Caracas', 15, 43, 0.0, '2004-11-29');'
@@ -123,7 +123,7 @@ Feature: SQL Database Steps
     And I close database connection
 
   Scenario: Execute a query from a file in a MySQL database
-    Given I connect with JDBC to database 'mysql' type 'mysql' on host '172.17.0.1' and port '3306' with user 'root' and password 'mysql'
+    Given I connect with JDBC to database 'mysql' type 'mysql' on host '${MYSQL_HOST}' and port '3306' with user 'root' and password 'mysql'
     When I execute query from 'sql/createWeather.sql'
     Then I check that table 'weather1' is iqual to
       | city           | temp_lo | temp_hi  | prcp  | date      |
@@ -138,7 +138,7 @@ Feature: SQL Database Steps
     And I close database connection
 
   Scenario: Execute a query from a file in a PostgreSQL database
-    Given I connect with JDBC to database 'postgres' type 'postgresql' on host '172.17.0.1' and port '5432' with user 'postgres' and password 'postgres'
+    Given I connect with JDBC to database 'postgres' type 'postgresql' on host '${POSTGRES_HOST}' and port '5432' with user 'postgres' and password 'postgres'
     When I execute query from 'sql/createWeather.sql'
     Then I check that table 'weather1' is iqual to
       | city           | temp_lo | temp_hi  | prcp  | date      |
@@ -153,7 +153,7 @@ Feature: SQL Database Steps
     And I close database connection
 
   Scenario: Store the value returned by a query in an environment variable
-    Given I connect with JDBC to database 'mysql' type 'mysql' on host '172.17.0.1' and port '3306' with user 'root' and password 'mysql'
+    Given I connect with JDBC to database 'mysql' type 'mysql' on host '${MYSQL_HOST}' and port '3306' with user 'root' and password 'mysql'
     When I execute query from 'sql/createWeather.sql'
     When I execute query from 'sql/selectWeather.sql'
     Then I save the value of the row number '1' and the column with name 'city' in environment variable 'CITY'
@@ -163,7 +163,7 @@ Feature: SQL Database Steps
     And I close database connection
 
   Scenario: Store the value returned by a query in an environment variable
-    Given I connect with JDBC to database 'postgres' type 'postgresql' on host '172.17.0.1' and port '5432' with user 'postgres' and password 'postgres'
+    Given I connect with JDBC to database 'postgres' type 'postgresql' on host '${POSTGRES_HOST}' and port '5432' with user 'postgres' and password 'postgres'
     When I execute query from 'sql/createWeather.sql'
     When I execute query from 'sql/selectWeather.sql'
     Then I save the value of the row number '1' and the column with name 'city' in environment variable 'CITY'
