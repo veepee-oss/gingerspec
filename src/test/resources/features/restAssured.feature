@@ -29,9 +29,17 @@ Feature: Rest Assured Feature
     Given My app is running in 'tms-api-uat20.privalia-test.com:80'.
     Given I set headers:.
       | x-user  | vente_privee_es                                                  |
-      | x-token | c4b8e71540edb78a4b1f9da4ee09e2a1e5283727768af993b760a7c318563134 |
+      | x-token | 93f44fdfe7c186e354fafbf0ff064eec1e2d6e31df6956cbeb7d3a7b5c112dc4 |
     When I send a 'GET' request to '/api/v1/shipment/1' as 'json'.
     Then the service response status must be '200'.
+    And the service response headers match the following cases:
+      | Server            | equal           |  nginx   |
+      | Content-Encoding  | equal           |  gzip    |
+      | Connection        | exists          |          |
+      | test              | does not exists |          |
+      | Cache-Control     | length          |  8       |
+      | Cache-Control     | contains        |  cache   |
+    And I save the response header 'Server' in environment variable 'SERVER'
     And I clear headers from previous request.
     When I send a 'GET' request to '/api/v1/shipment/1'.
     Then the service response status must be '401'.
