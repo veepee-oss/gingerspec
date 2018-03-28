@@ -10,7 +10,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: "mysql"
   postgres:
-    image: 'postgres:latest'
+    image: 'postgres:9.6.8'
     type:
       - testing
     environment:
