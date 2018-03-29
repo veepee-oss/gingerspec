@@ -1281,6 +1281,7 @@ public class CommonG {
     public void generateRestRequest(String requestType, String endPoint) throws Exception {
 
         this.getRestRequest().basePath(endPoint);
+
         this.getLogger().debug("Generating " + requestType + " reauest to " + endPoint);
 
         switch (requestType) {
