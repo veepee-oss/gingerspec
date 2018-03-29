@@ -35,7 +35,6 @@ import com.ning.http.client.cookie.Cookie;
 import com.privalia.qa.utils.*;
 import com.privalia.qa.conditions.Conditions;
 import cucumber.api.DataTable;
-import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.io.FileUtils;
@@ -67,9 +66,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.privalia.qa.assertions.Assertions.assertThat;
-import static io.restassured.RestAssured.given;
-import static io.restassured.http.ContentType.JSON;
-import static io.restassured.http.ContentType.fromContentType;
 import static org.testng.Assert.fail;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -192,7 +188,7 @@ public class CommonG {
      * @return
      */
     public RequestSpecification getRestRequest() {
-        return RestRequest;
+        return this.RestRequest;
     }
 
     /***
@@ -200,7 +196,7 @@ public class CommonG {
      * @param restRequest
      */
     public void setRestRequest(RequestSpecification restRequest) {
-        RestRequest = restRequest;
+        this.RestRequest = restRequest;
     }
 
     /**
@@ -1284,28 +1280,28 @@ public class CommonG {
      */
     public void generateRestRequest(String requestType, String endPoint) throws Exception {
 
-        RequestSpecification request = this.getRestRequest().basePath(endPoint);
+        this.getRestRequest().basePath(endPoint);
         this.getLogger().debug("Generating " + requestType + " reauest to " + endPoint);
 
         switch (requestType) {
             case "GET":
-                this.setRestResponse(request.when().get());
+                this.setRestResponse(this.getRestRequest().when().get());
                 break;
 
             case "POST":
-                this.setRestResponse(request.when().post());
+                this.setRestResponse(this.getRestRequest().when().post());
                 break;
 
             case "PUT":
-                this.setRestResponse(request.when().put());
+                this.setRestResponse(this.getRestRequest().when().put());
                 break;
 
             case "DELETE":
-                this.setRestResponse(request.when().delete());
+                this.setRestResponse(this.getRestRequest().when().delete());
                 break;
 
             case "PATCH":
-                this.setRestResponse(request.when().patch());
+                this.setRestResponse(this.getRestRequest().when().patch());
                 break;
 
             default:

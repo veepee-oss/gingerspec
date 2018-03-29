@@ -25,6 +25,7 @@ Feature: Rest Assured Feature
     Then '!{TITLE}' matches 'This is a test'
 
 
+    @ignore @toocomplex
   Scenario: Setting headers using a datatable
     Given My app is running in 'tms-api-uat20.privalia-test.com:80'
     Given I set headers:

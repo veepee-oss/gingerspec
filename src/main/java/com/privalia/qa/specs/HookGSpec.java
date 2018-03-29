@@ -22,6 +22,7 @@ import com.privalia.qa.utils.ThreadProperty;
 import com.thoughtworks.selenium.SeleniumException;
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
+import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.config.*;
 import io.restassured.filter.log.RequestLoggingFilter;
@@ -179,8 +180,10 @@ public class HookGSpec extends BaseGSpec {
         commonspec.setClient(new AsyncHttpClient(new AsyncHttpClientConfig.Builder().setAcceptAnyCertificate(true).setAllowPoolingConnections(false)
                 .build()));
 
-        RequestSpecification spec = new RequestSpecBuilder().setContentType(ContentType.JSON).build();
-        commonspec.setRestRequest(given().header("Content-Type", "application/json").spec(spec));
+        RequestSpecification request;
+        request = given();
+        commonspec.setRestRequest(request);
+
     }
 
     @After(order = 10, value = "@rest")

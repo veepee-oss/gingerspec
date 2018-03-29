@@ -3,7 +3,6 @@ package com.privalia.qa.specs;
 import com.jayway.jsonpath.PathNotFoundException;
 import com.privalia.qa.utils.ThreadProperty;
 import cucumber.api.DataTable;
-import cucumber.api.PendingException;
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
@@ -11,12 +10,8 @@ import cucumber.api.java.en.When;
 import gherkin.formatter.model.DataTableRow;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
-import io.restassured.http.Cookies;
-import io.restassured.http.Headers;
 import io.restassured.response.ResponseBody;
 import io.restassured.specification.RequestSpecification;
-import org.assertj.core.api.Assertions;
-import org.hjson.JsonValue;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -35,8 +30,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Jose Fernandez
  */
 public class RestSpec extends BaseGSpec {
-
-    private RequestSpecification request;
 
     public RestSpec(CommonG spec) {
         this.commonspec = spec;
@@ -73,7 +66,6 @@ public class RestSpec extends BaseGSpec {
         }
 
         restPort = restPort.replace(":", "");
-
         assertThat(commonspec.getRestRequest()).as("No rest client initialized. Did you forget to use @rest annotation in your feature?").isNotNull();
         commonspec.setRestHost(restHost);
         commonspec.setRestPort(restPort);
@@ -473,6 +465,24 @@ public class RestSpec extends BaseGSpec {
         }
     }
 
+    /**
+     * Checks if the headers in the response matches the specified values
+     * @param table DataTable containing the custom set of headers to be
+     *                      added to the requests. Syntax will be:
+     *                      {@code
+     *                      | <header name> | <condition> | <expected value>
+     *                      }
+     *                      where:
+     *                      header name: Header name
+     *                      condition: Condition that is going to be evaluated (available: equal,
+     *                      not equal, exists, does not exists, contains, does not contain, length, size)
+     *                      expected value: Value used to verify the condition
+     *                      for example:
+     *                      If we want to verify that the header "Content-Encoding" is equal
+     *                      to "application/json" we would do
+     *                      | Content-Encoding | equal | application/json |
+     * @throws Throwable
+     */
     @And("^the service response headers match the following cases:$")
     public void checkHeaders(DataTable table) throws Throwable {
 
@@ -488,6 +498,24 @@ public class RestSpec extends BaseGSpec {
 
     }
 
+    /**
+     * Checks if the cookies in the response matches the specified values
+     * @param table DataTable containing the custom set of cookies to be
+     *                      added to the requests. Syntax will be:
+     *                      {@code
+     *                      | <cookies name> | <condition> | <expected value>
+     *                      }
+     *                      where:
+     *                      cookies name: Header name
+     *                      condition: Condition that is going to be evaluated (available: equal,
+     *                      not equal, exists, does not exists, contains, does not contain, length, size)
+     *                      expected value: Value used to verify the condition
+     *                      for example:
+     *                      If we want to verify that the cookies "Content-Encoding" is equal
+     *                      to "application/json" we would do
+     *                      | Content-Encoding | equal | application/json |
+     * @throws Throwable
+     */
     @And("^the service response cookies match the following cases:$")
     public void checkCookies(DataTable table) throws Throwable {
 
@@ -502,6 +530,12 @@ public class RestSpec extends BaseGSpec {
         }
     }
 
+    /**
+     * Saves the header value for future use
+     * @param headerName  Header name
+     * @param varName     Name of the environmental variable
+     * @throws Throwable
+     */
     @And("^I save the response header '(.+?)' in environment variable '(.+?)'$")
     public void saveHeaderValue(String headerName, String varName) throws Throwable {
 
@@ -510,6 +544,12 @@ public class RestSpec extends BaseGSpec {
         ThreadProperty.set(varName, headerValue);
     }
 
+    /**
+     * Saves the cookie value for future use
+     * @param cookieName  Cookie name
+     * @param varName     Name of the environmental variable
+     * @throws Throwable
+     */
     @And("^I save the response cookie '(.+?)' in environment variable '(.+?)'$")
     public void saveCookieValue(String cookieName, String varName) throws Throwable {
 
