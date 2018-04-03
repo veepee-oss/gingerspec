@@ -11,7 +11,7 @@
 
 	<groupId>com.privalia</groupId>
 	<artifactId>bdt-lib</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>##VERSION##</version>
 
 	<name>Privalia BDT framework</name>
 	<url>http://gitlab.privalia.pin/som-qa/bdt-lib</url>
