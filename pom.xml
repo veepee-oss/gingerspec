@@ -104,7 +104,7 @@
 				<configuration>
 					<argLine>${jacoco-IT-argline}
 						-javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/1.8.8/aspectjweaver-1.8.8.jar
-						-Xmx1024m
+						-Xms512m -Xmx1536m
 					</argLine>
 				</configuration>
 			</plugin>
