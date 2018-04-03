@@ -117,6 +117,27 @@ public class RestSpec extends BaseGSpec {
     }
 
     /**
+     * Check if expression defined by JSOPath (http://goessner.net/articles/JsonPath/index.html)
+     * match in JSON stored in a environment variable.
+     *
+     * @param envVar environment variable where JSON is stored
+     * @param table  data table in which each row stores one expression
+     */
+    @Then("^'(.+?)' matches the following cases:$")
+    public void matchWithExpresion(String envVar, DataTable table) throws Exception {
+        String jsonString = ThreadProperty.get(envVar);
+
+        for (DataTableRow row : table.getGherkinRows()) {
+            String expression = row.getCells().get(0);
+            String condition = row.getCells().get(1);
+            String result = row.getCells().get(2);
+
+            String value = commonspec.getRestResponse().then().extract().path(expression);
+            commonspec.evaluateJSONElementOperation(value, condition, result);
+        }
+    }
+
+    /**
      * Generates a REST request of the type specified to the indicated endpoint
      * @param requestType   HTTP verb (type of request): POST, GET, PUT, PATCH, DELETE
      * @param endPoint      Endpoint (i.e /user/1). The base path used is the one indicated in a previous step

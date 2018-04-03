@@ -419,7 +419,7 @@ public class ThenGSpec extends BaseGSpec {
      * @param envVar environment variable where JSON is stored
      * @param table  data table in which each row stores one expression
      */
-    @Then("^'(.+?)' matches the following cases:$")
+    @Then("^'(.+?)' matches the following cases:.$")
     public void matchWithExpresion(String envVar, DataTable table) throws Exception {
         String jsonString = ThreadProperty.get(envVar);
 
