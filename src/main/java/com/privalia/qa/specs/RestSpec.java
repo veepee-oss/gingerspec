@@ -114,11 +114,13 @@ public class RestSpec extends BaseGSpec {
         commonspec.setWebHost(host);
         commonspec.setWebPort(port);
 
-        if (restProtocol.matches("https://")) {
-            commonspec.getRestRequest().relaxedHTTPSValidation();
-        }
+        if (commonspec.getRestRequest() != null) {
+            if (restProtocol.matches("https://")) {
+                commonspec.getRestRequest().relaxedHTTPSValidation();
+            }
 
-        commonspec.getRestRequest().baseUri(restProtocol + host).port(Integer.parseInt(port));
+            commonspec.getRestRequest().baseUri(restProtocol + host).port(Integer.parseInt(port));
+        }
     }
 
     /**
