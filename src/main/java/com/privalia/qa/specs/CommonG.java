@@ -35,6 +35,7 @@ import com.ning.http.client.cookie.Cookie;
 import com.privalia.qa.utils.*;
 import com.privalia.qa.conditions.Conditions;
 import cucumber.api.DataTable;
+import io.restassured.specification.RequestSpecification;
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.io.FileUtils;
 import org.assertj.core.api.Assertions;
@@ -105,6 +106,8 @@ public class CommonG {
 
     private Map<String, String> headers = new HashMap<>();
 
+    private Map<String, String> restCookies = new HashMap<>();
+
     private String restHost;
 
     private String restPort;
@@ -127,6 +130,10 @@ public class CommonG {
 
     private List<List<String>> previousSqlResult;
 
+    private RequestSpecification RestRequest;
+
+    private io.restassured.response.Response RestResponse;
+
     /**
      * Checks if a given string matches a regular expression or contains a string
      *
@@ -142,6 +149,54 @@ public class CommonG {
             pattern = Pattern.compile(Pattern.quote(expectedMessage));
         }
         return pattern;
+    }
+
+    /**
+     * Set the values of the cookies used when performing rest requests
+     * @return
+     */
+    public Map<String, String> getRestCookies() {
+        return restCookies;
+    }
+
+    /**
+     * Returns the values of the cookies used in the rest requests
+     * @param restCookies
+     */
+    public void setRestCookies(Map<String, String> restCookies) {
+        this.restCookies = restCookies;
+    }
+
+    /**
+     * Get the previos Rest response (restassured)
+     * @return
+     */
+    public io.restassured.response.Response getRestResponse() {
+        return RestResponse;
+    }
+
+    /**
+     * Sets the Rest response (restassured)
+     * @param restResponse
+     */
+    public void setRestResponse(io.restassured.response.Response restResponse) {
+        RestResponse = restResponse;
+    }
+
+    /**
+     * Returns the Rest Request object (restassured)
+     * @return
+     */
+    public RequestSpecification getRestRequest() {
+        return this.RestRequest;
+    }
+
+    /***
+     * Sets the Rest request object (restassured)
+     * @param restRequest
+     */
+    public void setRestRequest(RequestSpecification restRequest) {
+        this.RestRequest = restRequest;
     }
 
     /**
@@ -1217,6 +1272,46 @@ public class CommonG {
         return generateRequest(requestType, false, null, null, endPoint, data, type, "");
     }
 
+    /**
+     * Generates a request to a REST endpoint
+     * @param requestType   Request type (GET, POST, PUT, DELETE, PATCH)
+     * @param endPoint      Final endpoint (i.e /user/1)
+     * @throws Exception
+     */
+    public void generateRestRequest(String requestType, String endPoint) throws Exception {
+
+        this.getRestRequest().basePath(endPoint);
+
+        this.getLogger().debug("Generating " + requestType + " reauest to " + endPoint);
+
+        switch (requestType) {
+            case "GET":
+                this.setRestResponse(this.getRestRequest().when().get());
+                break;
+
+            case "POST":
+                this.setRestResponse(this.getRestRequest().when().post());
+                break;
+
+            case "PUT":
+                this.setRestResponse(this.getRestRequest().when().put());
+                break;
+
+            case "DELETE":
+                this.setRestResponse(this.getRestRequest().when().delete());
+                break;
+
+            case "PATCH":
+                this.setRestResponse(this.getRestRequest().when().patch());
+                break;
+
+            default:
+                throw new Exception("Operation not implemented: " + requestType);
+
+        }
+
+    }
+
 
     /**
      * Saves the value in the attribute in class extending CommonG.
@@ -1781,16 +1876,25 @@ public class CommonG {
             String value = (String) o;
             switch (condition) {
                 case "equal":
-                    assertThat(value).as("Evaluate JSONPath does not match with proposed value").isEqualTo(result);
+                    assertThat(value).as("Evaluate JSONPath/value does not match with proposed value").isEqualTo(result);
                     break;
                 case "not equal":
-                    assertThat(value).as("Evaluate JSONPath match with proposed value").isNotEqualTo(result);
+                    assertThat(value).as("Evaluate JSONPath/value match with proposed value").isNotEqualTo(result);
                     break;
                 case "contains":
-                    assertThat(value).as("Evaluate JSONPath does not contain proposed value").contains(result);
+                    assertThat(value).as("Evaluate JSONPath/value does not contain proposed value").contains(result);
                     break;
                 case "does not contain":
-                    assertThat(value).as("Evaluate JSONPath contain proposed value").doesNotContain(result);
+                    assertThat(value).as("Evaluate JSONPath/value contain proposed value").doesNotContain(result);
+                    break;
+                case "length":
+                    assertThat(value).as("Evaluate JSONPath/value contain proposed value").hasSize(Integer.parseInt(result));
+                    break;
+                case "exists":
+                    assertThat(value).as("Evaluate JSONPath/value contain proposed value").isNotNull();
+                    break;
+                case "does not exists":
+                    assertThat(value).as("Evaluate JSONPath/value contain proposed value").isNull();
                     break;
                 case "size":
                     JsonValue jsonObject = JsonValue.readHjson(value);

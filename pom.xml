@@ -104,7 +104,7 @@
 				<configuration>
 					<argLine>${jacoco-IT-argline}
 						-javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/1.8.8/aspectjweaver-1.8.8.jar
-						-Xmx1024m
+						-Xms512m -Xmx1536m
 					</argLine>
 				</configuration>
 			</plugin>
@@ -406,6 +406,16 @@
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 			<version>42.2.1</version>
+		</dependency>
+		<dependency>
+			<groupId>io.rest-assured</groupId>
+			<artifactId>rest-assured</artifactId>
+			<version>3.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>io.rest-assured</groupId>
+			<artifactId>json-schema-validator</artifactId>
+			<version>3.0.7</version>
 		</dependency>
 	</dependencies>
 </project>
