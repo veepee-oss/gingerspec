@@ -89,7 +89,7 @@ public class RestSpec extends BaseGSpec {
      * @param port      Port where the API is running. Defaults to 80 if null
      */
     @Given("^My app is running in '([^:]+?)(:.+?)?'$")
-    public void setupApp(String host, String port) {
+    public void setupApp(String host, String port) throws Exception {
         assertThat(host).isNotEmpty();
 
         String restProtocol = "http://";
@@ -104,10 +104,15 @@ public class RestSpec extends BaseGSpec {
 
         port = port.replace(":", "");
 
-        assertThat(commonspec.getRestRequest()).as("No rest client initialized. Did you forget to use @rest annotation in your feature?").isNotNull();
+        if (commonspec.getRestRequest() == null && commonspec.getDriver() == null) {
+            throw new Exception("Application was not initialized correctly. Did you forget to add @rest or @web at the top of your feature");
+        }
+
         commonspec.setRestHost(host);
         commonspec.setRestPort(port);
         commonspec.setRestProtocol(restProtocol);
+        commonspec.setWebHost(host);
+        commonspec.setWebPort(port);
 
         if (restProtocol.matches("https://")) {
             commonspec.getRestRequest().relaxedHTTPSValidation();
