@@ -27,7 +27,7 @@ Feature: Rest Assured Feature
 
     @ignore @toocomplex
   Scenario: Setting headers using a datatable
-    Given My app is running in 'tms-api-uat20.privalia-test.com:80'
+    Given I send requests to 'tms-api-uat20.privalia-test.com:80'
     Given I set headers:
       | x-user  | vente_privee_es                                                  |
       | x-token | 93f44fdfe7c186e354fafbf0ff064eec1e2d6e31df6956cbeb7d3a7b5c112dc4 |
