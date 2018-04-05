@@ -37,8 +37,8 @@ public class RestSpec extends BaseGSpec {
     }
 
     /**
-     * Set app host and port {@code host, @code port}. This parameters will be used for all future
-     * requests in the same scenario.
+     * Set app host and port {@code host, @code port} for Rest requests.
+     * This parameters will be used for all future requests in the same scenario.
      *
      * The rest request is build within the {@link HookGSpec} class, so, dont forget to use the
      * @rest annotation at the beginning of your feature for a proper initialization.
@@ -77,50 +77,6 @@ public class RestSpec extends BaseGSpec {
         }
 
         commonspec.getRestRequest().baseUri(restProtocol + restHost).port(Integer.parseInt(restPort));
-    }
-
-    /**
-     * Set app host and port {@code host, @code port}. This parameters will be used for all future
-     * requests in the same scenario.
-     *
-     * The rest request is build within the {@link HookGSpec} class, so, dont forget to use the
-     * @rest annotation at the beginning of your feature for a proper initialization.
-     * @param host      Remote host. Defaults to 'localhost' if null
-     * @param port      Port where the API is running. Defaults to 80 if null
-     */
-    @Given("^My app is running in '([^:]+?)(:.+?)?'$")
-    public void setupApp(String host, String port) throws Exception {
-        assertThat(host).isNotEmpty();
-
-        String restProtocol = "http://";
-
-        if (port == null) {
-            port = ":80";
-        }
-
-        if ("443".equals(port.substring(1))) {
-            restProtocol = "https://";
-        }
-
-        port = port.replace(":", "");
-
-        if (commonspec.getRestRequest() == null && commonspec.getDriver() == null) {
-            throw new Exception("Application was not initialized correctly. Did you forget to add @rest or @web at the top of your feature");
-        }
-
-        commonspec.setRestHost(host);
-        commonspec.setRestPort(port);
-        commonspec.setRestProtocol(restProtocol);
-        commonspec.setWebHost(host);
-        commonspec.setWebPort(port);
-
-        if (commonspec.getRestRequest() != null) {
-            if (restProtocol.matches("https://")) {
-                commonspec.getRestRequest().relaxedHTTPSValidation();
-            }
-
-            commonspec.getRestRequest().baseUri(restProtocol + host).port(Integer.parseInt(port));
-        }
     }
 
     /**
@@ -411,7 +367,12 @@ public class RestSpec extends BaseGSpec {
         commonspec.getHeaders().clear();
         RequestSpecification spec = new RequestSpecBuilder().setContentType(ContentType.JSON).build();
         commonspec.setRestRequest(given().header("Content-Type", "application/json").cookies(commonspec.getRestCookies()).spec(spec));
-        this.setupApp(commonspec.getRestHost(), commonspec.getRestPort());
+
+        if (commonspec.getRestProtocol().matches("https://")) {
+            this.setupApp("https://", commonspec.getRestHost(), commonspec.getRestPort());
+        } else {
+            this.setupApp(null, commonspec.getRestHost(), commonspec.getRestPort());
+        }
 
     }
 
@@ -430,7 +391,12 @@ public class RestSpec extends BaseGSpec {
         commonspec.getRestCookies().clear();
         RequestSpecification spec = new RequestSpecBuilder().setContentType(ContentType.JSON).build();
         commonspec.setRestRequest(given().header("Content-Type", "application/json").headers(commonspec.getHeaders()).spec(spec));
-        this.setupApp(commonspec.getRestHost(), commonspec.getRestPort());
+
+        if (commonspec.getRestProtocol().matches("https://")) {
+            this.setupApp("https://", commonspec.getRestHost(), commonspec.getRestPort());
+        } else {
+            this.setupApp(null, commonspec.getRestHost(), commonspec.getRestPort());
+        }
 
     }
 

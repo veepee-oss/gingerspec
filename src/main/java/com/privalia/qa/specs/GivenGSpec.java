@@ -174,7 +174,7 @@ public class GivenGSpec extends BaseGSpec {
      * @param host host where app is running
      * @param port port where app is running
      */
-    @Given("^My app is running in '([^:]+?)(:.+?)?'.$")
+    @Given("^My app is running in '([^:]+?)(:.+?)?'$")
     public void setupApp(String host, String port) {
         assertThat(host).isNotEmpty();
 

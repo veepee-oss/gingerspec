@@ -3,7 +3,7 @@
 Feature: Simple logger test with background
 
   Background:
-    Given My app is running in 'jsonplaceholder.typicode.com:443'
+    Given I securely send requests to 'jsonplaceholder.typicode.com'
 
   Scenario: Some simple request
     When I send a 'GET' request to '/posts'
