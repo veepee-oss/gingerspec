@@ -39,7 +39,7 @@ public class LoopIncludeTagAspect {
     private final Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
 
 
-    @Pointcut("execution (private * cucumber.runtime.FeatureBuilder.read(..)) &&" + "args (resource)")
+    @Pointcut("execution (* cucumber.runtime.FeatureBuilder.read(..)) &&" + "args (resource)")
     protected void featureBuilderRead(Resource resource) {
     }
 
