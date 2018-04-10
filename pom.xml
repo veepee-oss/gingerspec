@@ -74,7 +74,7 @@
 	</developers>
 
 	<properties>
-		<cucumber-java.version>1.1.6</cucumber-java.version>
+		<cucumber-java.version>1.1.8</cucumber-java.version>
 		<assertj-core.version>3.3.0</assertj-core.version>
 		<slf4j-api.version>1.7.7</slf4j-api.version>
 		<reflections.version>0.9.9-RC1</reflections.version>
