@@ -92,7 +92,7 @@ public class SqlUtils {
          * a bunch of SQL statements from an SQL file. To avoid this problem, we had to set allowMultiQueries = true
          */
         Properties props = new Properties();
-        String connectionString = "jdbc:" + dataBaseType.toLowerCase() + "://" + host + ":" + port + "/" + dataBaseName + "?allowMultiQueries=true" + "&user=" + user;
+        String connectionString = "jdbc:" + dataBaseType.toLowerCase() + "://" + host + ":" + port + "/" + dataBaseName + "?allowMultiQueries=true&serverTimezone=UTC" + "&user=" + user;
 
         /** You can use the step without password and a null will be passed to the password variable (for cases when the db does not use password)*/
         if (password != null) {
