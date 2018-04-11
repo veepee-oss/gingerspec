@@ -16,7 +16,7 @@ services:
     environment:
       POSTGRES_PASSWORD: 'postgres'
   rest-server:
-    image: 'spdc1k8sregistry11.privalia.pin/privalia-rest-server'
+    image: 'spdc1k8sregistry11.privalia.pin/privalia-rest-server:0.1.0'
     type:
       - testing
 
