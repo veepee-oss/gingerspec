@@ -3,7 +3,7 @@
 Feature: Simple logger test with background
 
   Background:
-    Given I securely send requests to 'jsonplaceholder.typicode.com'
+    Given I send requests to '${REST_SERVER_HOST}:3000'
 
   Scenario: Some simple request
     When I send a 'GET' request to '/posts'
