@@ -15,13 +15,17 @@ services:
       - testing
     environment:
       POSTGRES_PASSWORD: 'postgres'
+  rest-server:
+    image: 'privalia-rest-server'
+    type:
+      - testing
 
 pipeline:
   artifact_type: "library"
   stages:
     UnitTest:
       image: "spdc1k8sregistry11.privalia.pin/privalia-qa-worker:0.1.0"
-      cmd: "mvn clean install -DVERSION=1.0 -DSLEEPTEST=3 -DAGENT_LIST=1,2 -DVARNAME=foo -DPOSTGRES_HOST=postgres -DMYSQL_HOST=mysql"
+      cmd: "mvn clean install -DVERSION=1.0 -DSLEEPTEST=3 -DAGENT_LIST=1,2 -DVARNAME=foo -DPOSTGRES_HOST=postgres -DMYSQL_HOST=mysql -DREST_SERVER_HOST=rest-server"
       volumes:
         m2-cache: '/home/jenkins/.m2'
     Build:

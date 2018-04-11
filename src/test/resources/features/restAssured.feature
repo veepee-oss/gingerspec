@@ -8,17 +8,18 @@ Feature: Rest Assured Feature
 
 
   Scenario: Some simple request
-    Given I securely send requests to 'jsonplaceholder.typicode.com:443'
+    Given I send requests to '${REST_SERVER_HOST}:3000'
     When I send a 'GET' request to '/posts'
     Then the service response status must be '200' and its response must contain the text 'body'
     Then the service response status must be '200' and its response matches the schema in 'schemas/responseSchema.json'
-    Then the service response status must be '200' and its response length must be '27520'
+    When I send a 'GET' request to '/comments/1'
+    Then the service response status must be '200' and its response length must be '268'
     And the service response must contain the text 'body'
     And in less than '10' seconds, checking each '2' seconds, I send a 'GET' request to '/posts' so that the response contains 'body'
 
 
   Scenario: A new element is inserted via a POST call
-    Given I securely send requests to 'jsonplaceholder.typicode.com:443'
+    Given I send requests to '${REST_SERVER_HOST}:3000'
     When I send a 'POST' request to '/posts' based on 'schemas/mytestdata.json' as 'json'
     Then the service response status must be '201'
     And I save element '$.title' in environment variable 'TITLE'
@@ -47,7 +48,7 @@ Feature: Rest Assured Feature
 
 
   Scenario: Data in local file is altered using a datatable before sending
-    Given I securely send requests to 'jsonplaceholder.typicode.com:443'
+    Given I send requests to '${REST_SERVER_HOST}:3000'
     When I send a 'POST' request to '/posts' based on 'schemas/mytestdata.json' as 'json' with:
       | $.title | UPDATE | This is a test 2 |
     Then the service response status must be '201'
