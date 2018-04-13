@@ -230,10 +230,16 @@ public class ThenGSpec extends BaseGSpec {
      * Verifies that a webelement previously found {@code isSelected}
      *
      * @param index
-     * @param isSelected
+     * @param option
      */
     @Then("^the element on index '(\\d+?)' (IS|IS NOT) selected$")
-    public void assertSeleniumIsSelected(Integer index, Boolean isSelected) {
+    public void assertSeleniumIsSelected(Integer index, String option) {
+        Boolean isSelected = false;
+
+        if (option.matches("IS")) {
+            isSelected = true;
+        }
+
         assertThat(this.commonspec, commonspec.getPreviousWebElements()).as("There are less found elements than required")
                 .hasAtLeast(index);
         assertThat(this.commonspec, commonspec.getPreviousWebElements().getPreviousWebElements().get(index).isSelected()).as(
