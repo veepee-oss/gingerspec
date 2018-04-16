@@ -6,7 +6,7 @@ Feature: Selenium run test
     When I browse to '/registration'
     When '1' elements exists with 'id:profile_pic_10'
     Then I assign the file in 'schemas/empty.json' to the element on index '0'
-    And I wait '2' seconds
+    And I wait '3' seconds
 
   Scenario: Test send keys function
     Given My app is running in '${DEMO_SITE_HOST}'
