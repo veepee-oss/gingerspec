@@ -32,7 +32,9 @@ services:
     type:
       - testing
     volumes:
-      - "$(pwd):/usr/src/mymaven"
+      - type: bind
+        source: $(pwd)
+        target: /usr/src/mymaven
     environment:
       ID: 'myBrowser'
       SELENIUM_GRID: 'selenium-grid:4444'
