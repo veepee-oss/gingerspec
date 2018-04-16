@@ -1,6 +1,7 @@
 @web
 Feature: Selenium run test
 
+  @ignore @toocomplex
   Scenario: Test a file picker
     Given My app is running in '${DEMO_SITE_HOST}'
     When I browse to '/registration'

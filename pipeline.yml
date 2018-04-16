@@ -31,10 +31,6 @@ services:
     image: 'spdc1k8sregistry11.privalia.pin/privalia-selenium-chrome:62'
     type:
       - testing
-    volumes:
-      - type: bind
-        source: $(pwd)
-        target: /usr/src/mymaven
     environment:
       ID: 'myBrowser'
       SELENIUM_GRID: 'selenium-grid:4444'
