@@ -202,10 +202,16 @@ public class ThenGSpec extends BaseGSpec {
      * Verifies that a webelement previously found {@code isDisplayed}
      *
      * @param index
-     * @param isDisplayed
+     * @param option
      */
     @Then("^the element on index '(\\d+?)' (IS|IS NOT) displayed$")
-    public void assertSeleniumIsDisplayed(Integer index, Boolean isDisplayed) {
+    public void assertSeleniumIsDisplayed(Integer index, String option) {
+        Boolean isDisplayed = false;
+
+        if (option.matches("IS")) {
+            isDisplayed = true;
+        }
+
         assertThat(this.commonspec, commonspec.getPreviousWebElements()).as("There are less found elements than required")
                 .hasAtLeast(index);
         assertThat(this.commonspec, commonspec.getPreviousWebElements().getPreviousWebElements().get(index).isDisplayed()).as(
@@ -216,10 +222,16 @@ public class ThenGSpec extends BaseGSpec {
      * Verifies that a webelement previously found {@code isEnabled}
      *
      * @param index
-     * @param isEnabled
+     * @param option
      */
     @Then("^the element on index '(\\d+?)' (IS|IS NOT) enabled$")
-    public void assertSeleniumIsEnabled(Integer index, Boolean isEnabled) {
+    public void assertSeleniumIsEnabled(Integer index, String option) {
+        Boolean isEnabled = false;
+
+        if (option.matches("IS")) {
+            isEnabled = true;
+        }
+
         assertThat(this.commonspec, commonspec.getPreviousWebElements()).as("There are less found elements than required")
                 .hasAtLeast(index);
         assertThat(this.commonspec, commonspec.getPreviousWebElements().getPreviousWebElements().get(index).isEnabled())
