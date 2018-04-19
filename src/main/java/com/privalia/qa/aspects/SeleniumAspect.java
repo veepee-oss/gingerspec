@@ -40,7 +40,7 @@ public class SeleniumAspect extends BaseGSpec {
     private final Logger logger = LoggerFactory.getLogger(this.getClass()
             .getCanonicalName());
 
-    @Pointcut("call(* SeleniumAssert.*(..))"
+    @Pointcut("within(* com.privalia.qa.assertions.SeleniumAssert.*(..))"
             + " || call(* org.openqa.selenium.*.click(..))"
             + " || call(* org.openqa.selenium.*.findElement(..))")
     protected void exceptionCallPointcut() {
