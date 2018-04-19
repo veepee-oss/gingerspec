@@ -5,7 +5,10 @@ import cucumber.api.java.en.Then;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.WebElement;
 
+import java.io.File;
 import java.util.List;
+
+import static com.privalia.qa.assertions.Assertions.assertThat;
 
 /**
  * Generic Selenium Specs.
@@ -88,7 +91,11 @@ public class SeleniumGSpec extends BaseGSpec {
         String filePath = getClass().getClassLoader().getResource(fileName).getPath();
 
         //Assign the file absolute path to the file picker element previously set
+        File f = new File(filePath);
+        assertThat(f.exists()).as("The file located in " + filePath + " does not exists or is not accesible").isTrue();
         commonspec.getPreviousWebElements().getPreviousWebElements().get(index).sendKeys(filePath);
+
+
 
     }
 }
