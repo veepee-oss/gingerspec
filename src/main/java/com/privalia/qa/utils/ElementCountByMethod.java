@@ -1,4 +1,4 @@
-package com.privalia.qa.specs;
+package com.privalia.qa.utils;
 
 import com.privalia.qa.utils.ThreadProperty;
 import org.openqa.selenium.By;

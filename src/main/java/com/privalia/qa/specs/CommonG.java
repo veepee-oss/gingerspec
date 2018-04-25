@@ -32,8 +32,8 @@ import com.ning.http.client.Realm;
 import com.ning.http.client.Realm.AuthScheme;
 import com.ning.http.client.Response;
 import com.ning.http.client.cookie.Cookie;
-import com.privalia.qa.utils.*;
 import com.privalia.qa.conditions.Conditions;
+import com.privalia.qa.utils.*;
 import cucumber.api.DataTable;
 import io.restassured.specification.RequestSpecification;
 import org.apache.commons.collections.IteratorUtils;
@@ -48,8 +48,9 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.internal.Locatable;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import org.openqa.selenium.support.ui.*;
-import org.openqa.selenium.By;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.FluentWait;
+import org.openqa.selenium.support.ui.Wait;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,9 +67,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.privalia.qa.assertions.Assertions.assertThat;
-import static org.testng.Assert.fail;
-
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.testng.Assert.fail;
 
 public class CommonG {
 
@@ -478,35 +478,43 @@ public class CommonG {
      * @param expectedCount     integer. Expected number of elements.
      * @param type              The expected style of the element: visible, clickable, present, hidden
      * @return                  List(WebElement)
-     * @throws ClassNotFoundException
-     * @throws NoSuchFieldException
-     * @throws IllegalAccessException
      */
     public List<WebElement> locateElementWithPooling(int poolingInterval, int poolMaxTime, String method, String element,
-                                          Integer expectedCount, String type) throws ClassNotFoundException, NoSuchFieldException, IllegalAccessException {
+                                          Integer expectedCount, String type) {
 
         Wait wait = new FluentWait(driver)
                 .withTimeout(poolMaxTime, SECONDS)
                 .pollingEvery(poolingInterval, SECONDS)
                 .ignoring(NoSuchElementException.class)
                 .ignoring(StaleElementReferenceException.class)
-                .ignoring(ElementNotVisibleException.class);
+                .ignoring(ElementNotVisibleException.class)
+                .ignoring(TimeoutException.class)
+                .ignoring(WebDriverException.class);
 
         logger.debug("Waiting for {} elements by xpath to be {}", expectedCount, type);
-        if ("visible".matches(type)) {
-            wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(getByType(method, element)));
-        } else if ("clickable".matches(type)) {
-            wait.until(ExpectedConditions.elementToBeClickable(getByType(method, element)));
-        } else if ("present".matches(type)) {
-            wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(getByType(method, element)));
-        } else if ("hidden".matches(type)) {
-            wait.until(ExpectedConditions.invisibilityOfElementLocated(getByType(method, element)));
-        } else {
-            fail("Unknown type: " + type);
+
+        try {
+            List<WebElement> wel = (List<WebElement>) wait.until(new ElementCountByMethod(method, element, expectedCount));
+
+            if ("visible".matches(type)) {
+                wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(getByType(method, element)));
+            } else if ("clickable".matches(type)) {
+                wait.until(ExpectedConditions.elementToBeClickable(getByType(method, element)));
+            } else if ("present".matches(type)) {
+                wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(getByType(method, element)));
+            } else if ("hidden".matches(type)) {
+                wait.until(ExpectedConditions.invisibilityOfElementLocated(getByType(method, element)));
+            } else {
+                fail("Unknown type: " + type);
+            }
+
+            return wel;
+        } catch (Exception e) {
+            this.getLogger().error("An exception ocurred: " + e.getMessage());
+            this.getExceptions().add(e);
+            throw e;
         }
 
-
-        return locateElement(method, element, expectedCount);
     }
 
     /**
@@ -557,24 +565,16 @@ public class CommonG {
      * Dismiss any existing alert message in the current selenium context
      */
     public void dismissSeleniumAlert() {
-        if (this.getSeleniumAlert() == null) {
-            fail("There is not an alert present in the page");
-        }
-
+        assertThat(this, this.getSeleniumAlert()).as("There is not an alert present in the page").isNotEqualTo(null);
         this.getSeleniumAlert().dismiss();
-
     }
 
     /**
      * Accepts any existing alert message in the current selenium context
      */
     public void acceptSeleniumAlert() {
-        if (this.getSeleniumAlert() == null) {
-            fail("There is not an alert present in the page");
-        }
-
+        assertThat(this, this.getSeleniumAlert()).as("There is not an alert present in the page").isNotEqualTo(null);
         this.getSeleniumAlert().accept();
-
     }
 
      /**
@@ -597,6 +597,7 @@ public class CommonG {
      * @return String
      */
     public String captureEvidence(WebDriver driver, String type, String suffix) {
+
         String testSuffix = System.getProperty("TESTSUFFIX");
         String dir = "./target/executions/";
         if (testSuffix != null) {
@@ -664,7 +665,7 @@ public class CommonG {
             ((Locatable) driver.findElement(By.tagName("body")))
                     .getCoordinates().inViewPort();
 
-            if (currentBrowser.startsWith("chrome")
+            if (currentBrowser.startsWith("android")
                     || currentBrowser.startsWith("droidemu")) {
                 Actions actions = new Actions(driver);
                 actions.keyDown(Keys.CONTROL).sendKeys(Keys.HOME).perform();
