@@ -15,6 +15,11 @@ import static com.privalia.qa.assertions.Assertions.assertThat;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
 
+/**
+ * Custom ExpectedCondition to evaluate if the amount of web elements in a page
+ * match the expected count. This class is to be used with FluentWait (i.e. wait.until(new ElementCountByMethod(..)))
+ * @author Jose Fernandez
+ */
 public class ElementCountByMethod implements ExpectedCondition<List<WebElement>> {
 
     private String method;
@@ -56,7 +61,7 @@ public class ElementCountByMethod implements ExpectedCondition<List<WebElement>>
             fail("Unknown search method: " + method);
         }
 
-        return wel.size() > 0 ? wel : null;
+        return wel.size() == this.expectedCount ? wel : null;
 
     }
 }
