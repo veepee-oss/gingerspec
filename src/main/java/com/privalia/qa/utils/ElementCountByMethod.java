@@ -56,6 +56,7 @@ public class ElementCountByMethod implements ExpectedCondition<List<WebElement>>
             fail("Unknown search method: " + method);
         }
 
-        return wel;
+        return wel.size() > 0 ? wel : null;
+
     }
 }
