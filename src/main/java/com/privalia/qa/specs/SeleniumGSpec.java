@@ -92,7 +92,7 @@ public class SeleniumGSpec extends BaseGSpec {
 
         //Assign the file absolute path to the file picker element previously set
         File f = new File(filePath);
-        assertThat(f.exists()).as("The file located in " + filePath + " does not exists or is not accesible").isTrue();
+        assertThat(this.getCommonSpec(), f.exists()).as("The file located in " + filePath + " does not exists or is not accesible").isEqualTo(true);
         commonspec.getPreviousWebElements().getPreviousWebElements().get(index).sendKeys(filePath);
 
 
