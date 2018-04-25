@@ -20,6 +20,7 @@ import com.mongodb.DBObject;
 import com.privalia.qa.specs.CommonG;
 import com.privalia.qa.utils.PreviousWebElements;
 import cucumber.api.DataTable;
+import org.openqa.selenium.Alert;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -74,6 +75,10 @@ public class Assertions extends org.assertj.core.api.Assertions {
     }
 
     public static SeleniumAssert assertThat(CommonG common, String actual) {
+        return new SeleniumAssert(common, actual);
+    }
+
+    public static SeleniumAssert assertThat(CommonG common, Alert actual) {
         return new SeleniumAssert(common, actual);
     }
 
