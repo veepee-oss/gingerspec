@@ -49,7 +49,7 @@ public class SeleniumAspect extends BaseGSpec {
     @Pointcut("call(* com.privalia.qa.assertions.SeleniumAssert.*(..))"
             + " || call(* org.openqa.selenium.*.click(..))"
             + " || call(* org.openqa.selenium.*.findElement(..))"
-            + " || call(* org.openqa.selenium.support.ui.FluentWait.*(..))")
+            + " || call(* org.openqa.selenium.support.ui.FluentWait.*(..))") //To detect exceptions thrown by FluentWait
     protected void exceptionCallPointcut() {
     }
 
@@ -73,6 +73,10 @@ public class SeleniumAspect extends BaseGSpec {
             if (ex instanceof WebDriverException) {
                 logger.info("Got a selenium exception");
 
+                /**
+                 * This captures extracts the driver instance when a
+                 * TimeoutException is thrown by FluentWait
+                 */
                 if (ex instanceof TimeoutException) {
                     if (pjp.getThis() instanceof FluentWait) {
                         FluentWait fw = (FluentWait) pjp.getThis();
