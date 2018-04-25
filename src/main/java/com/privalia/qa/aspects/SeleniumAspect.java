@@ -16,18 +16,22 @@
 
 package com.privalia.qa.aspects;
 
+import com.privalia.qa.assertions.SeleniumAssert;
+import com.privalia.qa.specs.BaseGSpec;
 import com.privalia.qa.specs.CommonG;
 import com.privalia.qa.specs.ThenGSpec;
 import com.privalia.qa.utils.PreviousWebElements;
-import com.privalia.qa.assertions.SeleniumAssert;
-import com.privalia.qa.specs.BaseGSpec;
 import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.RemoteWebElement;
+import org.openqa.selenium.support.ui.FluentWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,14 +41,18 @@ import java.util.ArrayList;
 @Aspect
 public class SeleniumAspect extends BaseGSpec {
 
+    private WebDriver webdriver;
+
     private final Logger logger = LoggerFactory.getLogger(this.getClass()
             .getCanonicalName());
 
-    @Pointcut("within(* com.privalia.qa.assertions.SeleniumAssert.*(..))"
+    @Pointcut("call(* com.privalia.qa.assertions.SeleniumAssert.*(..))"
             + " || call(* org.openqa.selenium.*.click(..))"
-            + " || call(* org.openqa.selenium.*.findElement(..))")
+            + " || call(* org.openqa.selenium.*.findElement(..))"
+            + " || call(* org.openqa.selenium.support.ui.FluentWait.*(..))")
     protected void exceptionCallPointcut() {
     }
+
 
     /**
      * If an exception has thrown by selenium, this methods save a screen
@@ -55,8 +63,7 @@ public class SeleniumAspect extends BaseGSpec {
      * @throws Throwable exception
      */
     @Around(value = "exceptionCallPointcut()")
-    public Object aroundExceptionCalls(ProceedingJoinPoint pjp)
-            throws Throwable {
+    public Object aroundExceptionCalls(ProceedingJoinPoint pjp) throws Throwable {
         Object retVal = null;
         try {
             retVal = pjp.proceed();
@@ -65,10 +72,23 @@ public class SeleniumAspect extends BaseGSpec {
             WebDriver driver = null;
             if (ex instanceof WebDriverException) {
                 logger.info("Got a selenium exception");
-                if (!(pjp.getThis() instanceof WebDriver)) {
-                    throw ex;
+
+                if (ex instanceof TimeoutException) {
+                    if (pjp.getThis() instanceof FluentWait) {
+                        FluentWait fw = (FluentWait) pjp.getThis();
+                        Field f = fw.getClass().getDeclaredField("input");
+                        f.setAccessible(true);
+                        driver = (WebDriver) f.get(fw);
+                    } else {
+                        throw ex;
+                    }
+
+                } else {
+                    if (!(pjp.getThis() instanceof WebDriver)) {
+                        throw ex;
+                    }
+                    driver = (WebDriver) pjp.getThis();
                 }
-                driver = (WebDriver) pjp.getThis();
             } else if ((pjp.getTarget() instanceof SeleniumAssert)
                     && (ex instanceof AssertionError)) {
                 logger.info("Got a SeleniumAssert response");
@@ -95,18 +115,20 @@ public class SeleniumAspect extends BaseGSpec {
             }
             if (driver != null) {
                 logger.info("Trying to capture screenshots...");
+                String suffix = "assert";
                 CommonG common = null;
                 if ((pjp.getThis() instanceof ThenGSpec) && (((ThenGSpec) pjp.getThis()).getCommonSpec() != null)) {
                     common = ((ThenGSpec) pjp.getThis()).getCommonSpec();
                 } else if ((pjp.getTarget() instanceof SeleniumAssert) && ((SeleniumAssert) pjp.getTarget()).getCommonspec() != null) {
                     common = ((CommonG) ((SeleniumAssert) pjp.getTarget()).getCommonspec());
                 } else {
-                    logger.info("Got no Selenium driver to capture a screen");
-                    throw ex;
+                    common = new CommonG();
+                    common.setDriver((RemoteWebDriver) driver);
+                    suffix = "exception";
                 }
-                common.captureEvidence(driver, "framehtmlSource", "assert");
-                common.captureEvidence(driver, "htmlSource", "assert");
-                common.captureEvidence(driver, "screenCapture", "assert");
+                common.captureEvidence(driver, "framehtmlSource", suffix);
+                common.captureEvidence(driver, "htmlSource", suffix);
+                common.captureEvidence(driver, "screenCapture", suffix);
                 logger.info("Screenshots are available at target/executions");
             } else {
                 logger.info("Got no Selenium driver to capture a screen");
