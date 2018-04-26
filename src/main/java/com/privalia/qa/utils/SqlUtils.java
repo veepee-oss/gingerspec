@@ -2,6 +2,9 @@ package com.privalia.qa.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.io.Reader;
 import java.sql.*;
 import java.util.*;
 
@@ -194,22 +197,24 @@ public class SqlUtils {
      * Executes the given SQL statement, which may return multiple results
      * If the SQL statement returned a ResultSet, it is converted to a List<List<String>> and stored
      * in an accessible variable in case it needs to be used
-     * @param query Any SQL statement (SELECT or UPDATE type)
+     * @param reader A Reader object that contains the file
      * @return true if the result is a ResultSet object; false if it is an update count or there are no results
      * @throws SQLException
      */
-    public boolean executeQuery(String query) throws SQLException {
+    public boolean executeQuery(Reader reader) throws SQLException, IOException {
 
-        LOGGER.debug(String.format("Executing query %s", query));
+        LOGGER.debug(String.format("Executing query..."));
         try (Statement myStatement = this.sqlConnection.createStatement()) {
-            boolean r = myStatement.execute(query);
 
-            if (r) {
-                ResultSet resultSet = myStatement.getResultSet();
+            ScriptRunner sr = new ScriptRunner(this.sqlConnection, false, false);
+            sr.runScript(reader);
+
+            if (sr.isHasResults()) {
+                ResultSet resultSet = sr.getFinalResultSet();
                 this.setPreviousSqlResult(this.resultSetToList(resultSet));
             }
 
-            return r;
+            return sr.isHasResults();
         }
     }
 

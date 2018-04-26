@@ -2,11 +2,11 @@ package com.privalia.qa.specs;
 
 import com.privalia.qa.utils.ThreadProperty;
 import cucumber.api.DataTable;
-import cucumber.api.PendingException;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 
+import java.io.*;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -149,16 +149,18 @@ public class SqlDatabaseGSpec extends BaseGSpec {
 
     /**
      * Executes an SQL from a file. The SQL could be of any kind (a typical SELECT or a SQL Data
-     * Manipulation Language (DML) statement, such as INSERT, UPDATE or DELETE). If the SQL returns
-     * a {@link java.sql.ResultSet}, it is stored internally so further steps can use it
+     * Manipulation Language (DML) statement, such as INSERT, UPDATE or DELETE) or even SQL Scripts.
+     * If the SQL returns a {@link java.sql.ResultSet}, it is stored internally so further steps can use it
      * @param baseData  File location (typically schemas/myfile.sql)
      */
     @Then("^I execute query from '(.+?)'")
-    public void executeQueryFromFile(String baseData) {
+    public void executeQueryFromFile(String baseData) throws IOException {
 
-        String retrievedData = commonspec.retrieveData(baseData, "string");
+        InputStream stream = getClass().getClassLoader().getResourceAsStream(baseData);
+        Reader reader = new BufferedReader(new InputStreamReader(stream, "UTF-8"));
+
         try {
-            boolean r = this.commonspec.getSqlClient().executeQuery(retrievedData);
+            boolean r = this.commonspec.getSqlClient().executeQuery(reader);
 
             if (r) {
                 this.commonspec.setPreviousSqlResult(this.commonspec.getSqlClient().getPreviousSqlResult());
