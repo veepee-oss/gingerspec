@@ -1,0 +1,65 @@
+######################################################################################################
+# This is a docker-compose file that starts the necessary containers for testing the bdt-lib library
+#
+# In order to use it, go to the root folder of the project and execute
+#
+# $ cd bdt-lib/
+# $ docker-compose up -d
+#
+# All services will be available via localhost, and all will have port binding to a local port in the
+# machine. The ports that will be used for binding are:
+#
+# * 3306 (mysql)
+# * 5432 (postgres)
+# * 3000 (Rest API server)
+# * 80   (Demo site)
+# * 4444 (Selenium hub)
+# * 5900 (Selenium node)
+#
+# So, make sure this ports are available in the host machine. To Execute all tests:
+#
+# $ mvn clean install -DVERSION=1.0 -DSLEEPTEST=3 -DAGENT_LIST=1,2 -DVARNAME=foo -DPOSTGRES_HOST=localhost
+#        -DMYSQL_HOST=localhost -DREST_SERVER_HOST=localhost -DDEMO_SITE_HOST=demo-site -DSELENIUM_GRID=localhost:4444
+#
+# Notice how DEMO_SITE_HOST does not use localhost but "demo-site" instead, since from within the docker net (from
+# where selenium is executed) there is name resolution to the service name. You can still access the demo site from
+# the host machine using localhost
+#
+# To terminate all services just execute
+#
+# $ docker-compose down
+######################################################################################################
+version: '3'
+
+services:
+  mysql:
+    image: 'mysql:5.7'
+    environment:
+      MYSQL_ROOT_PASSWORD: "mysql"
+    ports:
+      - "3306:3306"
+  postgres:
+    image: 'postgres:9.6.8'
+    environment:
+      POSTGRES_PASSWORD: 'postgres'
+    ports:
+      - "5432:5432"
+  rest-server:
+    image: 'spdc1k8sregistry11.privalia.pin/privalia-rest-server:0.1.0'
+    ports:
+      - "3000:3000"
+  demo-site:
+    image: 'spdc1k8sregistry11.privalia.pin/privalia-front-image:0.1.0'
+    ports:
+      - "80:80"
+  selenium-grid:
+    image: 'spdc1k8sregistry11.privalia.pin/privalia-selenium-hub:3.7.1'
+    ports:
+      - "4444:4444"
+  selenium-chrome:
+    image: 'spdc1k8sregistry11.privalia.pin/privalia-selenium-chrome:62'
+    environment:
+      ID: 'myBrowser'
+      SELENIUM_GRID: 'selenium-grid:4444'
+    ports:
+      - "5900:5900"
