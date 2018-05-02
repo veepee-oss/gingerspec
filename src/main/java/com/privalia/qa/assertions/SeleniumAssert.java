@@ -20,10 +20,8 @@ import com.privalia.qa.specs.CommonG;
 import com.privalia.qa.utils.PreviousWebElements;
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.api.Condition;
-import org.assertj.core.internal.Booleans;
-import org.assertj.core.internal.Conditions;
-import org.assertj.core.internal.Integers;
-import org.assertj.core.internal.Strings;
+import org.assertj.core.internal.*;
+import org.openqa.selenium.Alert;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -57,6 +55,16 @@ public class SeleniumAssert extends AbstractAssert<SeleniumAssert, Object> {
      * @param actual webElement used in assert
      */
     public SeleniumAssert(WebDriver actual) {
+        super(actual, SeleniumAssert.class);
+    }
+
+
+    /**
+     * Constructor with Alert
+     *
+     * @param actual Alert element to use in the assert
+     */
+    public SeleniumAssert(Alert actual) {
         super(actual, SeleniumAssert.class);
     }
 
@@ -128,6 +136,17 @@ public class SeleniumAssert extends AbstractAssert<SeleniumAssert, Object> {
      * @param actual webElement used in assert
      */
     public SeleniumAssert(CommonG commong, String actual) {
+        super(actual, SeleniumAssert.class);
+        this.commonspec = commong;
+    }
+
+    /**
+     * Constructor with CommonG and Alert.
+     *
+     * @param commong common object that contains relevant execution info common object
+     * @param actual Alert used in assert
+     */
+    public SeleniumAssert(CommonG commong, Alert actual) {
         super(actual, SeleniumAssert.class);
         this.commonspec = commong;
     }
@@ -322,6 +341,16 @@ public class SeleniumAssert extends AbstractAssert<SeleniumAssert, Object> {
         return this;
     }
 
+    /**
+     * Checks element not equal
+     *
+     * */
+    @Override
+    public SeleniumAssert isNotEqualTo(Object other) {
+        Objects.instance().assertNotEqual(info, actual, other);
+        return this;
+    }
+
 
     /**
      * Checks String is not null.
@@ -332,7 +361,6 @@ public class SeleniumAssert extends AbstractAssert<SeleniumAssert, Object> {
         Strings.instance().assertNotEmpty(info, (String) actual);
         return this;
     }
-
 
     /**
      * Checks string matches value.
