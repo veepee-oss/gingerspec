@@ -134,6 +134,10 @@ public class CommonG {
 
     private io.restassured.response.Response RestResponse;
 
+    private List<Map<String, String>> lastFileParseResult;
+
+    private Map<String, String> lastFileParseRecord;
+
     /**
      * Checks if a given string matches a regular expression or contains a string
      *
@@ -149,6 +153,39 @@ public class CommonG {
             pattern = Pattern.compile(Pattern.quote(expectedMessage));
         }
         return pattern;
+    }
+
+    /**
+     * Returns the last selected record (Map<String, String>)
+     * @return
+     */
+    public Map<String, String> getLastFileParseRecord() {
+        return lastFileParseRecord;
+    }
+
+    /**
+     * Sets the record for the last operation (as (Map<String, String>))
+     * @param lastFileParseRecord
+     */
+    public void setLastFileParseRecord(Map<String, String> lastFileParseRecord) {
+        this.lastFileParseRecord = lastFileParseRecord;
+    }
+
+    /**
+     * Returns the records resulted from the last operation when
+     * decoding/parsing files
+     * @return
+     */
+    public List<Map<String, String>> getLastFileParseResult() {
+        return lastFileParseResult;
+    }
+
+    /**
+     * Stores the result of an operation when decoding/parsing files
+     * @param lastFileParseResult
+     */
+    public void setLastFileParseResult(List<Map<String, String>> lastFileParseResult) {
+        this.lastFileParseResult = lastFileParseResult;
     }
 
     /**
@@ -373,6 +410,15 @@ public class CommonG {
      */
     public SqlUtils getSqlClient() {
         return SqlUtil.INSTANCE.getSqlUtils();
+    }
+
+    /**
+     * Get the File Parser class
+     *
+     * @return FileParserUtils
+     */
+    public  FileParserUtils getFileParserUtil() {
+        return FileParserUtil.INSTANCE.getFileParserUtils();
     }
 
     /**
