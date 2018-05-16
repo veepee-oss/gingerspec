@@ -53,7 +53,7 @@ services:
     ports:
       - "80:80"
   selenium-grid:
-    image: 'spdc1k8sregistry11.privalia.pin/privalia-selenium-hub:3.7.1'
+    image: 'spdc1k8sregistry11.privalia.pin/privalia-selenium-hub:3.9.1'
     ports:
       - "4444:4444"
   selenium-chrome:
@@ -63,3 +63,10 @@ services:
       SELENIUM_GRID: 'selenium-grid:4444'
     ports:
       - "5900:5900"
+  selenium-firefox:
+    image: 'spdc1k8sregistry11.privalia.pin/privalia-selenium-firefox:60'
+    environment:
+      ID: 'myBrowser'
+      SELENIUM_GRID: 'selenium-grid:4444'
+    ports:
+      - "5901:5900"

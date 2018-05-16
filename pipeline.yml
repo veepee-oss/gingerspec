@@ -24,7 +24,7 @@ services:
     type:
       - testing
   selenium-grid:
-    image: 'spdc1k8sregistry11.privalia.pin/privalia-selenium-hub:3.7.1'
+    image: 'spdc1k8sregistry11.privalia.pin/privalia-selenium-hub:3.9.1'
     type:
       - testing
   selenium-chrome:

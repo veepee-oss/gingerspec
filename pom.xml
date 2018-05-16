@@ -80,12 +80,12 @@
 		<reflections.version>0.9.9-RC1</reflections.version>
 		<org.jacoco.core.version>0.7.5.201505241946</org.jacoco.core.version>
 		<aspectjweaver.version>1.8.8</aspectjweaver.version>
-		<cassandra-driver-core.version>3.1.0</cassandra-driver-core.version>
-		<guava.version>18.0</guava.version>
+		<cassandra-driver-core.version>3.2.0</cassandra-driver-core.version>
+		<guava.version>21.0</guava.version>
 		<lz4.version>1.2.0</lz4.version>
 		<httpclient.version>4.3.5</httpclient.version>
 		<mongo-java-driver.version>2.12.3</mongo-java-driver.version>
-		<selenium-java.version>2.49.1</selenium-java.version>
+		<selenium-java.version>3.9.1</selenium-java.version>
 		<jsoup.version>1.7.3</jsoup.version>
 		<json.version>20140107</json.version>
 
@@ -421,6 +421,21 @@
 			<groupId>com.sonalake</groupId>
 			<artifactId>utah-parser</artifactId>
 			<version>1.0.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-api</artifactId>
+			<version>${selenium-java.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+		    <artifactId>commons-io</artifactId>
+		    <version>2.6</version>
+		</dependency>
+		<dependency>
+		    <groupId>commons-collections</groupId>
+		    <artifactId>commons-collections</artifactId>
+		    <version>3.2.2</version>
 		</dependency>
 	</dependencies>
 </project>
