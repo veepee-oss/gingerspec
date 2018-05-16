@@ -19,11 +19,11 @@ package com.privalia.qa.specs;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
 import com.privalia.qa.utils.ThreadProperty;
-import com.thoughtworks.selenium.SeleniumException;
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
 import io.restassured.http.ContentType;
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.CommandInfo;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -126,7 +126,7 @@ public class HookGSpec extends BaseGSpec {
                 break;
             default:
                 commonspec.getLogger().error("Unknown browser: " + browser);
-                throw new SeleniumException("Unknown browser: " + browser);
+                throw new WebDriverException("Unknown browser: " + browser);
         }
 
         capabilities.setVersion(version);
@@ -155,7 +155,7 @@ public class HookGSpec extends BaseGSpec {
     public void seleniumTeardown() {
         if (commonspec.getDriver() != null) {
             commonspec.getLogger().debug("Shutdown Selenium client");
-            commonspec.getDriver().close();
+            //commonspec.getDriver().close(); //causes the driver instance when using firefox
             commonspec.getDriver().quit();
         }
     }
