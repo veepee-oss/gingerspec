@@ -46,7 +46,7 @@ import org.json.JSONObject;
 import org.openqa.selenium.*;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.internal.Locatable;
+import org.openqa.selenium.interactions.internal.Locatable;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
@@ -691,9 +691,7 @@ public class CommonG {
                 File fout = new File(outputFile);
                 boolean dirs = fout.getParentFile().mkdirs();
 
-                FileOutputStream fos;
-                try {
-                    fos = new FileOutputStream(fout, true);
+                try (FileOutputStream fos = new FileOutputStream(fout, true)) {
                     Writer out = new OutputStreamWriter(fos, "UTF8");
                     PrintWriter writer = new PrintWriter(out, false);
                     writer.append(source);
