@@ -57,7 +57,7 @@ services:
     ports:
       - "4444:4444"
   selenium-chrome:
-    image: 'spdc1k8sregistry11.privalia.pin/privalia-selenium-chrome:62'
+    image: 'spdc1k8sregistry11.privalia.pin/privalia-selenium-chrome:64'
     environment:
       ID: 'myBrowser'
       SELENIUM_GRID: 'selenium-grid:4444'

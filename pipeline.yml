@@ -28,7 +28,7 @@ services:
     type:
       - testing
   selenium-chrome:
-    image: 'spdc1k8sregistry11.privalia.pin/privalia-selenium-chrome:62'
+    image: 'spdc1k8sregistry11.privalia.pin/privalia-selenium-chrome:64'
     type:
       - testing
     environment:
