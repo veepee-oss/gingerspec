@@ -54,6 +54,10 @@ import org.openqa.selenium.support.ui.Wait;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.yandex.qatools.ashot.AShot;
+import ru.yandex.qatools.ashot.Screenshot;
+import ru.yandex.qatools.ashot.shooting.ShootingStrategies;
+import ru.yandex.qatools.ashot.shooting.cutter.CutStrategy;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -717,11 +721,18 @@ public class CommonG {
 
                 file = chromeFullScreenCapture(driver);
             } else {
-                file = ((TakesScreenshot) driver)
-                        .getScreenshotAs(OutputType.FILE);
+
+                Screenshot screenshot = new AShot().shootingStrategy(ShootingStrategies.viewportPasting(500)).takeScreenshot(driver);
+                try {
+                    file = new File("target/temp");
+                    ImageIO.write(screenshot.getImage(), "PNG",  file);
+                } catch (IOException e) {
+                    logger.error("Exception on taking screenshot", e);
+                }
             }
             try {
                 FileUtils.copyFile(file, new File(outputFile));
+                file.delete();
             } catch (IOException e) {
                 logger.error("Exception on copying browser screen capture", e);
             }
