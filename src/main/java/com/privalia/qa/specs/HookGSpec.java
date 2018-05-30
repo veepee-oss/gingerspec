@@ -192,4 +192,12 @@ public class HookGSpec extends BaseGSpec {
             commonspec.getRemoteSSHConnection().getSession().disconnect();
         }
     }
+
+    @After(value = "@sql")
+    public void sqlConnectionClose() throws Exception {
+        if ((commonspec.getSqlClient() != null) && (commonspec.getSqlClient().connectionStatus())) {
+            commonspec.getLogger().debug("Closing SQL remote connection");
+            commonspec.getSqlClient().disconnect();
+        }
+    }
 }
