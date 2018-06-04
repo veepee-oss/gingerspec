@@ -41,7 +41,7 @@ public class SoapServiceUtilsTest {
     /**
      * Evaluate if the library can parser correctly the elements in the WSDL document
      */
-    @Test(enabled = true)
+    @Test(enabled = false)
     public void parseWsdlContent() {
 
         soap = new SoapServiceUtils();
@@ -63,7 +63,7 @@ public class SoapServiceUtilsTest {
      * @throws SAXException
      * @throws ParserConfigurationException
      */
-    @Test(enabled = true)
+    @Test(enabled = false)
     public void evaluateXmlTest() throws IOException, SAXException, ParserConfigurationException {
 
         soap = new SoapServiceUtils();
@@ -78,7 +78,7 @@ public class SoapServiceUtilsTest {
      * and verify if the response is correct
      * @throws Exception
      */
-    @Test(enabled = true)
+    @Test(enabled = false)
     public void executeRemoteMethodAdd() throws Exception {
 
         String response;
@@ -102,7 +102,7 @@ public class SoapServiceUtilsTest {
      * and verify if the response is correct
      * @throws Exception
      */
-    @Test(enabled = true)
+    @Test(enabled = false)
     public void executeRemoteMethodEmail() throws Exception {
 
         String response;
@@ -111,13 +111,13 @@ public class SoapServiceUtilsTest {
         soap.parseWsdl("http://ws.cdyne.com/emailverify/Emailvernotestemail.asmx?WSDL");
 
         map.put("email", "josefd8@gmail.com");
-        map.put("timeout", "1");
+        map.put("timeout", "0");
         map.put("LicenseKey", "");
         response = soap.executeMethodWithParams("AdvancedVerifyEmail", this.verifyEmailRequest, map);
         assertThat(soap.evaluateXml(response, "GoodEmail")).matches("true");
 
         map.put("email", "novalidemail");
-        map.put("timeout", "1");
+        map.put("timeout", "0");
         map.put("LicenseKey", "");
         response = soap.executeMethodWithParams("AdvancedVerifyEmail", this.verifyEmailRequest, map);
         assertThat(soap.evaluateXml(response, "GoodEmail")).matches("false");

@@ -23,6 +23,7 @@ import javax.xml.ws.Dispatch;
 import javax.xml.ws.Service;
 import javax.xml.ws.soap.SOAPBinding;
 import java.io.*;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -85,7 +86,9 @@ public class SoapServiceUtils {
      * Returns name of the first service found in the WSDL description
      * @return
      */
-    public String getServiceName() { return this.getDefs().getServices().get(0).getName(); }
+    public String getServiceName() {
+        return this.getDefs().getServices().get(0).getName();
+    }
 
     /**
      * Returns Target Namespace
@@ -101,9 +104,11 @@ public class SoapServiceUtils {
      */
     public void parseWsdl(String url) {
 
+        LOGGER.debug(String.format("Parsing remote WSDL file in %s", url));
+        this.setWsdlAddress(url);
         WSDLParser parser = new WSDLParser();
         this.setDefs(parser.parse(url));
-        this.setWsdlAddress(url);
+        LOGGER.debug(String.format("WSDL parsed with TargetNamespace %s", url));
     }
 
     /**
@@ -112,6 +117,8 @@ public class SoapServiceUtils {
      * @return  Map containing action name -> corresponding soap action
      */
     public Map<String, String> getAvailableSoapActions() {
+
+        LOGGER.debug(String.format("Getting available SOAPActions"));
 
         Map<String, String> operations = new LinkedHashMap<>();
         String service = this.getDefs().getServices().get(0).getPorts().get(0).getBinding().getName();
@@ -127,6 +134,7 @@ public class SoapServiceUtils {
 
             }
         }
+        LOGGER.debug(String.format("%s SOAPActions found: %s", operations.size(), Arrays.toString(operations.entrySet().toArray())));
         return operations;
     }
 
@@ -138,12 +146,12 @@ public class SoapServiceUtils {
      */
     public String transformXml(String request, Map<String, String> variables) throws IOException, SAXException, ParserConfigurationException, TransformerException {
 
+        LOGGER.debug(String.format("Transforming request with %s", Arrays.toString(variables.entrySet().toArray())));
         DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
         Document document = documentBuilder.parse(new ByteArrayInputStream(request.getBytes()));
 
-        for (Map.Entry<String, String> entry : variables.entrySet())
-        {
+        for (Map.Entry<String, String> entry : variables.entrySet()) {
             document.getElementsByTagName(entry.getKey()).item(0).setTextContent(entry.getValue());
         }
 
@@ -153,6 +161,7 @@ public class SoapServiceUtils {
         StringWriter writer = new StringWriter();
         transformer.transform(new DOMSource(document), new StreamResult(writer));
         String output = writer.getBuffer().toString().replaceAll("\n|\r", "");
+
         return  output;
 
     }
@@ -165,6 +174,7 @@ public class SoapServiceUtils {
      */
     public String evaluateXml(String xmlString, String variable) throws ParserConfigurationException, IOException, SAXException {
 
+        LOGGER.debug(String.format("Getting value for tag: %s in response", variable));
         DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
         Document document = documentBuilder.parse(new ByteArrayInputStream(xmlString.getBytes()));
@@ -172,9 +182,11 @@ public class SoapServiceUtils {
         Node node = document.getElementsByTagName(variable).item(0);
 
         if (node != null) {
+            LOGGER.debug(String.format("Value for tag found: %s", node.getTextContent()));
             return node.getTextContent();
         }
 
+        LOGGER.debug(String.format("No value found, returning NULL"));
         return null;
 
     }
@@ -190,6 +202,7 @@ public class SoapServiceUtils {
     public String executeMethodWithParams(String ActionName, String request, Map<String, String> variables) throws Exception {
 
         String transformedRequest = this.transformXml(request, variables);
+        LOGGER.debug(String.format("Executing remote method %s with: %s", ActionName, Arrays.toString(variables.entrySet().toArray())));
         return this.executeMethod(ActionName, transformedRequest);
     }
 
@@ -206,6 +219,7 @@ public class SoapServiceUtils {
         QName portName = new QName(this.getTargetNameSpace(), this.getPortName());
         String SOAPAction = this.getAvailableSoapActions().get(ActionName);
 
+        LOGGER.debug(String.format("Using service %s, port name %s, action %s", serviceName, portName, SOAPAction));
         SOAPMessage response = invoke(serviceName, portName, this.getWsdlAddress(), SOAPAction, request);
 
         SOAPBody body = response.getSOAPBody();
