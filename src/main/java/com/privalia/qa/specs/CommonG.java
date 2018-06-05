@@ -142,6 +142,8 @@ public class CommonG {
 
     private Map<String, String> lastFileParseRecord;
 
+    private String lastSoapResponse;
+
     /**
      * Checks if a given string matches a regular expression or contains a string
      *
@@ -173,6 +175,22 @@ public class CommonG {
      */
     public void setLastFileParseRecord(Map<String, String> lastFileParseRecord) {
         this.lastFileParseRecord = lastFileParseRecord;
+    }
+
+    /**
+     * Returns the las response from a remote method execution in the webservice as an XML String
+     * @return XML String
+     */
+    public String getLastSoapResponse() {
+        return lastSoapResponse;
+    }
+
+    /**
+     * Sets the response of the execution of a remote method in a webservice as an XML String
+     * @param lastSoapResponse
+     */
+    public void setLastSoapResponse(String lastSoapResponse) {
+        this.lastSoapResponse = lastSoapResponse;
     }
 
     /**
@@ -414,6 +432,15 @@ public class CommonG {
      */
     public SqlUtils getSqlClient() {
         return SqlUtil.INSTANCE.getSqlUtils();
+    }
+
+    /**
+     * Get the SOAP Services utils.
+     *
+     * @return SoapServiceUtils
+     */
+    public SoapServiceUtils getSoapServiceClient() {
+        return SoapServiceUtil.INSTANCE.getSoapServiceUtils();
     }
 
     /**
