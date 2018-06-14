@@ -362,7 +362,7 @@
 		<dependency>
 			<groupId>org.apache.kafka</groupId>
 			<artifactId>kafka-clients</artifactId>
-			<version>0.10.0.0</version>
+			<version>1.1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.auth0</groupId>
@@ -371,8 +371,10 @@
 		</dependency>
 		<dependency>
 			<groupId>org.apache.kafka</groupId>
-			<artifactId>kafka_2.10</artifactId>
-			<version>0.10.0.0</version>
+			<artifactId>kafka_2.12</artifactId>
+			<version>1.1.0</version>
+			<!--<artifactId>kafka_2.10</artifactId>-->
+			<!--<version>0.10.2.1</version>-->
 			<exclusions>
 				<exclusion>
 					<groupId>org.slf4j</groupId>

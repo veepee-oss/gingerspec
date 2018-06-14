@@ -18,11 +18,13 @@ package com.privalia.qa.utils;
 
 import kafka.admin.AdminOperationException;
 import kafka.admin.AdminUtils;
+import kafka.admin.BrokerMetadata;
 import kafka.admin.RackAwareMode;
 import kafka.common.KafkaException;
 import kafka.common.TopicAlreadyMarkedForDeletionException;
 import kafka.utils.ZKStringSerializer$;
 import kafka.utils.ZkUtils;
+import kafka.zk.AdminZkClient;
 import org.I0Itec.zkclient.ZkClient;
 import org.I0Itec.zkclient.ZkConnection;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -34,11 +36,12 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.requests.MetadataResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import scala.Option;
+import scala.collection.JavaConversions;
+import scala.collection.JavaConverters;
+import scala.collection.Seq;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.*;
 
 /**
@@ -102,6 +105,7 @@ public class KafkaUtils {
         propsConsumer.put("auto.commit.interval.ms", "1000");
         propsConsumer.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         propsConsumer.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+        propsConsumer.put("session.timeout.ms", "10000");
     }
 
     /**
@@ -118,16 +122,28 @@ public class KafkaUtils {
     }
 
     public void setZkHost(String host, String port, String zkPath) {
-        this.zookeeperConnect = host + ":" + port + "/" + zkPath;
+        if ((zkPath != null) && (!(zkPath.matches("")))) {
+            this.zookeeperConnect = host + ":" + port + "/" + zkPath;
+        } else {
+            this.zookeeperConnect = host + ":" + port;
+        }
     }
 
     public ZkUtils getZkUtils() {
         return zkUtils;
     }
 
+    /**
+     * Returns the number of partitions for the given topic
+     * @param topicName Name of the topic
+     * @return          Number of partitions for the topic
+     */
     public int getPartitions(String topicName) {
-        MetadataResponse.TopicMetadata metaData = AdminUtils.fetchTopicMetadataFromZk(topicName, zkUtils);
-        return metaData.partitionMetadata().size();
+        List<?> partitions = JavaConversions.seqAsJavaList(
+                zkUtils.getPartitionsForTopics(
+                        JavaConversions.asScalaBuffer(Collections.singletonList(topicName))).head()._2());
+        return partitions.size();
+
     }
 
 
@@ -181,7 +197,13 @@ public class KafkaUtils {
         if (AdminUtils.topicExists(zkUtils, topicName)) {
             logger.debug("Altering topic {}", topicName);
             try {
-                AdminUtils.addPartitions(zkUtils, topicName, numPartitions, "", true, RackAwareMode.Enforced$.MODULE$);
+
+                Seq<String> names = JavaConverters.asScalaBuffer(Arrays.asList(topicName));
+                Seq<BrokerMetadata> brokers = AdminUtils.getBrokerMetadatas(zkUtils, RackAwareMode.Enforced$.MODULE$, Option.empty());
+                scala.collection.mutable.Map<String, scala.collection.Map<Object, Seq<Object>>> assignment = (scala.collection.mutable.Map<String, scala.collection.Map<Object, Seq<Object>>>) zkUtils.getPartitionAssignmentForTopics(names);
+                Map<String, scala.collection.Map<Object, Seq<Object>>> partitionaAssigmentMap = JavaConverters.mutableMapAsJavaMap(assignment);
+                AdminUtils.addPartitions(zkUtils, topicName, partitionaAssigmentMap.get(topicName), brokers, numPartitions, Option.empty(), false);
+
                 logger.debug("Topic {} altered with partitions : {}", topicName, partitions);
             } catch (AdminOperationException aoe) {
                 logger.debug("Error while altering partitions for topic : {}", topicName, aoe);
@@ -225,7 +247,9 @@ public class KafkaUtils {
     public List<String> readTopicFromBeginning(String topic) {
         List<String> result = new ArrayList<>();
         KafkaConsumer<String, String> consumer = new KafkaConsumer<>(propsConsumer);
-        consumer.subscribe(Arrays.asList(topic));
+        List<String> topics = new LinkedList();
+        ((LinkedList<String>) topics).addFirst(topic);
+        consumer.subscribe(topics);
         ConsumerRecords<String, String> records = consumer.poll(100);
         while (records.isEmpty()) {
             records = consumer.poll(100);

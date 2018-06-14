@@ -350,8 +350,8 @@ public class BigDataGSpec extends BaseGSpec {
      * @param zkPath ZK port
      * @throws UnknownHostException exception
      */
-    @Given("^I connect to kafka at '(.+)' using path '(.+)'$")
-    public void connectKafka(String zkHost, String zkPath) throws UnknownHostException {
+    @Given("^I connect to kafka at '(.+)'( using path '(.+)')?$")
+    public void connectKafka(String zkHost, String foo, String zkPath) throws UnknownHostException {
         String zkPort = zkHost.split(":")[1];
         zkHost = zkHost.split(":")[0];
         commonspec.getKafkaUtils().setZkHost(zkHost, zkPort, zkPath);
@@ -801,7 +801,9 @@ public class BigDataGSpec extends BaseGSpec {
      */
     @Then("^A kafka topic named '(.+?)' exists")
     public void kafkaTopicExist(String topic_name) throws KeeperException, InterruptedException {
-        assert commonspec.getKafkaUtils().getZkUtils().pathExists("/" + topic_name) : "There is no topic with that name";
+        List<String> topics = this.commonspec.getKafkaUtils().listTopics();
+        assertThat(topics.contains(topic_name)).as("There is no topic with that name").isTrue();
+        //assert commonspec.getKafkaUtils().getZkUtils().pathExists("/" + topic_name) : "There is no topic with that name";
     }
 
     /**
