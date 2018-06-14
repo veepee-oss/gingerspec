@@ -30,10 +30,9 @@ import org.I0Itec.zkclient.ZkConnection;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.Producer;
-import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.*;
 import org.apache.kafka.common.requests.MetadataResponse;
+import org.apache.kafka.common.serialization.StringSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Option;
@@ -95,8 +94,9 @@ public class KafkaUtils {
         props.put("batch.size", 16384);
         props.put("linger.ms", 1);
         props.put("buffer.memory", 33554432);
-        props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-        props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+        props.put(ProducerConfig.CLIENT_ID_CONFIG, "KafkaQAProducer");
+        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
         this.propsConsumer = new Properties();
         propsConsumer.put("bootstrap.servers", System.getProperty("KAFKA_HOSTS", "0.0.0.0:9092"));
         propsConsumer.put("group.id", "test");
@@ -234,12 +234,16 @@ public class KafkaUtils {
     public void sendAndConfirmMessage(String message, String topicName, long timeoutSeconds) throws InterruptedException, ExecutionException, TimeoutException {
         Producer<String, String> producer = new KafkaProducer<>(props);
         try {
-            producer.send(new ProducerRecord<String, String>(topicName, message)).get(timeoutSeconds, TimeUnit.SECONDS);
-            logger.debug("Message sent and acknowlegded by Kafka");
+            long time = System.currentTimeMillis();
+            ProducerRecord<String, String> record = new ProducerRecord<>(topicName, message);
+            RecordMetadata metadata = producer.send(record).get(timeoutSeconds, TimeUnit.SECONDS);
+            long elapsedTime = System.currentTimeMillis() - time;
+            logger.debug("Message sent and acknowlegded by Kafka(key=%s value=%s) meta(partition=%d, offset=%d) time=%d", record.key(), record.value(), metadata.partition(), metadata.offset(), elapsedTime);
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
             logger.error("Message not sent or acknowlegded by Kafka {}", e.getMessage());
             throw e;
         } finally {
+            producer.flush();
             producer.close();
         }
     }
@@ -257,6 +261,7 @@ public class KafkaUtils {
                 result.add(record.value());
             }
         }
+        logger.debug("Found " + result.size() + " messages in topic " + topic + ". " + result.toString());
         return result;
     }
 }

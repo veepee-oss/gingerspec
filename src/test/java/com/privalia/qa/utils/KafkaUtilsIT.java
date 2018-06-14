@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
@@ -75,7 +76,8 @@ public class KafkaUtilsIT {
         }
         kafka_utils.sendAndConfirmMessage(oneMessage, topic, 1);
         kafka_utils.sendAndConfirmMessage(anotherMessage, topic, 1);
-        assertThat(kafka_utils.readTopicFromBeginning(topic).contains("This is a test")).as("Topic {} contains {}", topic, anotherMessage);
+        List<String> messages = kafka_utils.readTopicFromBeginning(topic);
+        assertThat(messages.contains("This is a test")).isTrue();
         kafka_utils.deleteTopic(topic);
     }
 
