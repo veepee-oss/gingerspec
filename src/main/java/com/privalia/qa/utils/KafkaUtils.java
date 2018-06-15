@@ -24,14 +24,12 @@ import kafka.common.KafkaException;
 import kafka.common.TopicAlreadyMarkedForDeletionException;
 import kafka.utils.ZKStringSerializer$;
 import kafka.utils.ZkUtils;
-import kafka.zk.AdminZkClient;
 import org.I0Itec.zkclient.ZkClient;
 import org.I0Itec.zkclient.ZkConnection;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.*;
-import org.apache.kafka.common.requests.MetadataResponse;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +39,9 @@ import scala.collection.JavaConverters;
 import scala.collection.Seq;
 
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Generic utilities for operations over Kafka.
@@ -248,19 +248,20 @@ public class KafkaUtils {
         }
     }
 
-    public List<String> readTopicFromBeginning(String topic) {
+    public List<String> readTopicFromBeginning(String topic) throws InterruptedException {
         List<String> result = new ArrayList<>();
         KafkaConsumer<String, String> consumer = new KafkaConsumer<>(propsConsumer);
-        List<String> topics = new LinkedList();
-        ((LinkedList<String>) topics).addFirst(topic);
-        consumer.subscribe(topics);
-        ConsumerRecords<String, String> records = consumer.poll(100);
-        while (records.isEmpty()) {
-            records = consumer.poll(100);
+        consumer.subscribe(Arrays.asList(topic));
+
+        long endTimeMillis = System.currentTimeMillis() + 5000;
+        while ((System.currentTimeMillis() < endTimeMillis)) {
+            ConsumerRecords<String, String> records = consumer.poll(1000);
             for (ConsumerRecord<String, String> record : records) {
+                logger.debug(record.offset() + ": " + record.value());
                 result.add(record.value());
             }
         }
+
         logger.debug("Found " + result.size() + " messages in topic " + topic + ". " + result.toString());
         return result;
     }

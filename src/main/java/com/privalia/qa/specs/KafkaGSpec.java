@@ -12,6 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Class for all Kafka-related cucumber steps
+ * @author José Fernández
  */
 public class KafkaGSpec extends BaseGSpec {
 
@@ -65,14 +66,17 @@ public class KafkaGSpec extends BaseGSpec {
     }
 
     /**
-     * Modify partitions in a Kafka topic.
+     * Modify partitions in a Kafka topic by increasing the current number of partitions in the topic by the specified
+     * number. Mind that the number of partitions for a topic can only be increased once its created
      *
      * @param topic_name    topic name
-     * @param numPartitions number of partitions
+     * @param numPartitions number of partitions to add to the current amount of partitions for the topic
      */
     @When("^I increase '(.+?)' partitions in a Kafka topic named '(.+?)'")
     public void modifyPartitions(int numPartitions, String topic_name) throws Exception {
-        commonspec.getKafkaUtils().modifyTopicPartitioning(topic_name, numPartitions);
+        int currentPartitions = commonspec.getKafkaUtils().getPartitions(topic_name);
+        commonspec.getKafkaUtils().modifyTopicPartitioning(topic_name, currentPartitions + numPartitions);
+        assertThat(commonspec.getKafkaUtils().getPartitions(topic_name)).as("Number of partitions is not the expected after operation").isEqualTo(currentPartitions + numPartitions);
     }
 
     /**
@@ -98,7 +102,7 @@ public class KafkaGSpec extends BaseGSpec {
     }
 
     /**
-     * Check that the number of partitions is like expected.
+     * Check that the number of partitions is the expected.
      *
      * @param topic_name      Name of kafka topic
      * @param numOfPartitions Number of partitions
@@ -110,8 +114,14 @@ public class KafkaGSpec extends BaseGSpec {
 
     }
 
+    /**
+     * Pools the given topic for messages and checks in the given content is contained
+     * @param topic     Topic to poll
+     * @param content   Message to look for
+     * @throws InterruptedException
+     */
     @Then("^The kafka topic '(.*?)' has a message containing '(.*?)'$")
-    public void checkMessages(String topic, String content) {
+    public void checkMessages(String topic, String content) throws InterruptedException {
         assertThat(commonspec.getKafkaUtils().readTopicFromBeginning(topic).contains(content)).as("Topic does not exist or the content does not match").isTrue();
     }
 
@@ -124,7 +134,6 @@ public class KafkaGSpec extends BaseGSpec {
     public void kafkaTopicExist(String topic_name) throws KeeperException, InterruptedException {
         List<String> topics = this.commonspec.getKafkaUtils().listTopics();
         assertThat(topics.contains(topic_name)).as("There is no topic with that name").isTrue();
-        //assert commonspec.getKafkaUtils().getZkUtils().pathExists("/" + topic_name) : "There is no topic with that name";
     }
 
 
