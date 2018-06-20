@@ -24,13 +24,16 @@ import kafka.common.KafkaException;
 import kafka.common.TopicAlreadyMarkedForDeletionException;
 import kafka.utils.ZKStringSerializer$;
 import kafka.utils.ZkUtils;
+import okhttp3.*;
 import org.I0Itec.zkclient.ZkClient;
 import org.I0Itec.zkclient.ZkConnection;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.*;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Option;
@@ -38,6 +41,7 @@ import scala.collection.JavaConversions;
 import scala.collection.JavaConverters;
 import scala.collection.Seq;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -75,6 +79,8 @@ public class KafkaUtils {
 
     private ZkClient zkClient;
 
+    private String schemaRegistryConnect;
+
     /**
      * Generic contructor of KafkaUtils.
      */
@@ -85,6 +91,7 @@ public class KafkaUtils {
         this.connectionTimeoutMs = Integer.valueOf(System.getProperty("KAFKA_CONNECTION_TIMEOUT", "60000"));
         this.isSecureKafkaCluster = Boolean.valueOf(System.getProperty("KAFKA_SECURED", "false"));
         this.zookeeperConnect = System.getProperty("ZOOKEEPER_HOSTS", "0.0.0.0:2181");
+        this.schemaRegistryConnect = System.getProperty("SCHEMA_REGISTRY_HOST", "http://localhost:8081");
         this.rackAwareMode = RackAwareMode.Enforced$.MODULE$;
         this.topicConfig = new Properties();
         this.props = new Properties();
@@ -248,21 +255,68 @@ public class KafkaUtils {
         }
     }
 
-    public List<String> readTopicFromBeginning(String topic) throws InterruptedException {
+    /**
+     * Fetch messages from the given partition using poll(). Since there is no warranty that the pool will
+     * return messages, the function is enclosed in a loop for 5 seconds
+     * @param topic Name of the topic from which retrieve messages
+     * @return      List of messages in the topic
+     */
+    public List<String> readTopicFromBeginning(String topic) {
         List<String> result = new ArrayList<>();
         KafkaConsumer<String, String> consumer = new KafkaConsumer<>(propsConsumer);
         consumer.subscribe(Arrays.asList(topic));
 
-        long endTimeMillis = System.currentTimeMillis() + 5000;
-        while ((System.currentTimeMillis() < endTimeMillis)) {
-            ConsumerRecords<String, String> records = consumer.poll(1000);
-            for (ConsumerRecord<String, String> record : records) {
-                logger.debug(record.offset() + ": " + record.value());
-                result.add(record.value());
+        try {
+            long endTimeMillis = System.currentTimeMillis() + 5000;
+            while ((System.currentTimeMillis() < endTimeMillis)) {
+                ConsumerRecords<String, String> records = consumer.poll(100);
+                for (ConsumerRecord<String, String> record : records) {
+                    logger.debug(record.offset() + ": " + record.value());
+                    result.add(record.value());
+                }
+                consumer.commitSync();
             }
+        } finally {
+            consumer.unsubscribe();
+            consumer.close();
         }
+
 
         logger.debug("Found " + result.size() + " messages in topic " + topic + ". " + result.toString());
         return result;
     }
+
+    /**
+     * Set remote schema registry url and port for all future requests
+     * @param host  host (defaults to http://0.0.0.0:8081)
+     */
+    public void setSchemaRegistryUrl(String host){
+        logger.debug("Setting schema registry remote url to " + host);
+        this.schemaRegistryConnect = host;
+    }
+
+    /**
+     * Publish a new version of the schema under the given subject
+     * @param subject   Name of the subject
+     * @param schema    Schema object as string
+     */
+    public Response registerNewSchema(String subject, String schema) throws IOException {
+        logger.debug("Registering new version of schema for subject " + subject);
+
+        String jsonEncodedString = "{\"schema\": " + JSONObject.quote(schema) + "}";
+
+        OkHttpClient client = new OkHttpClient();
+
+        MediaType mediaType = MediaType.parse("application/vnd.schemaregistry.v1+json");
+        RequestBody body = RequestBody.create(mediaType, jsonEncodedString);
+        Request request = new Request.Builder()
+                .url(this.schemaRegistryConnect + "/subjects/" + subject + "/versions")
+                .post(body)
+                .addHeader("Content-Type", "application/vnd.schemaregistry.v1+json")
+                .build();
+
+        return client.newCall(request).execute();
+
+    }
+
 }

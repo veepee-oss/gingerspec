@@ -18,11 +18,13 @@ package com.privalia.qa.utils;
 import com.google.common.base.Joiner;
 import kafka.admin.AdminUtils;
 import kafka.utils.ZkUtils;
+import okhttp3.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
@@ -38,6 +40,7 @@ public class KafkaUtilsIT {
     @BeforeMethod(enabled = true)
     public void setSettingsTest() {
         kafka_utils = new KafkaUtils();
+        kafka_utils.setSchemaRegistryUrl("http://localhost:8081");
         kafka_utils.connect();
     }
 
@@ -114,5 +117,12 @@ public class KafkaUtilsIT {
         }
         kafka_utils.sendMessage("hello, its me", "testMessage");
         assertThat(kafka_utils.readTopicFromBeginning("testMessage")).contains("hello, its me");
+    }
+
+    @Test(enabled = true)
+    public void addNewSchemaTest() throws IOException {
+
+        Response  response = kafka_utils.registerNewSchema("Kafka-key", "{\"schema\": \"{\\\"type\\\": \\\"string\\\"}\"}");
+        assertThat(response.code()).as("Schema registry returned " + response.code() + " response, body: " + response.body().string()).isEqualTo(200);
     }
 }

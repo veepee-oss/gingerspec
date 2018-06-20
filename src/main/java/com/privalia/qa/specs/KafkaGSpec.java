@@ -1,8 +1,10 @@
 package com.privalia.qa.specs;
 
+import cucumber.api.PendingException;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
+import okhttp3.Response;
 import org.apache.zookeeper.KeeperException;
 
 import java.net.UnknownHostException;
@@ -134,6 +136,31 @@ public class KafkaGSpec extends BaseGSpec {
     public void kafkaTopicExist(String topic_name) throws KeeperException, InterruptedException {
         List<String> topics = this.commonspec.getKafkaUtils().listTopics();
         assertThat(topics.contains(topic_name)).as("There is no topic with that name").isTrue();
+    }
+
+
+    /**
+     * Initializes the remote URL of the schema registry service for all future requests
+     * @param host          Remote host and port (defaults to http://0.0.0.0:8081)
+     * @throws Throwable
+     */
+    @Given("^My schema registry is running at '(.+)'$")
+    public void mySchemaRegistryIsRunningAtLocalhost(String host) throws Throwable {
+        commonspec.getKafkaUtils().setSchemaRegistryUrl(host);
+    }
+
+    /**
+     * Generates a POST to the schema register to add a new schema for the given subject
+     * @param subjectName   Name of the subject where register the new schema
+     * @param filepath      Path of the file containing the schema
+     */
+    @Then("^I register a new version of a schema under the subject '(.+)' with '(.+)'$")
+    public void iRegisterANewVersionOfASchemaUnderTheSubject(String subjectName, String filepath) throws Throwable {
+
+        String retrievedData = commonspec.retrieveData(filepath, "json");
+        Response response = commonspec.getKafkaUtils().registerNewSchema(subjectName, retrievedData);
+        assertThat(response.code()).as("Schema registry returned " + response.code() + " response, body: " + response.body().string()).isEqualTo(200);
+
     }
 
 
