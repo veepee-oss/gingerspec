@@ -27,12 +27,10 @@ import kafka.utils.ZkUtils;
 import okhttp3.*;
 import org.I0Itec.zkclient.ZkClient;
 import org.I0Itec.zkclient.ZkConnection;
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.*;
-import org.apache.kafka.common.serialization.StringSerializer;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,6 +79,10 @@ public class KafkaUtils {
 
     private String schemaRegistryConnect;
 
+    public Properties getPropsConsumer() {
+        return propsConsumer;
+    }
+
     /**
      * Generic contructor of KafkaUtils.
      */
@@ -102,8 +104,8 @@ public class KafkaUtils {
         props.put("linger.ms", 1);
         props.put("buffer.memory", 33554432);
         props.put(ProducerConfig.CLIENT_ID_CONFIG, "KafkaQAProducer");
-        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
-        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+        props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+        props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
         this.propsConsumer = new Properties();
         propsConsumer.put("bootstrap.servers", System.getProperty("KAFKA_HOSTS", "0.0.0.0:9092"));
         propsConsumer.put("group.id", "test");
@@ -142,8 +144,9 @@ public class KafkaUtils {
 
     /**
      * Returns the number of partitions for the given topic
+     *
      * @param topicName Name of the topic
-     * @return          Number of partitions for the topic
+     * @return Number of partitions for the topic
      */
     public int getPartitions(String topicName) {
         List<?> partitions = JavaConversions.seqAsJavaList(
@@ -232,18 +235,39 @@ public class KafkaUtils {
     }
 
     /**
-     * Send (and confirm) a message
+     * Send (and confirm) a message. The system automatically infers the type of the key and value based
+     * on the producer properties for key and value serializer types
      *
      * @param message        The message to be sent
      * @param topicName      name of topic
      * @param timeoutSeconds Number of seconds to wait for acknowledgement by Kafka
      */
     public void sendAndConfirmMessage(String message, String topicName, long timeoutSeconds) throws InterruptedException, ExecutionException, TimeoutException {
-        Producer<String, String> producer = new KafkaProducer<>(props);
+
+        String key = this.props.getProperty("key.serializer");
+        String value = this.props.getProperty("value.serializer");
+        Class keyClass = this.getProperClass(key);
+        Class valueClass = this.getProperClass(value);
+
+        Object finalMessage = null;
+
+        if (valueClass.equals(String.class)) {
+            finalMessage = message.toString();
+        }
+        if (valueClass.equals(Long.class)) {
+            finalMessage = Long.parseLong(message);
+        }
+
+        this.sendAndConfirmMessage(finalMessage, topicName, timeoutSeconds,  keyClass, valueClass);
+
+    }
+
+    private <K, V> void sendAndConfirmMessage(Object message, String topicName, long timeoutSeconds, K keyClass, V valueClass) throws InterruptedException, ExecutionException, TimeoutException {
+        Producer<K, V> producer = new KafkaProducer<>(props);
         try {
             long time = System.currentTimeMillis();
-            ProducerRecord<String, String> record = new ProducerRecord<>(topicName, message);
-            RecordMetadata metadata = producer.send(record).get(timeoutSeconds, TimeUnit.SECONDS);
+            ProducerRecord<K, V> record = new ProducerRecord(topicName, message);
+            RecordMetadata metadata = (RecordMetadata) producer.send(record).get(timeoutSeconds, TimeUnit.SECONDS);
             long elapsedTime = System.currentTimeMillis() - time;
             logger.debug("Message sent and acknowlegded by Kafka(key=%s value=%s) meta(partition=%d, offset=%d) time=%d", record.key(), record.value(), metadata.partition(), metadata.offset(), elapsedTime);
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
@@ -255,22 +279,60 @@ public class KafkaUtils {
         }
     }
 
+
+    /**
+     * Returns the appropiate class for the given property
+     * @param item
+     * @return
+     */
+    private Class getProperClass(String item) {
+        switch (item) {
+
+            case "org.apache.kafka.common.serialization.StringSerializer":
+                return String.class;
+
+            case "org.apache.kafka.common.serialization.LongSerializer":
+                return Long.class;
+
+            case "org.apache.kafka.common.serialization.StringDeserializer":
+                return String.class;
+
+            case "org.apache.kafka.common.serialization.LongDeserializer":
+                return Long.class;
+
+            default:
+                return String.class;
+        }
+    }
+
     /**
      * Fetch messages from the given partition using poll(). Since there is no warranty that the pool will
      * return messages, the function is enclosed in a loop for 5 seconds
+     *
      * @param topic Name of the topic from which retrieve messages
-     * @return      List of messages in the topic
+     * @return List of messages in the topic
      */
-    public List<String> readTopicFromBeginning(String topic) {
-        List<String> result = new ArrayList<>();
-        KafkaConsumer<String, String> consumer = new KafkaConsumer<>(propsConsumer);
+    public List<Object> readTopicFromBeginning(String topic) {
+
+        String key = this.propsConsumer.getProperty("key.deserializer");
+        String value = this.propsConsumer.getProperty("value.deserializer");
+        Class keyClass = this.getProperClass(key);
+        Class valueClass = this.getProperClass(value);
+
+        return this.readTopicFromBeginning(topic, keyClass, valueClass);
+
+    }
+
+    public <K, V> List readTopicFromBeginning(String topic, K keyClass, V valueClass) {
+        List<V> result = new ArrayList<>();
+        KafkaConsumer<K, V> consumer = new KafkaConsumer<>(propsConsumer);
         consumer.subscribe(Arrays.asList(topic));
 
         try {
             long endTimeMillis = System.currentTimeMillis() + 5000;
             while ((System.currentTimeMillis() < endTimeMillis)) {
-                ConsumerRecords<String, String> records = consumer.poll(100);
-                for (ConsumerRecord<String, String> record : records) {
+                ConsumerRecords<K, V> records = consumer.poll(100);
+                for (ConsumerRecord<K, V> record : records) {
                     logger.debug(record.offset() + ": " + record.value());
                     result.add(record.value());
                 }
@@ -286,19 +348,23 @@ public class KafkaUtils {
         return result;
     }
 
+
+
     /**
      * Set remote schema registry url and port for all future requests
-     * @param host  host (defaults to http://0.0.0.0:8081)
+     *
+     * @param host host (defaults to http://0.0.0.0:8081)
      */
-    public void setSchemaRegistryUrl(String host){
+    public void setSchemaRegistryUrl(String host) {
         logger.debug("Setting schema registry remote url to " + host);
         this.schemaRegistryConnect = host;
     }
 
     /**
      * Publish a new version of the schema under the given subject
-     * @param subject   Name of the subject
-     * @param schema    Schema object as string
+     *
+     * @param subject Name of the subject
+     * @param schema  Schema object as string
      */
     public Response registerNewSchema(String subject, String schema) throws IOException {
         logger.debug("Registering new version of schema for subject " + subject);
@@ -317,6 +383,27 @@ public class KafkaUtils {
 
         return client.newCall(request).execute();
 
+    }
+
+    /**
+     * Modify a single property of the producer
+     *
+     * @param key   Property name
+     * @param value Property new value
+     */
+    public void modifyProducerProperties(String key, String value) {
+        this.props.put(key, value);
+    }
+
+
+    /**
+     * Modify a single property of the producer
+     *
+     * @param key   Property name
+     * @param value Property new value
+     */
+    public void modifyConsumerProperties(String key, String value) {
+        this.propsConsumer.put(key, value);
     }
 
 }

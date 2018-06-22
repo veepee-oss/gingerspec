@@ -1,14 +1,18 @@
 package com.privalia.qa.specs;
 
+import cucumber.api.DataTable;
 import cucumber.api.PendingException;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
+import gherkin.formatter.model.DataTableRow;
 import okhttp3.Response;
 import org.apache.zookeeper.KeeperException;
 
 import java.net.UnknownHostException;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -87,10 +91,32 @@ public class KafkaGSpec extends BaseGSpec {
      * @param topic_name topic name
      * @param message    string that you send to topic
      */
-    @When("^I send a message '(.+?)' to the kafka topic named '(.+?)'")
+    @When("^I send a message '(.+?)' to the kafka topic named '(.+?)'$")
     public void sendAMessage(String message, String topic_name) throws Exception {
-        //commonspec.getKafkaUtils().sendMessage(message, topic_name);
         commonspec.getKafkaUtils().sendAndConfirmMessage(message, topic_name, 1);
+    }
+
+    /**
+     * Modify properties of producer before sending
+     * @param message
+     * @param topic_name
+     * @param table
+     * @throws InterruptedException
+     * @throws ExecutionException
+     * @throws TimeoutException
+     */
+    @Given("I send a message '(.+?)' to the kafka topic named '(.+?)' with:$")
+    public void sendAMessageWithDatatable(String message, String topic_name, DataTable table) throws InterruptedException, ExecutionException, TimeoutException {
+
+        /*Modify properties of producer*/
+        for (DataTableRow row : table.getGherkinRows()) {
+            String key = row.getCells().get(0);
+            String value = row.getCells().get(1);
+            commonspec.getKafkaUtils().modifyProducerProperties(key, value);
+        }
+
+        commonspec.getKafkaUtils().sendAndConfirmMessage(message, topic_name, 1);
+
     }
 
     /**
@@ -163,5 +189,36 @@ public class KafkaGSpec extends BaseGSpec {
 
     }
 
+    @Then("^The kafka topic '(.+?)' has a message containing '(.+?)' with:$")
+    public void theKafkaTopicStringTopicHasAMessageContainingHelloWith(String topicName, String message, DataTable dataTable) throws Throwable {
 
+        /*Modify properties of consumer*/
+        for (DataTableRow row : dataTable.getGherkinRows()) {
+            String key = row.getCells().get(0);
+            String value = row.getCells().get(1);
+            commonspec.getKafkaUtils().modifyConsumerProperties(key, value);
+        }
+
+        String deserializer = commonspec.getKafkaUtils().getPropsConsumer().getProperty("value.deserializer");
+        Object finalMessage;
+
+        switch (deserializer) {
+
+            case "org.apache.kafka.common.serialization.StringDeserializer":
+                finalMessage = message.toString();
+                break;
+
+            case "org.apache.kafka.common.serialization.LongDeserializer":
+                finalMessage = Long.parseLong(message);
+                break;
+
+            default:
+                finalMessage = message.toString();
+        }
+
+
+        List<Object> results = commonspec.getKafkaUtils().readTopicFromBeginning(topicName);
+
+        assertThat(results.contains(finalMessage)).as("Topic does not exist or the content does not match").isTrue();
+    }
 }

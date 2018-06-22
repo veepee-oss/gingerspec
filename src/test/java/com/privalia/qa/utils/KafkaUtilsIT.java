@@ -79,7 +79,7 @@ public class KafkaUtilsIT {
         }
         kafka_utils.sendAndConfirmMessage(oneMessage, topic, 1);
         kafka_utils.sendAndConfirmMessage(anotherMessage, topic, 1);
-        List<String> messages = kafka_utils.readTopicFromBeginning(topic);
+        List<Object> messages = kafka_utils.readTopicFromBeginning(topic);
         assertThat(messages.contains("This is a test")).isTrue();
         kafka_utils.deleteTopic(topic);
     }
@@ -122,7 +122,7 @@ public class KafkaUtilsIT {
     @Test(enabled = true)
     public void addNewSchemaTest() throws IOException {
 
-        Response  response = kafka_utils.registerNewSchema("Kafka-key", "{\"schema\": \"{\\\"type\\\": \\\"string\\\"}\"}");
+        Response  response = kafka_utils.registerNewSchema("Kafka-key", "{\"type\": \"string\"}");
         assertThat(response.code()).as("Schema registry returned " + response.code() + " response, body: " + response.body().string()).isEqualTo(200);
     }
 }
