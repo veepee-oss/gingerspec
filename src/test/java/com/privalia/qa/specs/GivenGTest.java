@@ -45,6 +45,6 @@ public class GivenGTest {
             fail("Error parsing JSON String");
         }
 
-        assertThat(ThreadProperty.get(envVar)).as("Not correctly ordered").isEqualTo("stratiopaaslogs-2016-07-26");
+        assertThat(ThreadProperty.get(envVar)).as("Not correctly ordered").isEqualTo("dummylogs-2016-07-26");
     }
 }

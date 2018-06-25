@@ -4,7 +4,25 @@ Only listing significant user-visible, not internal code cleanups and minor bug 
 
 ## 0.1.0 (upcoming)
 
+* SOAP Web services src/main/java/com/privalia/qa/specs/SoapServiceGSpec.java,
+  src/main/java/com/privalia/qa/utils/SoapServiceUtils.java
+  
+* SQL Hook
 
+* Feature take full-screenshots (for large pages)
+
+* Selenium upgrade to 3.9.1 and minor fixes
+
+* Parse files steps src/main/java/com/privalia/qa/specs/FileParserGSpec.java,
+  src/main/java/com/privalia/qa/utils/FileParserUtils.java
+
+* Fix captureEvidence function for Selenium
+
+* Cucumber-java dependency was upgraded (1.1.6 -> 1.1.8)
+
+* New src/main/java/com/privalia/qa/specs/RestSpec.java with RestAssured implementation for 
+  Rest API logic, new feature file and changes in CommonG, HookGSpec
+  
 * New logic for Relation databases: MySQL and Postgres
                         src/main/java/com/privalia/qa/specs/SqlDatabaseGSpec.java
                         src/main/java/com/privalia/qa/utils/SqlUtils.java

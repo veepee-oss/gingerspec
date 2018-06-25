@@ -39,8 +39,8 @@ public class ThenGTest {
 
         ThreadProperty.set(envVar, result);
 
-        List<String> row1 = Arrays.asList("$.[0].Node", "equal", "paaslab31.stratio.com");
-        List<String> row2 = Arrays.asList("[0].Node", "equal", "paaslab31.stratio.com");
+        List<String> row1 = Arrays.asList("$.[0].Node", "equal", "test1.dummy.com");
+        List<String> row2 = Arrays.asList("[0].Node", "equal", "test1.dummy.com");
 
         List<List<String>> rawData = Arrays.asList(row1, row2);
 
@@ -64,8 +64,8 @@ public class ThenGTest {
 
         ThreadProperty.set(envVar, result);
 
-        List<String> row1 = Arrays.asList("$.[1].Node", "not equal", "paaslab31.stratio.com");
-        List<String> row2 = Arrays.asList("[2].Node", "not equal", "paaslab32.stratio.com");
+        List<String> row1 = Arrays.asList("$.[1].Node", "not equal", "test1.dummy.com");
+        List<String> row2 = Arrays.asList("[2].Node", "not equal", "test1.dummy.com");
 
         List<List<String>> rawData = Arrays.asList(row1, row2);
 
@@ -138,7 +138,7 @@ public class ThenGTest {
         ThreadProperty.set(envVar, result);
 
         List<String> row1 = Arrays.asList("$.[0].ServiceTags", "&&", "leader");
-        List<String> row2 = Arrays.asList("[1].Node", "||", "paaslab32.stratio.com");
+        List<String> row2 = Arrays.asList("[1].Node", "||", "test1.dummy.com");
 
         List<List<String>> rawData = Arrays.asList(row1, row2);
 

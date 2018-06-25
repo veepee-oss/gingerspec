@@ -29,7 +29,7 @@ Feature: Selenium run test
 
     @ignore @toocomplex
   Scenario: Dummy scenario with HTTPS
-    Given My app is running in 'es.privalia-test.com'
+    Given My app is running in 'es.dummy-test.com'
     When I securely browse to '/'
 
 

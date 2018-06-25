@@ -467,7 +467,7 @@ public class CucumberReporter implements Formatter, Reporter {
 
         /**
          * Builds a test result xml document, builds exception messages on non valid ignore causes such as
-         * \@tillfixed without an in progress Stratio's Jira ticker
+         * \@tillfixed without an in progress Jira ticker
          *
          * @param doc report document
          * @param element scenario execution result
