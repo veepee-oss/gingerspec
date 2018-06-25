@@ -16,7 +16,7 @@ Feature: Selenium wait with pooling
   Scenario: Verify that a warning alert appears when clicking on the excel icon without campaigns listed and that the alert can be
     dismissed or accepted
 
-    Given My app is running in 'boit-uat24.privalia-test.com:80'
+    Given My app is running in 'dummy-test.com:80'
     And I browse to '/login'
     When '1' elements exists with 'xpath://*[@id="aclusr_username"]'
     Then I type 'root' on the element on index '0'

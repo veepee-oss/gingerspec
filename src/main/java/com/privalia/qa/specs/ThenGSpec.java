@@ -361,7 +361,7 @@ public class ThenGSpec extends BaseGSpec {
      *                        Example:
      *                        |latitude| longitude|place     |occurrences|
      *                        |12.5    |12.7      |Valencia  |1           |
-     *                        |2.5     | 2.6      |Stratio   |0           |
+     *                        |2.5     | 2.6      |Madrid   |0           |
      *                        |12.5    |13.7      |Sevilla   |1           |
      *                        IMPORTANT: There no should be no existing columns
      * @throws Exception

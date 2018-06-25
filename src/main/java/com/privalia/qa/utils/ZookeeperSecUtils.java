@@ -35,7 +35,7 @@ public class ZookeeperSecUtils {
 
     private static final String DEFAULT_ZK_SESSION_TIMEOUT = "30000";
 
-    private static final String DEFAULT_ZK_PRINCIPAL = "zookeeper/zookeeper-plugin-agent@DEMO.STRATIO.COM";
+    private static final String DEFAULT_ZK_PRINCIPAL = "zookeeper/zookeeper-plugin-agent@DEMO.TEST.COM";
 
     private String zk_hosts;
 

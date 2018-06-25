@@ -62,7 +62,7 @@ public class CassandraToolsIT extends BaseGSpec {
     DataTable dataTableComparison2 = DataTable.create(dataComparison2);
 
     String tableName = "testcstring";
-    String keySpace = "stratio_decision";
+    String keySpace = "test_keySpace";
 
     public CassandraToolsIT() {
         ThreadProperty.set("class", this.getClass().getCanonicalName());
@@ -156,7 +156,7 @@ public class CassandraToolsIT extends BaseGSpec {
     @Test(enabled = false)
     public void testCassandraMetaData() throws DBException {
         Metadata metaData = commonspec.getCassandraClient().getMetadata();
-        assert metaData.getClusterName().equals("Stratio cluster");
+        assert metaData.getClusterName().equals("Dummy cluster");
     }
 
     @AfterClass(enabled = false)

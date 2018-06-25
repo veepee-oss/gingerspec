@@ -1176,8 +1176,8 @@ public class CommonGTest {
             fail("Error parsing JSON String");
         }
 
-        assertThat(value1).as("Value for [0].Node key does not match").isEqualTo("paaslab31.stratio.com");
-        assertThat(value2).as("Value for [1].Node key does not match").isEqualTo("paaslab33.stratio.com");
+        assertThat(value1).as("Value for [0].Node key does not match").isEqualTo("test1.dummy.com");
+        assertThat(value2).as("Value for [1].Node key does not match").isEqualTo("test3.dummy.com");
     }
 
 
@@ -1224,7 +1224,7 @@ public class CommonGTest {
             fail("Error parsing JSON String");
         }
 
-        assertThat(value1).as("Value for search does not match").isEqualTo("paaslab34.stratio.com");
+        assertThat(value1).as("Value for search does not match").isEqualTo("test4.dummy.com");
     }
 
 

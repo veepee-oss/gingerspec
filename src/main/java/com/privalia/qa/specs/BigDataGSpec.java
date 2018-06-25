@@ -471,7 +471,7 @@ public class BigDataGSpec extends BaseGSpec {
         String retrievedData = commonspec.retrieveData(schema, type);
         String modifiedData = commonspec.modifyData(retrievedData, type, modifications).toString();
         String query = "CREATE CUSTOM INDEX " + index_name + " ON " + keyspace + "." + table + "(" + magic_column + ") "
-                + "USING 'com.stratio.cassandra.lucene.Index' WITH OPTIONS = " + modifiedData;
+                + "USING 'com.dummy.cassandra.lucene.Index' WITH OPTIONS = " + modifiedData;
         commonspec.getLogger().debug("Will execute a cassandra query: {}", query);
         commonspec.getCassandraClient().executeQuery(query);
     }
