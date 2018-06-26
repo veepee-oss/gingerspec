@@ -27,10 +27,15 @@ import kafka.utils.ZkUtils;
 import okhttp3.*;
 import org.I0Itec.zkclient.ZkClient;
 import org.I0Itec.zkclient.ZkConnection;
+import org.apache.avro.Schema;
+import org.apache.avro.generic.GenericData;
+import org.apache.avro.generic.GenericRecord;
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.*;
+import org.apache.kafka.common.serialization.StringSerializer;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,6 +87,8 @@ public class KafkaUtils {
     public Properties getPropsConsumer() {
         return propsConsumer;
     }
+
+    public Map<String, GenericRecord> avroRecords = new HashedMap();
 
     /**
      * Generic contructor of KafkaUtils.
@@ -136,6 +143,10 @@ public class KafkaUtils {
         } else {
             this.zookeeperConnect = host + ":" + port;
         }
+    }
+
+    public Map<String, GenericRecord> getAvroRecords() {
+        return avroRecords;
     }
 
     public ZkUtils getZkUtils() {
@@ -257,6 +268,10 @@ public class KafkaUtils {
         if (valueClass.equals(Long.class)) {
             finalMessage = Long.parseLong(message);
         }
+        if (valueClass.equals(GenericRecord.class)) {
+            GenericRecord record = this.getAvroRecords().get(message);
+            finalMessage = record;
+        }
 
         this.sendAndConfirmMessage(finalMessage, topicName, timeoutSeconds,  keyClass, valueClass);
 
@@ -299,6 +314,9 @@ public class KafkaUtils {
 
             case "org.apache.kafka.common.serialization.LongDeserializer":
                 return Long.class;
+
+            case "io.confluent.kafka.serializers.KafkaAvroSerializer":
+                return GenericRecord.class;
 
             default:
                 return String.class;
@@ -404,6 +422,30 @@ public class KafkaUtils {
      */
     public void modifyConsumerProperties(String key, String value) {
         this.propsConsumer.put(key, value);
+    }
+
+
+    /**
+     * Cretes a {@link GenericRecord} to be sent through kafka using avro serializers
+     * @param key           Name of the generic record
+     * @param propertyList  List of properties and values
+     * @param schema        Schema to be used to serialize the object
+     */
+    public void createGenericRecord(String key, Map<String, String> propertyList, String schema) {
+
+        Schema.Parser parser = new Schema.Parser();
+        Schema s = parser.parse(schema);
+        GenericRecord avroRecord = new GenericData.Record(s);
+
+        for (Map.Entry<String, String> entry : propertyList.entrySet()) {
+            if (s.getField(entry.getKey()).schema().getType().getName().toLowerCase().matches("int")) {
+                avroRecord.put(entry.getKey(), Integer.valueOf(entry.getValue()));
+            } else {
+                avroRecord.put(entry.getKey(), entry.getValue());
+            }
+        }
+
+        this.avroRecords.put(key, avroRecord);
     }
 
 }

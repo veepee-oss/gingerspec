@@ -19,6 +19,9 @@ import com.google.common.base.Joiner;
 import kafka.admin.AdminUtils;
 import kafka.utils.ZkUtils;
 import okhttp3.Response;
+import org.apache.avro.Schema;
+import org.apache.avro.generic.GenericData;
+import org.apache.avro.generic.GenericRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.BeforeMethod;
@@ -124,5 +127,34 @@ public class KafkaUtilsIT {
 
         Response  response = kafka_utils.registerNewSchema("Kafka-key", "{\"type\": \"string\"}");
         assertThat(response.code()).as("Schema registry returned " + response.code() + " response, body: " + response.body().string()).isEqualTo(200);
+    }
+
+    @Test(enabled = false)
+    public void sendAvroRecordTest() throws IOException, InterruptedException, ExecutionException, TimeoutException {
+
+        String schema = "{\"type\":\"record\",\"name\":\"Record\",\"namespace\":\"com.mynamespace\",\"fields\":[{\"name\":\"str1\",\"type\":\"string\"},{\"name\":\"str2\",\"type\":\"string\"},{\"name\":\"int1\",\"type\":\"int\"}]}";
+
+        Response  response = kafka_utils.registerNewSchema("Kafka-key", schema);
+        assertThat(response.code()).as("Schema registry returned " + response.code() + " response, body: " + response.body().string()).isEqualTo(200);
+
+        Schema.Parser parser = new Schema.Parser();
+        Schema s = parser.parse(schema);
+        GenericRecord avroRecord = new GenericData.Record(s);
+        avroRecord.put("str1","str1");
+        avroRecord.put("str2","str2");
+        avroRecord.put("int1",1);
+
+        if (AdminUtils.topicExists(kafka_utils.getZkUtils(), "avroTopic")) {
+            kafka_utils.deleteTopic("avroTopic");
+        }
+        kafka_utils.createTopic("avroTopic");
+        kafka_utils.getAvroRecords().put("record", avroRecord);
+
+        kafka_utils.modifyProducerProperties("schema.registry.url", "http://localhost:8081");
+        kafka_utils.modifyProducerProperties("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+        kafka_utils.modifyProducerProperties("value.serializer", "io.confluent.kafka.serializers.KafkaAvroSerializer");
+
+        kafka_utils.sendAndConfirmMessage("record", "avroTopic", 1);
+
     }
 }
