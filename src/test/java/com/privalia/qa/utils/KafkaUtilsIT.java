@@ -40,14 +40,14 @@ public class KafkaUtilsIT {
 
     private KafkaUtils kafka_utils;
 
-    @BeforeMethod(enabled = true)
+    @BeforeMethod(enabled = false)
     public void setSettingsTest() {
         kafka_utils = new KafkaUtils();
         kafka_utils.setSchemaRegistryUrl("http://localhost:8081");
         kafka_utils.connect();
     }
 
-    @Test(enabled = true)
+    @Test(enabled = false)
     public void createTopicTest() {
         if (AdminUtils.topicExists(kafka_utils.getZkUtils(), "testTopic")) {
             kafka_utils.deleteTopic("testTopic");
@@ -57,7 +57,7 @@ public class KafkaUtilsIT {
         kafka_utils.deleteTopic("testTopic");
     }
 
-    @Test(enabled = true)
+    @Test(enabled = false)
     public void listTopicsTest() {
         if (AdminUtils.topicExists(kafka_utils.getZkUtils(), "testList")) {
             kafka_utils.deleteTopic("testList");
@@ -71,7 +71,7 @@ public class KafkaUtilsIT {
         kafka_utils.deleteTopic("testList2");
     }
 
-    @Test(enabled = true)
+    @Test(enabled = false)
     public void writeAndReadKafkaTest() throws InterruptedException, ExecutionException, TimeoutException {
         String topic = "kafkaTest";
         String oneMessage = "Opening message";
@@ -87,7 +87,7 @@ public class KafkaUtilsIT {
         kafka_utils.deleteTopic(topic);
     }
 
-    @Test(enabled = true)
+    @Test(enabled = false)
     public void modifyPartitionsTest() {
         if (AdminUtils.topicExists(kafka_utils.getZkUtils(), "testPartitions")) {
             kafka_utils.deleteTopic("testPartitions");
@@ -99,7 +99,7 @@ public class KafkaUtilsIT {
         kafka_utils.deleteTopic("testPartitions");
     }
 
-    @Test(enabled = true)
+    @Test(enabled = false)
     public void modifyPartitionsNotKnownTopicTest() {
         if (AdminUtils.topicExists(kafka_utils.getZkUtils(), "testPartitions2")) {
             kafka_utils.deleteTopic("testPartitions2");
@@ -107,13 +107,13 @@ public class KafkaUtilsIT {
         kafka_utils.modifyTopicPartitioning("testPartitions2", 2);
     }
 
-    @Test(enabled = true)
+    @Test(enabled = false)
     public void setZkHostTest() {
         ZkUtils zkOpts = kafka_utils.getZkUtils();
         kafka_utils.setZkHost(zkOpts.zkConnection().getServers(),"2181","/");
     }
 
-    @Test(enabled = true)
+    @Test(enabled = false)
     public void sendMessageTopicTest() throws InterruptedException, ExecutionException, TimeoutException {
         if (!AdminUtils.topicExists(kafka_utils.getZkUtils(), "testMessage")) {
             kafka_utils.createTopic("testMessage");
@@ -122,7 +122,7 @@ public class KafkaUtilsIT {
         assertThat(kafka_utils.readTopicFromBeginning("testMessage")).contains("hello, its me");
     }
 
-    @Test(enabled = true)
+    @Test(enabled = false)
     public void addNewSchemaTest() throws IOException {
 
         Response  response = kafka_utils.registerNewSchema("Kafka-key", "{\"type\": \"string\"}");

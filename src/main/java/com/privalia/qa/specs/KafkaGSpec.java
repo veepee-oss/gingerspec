@@ -175,9 +175,9 @@ public class KafkaGSpec extends BaseGSpec {
      */
     @Given("^My schema registry is running at '(.+)'$")
     public void mySchemaRegistryIsRunningAtLocalhost(String host) throws Throwable {
-        commonspec.getKafkaUtils().setSchemaRegistryUrl(host);
-        commonspec.getKafkaUtils().modifyProducerProperties("schema.registry.url", host);
-        commonspec.getKafkaUtils().modifyConsumerProperties("schema.registry.url", host);
+        commonspec.getKafkaUtils().setSchemaRegistryUrl("http://" + host);
+        commonspec.getKafkaUtils().modifyProducerProperties("schema.registry.url", "http://" + host);
+        commonspec.getKafkaUtils().modifyConsumerProperties("schema.registry.url", "http://" + host);
     }
 
     /**
