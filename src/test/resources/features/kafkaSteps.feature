@@ -1,4 +1,4 @@
-Feature: Kafka steps test
+Feature: Kafka steps test.
 
   Scenario: Connect to kafka
     Given I connect to kafka at '${ZOOKEEPER_HOST}'
