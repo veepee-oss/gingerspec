@@ -38,6 +38,8 @@ services:
     image: 'zookeeper:latest'
     type:
       - testing
+    environment:
+      ZOO_STANDALONE_ENABLED: true
   kafka:
     image: 'confluentinc/cp-kafka:latest'
     type:
