@@ -44,7 +44,7 @@ services:
       ZOOKEEPER_SERVER_ID: '1'
       ZOOKEEPER_INIT_LIMIT: '5'
       ZOOKEEPER_SYNC_LIMIT: '2'
-      ZOOKEEPER_SERVERS: 'localhost:22888:23888'
+      ZOOKEEPER_SERVERS: 'zookeeper:22888:23888'
   kafka:
     image: 'confluentinc/cp-kafka:latest'
     type:
