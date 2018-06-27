@@ -38,13 +38,13 @@ services:
     image: 'confluentinc/cp-zookeeper'
     type:
       - testing
-    ports:
-      2181:2181
-      2888:2888
-      3888:3888
     environment:
       ZOOKEEPER_CLIENT_PORT: '2181'
       ZOOKEEPER_TICK_TIME: '2000'
+      ZOOKEEPER_SERVER_ID: '1'
+      ZOOKEEPER_INIT_LIMIT: '5'
+      ZOOKEEPER_SYNC_LIMIT: '2'
+      ZOOKEEPER_SERVERS: 'zookeeper:2888:3888'
   kafka:
     image: 'confluentinc/cp-kafka:latest'
     type:
