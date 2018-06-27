@@ -35,11 +35,9 @@ services:
       ID: 'myBrowser'
       SELENIUM_GRID: 'selenium-grid:4444'
   zookeeper:
-    image: 'zookeeper:latest'
+    image: 'spdc1k8sregistry11.privalia.pin/qa-zookeeper:0.1.0'
     type:
       - testing
-    environment:
-      ZOO_STANDALONE_ENABLED: true
   kafka:
     image: 'confluentinc/cp-kafka:latest'
     type:
