@@ -34,40 +34,13 @@ services:
     environment:
       ID: 'myBrowser'
       SELENIUM_GRID: 'selenium-grid:4444'
-  zookeeper:
-    image: 'spdc1k8sregistry11.privalia.pin/qa-zookeeper:0.1.0'
-    type:
-      - testing
-  kafka:
-    image: 'confluentinc/cp-kafka:latest'
-    type:
-      - testing
-    depends_on:
-      - zookeeper
-    environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT'
-      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://zookeeper:9092'
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: '1'
-      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: '0'
-  schema-registry:
-    image: 'confluentinc/cp-schema-registry'
-    type:
-      - testing
-    depends_on:
-      - zookeeper
-      - kafka
-    environment:
-      SCHEMA_REGISTRY_HOST_NAME: 'schema-registry'
-      SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: 'zookeeper:2181'
 
 pipeline:
   artifact_type: "library"
   stages:
     UnitTest:
       image: "spdc1k8sregistry11.privalia.pin/privalia-qa-worker:0.1.0"
-      cmd: "mvn clean install -DVERSION=1.0 -DSLEEPTEST=3 -DAGENT_LIST=1,2 -DVARNAME=foo -DPOSTGRES_HOST=postgres -DMYSQL_HOST=mysql -DREST_SERVER_HOST=rest-server -DDEMO_SITE_HOST=demo-site -DSELENIUM_GRID=selenium-grid:4444 -DZOOKEEPER_HOST=zookeeper:2181 -DSCHEMA_REGISTRY_HOST=schema-registry:8081"
+      cmd: "mvn clean install -DVERSION=1.0 -DSLEEPTEST=3 -DAGENT_LIST=1,2 -DVARNAME=foo -DPOSTGRES_HOST=postgres -DMYSQL_HOST=mysql -DREST_SERVER_HOST=rest-server -DDEMO_SITE_HOST=demo-site -DSELENIUM_GRID=selenium-grid:4444"
       volumes:
         m2-cache: '/home/jenkins/.m2'
     Build:

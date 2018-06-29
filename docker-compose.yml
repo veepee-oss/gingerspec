@@ -33,44 +33,44 @@
 version: '3'
 
 services:
-#  mysql:
-#    image: 'mysql:5.7'
-#    environment:
-#      MYSQL_ROOT_PASSWORD: "mysql"
-#    ports:
-#      - "3306:3306"
-#  postgres:
-#    image: 'postgres:9.6.8'
-#    environment:
-#      POSTGRES_PASSWORD: 'postgres'
-#    ports:
-#      - "5432:5432"
-#  rest-server:
-#    image: 'spdc1k8sregistry11.privalia.pin/privalia-rest-server:0.1.0'
-#    ports:
-#      - "3000:3000"
-#  demo-site:
-#    image: 'spdc1k8sregistry11.privalia.pin/privalia-front-image:0.1.0'
-#    ports:
-#      - "80:80"
-#  selenium-grid:
-#    image: 'spdc1k8sregistry11.privalia.pin/privalia-selenium-hub:3.9.1'
-#    ports:
-#      - "4444:4444"
-#  selenium-chrome:
-#    image: 'spdc1k8sregistry11.privalia.pin/privalia-selenium-chrome:64'
-#    environment:
-#      ID: 'myBrowser'
-#      SELENIUM_GRID: 'selenium-grid:4444'
-#    ports:
-#      - "5900:5900"
-#  selenium-firefox:
-#    image: 'spdc1k8sregistry11.privalia.pin/privalia-selenium-firefox:60'
-#    environment:
-#      ID: 'myBrowser'
-#      SELENIUM_GRID: 'selenium-grid:4444'
-#    ports:
-#      - "5901:5900"
+  mysql:
+    image: 'mysql:5.7'
+    environment:
+      MYSQL_ROOT_PASSWORD: "mysql"
+    ports:
+      - "3306:3306"
+  postgres:
+    image: 'postgres:9.6.8'
+    environment:
+      POSTGRES_PASSWORD: 'postgres'
+    ports:
+      - "5432:5432"
+  rest-server:
+    image: 'spdc1k8sregistry11.privalia.pin/privalia-rest-server:0.1.0'
+    ports:
+      - "3000:3000"
+  demo-site:
+    image: 'spdc1k8sregistry11.privalia.pin/privalia-front-image:0.1.0'
+    ports:
+      - "80:80"
+  selenium-grid:
+    image: 'spdc1k8sregistry11.privalia.pin/privalia-selenium-hub:3.9.1'
+    ports:
+      - "4444:4444"
+  selenium-chrome:
+    image: 'spdc1k8sregistry11.privalia.pin/privalia-selenium-chrome:64'
+    environment:
+      ID: 'myBrowser'
+      SELENIUM_GRID: 'selenium-grid:4444'
+    ports:
+      - "5900:5900"
+  selenium-firefox:
+    image: 'spdc1k8sregistry11.privalia.pin/privalia-selenium-firefox:60'
+    environment:
+      ID: 'myBrowser'
+      SELENIUM_GRID: 'selenium-grid:4444'
+    ports:
+      - "5901:5900"
   zookeeper:
     image: 'confluentinc/cp-zookeeper'
     ports:

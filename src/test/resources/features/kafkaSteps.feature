@@ -1,3 +1,4 @@
+@ignore @toocomplex
 Feature: Kafka steps test.
 
   Scenario: Connect to kafka
