@@ -14,8 +14,8 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 /**
- * Adds the possibility of printing the comments from the feature files as info level messages when executing
- * via CLI
+ * Adds the possibility of printing the comments from the feature files as info level messages when executing.
+ * Using #log <message> in a feature file, will print the message in the CLI when executing the test
  * @author José Fernández
  */
 @Aspect
@@ -38,24 +38,18 @@ public class LogTagAspect {
 
             String value = comment.getValue();
 
-            if (value.toLowerCase().startsWith("#trace")) {
-                logger.trace(value.replace("#trace ", ""));
-            }
-            if (value.toLowerCase().startsWith("#debug")) {
-                logger.debug(value.replace("#debug ", ""));
-            }
-            if (value.toLowerCase().startsWith("#info")) {
-                logger.info(value.replace("#info ", ""));
-            }
-            if (value.toLowerCase().startsWith("#warn")) {
-                logger.warn(value.replace("#warn ", ""));
-            }
-            if (value.toLowerCase().startsWith("#error")) {
-                logger.error(value.replace("#error ", ""));
+            if (value.toLowerCase().startsWith("#log")) {
+
+                String replacedValue;
+                try {
+                    ReplacementAspect replace = new ReplacementAspect();
+                    replacedValue = replace.replacedElement(value, jp);
+                } catch (Exception e) {
+                    replacedValue = value;
+                }
+                logger.warn(replacedValue.replace("#log ", ""));
             }
         }
-
     }
-
 
 }
