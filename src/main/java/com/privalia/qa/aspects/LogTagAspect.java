@@ -1,35 +1,17 @@
 package com.privalia.qa.aspects;
 
-import com.privalia.qa.cucumber.testng.CucumberReporter;
-import com.privalia.qa.exceptions.NonReplaceableException;
-import com.privalia.qa.specs.CommonG;
-import com.privalia.qa.utils.ThreadProperty;
-import cucumber.runtime.Runtime;
-import cucumber.runtime.model.CucumberScenario;
 import gherkin.I18n;
-import gherkin.formatter.Formatter;
 import gherkin.formatter.Reporter;
-import gherkin.formatter.model.*;
+import gherkin.formatter.model.Comment;
+import gherkin.formatter.model.Step;
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.*;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
+import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import static com.privalia.qa.aspects.IgnoreTagAspect.ignoreReasons.NOREASON;
-import static com.privalia.qa.aspects.IgnoreTagAspect.ignoreReasons.NOTIGNORED;
 
 /**
  * Adds the possibility of printing the comments from the feature files as info level messages when executing
