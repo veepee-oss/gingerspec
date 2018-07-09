@@ -24,8 +24,8 @@ Feature: Kafka steps test.
     Given My schema registry is running at '${SCHEMA_REGISTRY_HOST}'
     Then I register a new version of a schema under the subject 'record' with 'schemas/recordSchema.avsc'
 
-  Scenario: Using String, Long, and AVRO serializers/deserializers
-     Given I connect to kafka at '${ZOOKEEPER_HOST}'
+  Scenario: Using String, Long serializers/deserializers
+    Given I connect to kafka at '${ZOOKEEPER_HOST}'
 
     Given I create a Kafka topic named 'stringTopic' if it doesn't exists
     When I send a message 'hello' to the kafka topic named 'stringTopic'
@@ -40,6 +40,8 @@ Feature: Kafka steps test.
       | key.deserializer    | org.apache.kafka.common.serialization.StringDeserializer |
       | value.deserializer  | org.apache.kafka.common.serialization.LongDeserializer   |
 
+  Scenario: Using AVRO serializers/deserializers
+    Given I connect to kafka at '${ZOOKEEPER_HOST}'
     Given My schema registry is running at '${SCHEMA_REGISTRY_HOST}'
     Then I register a new version of a schema under the subject 'record' with 'schemas/recordSchema.avsc'
     And I create a Kafka topic named 'avroTopic' if it doesn't exists
@@ -47,7 +49,15 @@ Feature: Kafka steps test.
       | str1    | str1 |
       | str2    | str2 |
       | int1    |   1  |
+    Then I create the avro record 'record2' using version '1' of subject 'record' from registry with:
+      | str1    | str1 |
+      | str2    | str2 |
+      | int1    |   1  |
     When I send the avro record 'record' to the kafka topic 'avroTopic' with:
       | key.serializer    | org.apache.kafka.common.serialization.StringSerializer |
     Then The kafka topic 'avroTopic' has an avro message 'record' with:
+      | key.deserializer    | org.apache.kafka.common.serialization.StringDeserializer |
+    When I send the avro record 'record2' to the kafka topic 'avroTopic' with:
+      | key.serializer    | org.apache.kafka.common.serialization.StringSerializer |
+    Then The kafka topic 'avroTopic' has an avro message 'record2' with:
       | key.deserializer    | org.apache.kafka.common.serialization.StringDeserializer |

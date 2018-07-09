@@ -1,6 +1,7 @@
 package com.privalia.qa.specs;
 
 import cucumber.api.DataTable;
+import cucumber.api.PendingException;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
@@ -251,6 +252,28 @@ public class KafkaGSpec extends BaseGSpec {
         }
 
         commonspec.getKafkaUtils().createGenericRecord(recordName, properties, retrievedData);
+
+    }
+
+    /**
+     * Creates a new Avro record by reading the schema directly from the schema registry for the specified subject and version
+     * @param recordName        Name of the record
+     * @param versionNumber     Verison number of the schema
+     * @param subject           Subject name
+     * @param table             Modifications datatable
+     * @throws Throwable
+     */
+    @Then("^I create the avro record '(.+?)' using version '(.+?)' of subject '(.+?)' from registry with:$")
+    public void iCreateTheAvroRecordRecordUsingVersionOfSubjectRecordFromRegistryWith(String recordName, String versionNumber, String subject, DataTable table) throws Throwable {
+
+        String schema = this.commonspec.getKafkaUtils().getSchemaFromRegistry(subject, versionNumber);
+
+        Map<String, String> properties = new HashMap<>();
+        for (DataTableRow row : table.getGherkinRows()) {
+            properties.put(row.getCells().get(0), row.getCells().get(1));
+        }
+
+        commonspec.getKafkaUtils().createGenericRecord(recordName, properties, schema);
 
     }
 
