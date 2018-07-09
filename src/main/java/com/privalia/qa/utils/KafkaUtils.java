@@ -16,6 +16,7 @@
 
 package com.privalia.qa.utils;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import kafka.admin.AdminOperationException;
 import kafka.admin.AdminUtils;
 import kafka.admin.BrokerMetadata;
@@ -400,6 +401,32 @@ public class KafkaUtils {
                 .build();
 
         return client.newCall(request).execute();
+
+    }
+
+    /**
+     * Fetch version of the schema registered under the specified subject in the registry
+     *
+     * @param subject   Subject name
+     * @param version   Version of the schema to fetch
+     * @return          Json encoded string of the schema
+     */
+    public String getSchemaFromRegistry(String subject, String version) throws IOException {
+        logger.debug("Fetching schema version " + version + " from subject " + subject);
+
+        OkHttpClient client = new OkHttpClient();
+
+        Request request = new Request.Builder()
+                .url(this.schemaRegistryConnect + "/subjects/" + subject + "/versions/" + version)
+                .get()
+                .addHeader("Content-Type", "application/json")
+                .build();
+
+        ObjectMapper om =  new ObjectMapper();
+        ResponseBody response = client.newCall(request).execute().body();
+        Map fieldMapped = om.readValue(response.byteStream(), Map.class);
+        String schema = (String) fieldMapped.get("schema");
+        return  schema;
 
     }
 
