@@ -17,6 +17,7 @@
 package com.privalia.qa.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 import kafka.admin.AdminOperationException;
 import kafka.admin.AdminUtils;
 import kafka.admin.BrokerMetadata;
@@ -46,6 +47,8 @@ import scala.collection.JavaConverters;
 import scala.collection.Seq;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -460,19 +463,74 @@ public class KafkaUtils {
      */
     public void createGenericRecord(String key, Map<String, String> propertyList, String schema) {
 
+        try {
+            this.avroRecords.put(key, this.buildRecord(schema, propertyList));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    /**
+     * Creates a {@link GenericRecord} given its schema and the list of key -> value
+     * @param schema        Schema as string
+     * @param propertyList  Property list (Key -> Value)
+     * @return              {@link GenericRecord}
+     * @throws IOException
+     */
+    private GenericRecord buildRecord(String schema, Map<String, String> propertyList) throws IOException {
+
         Schema.Parser parser = new Schema.Parser();
         Schema s = parser.parse(schema);
         GenericRecord avroRecord = new GenericData.Record(s);
 
         for (Map.Entry<String, String> entry : propertyList.entrySet()) {
-            if (s.getField(entry.getKey()).schema().getType().getName().toLowerCase().matches("int")) {
-                avroRecord.put(entry.getKey(), Integer.valueOf(entry.getValue()));
+
+            String type = s.getField(entry.getKey()).schema().getType().getName().toLowerCase();
+            String value;
+            try {
+                value = entry.getValue();
+            } catch (Exception e) {
+                value = new Gson().toJson(entry.getValue());
+            }
+
+
+            if (type.matches("int")) {
+                avroRecord.put(entry.getKey(), Integer.valueOf(value));
+            } else if (type.matches("bytes")) {
+                avroRecord.put(entry.getKey(), ByteBuffer.wrap(new BigDecimal(value).unscaledValue().toByteArray()));
+            } else if (type.matches("long")) {
+                avroRecord.put(entry.getKey(), Long.parseLong(value));
+            } else if (type.matches("string")) {
+                avroRecord.put(entry.getKey(), value);
+            } else if (type.matches("boolean")) {
+                avroRecord.put(entry.getKey(), (value.matches("true") ?  true : false));
+            } else if (type.matches("array")) {
+                List<Object> objectArray = new ArrayList<>();
+
+                if (s.getField(entry.getKey()).schema().getElementType().getType().getName().toLowerCase().matches("record")) {
+
+                    List<HashMap<String, String>> elements = new ObjectMapper().readValue(value, List.class);
+                    String elementsSchema = s.getField(entry.getKey()).schema().getElementType().toString();
+
+                    for (HashMap<String, String> element: elements) {
+                        objectArray.add(this.buildRecord(elementsSchema, element));
+                    }
+                }
+
+                avroRecord.put(entry.getKey(), objectArray);
+
+            } else if (type.matches("record")) {
+                HashMap<String, String> result = new ObjectMapper().readValue(value, HashMap.class);
+                GenericRecord temp = this.buildRecord(s.getField(entry.getKey()).schema().toString(), result);
+                avroRecord.put(entry.getKey(), temp);
             } else {
-                avroRecord.put(entry.getKey(), entry.getValue());
+                logger.warn("Unrecognized type in schema: " + type);
+                avroRecord.put(entry.getKey(), value);
             }
         }
 
-        this.avroRecords.put(key, avroRecord);
+        return avroRecord;
     }
 
 }
