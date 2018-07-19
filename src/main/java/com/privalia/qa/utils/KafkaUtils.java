@@ -277,7 +277,7 @@ public class KafkaUtils {
             finalMessage = record;
         }
 
-        this.sendAndConfirmMessage(finalMessage, topicName, timeoutSeconds,  keyClass, valueClass);
+        this.sendAndConfirmMessage(finalMessage, topicName, timeoutSeconds, keyClass, valueClass);
 
     }
 
@@ -301,6 +301,7 @@ public class KafkaUtils {
 
     /**
      * Returns the appropiate class for the given property
+     *
      * @param item
      * @return
      */
@@ -371,7 +372,6 @@ public class KafkaUtils {
     }
 
 
-
     /**
      * Set remote schema registry url and port for all future requests
      *
@@ -410,9 +410,9 @@ public class KafkaUtils {
     /**
      * Fetch version of the schema registered under the specified subject in the registry
      *
-     * @param subject   Subject name
-     * @param version   Version of the schema to fetch
-     * @return          Json encoded string of the schema
+     * @param subject Subject name
+     * @param version Version of the schema to fetch
+     * @return Json encoded string of the schema
      */
     public String getSchemaFromRegistry(String subject, String version) throws IOException {
         logger.debug("Fetching schema version " + version + " from subject " + subject);
@@ -425,11 +425,11 @@ public class KafkaUtils {
                 .addHeader("Content-Type", "application/json")
                 .build();
 
-        ObjectMapper om =  new ObjectMapper();
+        ObjectMapper om = new ObjectMapper();
         ResponseBody response = client.newCall(request).execute().body();
         Map fieldMapped = om.readValue(response.byteStream(), Map.class);
         String schema = (String) fieldMapped.get("schema");
-        return  schema;
+        return schema;
 
     }
 
@@ -457,9 +457,10 @@ public class KafkaUtils {
 
     /**
      * Cretes a {@link GenericRecord} to be sent through kafka using avro serializers
-     * @param key           Name of the generic record
-     * @param propertyList  List of properties and values
-     * @param schema        Schema to be used to serialize the object
+     *
+     * @param key          Name of the generic record
+     * @param propertyList List of properties and values
+     * @param schema       Schema to be used to serialize the object
      */
     public void createGenericRecord(String key, Map<String, String> propertyList, String schema) {
 
@@ -473,9 +474,10 @@ public class KafkaUtils {
 
     /**
      * Creates a {@link GenericRecord} given its schema and the list of key -> value
-     * @param schema        Schema as string
-     * @param propertyList  Property list (Key -> Value)
-     * @return              {@link GenericRecord}
+     *
+     * @param schema       Schema as string
+     * @param propertyList Property list (Key -> Value)
+     * @return {@link GenericRecord}
      * @throws IOException
      */
     private GenericRecord buildRecord(String schema, Map<String, String> propertyList) throws IOException {
@@ -486,47 +488,62 @@ public class KafkaUtils {
 
         for (Map.Entry<String, String> entry : propertyList.entrySet()) {
 
-            String type = s.getField(entry.getKey()).schema().getType().getName().toLowerCase();
-            String value;
-            try {
-                value = entry.getValue();
-            } catch (Exception e) {
-                value = new Gson().toJson(entry.getValue());
-            }
+            Schema.Field field = s.getField(entry.getKey());
+            if (field != null) {
 
-
-            if (type.matches("int")) {
-                avroRecord.put(entry.getKey(), Integer.valueOf(value));
-            } else if (type.matches("bytes")) {
-                avroRecord.put(entry.getKey(), ByteBuffer.wrap(new BigDecimal(value).unscaledValue().toByteArray()));
-            } else if (type.matches("long")) {
-                avroRecord.put(entry.getKey(), Long.parseLong(value));
-            } else if (type.matches("string")) {
-                avroRecord.put(entry.getKey(), value);
-            } else if (type.matches("boolean")) {
-                avroRecord.put(entry.getKey(), (value.matches("true") ?  true : false));
-            } else if (type.matches("array")) {
-                List<Object> objectArray = new ArrayList<>();
-
-                if (s.getField(entry.getKey()).schema().getElementType().getType().getName().toLowerCase().matches("record")) {
-
-                    List<HashMap<String, String>> elements = new ObjectMapper().readValue(value, List.class);
-                    String elementsSchema = s.getField(entry.getKey()).schema().getElementType().toString();
-
-                    for (HashMap<String, String> element: elements) {
-                        objectArray.add(this.buildRecord(elementsSchema, element));
-                    }
+                String type = field.schema().getType().getName().toLowerCase();
+                String value;
+                try {
+                    value = entry.getValue();
+                } catch (Exception e) {
+                    value = new Gson().toJson(entry.getValue());
                 }
 
-                avroRecord.put(entry.getKey(), objectArray);
+                if (type.matches("int")) {
+                    avroRecord.put(entry.getKey(), Integer.valueOf(value));
+                } else if (type.matches("bytes")) {
+                    avroRecord.put(entry.getKey(), ByteBuffer.wrap(new BigDecimal(value).unscaledValue().toByteArray()));
+                } else if (type.matches("long")) {
+                    avroRecord.put(entry.getKey(), Long.parseLong(value));
+                } else if (type.matches("string")) {
+                    avroRecord.put(entry.getKey(), value);
+                } else if (type.matches("boolean")) {
+                    avroRecord.put(entry.getKey(), (value.matches("true") ? true : false));
+                } else if (type.matches("array")) {
+                    List<Object> objectArray = new ArrayList<>();
 
-            } else if (type.matches("record")) {
-                HashMap<String, String> result = new ObjectMapper().readValue(value, HashMap.class);
-                GenericRecord temp = this.buildRecord(s.getField(entry.getKey()).schema().toString(), result);
-                avroRecord.put(entry.getKey(), temp);
+                    if (s.getField(entry.getKey()).schema().getElementType().getType().getName().toLowerCase().matches("record")) {
+
+                        List<HashMap<String, String>> elements = null;
+                        try {
+                            elements = new ObjectMapper().readValue(value, List.class);
+                        } catch (IOException e) {
+                            throw new IOException("Could not map " + value + " to array", e);
+                        }
+                        String elementsSchema = s.getField(entry.getKey()).schema().getElementType().toString();
+
+                        for (HashMap<String, String> element : elements) {
+                            objectArray.add(this.buildRecord(elementsSchema, element));
+                        }
+                    }
+
+                    avroRecord.put(entry.getKey(), objectArray);
+
+                } else if (type.matches("record")) {
+                    HashMap<String, String> result = null;
+                    try {
+                        result = new ObjectMapper().readValue(value, HashMap.class);
+                    } catch (IOException e) {
+                        throw new IOException("Could not map " + value + " to a record type", e);
+                    }
+                    GenericRecord temp = this.buildRecord(s.getField(entry.getKey()).schema().toString(), result);
+                    avroRecord.put(entry.getKey(), temp);
+                } else {
+                    logger.warn("Unrecognized type in schema: " + type);
+                    avroRecord.put(entry.getKey(), value);
+                }
             } else {
-                logger.warn("Unrecognized type in schema: " + type);
-                avroRecord.put(entry.getKey(), value);
+                logger.warn("the field " + entry.getKey() + " is not present in the schema and will be ignored");
             }
         }
 

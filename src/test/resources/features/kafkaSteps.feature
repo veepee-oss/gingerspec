@@ -53,6 +53,10 @@ Feature: Kafka steps test.
       | str1    | str1 |
       | str2    | str2 |
       | int1    |   1  |
+    Then I create the avro record 'record' from the schema in 'schemas/recordSchema.avsc' based on 'schemas/seedfile.json' with:
+      | str1    | str1 |
+      | str2    | str2 |
+      | int1    |   1  |
     When I send the avro record 'record' to the kafka topic 'avroTopic' with:
       | key.serializer    | org.apache.kafka.common.serialization.StringSerializer |
     Then The kafka topic 'avroTopic' has an avro message 'record' with:

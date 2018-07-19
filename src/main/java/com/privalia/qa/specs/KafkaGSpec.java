@@ -1,5 +1,7 @@
 package com.privalia.qa.specs;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 import cucumber.api.DataTable;
 import cucumber.api.PendingException;
 import cucumber.api.java.en.Given;
@@ -14,6 +16,7 @@ import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
@@ -241,12 +244,29 @@ public class KafkaGSpec extends BaseGSpec {
      * @param table         Table containen the values for the fields on the schema. (Values will be converted according to field type)
      * @throws Throwable
      */
-    @Then("^I create the avro record '(.+?)' from the schema in '(.+?)' with:$")
-    public void iCreateTheAvroRecordRecord(String recordName, String schemaFile, DataTable table) throws Throwable {
+    @Then("^I create the avro record '(.+?)' from the schema in '(.+?)'( based on '(.+?)')? with:$")
+    public void iCreateTheAvroRecordRecord(String recordName, String schemaFile, String foo, String seedFile, DataTable table) throws Throwable {
 
         String retrievedData = commonspec.retrieveData(schemaFile, "json");
 
         Map<String, String> properties = new HashMap<>();
+
+        if (seedFile != null) {
+            String seed = commonspec.retrieveData(seedFile, "json");
+            HashMap<String, String> result = new ObjectMapper().readValue(seed, HashMap.class);
+
+            Set<String> keys = result.keySet();
+
+            for (String key : keys) {
+                if (result.get(key) instanceof String) {
+                    properties.put(key, result.get(key));
+                } else {
+                    properties.put(key, new Gson().toJson(result.get(key)));
+                }
+            }
+        }
+
+
         for (DataTableRow row : table.getGherkinRows()) {
             properties.put(row.getCells().get(0), row.getCells().get(1));
         }
@@ -263,12 +283,29 @@ public class KafkaGSpec extends BaseGSpec {
      * @param table             Modifications datatable
      * @throws Throwable
      */
-    @Then("^I create the avro record '(.+?)' using version '(.+?)' of subject '(.+?)' from registry with:$")
-    public void iCreateTheAvroRecordRecordUsingVersionOfSubjectRecordFromRegistryWith(String recordName, String versionNumber, String subject, DataTable table) throws Throwable {
+    @Then("^I create the avro record '(.+?)' using version '(.+?)' of subject '(.+?)'( based on '(.+?)') from registry with:$")
+    public void iCreateTheAvroRecordRecordUsingVersionOfSubjectRecordFromRegistryWith(String recordName, String versionNumber, String subject, String foo, String seedFile, DataTable table) throws Throwable {
 
         String schema = this.commonspec.getKafkaUtils().getSchemaFromRegistry(subject, versionNumber);
 
         Map<String, String> properties = new HashMap<>();
+
+        if (seedFile != null) {
+            String seed = commonspec.retrieveData(seedFile, "json");
+            HashMap<String, String> result = new ObjectMapper().readValue(seed, HashMap.class);
+
+            Set<String> keys = result.keySet();
+
+            for (String key : keys) {
+                if (result.get(key) instanceof String) {
+                    properties.put(key, result.get(key));
+                } else {
+                    properties.put(key, new Gson().toJson(result.get(key)));
+                }
+            }
+        }
+
+
         for (DataTableRow row : table.getGherkinRows()) {
             properties.put(row.getCells().get(0), row.getCells().get(1));
         }
