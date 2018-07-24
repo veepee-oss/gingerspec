@@ -12,6 +12,7 @@ import okhttp3.Response;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.zookeeper.KeeperException;
 
+import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.List;
@@ -248,6 +249,35 @@ public class KafkaGSpec extends BaseGSpec {
     public void iCreateTheAvroRecordRecord(String recordName, String schemaFile, String foo, String seedFile, DataTable table) throws Throwable {
 
         String schemaString = commonspec.retrieveData(schemaFile, "json");
+        this.createRecord(recordName, schemaString, seedFile, table);
+
+    }
+
+    /**
+     * Creates a new Avro record by reading the schema directly from the schema registry for the specified subject and version
+     * @param recordName        Name of the record
+     * @param versionNumber     Verison number of the schema
+     * @param subject           Subject name
+     * @param table             Modifications datatable
+     * @throws Throwable
+     */
+    @Then("^I create the avro record '(.+?)' using version '(.+?)' of subject '(.+?)' from registry( based on '(.+?)')? with:$")
+    public void iCreateTheAvroRecordRecordUsingVersionOfSubjectRecordFromRegistryWith(String recordName, String versionNumber, String subject, String foo, String seedFile, DataTable table) throws Throwable {
+
+        String schema = this.commonspec.getKafkaUtils().getSchemaFromRegistry(subject, versionNumber);
+        this.createRecord(recordName, schema, seedFile, table);
+
+    }
+
+    /**
+     * Creates the Avro record given the final name of the record, the schema to use, a seedFile and a datatable
+     * @param recordName        Name of the record
+     * @param schemaString      Schema to use as String
+     * @param seedFile          File to use as initial set of data (if null, the record will be created using the data from the datatable)
+     * @param table             Datatable with values for the parameters of the schema (or set of modifications for the seed file)
+     * @throws Exception
+     */
+    private void createRecord(String recordName, String schemaString, String seedFile, DataTable table) throws Exception {
 
         if (seedFile != null) {
             commonspec.getLogger().debug("Building Avro record from seed file");
@@ -271,46 +301,6 @@ public class KafkaGSpec extends BaseGSpec {
 
             commonspec.getKafkaUtils().createGenericRecord(recordName, properties, schemaString);
         }
-
-    }
-
-    /**
-     * Creates a new Avro record by reading the schema directly from the schema registry for the specified subject and version
-     * @param recordName        Name of the record
-     * @param versionNumber     Verison number of the schema
-     * @param subject           Subject name
-     * @param table             Modifications datatable
-     * @throws Throwable
-     */
-    @Then("^I create the avro record '(.+?)' using version '(.+?)' of subject '(.+?)' from registry( based on '(.+?)')? with:$")
-    public void iCreateTheAvroRecordRecordUsingVersionOfSubjectRecordFromRegistryWith(String recordName, String versionNumber, String subject, String foo, String seedFile, DataTable table) throws Throwable {
-
-        String schema = this.commonspec.getKafkaUtils().getSchemaFromRegistry(subject, versionNumber);
-
-        Map<String, String> properties = new HashMap<>();
-
-        if (seedFile != null) {
-            String seed = commonspec.retrieveData(seedFile, "json");
-            HashMap<String, String> result = new ObjectMapper().readValue(seed, HashMap.class);
-
-            Set<String> keys = result.keySet();
-
-            for (String key : keys) {
-                if (result.get(key) instanceof String) {
-                    properties.put(key, result.get(key));
-                } else {
-                    properties.put(key, new Gson().toJson(result.get(key)));
-                }
-            }
-        }
-
-
-        for (DataTableRow row : table.getGherkinRows()) {
-            properties.put(row.getCells().get(0), row.getCells().get(1));
-        }
-
-        commonspec.getKafkaUtils().createGenericRecord(recordName, properties, schema);
-
     }
 
     /**
