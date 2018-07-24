@@ -247,31 +247,30 @@ public class KafkaGSpec extends BaseGSpec {
     @Then("^I create the avro record '(.+?)' from the schema in '(.+?)'( based on '(.+?)')? with:$")
     public void iCreateTheAvroRecordRecord(String recordName, String schemaFile, String foo, String seedFile, DataTable table) throws Throwable {
 
-        String retrievedData = commonspec.retrieveData(schemaFile, "json");
-
-        Map<String, String> properties = new HashMap<>();
+        String schemaString = commonspec.retrieveData(schemaFile, "json");
 
         if (seedFile != null) {
-            String seed = commonspec.retrieveData(seedFile, "json");
-            HashMap<String, String> result = new ObjectMapper().readValue(seed, HashMap.class);
+            commonspec.getLogger().debug("Building Avro record from seed file");
 
-            Set<String> keys = result.keySet();
+            // Retrieve data
+            String seedJson = commonspec.retrieveData(seedFile, "json");
 
-            for (String key : keys) {
-                if (result.get(key) instanceof String) {
-                    properties.put(key, result.get(key));
-                } else {
-                    properties.put(key, new Gson().toJson(result.get(key)));
-                }
+            // Modify data
+            commonspec.getLogger().debug("Modifying data {} as {}", seedJson, "json");
+            String modifiedData = commonspec.modifyData(seedJson, "json", table).toString();
+
+            commonspec.getKafkaUtils().createGenericRecord(recordName, modifiedData, schemaString);
+
+        } else {
+            commonspec.getLogger().debug("Building Avro record from datatable");
+
+            Map<String, String> properties = new HashMap<>();
+            for (DataTableRow row : table.getGherkinRows()) {
+                properties.put(row.getCells().get(0), row.getCells().get(1));
             }
+
+            commonspec.getKafkaUtils().createGenericRecord(recordName, properties, schemaString);
         }
-
-
-        for (DataTableRow row : table.getGherkinRows()) {
-            properties.put(row.getCells().get(0), row.getCells().get(1));
-        }
-
-        commonspec.getKafkaUtils().createGenericRecord(recordName, properties, retrievedData);
 
     }
 
@@ -283,7 +282,7 @@ public class KafkaGSpec extends BaseGSpec {
      * @param table             Modifications datatable
      * @throws Throwable
      */
-    @Then("^I create the avro record '(.+?)' using version '(.+?)' of subject '(.+?)'( based on '(.+?)') from registry with:$")
+    @Then("^I create the avro record '(.+?)' using version '(.+?)' of subject '(.+?)' from registry( based on '(.+?)')? with:$")
     public void iCreateTheAvroRecordRecordUsingVersionOfSubjectRecordFromRegistryWith(String recordName, String versionNumber, String subject, String foo, String seedFile, DataTable table) throws Throwable {
 
         String schema = this.commonspec.getKafkaUtils().getSchemaFromRegistry(subject, versionNumber);

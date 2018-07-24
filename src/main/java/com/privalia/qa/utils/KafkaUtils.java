@@ -31,7 +31,12 @@ import org.I0Itec.zkclient.ZkClient;
 import org.I0Itec.zkclient.ZkConnection;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
+import org.apache.avro.generic.GenericDatumReader;
 import org.apache.avro.generic.GenericRecord;
+import org.apache.avro.io.DatumReader;
+import org.apache.avro.io.Decoder;
+import org.apache.avro.io.DecoderFactory;
+import org.apache.avro.io.JsonDecoder;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -454,6 +459,25 @@ public class KafkaUtils {
         this.propsConsumer.put(key, value);
     }
 
+
+    /**
+     * given a json representation of the data, creates a generic record with the given schema
+     * @param key       Name of the generic record
+     * @param json      Json string with data
+     * @param schema    Schema to be used to serialize the object
+     */
+    public void createGenericRecord(String key, String json, String schema) throws IOException {
+
+        Schema.Parser schemaParser = new Schema.Parser();
+        Schema s = schemaParser.parse(schema);
+        DecoderFactory decoderFactory = new DecoderFactory();
+        Decoder decoder = decoderFactory.jsonDecoder(s, json);
+        DatumReader<GenericData.Record> reader =
+                new GenericDatumReader<>(s);
+        GenericRecord genericRecord = reader.read(null, decoder);
+        this.avroRecords.put(key, genericRecord);
+
+    }
 
     /**
      * Cretes a {@link GenericRecord} to be sent through kafka using avro serializers
