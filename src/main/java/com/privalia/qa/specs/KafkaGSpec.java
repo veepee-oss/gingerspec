@@ -99,9 +99,9 @@ public class KafkaGSpec extends BaseGSpec {
      * @param topic_name topic name
      * @param message    string that you send to topic
      */
-    @When("^I send a message '(.+?)' to the kafka topic named '(.+?)'$")
-    public void sendAMessage(String message, String topic_name) throws Exception {
-        commonspec.getKafkaUtils().sendAndConfirmMessage(message, topic_name, 1);
+    @When("^I send a message '(.+?)' to the kafka topic named '(.+?)'( with key '(.+?)')?$")
+    public void sendAMessage(String message, String topic_name, String foo, String recordKey) throws Exception {
+        commonspec.getKafkaUtils().sendAndConfirmMessage(message, recordKey, topic_name, 1);
     }
 
     /**
@@ -113,8 +113,8 @@ public class KafkaGSpec extends BaseGSpec {
      * @throws ExecutionException
      * @throws TimeoutException
      */
-    @Given("I send a message '(.+?)' to the kafka topic named '(.+?)' with:$")
-    public void sendAMessageWithDatatable(String message, String topic_name, DataTable table) throws InterruptedException, ExecutionException, TimeoutException {
+    @Given("I send a message '(.+?)' to the kafka topic named '(.+?)'( with key '(.+?)')? with:$")
+    public void sendAMessageWithDatatable(String message, String topic_name, String foo, String recordKey, DataTable table) throws InterruptedException, ExecutionException, TimeoutException {
 
         /*Modify properties of producer*/
         for (DataTableRow row : table.getGherkinRows()) {
@@ -123,7 +123,7 @@ public class KafkaGSpec extends BaseGSpec {
             commonspec.getKafkaUtils().modifyProducerProperties(key, value);
         }
 
-        commonspec.getKafkaUtils().sendAndConfirmMessage(message, topic_name, 1);
+        commonspec.getKafkaUtils().sendAndConfirmMessage(message, recordKey, topic_name, 1);
 
     }
 
@@ -283,13 +283,13 @@ public class KafkaGSpec extends BaseGSpec {
             commonspec.getLogger().debug("Building Avro record from seed file");
 
             // Retrieve data
-            String seedJson = commonspec.retrieveData(seedFile, "json");
+            String seedJson = commonspec.retrieveData(seedFile, "json", "ISO-8859-1");
 
             // Modify data
             commonspec.getLogger().debug("Modifying data {} as {}", seedJson, "json");
-            String modifiedData = commonspec.modifyData(seedJson, "json", table).toString();
+            //String modifiedData = commonspec.modifyData(seedJson, "json", table).toString();
 
-            commonspec.getKafkaUtils().createGenericRecord(recordName, modifiedData, schemaString);
+            commonspec.getKafkaUtils().createGenericRecord(recordName, seedJson, schemaString);
 
         } else {
             commonspec.getLogger().debug("Building Avro record from datatable");
@@ -311,8 +311,8 @@ public class KafkaGSpec extends BaseGSpec {
      * @param table             Table containing modifications for the producer properties
      * @throws Throwable
      */
-    @When("^I send the avro record '(.+?)' to the kafka topic '(.+?)' with:$")
-    public void iSendTheAvroRecordRecordToTheKafkaTopic(String genericRecord, String topicName, DataTable table) throws Throwable {
+    @When("^I send the avro record '(.+?)' to the kafka topic '(.+?)'( with key '(.+?)')? with:$")
+    public void iSendTheAvroRecordRecordToTheKafkaTopic(String genericRecord, String topicName, String foo, String recordKey, DataTable table) throws Throwable {
 
         /*Modify properties of producer*/
         for (DataTableRow row : table.getGherkinRows()) {
@@ -325,7 +325,7 @@ public class KafkaGSpec extends BaseGSpec {
 
         GenericRecord record = commonspec.getKafkaUtils().getAvroRecords().get(genericRecord);
         assertThat(record).as("No generic record found with name " + genericRecord).isNotNull();
-        commonspec.getKafkaUtils().sendAndConfirmMessage(genericRecord, topicName, 1);
+        commonspec.getKafkaUtils().sendAndConfirmMessage(genericRecord, recordKey, topicName, 1);
 
     }
 
