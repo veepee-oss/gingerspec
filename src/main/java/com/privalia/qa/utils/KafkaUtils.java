@@ -124,7 +124,7 @@ public class KafkaUtils {
         props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
         this.propsConsumer = new Properties();
         propsConsumer.put("bootstrap.servers", System.getProperty("KAFKA_HOSTS", "0.0.0.0:9092"));
-        propsConsumer.put("group.id", "test");
+        propsConsumer.put("group.id", "QAConsumerGroup");
         propsConsumer.put("enable.auto.commit", "true");
         propsConsumer.put("auto.offset.reset", "earliest");
         propsConsumer.put("auto.commit.interval.ms", "1000");
@@ -147,7 +147,7 @@ public class KafkaUtils {
     }
 
     public void setZkHost(String host, String port, String zkPath) {
-        if ((zkPath != null) && (!(zkPath.matches("")))) {
+        if ((zkPath != null) && (!(zkPath.matches("")))  && (!(zkPath.matches("null")))) {
             this.zookeeperConnect = host + ":" + port + "/" + zkPath;
         } else {
             this.zookeeperConnect = host + ":" + port;
@@ -248,6 +248,7 @@ public class KafkaUtils {
      *
      * @param topicName name of topic.
      */
+    @Deprecated
     public void sendMessage(String message, String topicName) {
         Producer<String, String> producer = new KafkaProducer<>(props);
         producer.send(new ProducerRecord<String, String>(topicName, message));
@@ -491,6 +492,14 @@ public class KafkaUtils {
      */
     public void createGenericRecord(String key, String json, String schema) throws IOException {
 
+        /**
+         * This is the official way of creating a generic record using the standard
+         * library. However, the library requires the fields of type byte to be represented
+         * in a very special way, which I never figured out what it was. Thats why i decided to
+         * create my own method for creating a generic record
+         */
+
+        /*
         Schema.Parser schemaParser = new Schema.Parser();
         Schema s = schemaParser.parse(schema);
         DecoderFactory decoderFactory = new DecoderFactory();
@@ -499,11 +508,32 @@ public class KafkaUtils {
                 new GenericDatumReader<>(s);
         GenericRecord genericRecord = reader.read(null, decoder);
         this.avroRecords.put(key, genericRecord);
+        */
+
+
+        /**
+         * My way of creating a generic record
+         */
+        Map<String, String> propertyList = new HashedMap();
+        HashMap<String, String> result = new ObjectMapper().readValue(json, HashMap.class);
+
+        for (String item : result.keySet()) {
+
+            try {
+                propertyList.put(item, result.get(item));
+            } catch (Exception e) {
+                propertyList.put(item, new Gson().toJson(result.get(item)));
+            }
+
+        }
+
+        this.createGenericRecord(key, propertyList, schema);
 
     }
 
     /**
-     * Cretes a {@link GenericRecord} to be sent through kafka using avro serializers
+     * Creates a {@link GenericRecord} to be sent through kafka using avro serializers.
+     * The message is stored in an internal map using the specified key for later use.
      *
      * @param key          Name of the generic record
      * @param propertyList List of properties and values
@@ -596,10 +626,30 @@ public class KafkaUtils {
                                 avroRecord.put(entry.getKey(), value);
                                 break;
 
+                            case "bytes":
+                                avroRecord.put(entry.getKey(), ByteBuffer.wrap(new BigDecimal(value).unscaledValue().toByteArray()));
+                                break;
+
+                            case "long":
+                                avroRecord.put(entry.getKey(), Long.parseLong(value));
+                                break;
+
+                            case "int":
+                                avroRecord.put(entry.getKey(), Integer.valueOf(value));
+                                break;
+
+                            case "boolean":
+                                avroRecord.put(entry.getKey(), (value.matches("true") ? true : false));
+                                break;
+
 
                             default:
-                                GenericRecord temp = this.buildRecord(sch.toString(), new ObjectMapper().readValue(value, HashMap.class));
-                                avroRecord.put(entry.getKey(), temp);
+                                if (value != null) {
+                                    GenericRecord temp = this.buildRecord(sch.toString(), new ObjectMapper().readValue(value, HashMap.class));
+                                    avroRecord.put(entry.getKey(), temp);
+                                } else {
+                                    avroRecord.put(entry.getKey(), null);
+                                }
 
                         }
 

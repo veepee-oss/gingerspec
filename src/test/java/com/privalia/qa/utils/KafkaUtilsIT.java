@@ -80,8 +80,8 @@ public class KafkaUtilsIT {
         if (!AdminUtils.topicExists(kafka_utils.getZkUtils(), topic)) {
             kafka_utils.createTopic(topic);
         }
-        kafka_utils.sendAndConfirmMessage(oneMessage, topic, 1);
-        kafka_utils.sendAndConfirmMessage(anotherMessage, topic, 1);
+        kafka_utils.sendAndConfirmMessage(oneMessage, null, topic, 1);
+        kafka_utils.sendAndConfirmMessage(anotherMessage, null, topic, 1);
         List<Object> messages = kafka_utils.readTopicFromBeginning(topic);
         assertThat(messages.contains("This is a test")).isTrue();
         kafka_utils.deleteTopic(topic);
@@ -112,16 +112,7 @@ public class KafkaUtilsIT {
         ZkUtils zkOpts = kafka_utils.getZkUtils();
         kafka_utils.setZkHost(zkOpts.zkConnection().getServers(),"2181","/");
     }
-
-    @Test(enabled = false)
-    public void sendMessageTopicTest() throws InterruptedException, ExecutionException, TimeoutException {
-        if (!AdminUtils.topicExists(kafka_utils.getZkUtils(), "testMessage")) {
-            kafka_utils.createTopic("testMessage");
-        }
-        kafka_utils.sendMessage("hello, its me", "testMessage");
-        assertThat(kafka_utils.readTopicFromBeginning("testMessage")).contains("hello, its me");
-    }
-
+    
     @Test(enabled = false)
     public void addNewSchemaTest() throws IOException {
 
@@ -153,8 +144,7 @@ public class KafkaUtilsIT {
         kafka_utils.modifyProducerProperties("schema.registry.url", "http://localhost:8081");
         kafka_utils.modifyProducerProperties("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
         kafka_utils.modifyProducerProperties("value.serializer", "io.confluent.kafka.serializers.KafkaAvroSerializer");
-
-        kafka_utils.sendAndConfirmMessage("record", "avroTopic", 1);
+        kafka_utils.sendAndConfirmMessage("record", null,"avroTopic", 1);
 
     }
 }

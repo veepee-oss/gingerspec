@@ -41,7 +41,7 @@ public class KafkaGSpec extends BaseGSpec {
      * @param zkPath ZK port
      * @throws UnknownHostException exception
      */
-    @Given("^I connect to kafka at '(.+)'( using path '(.+)')?$")
+    @Given("^I connect to kafka at '(.+?)'( using path '(.+?)')?$")
     public void connectKafka(String zkHost, String foo, String zkPath) throws UnknownHostException {
         String zkPort = zkHost.split(":")[1];
         zkHost = zkHost.split(":")[0];
@@ -182,7 +182,6 @@ public class KafkaGSpec extends BaseGSpec {
     public void mySchemaRegistryIsRunningAtLocalhost(String host) throws Throwable {
         commonspec.getKafkaUtils().setSchemaRegistryUrl("http://" + host);
         commonspec.getKafkaUtils().modifyProducerProperties("schema.registry.url", "http://" + host);
-        commonspec.getKafkaUtils().modifyConsumerProperties("schema.registry.url", "http://" + host);
     }
 
     /**
@@ -287,9 +286,9 @@ public class KafkaGSpec extends BaseGSpec {
 
             // Modify data
             commonspec.getLogger().debug("Modifying data {} as {}", seedJson, "json");
-            //String modifiedData = commonspec.modifyData(seedJson, "json", table).toString();
+            String modifiedData = commonspec.modifyData(seedJson, "json", table).toString();
 
-            commonspec.getKafkaUtils().createGenericRecord(recordName, seedJson, schemaString);
+            commonspec.getKafkaUtils().createGenericRecord(recordName, modifiedData, schemaString);
 
         } else {
             commonspec.getLogger().debug("Building Avro record from datatable");
