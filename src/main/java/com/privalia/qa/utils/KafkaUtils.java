@@ -17,6 +17,7 @@
 package com.privalia.qa.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 import kafka.admin.AdminOperationException;
 import kafka.admin.AdminUtils;
 import kafka.admin.BrokerMetadata;
@@ -30,7 +31,12 @@ import org.I0Itec.zkclient.ZkClient;
 import org.I0Itec.zkclient.ZkConnection;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
+import org.apache.avro.generic.GenericDatumReader;
 import org.apache.avro.generic.GenericRecord;
+import org.apache.avro.io.DatumReader;
+import org.apache.avro.io.Decoder;
+import org.apache.avro.io.DecoderFactory;
+import org.apache.avro.io.JsonDecoder;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -46,6 +52,8 @@ import scala.collection.JavaConverters;
 import scala.collection.Seq;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -116,7 +124,7 @@ public class KafkaUtils {
         props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
         this.propsConsumer = new Properties();
         propsConsumer.put("bootstrap.servers", System.getProperty("KAFKA_HOSTS", "0.0.0.0:9092"));
-        propsConsumer.put("group.id", "test");
+        propsConsumer.put("group.id", "QAConsumerGroup");
         propsConsumer.put("enable.auto.commit", "true");
         propsConsumer.put("auto.offset.reset", "earliest");
         propsConsumer.put("auto.commit.interval.ms", "1000");
@@ -139,7 +147,7 @@ public class KafkaUtils {
     }
 
     public void setZkHost(String host, String port, String zkPath) {
-        if ((zkPath != null) && (!(zkPath.matches("")))) {
+        if ((zkPath != null) && (!(zkPath.matches("")))  && (!(zkPath.matches("null")))) {
             this.zookeeperConnect = host + ":" + port + "/" + zkPath;
         } else {
             this.zookeeperConnect = host + ":" + port;
@@ -240,6 +248,7 @@ public class KafkaUtils {
      *
      * @param topicName name of topic.
      */
+    @Deprecated
     public void sendMessage(String message, String topicName) {
         Producer<String, String> producer = new KafkaProducer<>(props);
         producer.send(new ProducerRecord<String, String>(topicName, message));
@@ -254,15 +263,17 @@ public class KafkaUtils {
      * @param topicName      name of topic
      * @param timeoutSeconds Number of seconds to wait for acknowledgement by Kafka
      */
-    public void sendAndConfirmMessage(String message, String topicName, long timeoutSeconds) throws InterruptedException, ExecutionException, TimeoutException {
+    public void sendAndConfirmMessage(String message, String key, String topicName, long timeoutSeconds) throws InterruptedException, ExecutionException, TimeoutException {
 
-        String key = this.props.getProperty("key.serializer");
-        String value = this.props.getProperty("value.serializer");
-        Class keyClass = this.getProperClass(key);
-        Class valueClass = this.getProperClass(value);
+        String keySerializer = this.props.getProperty("key.serializer");
+        String valueSerializer = this.props.getProperty("value.serializer");
+        Class keyClass = this.getProperClass(keySerializer);
+        Class valueClass = this.getProperClass(valueSerializer);
 
         Object finalMessage = null;
+        Object finalKey = null;
 
+        //Value can be string, int or avro
         if (valueClass.equals(String.class)) {
             finalMessage = message.toString();
         }
@@ -274,15 +285,35 @@ public class KafkaUtils {
             finalMessage = record;
         }
 
-        this.sendAndConfirmMessage(finalMessage, topicName, timeoutSeconds,  keyClass, valueClass);
+        //Key can be string or int
+        if (key != null) {
+            if (keyClass.equals(String.class)) {
+                finalKey = key.toString();
+            }
+            if (keyClass.equals(Long.class)) {
+                finalKey = Long.parseLong(key);
+            }
+        } else {
+            finalKey = null;
+        }
+
+
+        this.sendAndConfirmMessage(finalMessage, finalKey, topicName, timeoutSeconds, keyClass, valueClass);
 
     }
 
-    private <K, V> void sendAndConfirmMessage(Object message, String topicName, long timeoutSeconds, K keyClass, V valueClass) throws InterruptedException, ExecutionException, TimeoutException {
+    private <K, V> void sendAndConfirmMessage(Object message, Object key, String topicName, long timeoutSeconds, K keyClass, V valueClass) throws InterruptedException, ExecutionException, TimeoutException {
         Producer<K, V> producer = new KafkaProducer<>(props);
         try {
             long time = System.currentTimeMillis();
-            ProducerRecord<K, V> record = new ProducerRecord(topicName, message);
+
+            ProducerRecord<K, V> record;
+            if (key != null) {
+                record = new ProducerRecord(topicName, key, message);
+            } else {
+                record = new ProducerRecord(topicName, message);
+            }
+
             RecordMetadata metadata = (RecordMetadata) producer.send(record).get(timeoutSeconds, TimeUnit.SECONDS);
             long elapsedTime = System.currentTimeMillis() - time;
             logger.debug("Message sent and acknowlegded by Kafka(key=%s value=%s) meta(partition=%d, offset=%d) time=%d", record.key(), record.value(), metadata.partition(), metadata.offset(), elapsedTime);
@@ -298,6 +329,7 @@ public class KafkaUtils {
 
     /**
      * Returns the appropiate class for the given property
+     *
      * @param item
      * @return
      */
@@ -368,7 +400,6 @@ public class KafkaUtils {
     }
 
 
-
     /**
      * Set remote schema registry url and port for all future requests
      *
@@ -407,9 +438,9 @@ public class KafkaUtils {
     /**
      * Fetch version of the schema registered under the specified subject in the registry
      *
-     * @param subject   Subject name
-     * @param version   Version of the schema to fetch
-     * @return          Json encoded string of the schema
+     * @param subject Subject name
+     * @param version Version of the schema to fetch
+     * @return Json encoded string of the schema
      */
     public String getSchemaFromRegistry(String subject, String version) throws IOException {
         logger.debug("Fetching schema version " + version + " from subject " + subject);
@@ -422,11 +453,11 @@ public class KafkaUtils {
                 .addHeader("Content-Type", "application/json")
                 .build();
 
-        ObjectMapper om =  new ObjectMapper();
+        ObjectMapper om = new ObjectMapper();
         ResponseBody response = client.newCall(request).execute().body();
         Map fieldMapped = om.readValue(response.byteStream(), Map.class);
         String schema = (String) fieldMapped.get("schema");
-        return  schema;
+        return schema;
 
     }
 
@@ -453,26 +484,253 @@ public class KafkaUtils {
 
 
     /**
-     * Cretes a {@link GenericRecord} to be sent through kafka using avro serializers
-     * @param key           Name of the generic record
-     * @param propertyList  List of properties and values
-     * @param schema        Schema to be used to serialize the object
+     * given a json representation of the data, creates a generic record with the given schema
+     *
+     * @param key    Name of the generic record
+     * @param json   Json string with data
+     * @param schema Schema to be used to serialize the object
+     */
+    public void createGenericRecord(String key, String json, String schema) throws IOException {
+
+        /**
+         * This is the official way of creating a generic record using the standard
+         * library. However, the library requires the fields of type byte to be represented
+         * in a very special way, which I never figured out what it was. Thats why i decided to
+         * create my own method for creating a generic record
+         */
+
+        /*
+        Schema.Parser schemaParser = new Schema.Parser();
+        Schema s = schemaParser.parse(schema);
+        DecoderFactory decoderFactory = new DecoderFactory();
+        Decoder decoder = decoderFactory.jsonDecoder(s, json);
+        DatumReader<GenericData.Record> reader =
+                new GenericDatumReader<>(s);
+        GenericRecord genericRecord = reader.read(null, decoder);
+        this.avroRecords.put(key, genericRecord);
+        */
+
+
+        /**
+         * My way of creating a generic record
+         */
+        Map<String, String> propertyList = new HashedMap();
+        HashMap<String, String> result = new ObjectMapper().readValue(json, HashMap.class);
+
+        for (String item : result.keySet()) {
+
+            try {
+                propertyList.put(item, result.get(item));
+            } catch (Exception e) {
+                propertyList.put(item, new Gson().toJson(result.get(item)));
+            }
+
+        }
+
+        this.createGenericRecord(key, propertyList, schema);
+
+    }
+
+    /**
+     * Creates a {@link GenericRecord} to be sent through kafka using avro serializers.
+     * The message is stored in an internal map using the specified key for later use.
+     *
+     * @param key          Name of the generic record
+     * @param propertyList List of properties and values
+     * @param schema       Schema to be used to serialize the object
      */
     public void createGenericRecord(String key, Map<String, String> propertyList, String schema) {
+
+        try {
+            this.avroRecords.put(key, this.buildRecord(schema, propertyList));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    /**
+     * Creates a {@link GenericRecord} given its schema and the list of key -> value
+     *
+     * @param schema       Schema as string
+     * @param propertyList Property list (Key -> Value)
+     * @return {@link GenericRecord}
+     * @throws IOException
+     */
+    private GenericRecord buildRecord(String schema, Map<String, String> propertyList) throws IOException {
 
         Schema.Parser parser = new Schema.Parser();
         Schema s = parser.parse(schema);
         GenericRecord avroRecord = new GenericData.Record(s);
 
+        //for cases of null records
+        if (propertyList == null) {
+            return null;
+        }
+
         for (Map.Entry<String, String> entry : propertyList.entrySet()) {
-            if (s.getField(entry.getKey()).schema().getType().getName().toLowerCase().matches("int")) {
-                avroRecord.put(entry.getKey(), Integer.valueOf(entry.getValue()));
+
+            Schema.Field field = s.getField(entry.getKey());
+            if (field != null) {
+
+                String type = field.schema().getType().getName().toLowerCase();
+                String value;
+                try {
+                    value = entry.getValue();
+                } catch (Exception e) {
+                    value = new Gson().toJson(entry.getValue());
+                }
+
+
+                if (type.matches("int")) {
+                    avroRecord.put(entry.getKey(), Integer.valueOf(value));
+                } else if (type.matches("bytes")) {
+                    avroRecord.put(entry.getKey(), ByteBuffer.wrap(new BigDecimal(value).unscaledValue().toByteArray()));
+                } else if (type.matches("long")) {
+                    avroRecord.put(entry.getKey(), Long.parseLong(value));
+                } else if (type.matches("string")) {
+                    avroRecord.put(entry.getKey(), value);
+                } else if (type.matches("boolean")) {
+                    avroRecord.put(entry.getKey(), (value.matches("true") ? true : false));
+                } else if (type.matches("array")) {
+                    List<Object> objectArray = new ArrayList<>();
+                    objectArray = this.getObjectsfromArray(entry.getKey(), value, s);
+                    avroRecord.put(entry.getKey(), objectArray);
+                } else if (type.matches("record")) {
+                    HashMap<String, String> result = null;
+                    try {
+                        result = new ObjectMapper().readValue(value, HashMap.class);
+                    } catch (IOException e) {
+                        throw new IOException("Could not map " + value + " to a record type", e);
+                    }
+                    GenericRecord temp = this.buildRecord(s.getField(entry.getKey()).schema().toString(), result);
+                    avroRecord.put(entry.getKey(), temp);
+                } else if (type.matches("union")) {
+
+                    for (Schema sch : field.schema().getTypes()) {
+
+                        String t = sch.getName().toLowerCase();
+
+                        switch (t) {
+
+                            case "null":
+                                break;
+
+                            case "array":
+                                List<Object> objectArray = new ArrayList<>();
+                                objectArray = this.getObjectsfromArray(entry.getKey(), value, sch);
+                                avroRecord.put(entry.getKey(), objectArray);
+                                break;
+
+                            case "string":
+                                avroRecord.put(entry.getKey(), value);
+                                break;
+
+                            case "bytes":
+                                avroRecord.put(entry.getKey(), ByteBuffer.wrap(new BigDecimal(value).unscaledValue().toByteArray()));
+                                break;
+
+                            case "long":
+                                avroRecord.put(entry.getKey(), Long.parseLong(value));
+                                break;
+
+                            case "int":
+                                avroRecord.put(entry.getKey(), Integer.valueOf(value));
+                                break;
+
+                            case "boolean":
+                                avroRecord.put(entry.getKey(), (value.matches("true") ? true : false));
+                                break;
+
+
+                            default:
+                                if (value != null) {
+                                    GenericRecord temp = this.buildRecord(sch.toString(), new ObjectMapper().readValue(value, HashMap.class));
+                                    avroRecord.put(entry.getKey(), temp);
+                                } else {
+                                    avroRecord.put(entry.getKey(), null);
+                                }
+
+                        }
+
+                    }
+
+                } else {
+                    logger.warn("Unrecognized type in schema: " + type);
+                    avroRecord.put(entry.getKey(), value);
+                }
             } else {
-                avroRecord.put(entry.getKey(), entry.getValue());
+                logger.warn("the field " + entry.getKey() + " is not present in the schema and will be ignored");
             }
         }
 
-        this.avroRecords.put(key, avroRecord);
+        return avroRecord;
+    }
+
+    private List<Object> getObjectsfromArray(String entry, String value, Schema s) throws IOException {
+
+        List<Object> objectArray = new ArrayList<>();
+        String t = null;
+
+        try {
+            t = s.getField(entry).schema().getElementType().getType().getName().toLowerCase();
+        } catch (Exception e) {
+            t = s.getElementType().getType().getName().toLowerCase();
+        }
+
+
+        if (t.matches("record")) {
+
+            List<HashMap<String, String>> elements = null;
+            try {
+                elements = new ObjectMapper().readValue(value, List.class);
+            } catch (IOException e) {
+                throw new IOException("Could not map " + value + " to array", e);
+            }
+            String elementsSchema = null;
+            try {
+                elementsSchema = s.getField(entry).schema().getElementType().toString();
+            } catch (Exception e) {
+                elementsSchema = s.getElementType().toString();
+            }
+
+            for (HashMap<String, String> element : elements) {
+                objectArray.add(this.buildRecord(elementsSchema, element));
+            }
+        } else {
+
+            List<String> elements = null;
+            for (String element : elements) {
+
+                switch (t) {
+                    case "string":
+                        objectArray.add(element);
+                        break;
+
+                    case "bytes":
+                        objectArray.add(ByteBuffer.wrap(new BigDecimal(element).unscaledValue().toByteArray()));
+                        break;
+
+                    case "long":
+                        objectArray.add(Long.parseLong(element));
+                        break;
+
+                    case "boolean":
+                        objectArray.add((element.matches("true") ? true : false));
+                        break;
+
+                    case "int":
+                        objectArray.add(Integer.valueOf(element));
+                        break;
+
+                    default:
+                        objectArray.add(element);
+                }
+            }
+        }
+
+        return objectArray;
+
     }
 
 }

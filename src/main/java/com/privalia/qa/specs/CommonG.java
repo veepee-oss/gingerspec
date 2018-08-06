@@ -923,13 +923,26 @@ public class CommonG {
     }
 
     /**
-     * Returns the information contained in file passed as parameter
+     * Returns the information contained in file passed as parameter. the file
+     * is read with UTF-8 charset by default
      *
      * @param baseData path to file to be read
      * @param type     type of information, it can be: json|string
      * @return String
      */
     public String retrieveData(String baseData, String type) {
+        return this.retrieveData(baseData, type, "UTF-8");
+    }
+
+    /**
+     * Returns the information contained in file passed as parameter
+     *
+     * @param baseData path to file to be read
+     * @param type     type of information, it can be: json|string
+     * @param charset  charset to use when reading the file
+     * @return String
+     */
+    public String retrieveData(String baseData, String type, String charset) {
         String result;
 
         InputStream stream = getClass().getClassLoader().getResourceAsStream(baseData);
@@ -944,7 +957,7 @@ public class CommonG {
         }
 
         try {
-            reader = new BufferedReader(new InputStreamReader(stream, "UTF-8"));
+            reader = new BufferedReader(new InputStreamReader(stream, charset));
             int n;
             while ((n = reader.read(buffer)) != -1) {
                 writer.write(buffer, 0, n);
