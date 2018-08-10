@@ -28,7 +28,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
@@ -82,8 +82,8 @@ public class KafkaUtilsIT {
         }
         kafka_utils.sendAndConfirmMessage(oneMessage, null, topic, 1);
         kafka_utils.sendAndConfirmMessage(anotherMessage, null, topic, 1);
-        List<Object> messages = kafka_utils.readTopicFromBeginning(topic);
-        assertThat(messages.contains("This is a test")).isTrue();
+        Map<Object, Object> messages = kafka_utils.readTopicFromBeginning(topic);
+        assertThat(messages.containsValue("This is a test")).isTrue();
         kafka_utils.deleteTopic(topic);
     }
 
@@ -112,7 +112,7 @@ public class KafkaUtilsIT {
         ZkUtils zkOpts = kafka_utils.getZkUtils();
         kafka_utils.setZkHost(zkOpts.zkConnection().getServers(),"2181","/");
     }
-    
+
     @Test(enabled = false)
     public void addNewSchemaTest() throws IOException {
 
