@@ -101,7 +101,11 @@ public class KafkaGSpec extends BaseGSpec {
     public void sendAMessage(String message, String topic_name, String foo, String recordKey, String ifExists) throws Exception {
         if (ifExists != null) {
             Map<Object, Object> result = commonspec.getKafkaUtils().readTopicFromBeginning(topic_name);
-            if (!result.containsValue(message) || !result.containsKey(recordKey)) {
+            if (result.containsKey(recordKey)) {
+                if (!result.get(recordKey).toString().matches(message)) {
+                    commonspec.getKafkaUtils().sendAndConfirmMessage(message, recordKey, topic_name, 1);
+                }
+            } else {
                 commonspec.getKafkaUtils().sendAndConfirmMessage(message, recordKey, topic_name, 1);
             }
         } else {
