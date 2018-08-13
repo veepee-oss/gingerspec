@@ -363,7 +363,7 @@ public class KafkaUtils {
      * @param topic Name of the topic from which retrieve messages
      * @return List of messages in the topic
      */
-    public List<Object> readTopicFromBeginning(String topic) {
+    public Map<Object, Object> readTopicFromBeginning(String topic) {
 
         String key = this.propsConsumer.getProperty("key.deserializer");
         String value = this.propsConsumer.getProperty("value.deserializer");
@@ -374,8 +374,8 @@ public class KafkaUtils {
 
     }
 
-    public <K, V> List readTopicFromBeginning(String topic, K keyClass, V valueClass) {
-        List<V> result = new ArrayList<>();
+    public <K, V> Map readTopicFromBeginning(String topic, K keyClass, V valueClass) {
+        Map<K, V> result = new LinkedHashMap<>();
         KafkaConsumer<K, V> consumer = new KafkaConsumer<>(propsConsumer);
         consumer.subscribe(Arrays.asList(topic));
 
@@ -385,7 +385,7 @@ public class KafkaUtils {
                 ConsumerRecords<K, V> records = consumer.poll(100);
                 for (ConsumerRecord<K, V> record : records) {
                     logger.debug(record.offset() + ": " + record.value());
-                    result.add(record.value());
+                    result.put(record.key(), record.value());
                 }
                 consumer.commitSync();
             }
