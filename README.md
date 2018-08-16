@@ -79,7 +79,7 @@ This last ignored reason is associated to a ticket in Jira. After executing the 
 
 - **IncludeTagAspect**
 
-An AspectJ aspect that includes an scenario before the taged one. It manages parameters as well.
+An AspectJ aspect that includes an scenario before the taged one. It manages parameters as well. Scenario name of the included feature can not contain spaces. Parameters should be wrapped in []
 
 ` @include(feature:<feature>,scenario:<scenario>)`
 
@@ -88,17 +88,29 @@ An AspectJ aspect that includes an scenario before the taged one. It manages par
 
 _Examples:_
 
+This will execute the scenario "Not_so_dummy_scenario" from the feature file sample.feature before executing "Dummy scenario" 
 ```
-    @include(feature:sample.feature,scenario:Not so dummy scenario)
+    @include(feature:sample.feature,scenario:Not_so_dummy_scenario)
     Scenario: Dummy scenario
-          And I wait '${SECS}' seconds
+          And I wait '1' seconds
 ```
 
+Similarly, this will execute the scenario "Not_so_dummy_scenario" from the feature file sample.feature but will inject the variables time1=1 and time2=2
 ```
-    @include(feature:sample.feature,scenario:Not so dummy scenario,params:param1=1)
+    @include(feature:sample.feature,scenario:Not_so_dummy_scenario,params:[time1:1,time2:2])
     Scenario: Dummy scenario
-          And I wait '${SECS}' seconds
+          And I wait '1' seconds
 ```
+
+to make use of the variables time1 and time2 in the scenario "Not_so_dummy_scenario":
+```
+    Feature: Included Feature
+    
+      Scenario: Not_so_dummy_scenario
+        And I wait '<time1>' seconds
+        And I wait '<time2>' seconds
+```
+
 
 - **LoopTagAspect**
 
