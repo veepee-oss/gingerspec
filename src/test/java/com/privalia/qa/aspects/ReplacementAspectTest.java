@@ -17,8 +17,12 @@ package com.privalia.qa.aspects;
 
 import com.privalia.qa.exceptions.NonReplaceableException;
 import com.privalia.qa.utils.ThreadProperty;
+import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.testng.annotations.Test;
+
+import java.io.FileNotFoundException;
+import java.net.URISyntaxException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
@@ -69,7 +73,7 @@ public class ReplacementAspectTest {
     }
 
     @Test
-    public void replaceElementPlaceholderCaseTest() throws NonReplaceableException {
+    public void replaceElementPlaceholderCaseTest() throws NonReplaceableException, FileNotFoundException, ConfigurationException, URISyntaxException {
         ThreadProperty.set("class", this.getClass().getCanonicalName());
         ReplacementAspect repAspect = new ReplacementAspect();
         ProceedingJoinPoint pjp = null;
