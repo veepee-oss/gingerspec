@@ -63,7 +63,7 @@ public class WhenGSpec extends BaseGSpec {
      * @param seconds
      * @throws InterruptedException
      */
-    @When("^I wait '(\\d+?)' seconds?$")
+    @When("^I wait '(.+?)' seconds?$")
     public void idleWait(Integer seconds) throws InterruptedException {
         Thread.sleep(seconds * DEFAULT_TIMEOUT);
     }
