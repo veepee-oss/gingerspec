@@ -23,16 +23,22 @@ import com.privalia.qa.utils.ThreadProperty;
 import gherkin.I18n;
 import gherkin.formatter.Reporter;
 import gherkin.formatter.model.*;
+import org.apache.commons.configuration2.CombinedConfiguration;
+import org.apache.commons.configuration2.FileBasedConfiguration;
+import org.apache.commons.configuration2.PropertiesConfiguration;
+import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
+import org.apache.commons.configuration2.builder.fluent.Parameters;
+import org.apache.commons.configuration2.ex.ConfigurationException;
+import org.apache.commons.configuration2.tree.OverrideCombiner;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.lang.reflect.Field;
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
+import java.net.*;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -113,7 +119,7 @@ public class ReplacementAspect {
         logger.info("  {}{}", step.getKeyword(), step.getName());
     }
 
-    protected String replacedElement(String el, JoinPoint jp) throws NonReplaceableException {
+    protected String replacedElement(String el, JoinPoint jp) throws NonReplaceableException, ConfigurationException, URISyntaxException, FileNotFoundException {
         if (el.contains("${")) {
             el = replaceEnvironmentPlaceholders(el, jp);
         }
@@ -123,7 +129,80 @@ public class ReplacementAspect {
         if (el.contains("@{")) {
             el = replaceCodePlaceholders(el, jp);
         }
+        if (el.contains("#{")) {
+            el = replacePropertyPlaceholders(el, jp);
+        }
         return el;
+    }
+
+    private File getfile(String environment) throws URISyntaxException, FileNotFoundException {
+
+        URL url = getClass().getClassLoader().getResource("configuration/" + environment + ".properties");
+
+        if (url != null) {
+            return new File(url.toURI());
+        } else {
+            logger.error("The configuration file {}.properties was not found", environment);
+            throw new FileNotFoundException("The configuration file " + environment + ".properties was not found");
+        }
+
+    }
+
+    /**
+     * Replaces every placeholded element, enclosed in #{} with the
+     * corresponding value in a properties file.
+     *
+     * The file that contains all common configuration for the project (environment
+     * independent configuration) must be located in /resources/configuration/common.properties
+     *
+     * Environment-specific configuration can be located in a separated file. This configuration can
+     * override the configuration from the common file. All environment specific configuration files
+     * can be included at runtime via maven variable, setting the 'env' to the name of the file.
+     *
+     * for example, to use properties from the file pre.properties located in
+     * /resources/configuration/pre.properties, just pass -Denv=pre when
+     * running your tests
+     *
+     * @param element element to be replaced
+     * @param pjp JoinPoint
+     * @return String
+     */
+    protected String replacePropertyPlaceholders(String element, JoinPoint pjp) throws ConfigurationException, URISyntaxException, NonReplaceableException, FileNotFoundException {
+
+        String newVal = element;
+        Parameters params = new Parameters();
+        CombinedConfiguration config = new CombinedConfiguration(new OverrideCombiner());
+
+        /*If environment specific file is required, search it by its name and add it as a source of properties*/
+        String environment = System.getProperty("env", null);
+        if (environment != null) {
+            FileBasedConfigurationBuilder<FileBasedConfiguration> config2 = new FileBasedConfigurationBuilder<FileBasedConfiguration>(
+                    PropertiesConfiguration.class).configure(params.properties().setFile(this.getfile(environment)));
+            config.addConfiguration(config2.getConfiguration());
+        }
+
+        /*Add the file common.properties as a source of properties*/
+        FileBasedConfigurationBuilder<FileBasedConfiguration> config1 = new FileBasedConfigurationBuilder<FileBasedConfiguration>(
+                PropertiesConfiguration.class)
+                .configure(params.properties().setFile(this.getfile("common")));
+
+        config.addConfiguration(config1.getConfiguration());
+
+
+        while (newVal.contains("#{")) {
+            String placeholder = newVal.substring(newVal.indexOf("#{"), newVal.indexOf("}", newVal.indexOf("#{")) + 1);
+            String property = placeholder.substring(2, placeholder.length() - 1);
+
+            String prop = config.getString(property);
+            if (prop != null) {
+                newVal = newVal.replace(placeholder, prop);
+            } else {
+                logger.error("Could not find property {} in included files", property);
+                throw new NonReplaceableException("Unreplaceable placeholder: " + placeholder);
+            }
+        }
+
+        return newVal;
     }
 
     /**
