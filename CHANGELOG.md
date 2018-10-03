@@ -1,8 +1,15 @@
 # Changelog
 
-Only listing significant user-visible, not internal code cleanups and minor bug fixes.
 
 ## 0.1.0 (upcoming)
+
+* Config files for the projects
+
+* Log Aspect to print some logs at INFO level
+
+* New Kafka steps, Kafka with Avro format
+
+* Refactor hardcoded names
 
 * SOAP Web services src/main/java/com/privalia/qa/specs/SoapServiceGSpec.java,
   src/main/java/com/privalia/qa/utils/SoapServiceUtils.java
@@ -84,4 +91,4 @@ Only listing significant user-visible, not internal code cleanups and minor bug 
 * Changes all references in code to Privalia
 * Users can now specify glue files via @CucumberOptions annotation
 * Updated references to parent pom
-* Migration from Stratio bdt-lib
+* Migration from Stratio bdt-lib to gitlab
