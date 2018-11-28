@@ -611,23 +611,6 @@ public class RestSpec extends BaseGSpec {
     @Given("^I set url parameters:$")
     public void iSetUrlQueryParameters(DataTable modifications) throws Throwable {
 
-        /**
-         * Since there is no easy way to remove all url parameters from the request,
-         * a new request object is created with the same configuration
-         * */
-        RequestSpecification spec = new RequestSpecBuilder().setContentType(ContentType.JSON).build();
-        commonspec.setRestRequest(given().header("Content-Type", "application/json").headers(commonspec.getHeaders()).spec(spec));
-
-        if (commonspec.getRestProtocol().matches("https://")) {
-            this.setupApp("https://", commonspec.getRestHost(), commonspec.getRestPort());
-        } else {
-            this.setupApp(null, commonspec.getRestHost(), commonspec.getRestPort());
-        }
-
-
-        /**
-         * Now the url query params are added
-         */
         Map<String, String> queryParams = new HashMap<>();
 
         LinkedHashMap jsonAsMap = new LinkedHashMap();
@@ -637,6 +620,34 @@ public class RestSpec extends BaseGSpec {
             queryParams.put(key, value);
             commonspec.getRestRequest().queryParam(key, value);
 
+        }
+    }
+
+    /**
+     * Clears the url query parameters that were configured in a previous step.
+     *
+     * Once the user uses the step to set url query parameters (Given I set url parameters),
+     * the parameters are automatically added to all future requests in the same scenario. This
+     * step allows to delete this parameters from the system, so new requests are created without
+     * any url query parameters
+     *
+     * @throws Throwable
+     */
+    @Then("^I clear the url parameters from previous request$")
+    public void iClearTheUrlParametersFromPreviousRequest() throws Throwable {
+        /**
+         * Since there is no easy way to remove all url parameters from the request,
+         * a new request object is created with the same configuration
+         * */
+        RequestSpecification spec = new RequestSpecBuilder().setContentType(ContentType.JSON).build();
+        commonspec.setRestRequest(given().header("Content-Type", "application/json").headers(commonspec.getHeaders()).spec(spec));
+        commonspec.setRestRequest(given().cookies(commonspec.getRestCookies()).spec(spec));
+
+
+        if (commonspec.getRestProtocol().matches("https://")) {
+            this.setupApp("https://", commonspec.getRestHost(), commonspec.getRestPort());
+        } else {
+            this.setupApp(null, commonspec.getRestHost(), commonspec.getRestPort());
         }
     }
 }

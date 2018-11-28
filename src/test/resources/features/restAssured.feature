@@ -47,6 +47,7 @@ Feature: Rest Assured Feature
     And I save element '$.[0]' in environment variable 'response'
     And 'response' matches the following cases:
       | $.userId | equal | 3 |
+    Then I clear the url parameters from previous request
     Given I set url parameters:
       | userId | 4 |
     When I send a 'GET' request to '/posts'
