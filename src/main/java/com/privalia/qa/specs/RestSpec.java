@@ -19,6 +19,7 @@ package com.privalia.qa.specs;
 import com.jayway.jsonpath.PathNotFoundException;
 import com.privalia.qa.utils.ThreadProperty;
 import cucumber.api.DataTable;
+import cucumber.api.PendingException;
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
@@ -584,5 +585,69 @@ public class RestSpec extends BaseGSpec {
         String cookieValue = commonspec.getRestResponse().getCookies().get(cookieName);
         assertThat(cookieValue).as("The cookie " + cookieName + " is not present in the response").isNotNull();
         ThreadProperty.set(varName, cookieValue);
+    }
+
+    /**
+     * Specify a custom map of url query parameters to be added to future requests
+     * @param modifications DataTable containing the custom set of url query parameters to be
+     *                      added to the requests. Syntax will be:
+     *                      {@code
+     *                      | <key> | <value> |
+     *                      }
+     *                      where:
+     *                      key: parameters name
+     *                      value: parameters value
+     *                      for example:
+     *                      if we want to add the parameter "id" with value "1", to the request url
+     *                      the modification will be:
+     *
+     *                      Given I set url parameters
+     *                          |  id  |  1  |
+     *                      When I send a 'GET' request to '/posts'
+     *
+     *                      This will produce the request -> '/posts?id=1'
+     * @throws Exception
+     */
+    @Given("^I set url parameters:$")
+    public void iSetUrlQueryParameters(DataTable modifications) throws Throwable {
+
+        Map<String, String> queryParams = new HashMap<>();
+
+        LinkedHashMap jsonAsMap = new LinkedHashMap();
+        for (int i = 0; i < modifications.raw().size(); i++) {
+            String key = modifications.raw().get(i).get(0);
+            String value = modifications.raw().get(i).get(1);
+            queryParams.put(key, value);
+            commonspec.getRestRequest().queryParam(key, value);
+
+        }
+    }
+
+    /**
+     * Clears the url query parameters that were configured in a previous step.
+     *
+     * Once the user uses the step to set url query parameters (Given I set url parameters),
+     * the parameters are automatically added to all future requests in the same scenario. This
+     * step allows to delete this parameters from the system, so new requests are created without
+     * any url query parameters
+     *
+     * @throws Throwable
+     */
+    @Then("^I clear the url parameters from previous request$")
+    public void iClearTheUrlParametersFromPreviousRequest() throws Throwable {
+        /**
+         * Since there is no easy way to remove all url parameters from the request,
+         * a new request object is created with the same configuration
+         * */
+        RequestSpecification spec = new RequestSpecBuilder().setContentType(ContentType.JSON).build();
+        commonspec.setRestRequest(given().header("Content-Type", "application/json").headers(commonspec.getHeaders()).spec(spec));
+        commonspec.setRestRequest(given().cookies(commonspec.getRestCookies()).spec(spec));
+
+
+        if (commonspec.getRestProtocol().matches("https://")) {
+            this.setupApp("https://", commonspec.getRestHost(), commonspec.getRestPort());
+        } else {
+            this.setupApp(null, commonspec.getRestHost(), commonspec.getRestPort());
+        }
     }
 }
