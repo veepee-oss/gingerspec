@@ -1,48 +1,60 @@
-@ignore @toocomplex
 Feature: Kafka steps test.
 
+
   Scenario: Connect to kafka
-    Given I connect to kafka at '${ZOOKEEPER_HOST}'
+    Given I connect to kafka at '${ZOOKEEPER_HOST}:2181'
+    Then I close the connection to kafka
+
 
   Scenario: Send message to kafka topic
-    Given I connect to kafka at '${ZOOKEEPER_HOST}'
+    Given I connect to kafka at '${ZOOKEEPER_HOST}:2181'
     Given I create a Kafka topic named 'testqa' if it doesn't exists
     Then A kafka topic named 'testqa' exists
     Given I send a message 'hello' to the kafka topic named 'testqa'
     Then The kafka topic 'testqa' has a message containing 'hello'
+    Then I close the connection to kafka
+
 
   Scenario: Increase partitions in kafka topic
+    Given I connect to kafka at '${ZOOKEEPER_HOST}:2181'
+    Given I create a Kafka topic named 'testqa' if it doesn't exists
+    Then A kafka topic named 'testqa' exists
     Given I increase '1' partitions in a Kafka topic named 'testqa'
+    Then I close the connection to kafka
+
 
   Scenario: A kafka topic deletion
+    Given I connect to kafka at '${ZOOKEEPER_HOST}:2181'
     Given I create a Kafka topic named 'testqa' if it doesn't exists
     Then A kafka topic named 'testqa' exists
     When I delete a Kafka topic named 'testqa'
     Then A kafka topic named 'testqa' does not exist
+    Then I close the connection to kafka
+
 
   Scenario: Managing schemas in the schema registry
-    Given My schema registry is running at '${SCHEMA_REGISTRY_HOST}'
+    Given My schema registry is running at '${SCHEMA_REGISTRY_HOST}:8081'
     Then I register a new version of a schema under the subject 'record' with 'schemas/recordSchema.avsc'
 
-  Scenario: Using String, Long serializers/deserializers
-    Given I connect to kafka at '${ZOOKEEPER_HOST}'
 
+  Scenario: Using String, Long serializers/deserializers
+    Given I connect to kafka at '${ZOOKEEPER_HOST}:2181'
     Given I create a Kafka topic named 'stringTopic' if it doesn't exists
     When I send a message 'hello' to the kafka topic named 'stringTopic'
     Then The kafka topic 'stringTopic' has a message containing 'hello'
-
     Given I create a Kafka topic named 'longTopic' if it doesn't exists
     When I send a message '1234567890' to the kafka topic named 'longTopic' with:
       | key.serializer    | org.apache.kafka.common.serialization.StringSerializer |
       | value.serializer  | org.apache.kafka.common.serialization.LongSerializer   |
-
     Then The kafka topic 'longTopic' has a message containing '1234567890' with:
       | key.deserializer    | org.apache.kafka.common.serialization.StringDeserializer |
       | value.deserializer  | org.apache.kafka.common.serialization.LongDeserializer   |
+    Then I close the connection to kafka
+
 
   Scenario: Using AVRO serializers/deserializers
-    Given I connect to kafka at 'localhost:2181'
-    Given My schema registry is running at 'localhost:8081'
+    Given I connect to kafka at '${ZOOKEEPER_HOST}:2181'
+    Given My schema registry is running at '${SCHEMA_REGISTRY_HOST}:8081'
     Then I register a new version of a schema under the subject 'record' with 'schemas/recordSchema.avsc'
     And I create a Kafka topic named 'avroTopic' if it doesn't exists
     #log if no seed file present, the datatable represents the values for every key in the schema
@@ -69,3 +81,4 @@ Feature: Kafka steps test.
       | key.serializer    | org.apache.kafka.common.serialization.StringSerializer |
     Then The kafka topic 'avroTopic' has an avro message 'record2' with:
       | key.deserializer    | org.apache.kafka.common.serialization.StringDeserializer |
+    Then I close the connection to kafka

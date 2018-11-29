@@ -384,6 +384,9 @@ public class KafkaGSpec extends BaseGSpec {
         }
 
         commonspec.getKafkaUtils().modifyConsumerProperties("value.deserializer", "io.confluent.kafka.serializers.KafkaAvroDeserializer");
+        assertThat(this.getCommonSpec().getKafkaUtils().getSchemaRegistryUrl()).as("Could not build avro consumer since no schema registry was defined").isNotNull();
+        commonspec.getKafkaUtils().modifyConsumerProperties("schema.registry.url", this.getCommonSpec().getKafkaUtils().getSchemaRegistryUrl());
+
 
         Map<Object, Object> results = commonspec.getKafkaUtils().readTopicFromBeginning(topicName);
         assertThat(results.containsValue(commonspec.getKafkaUtils().getAvroRecords().get(avroRecord))).as("Topic does not exist or the content does not match").isTrue();
@@ -401,6 +404,7 @@ public class KafkaGSpec extends BaseGSpec {
         for (DataTableRow row : dataTable.getGherkinRows()) {
             String key = row.getCells().get(0);
             String value = row.getCells().get(1);
+            this.getCommonSpec().getLogger().debug("Setting kafka consumer property: " + key + " -> " + value);
             commonspec.getKafkaUtils().modifyConsumerProperties(key, value);
         }
     }
@@ -417,7 +421,18 @@ public class KafkaGSpec extends BaseGSpec {
         for (DataTableRow row : dataTable.getGherkinRows()) {
             String key = row.getCells().get(0);
             String value = row.getCells().get(1);
+            this.getCommonSpec().getLogger().debug("Setting kafka producer property: " + key + " -> " + value);
             commonspec.getKafkaUtils().modifyProducerProperties(key, value);
         }
+    }
+
+    @Then("^I close the connection to kafka$")
+    public void iCloseTheConnectionToKafka() throws Throwable {
+
+//        this.getCommonSpec().getLogger().debug("Closing connection to kafka..");
+//        if (this.getCommonSpec().getKafkaUtils().getZkUtils() != null) {
+//            this.getCommonSpec().getKafkaUtils().getZkUtils().close();
+//        }
+
     }
 }
