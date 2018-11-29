@@ -45,9 +45,12 @@
         <logger name="com.privalia.qa.specs" level="DEBUG" additivity="false"/>
 
         <logger name="org.apache.zookeeper" level="OFF"/>
-        <logger name="org.reflections.Reflections" level="WARN"/>
-        <logger name="org.I0Itec.zkclient" level="WARN"/>
+        <logger name="org.apache.avro" level="WARN"/>
         <logger name="org.apache.kafka" level="WARN"/>
+        <logger name="org.I0Itec.zkclient" level="WARN"/>
+        <logger name="kafka.utils.Log4jControllerRegistration" level="OFF"/>
+        <logger name="io.confluent.common.config.AbstractConfig" level="OFF"/>
+        <logger name="org.reflections.Reflections" level="WARN"/>
         <logger name="org.elasticsearch.plugins" level="WARN"/>
         <logger name="com.datastax.driver.core" level="OFF"/>
         <logger name="kafka.admin" level="OFF"/>
