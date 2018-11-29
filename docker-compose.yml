@@ -15,12 +15,16 @@
 # * 80   (Demo site)
 # * 4444 (Selenium hub)
 # * 5900 (Selenium node)
+# * 9092 (Kafka broker)
+# * 2181 (ZooKeeper)
+# * 8081 (schema registry)
+# * 3030 (landoops UI)
 #
 # So, make sure this ports are available in the host machine. To Execute all tests:
 #
 # $ mvn clean install -DVERSION=1.0 -DSLEEPTEST=3 -DAGENT_LIST=1,2 -DVARNAME=foo -DPOSTGRES_HOST=localhost
 #        -DMYSQL_HOST=localhost -DREST_SERVER_HOST=localhost -DDEMO_SITE_HOST=demo-site -DSELENIUM_GRID=localhost:4444
-#        -DZOOKEEPER_HOST=localhost:2181 -DSCHEMA_REGISTRY_HOST=localhost:8081
+#        -DZOOKEEPER_HOST=localhost -DSCHEMA_REGISTRY_HOST=localhost
 #
 # Notice how DEMO_SITE_HOST does not use localhost but "demo-site" instead, since from within the docker net (from
 # where selenium is executed) there is name resolution to the service name. You can still access the demo site from
@@ -71,33 +75,14 @@ services:
       SELENIUM_GRID: 'selenium-grid:4444'
     ports:
       - "5901:5900"
-  zookeeper:
-    image: 'confluentinc/cp-zookeeper'
-    ports:
-      - "2181:2181"
-    environment:
-      ZOOKEEPER_CLIENT_PORT: '2181'
-      ZOOKEEPER_TICK_TIME: '2000'
   kafka:
-    image: 'confluentinc/cp-kafka:latest'
+    image: 'landoop/fast-data-dev:1.0.1'
     ports:
-      - "9092:9092"
-    depends_on:
-      - zookeeper
+     - "2181:2181"
+     - "3030:3030"
+     - "8081:8081"
+     - "8082:8082"
+     - "8083:8083"
+     - "9092:9092"
     environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT'
-      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://172.17.0.1:9092'
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: '1'
-      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: '0'
-  schema-registry:
-    image: 'confluentinc/cp-schema-registry'
-    ports:
-      - "8081:8081"
-    depends_on:
-      - zookeeper
-      - kafka
-    environment:
-      SCHEMA_REGISTRY_HOST_NAME: 'schema-registry'
-      SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: 'zookeeper:2181'
+     - ADV_HOST=localhost

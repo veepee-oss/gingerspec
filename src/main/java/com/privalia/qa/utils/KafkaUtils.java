@@ -31,18 +31,12 @@ import org.I0Itec.zkclient.ZkClient;
 import org.I0Itec.zkclient.ZkConnection;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
-import org.apache.avro.generic.GenericDatumReader;
 import org.apache.avro.generic.GenericRecord;
-import org.apache.avro.io.DatumReader;
-import org.apache.avro.io.Decoder;
-import org.apache.avro.io.DecoderFactory;
-import org.apache.avro.io.JsonDecoder;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.*;
-import org.apache.kafka.common.serialization.StringSerializer;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -351,6 +345,9 @@ public class KafkaUtils {
             case "io.confluent.kafka.serializers.KafkaAvroSerializer":
                 return GenericRecord.class;
 
+            case "io.confluent.kafka.serializers.KafkaAvroDeserializer":
+                return GenericRecord.class;
+
             default:
                 return String.class;
         }
@@ -408,6 +405,11 @@ public class KafkaUtils {
     public void setSchemaRegistryUrl(String host) {
         logger.debug("Setting schema registry remote url to " + host);
         this.schemaRegistryConnect = host;
+    }
+
+    public String getSchemaRegistryUrl() {
+        logger.debug("Getting schema registry url");
+        return this.schemaRegistryConnect;
     }
 
     /**
