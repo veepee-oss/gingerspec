@@ -429,10 +429,10 @@ public class KafkaGSpec extends BaseGSpec {
     @Then("^I close the connection to kafka$")
     public void iCloseTheConnectionToKafka() throws Throwable {
 
-//        this.getCommonSpec().getLogger().debug("Closing connection to kafka..");
-//        if (this.getCommonSpec().getKafkaUtils().getZkUtils() != null) {
-//            this.getCommonSpec().getKafkaUtils().getZkUtils().close();
-//        }
+        this.getCommonSpec().getLogger().debug("Closing connection to kafka..");
+        if (this.getCommonSpec().getKafkaUtils().getZkUtils() != null) {
+            this.getCommonSpec().getKafkaUtils().getZkUtils().close();
+        }
 
     }
 }
