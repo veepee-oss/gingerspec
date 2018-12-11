@@ -23,7 +23,6 @@ import cucumber.api.java.en.Then;
 import gherkin.formatter.model.DataTableRow;
 import org.assertj.core.api.Fail;
 import org.assertj.core.api.WritableAssertionInfo;
-import org.json.JSONArray;
 import org.junit.Assert;
 import org.openqa.selenium.WebElement;
 

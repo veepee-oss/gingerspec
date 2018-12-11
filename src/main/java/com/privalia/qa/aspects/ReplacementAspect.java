@@ -87,8 +87,9 @@ public class ReplacementAspect {
         List<DataTableRow> rows = step.getRows();
         if (docString != null) {
             String value = replacedElement(docString.getValue(), jp);
-            Field field = docString.getClass().getField("value");
-            field.set(field, value);
+            Field field = docString.getClass().getDeclaredField("value");
+            field.setAccessible(true);
+            field.set(docString, value);
         }
         if (rows != null) {
             for (int r = 0; r < rows.size(); r++) {

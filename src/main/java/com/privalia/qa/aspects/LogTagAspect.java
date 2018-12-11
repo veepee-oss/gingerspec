@@ -32,24 +32,31 @@ public class LogTagAspect {
     @Before(value = "logStep(featurePath, step, reporter, i18n)")
     public void beforeLogStep(JoinPoint jp, String featurePath, Step step, Reporter reporter, I18n i18n) throws Throwable {
 
-        List<Comment> comments = step.getComments();
+        try {
 
-        for (Comment comment: comments) {
+            List<Comment> comments = step.getComments();
 
-            String value = comment.getValue();
+            for (Comment comment: comments) {
 
-            if (value.toLowerCase().startsWith("#log")) {
+                String value = comment.getValue();
 
-                String replacedValue;
-                try {
-                    ReplacementAspect replace = new ReplacementAspect();
-                    replacedValue = replace.replacedElement(value, jp);
-                } catch (Exception e) {
-                    replacedValue = value;
+                if (value.toLowerCase().startsWith("#log")) {
+
+                    String replacedValue;
+                    try {
+                        ReplacementAspect replace = new ReplacementAspect();
+                        replacedValue = replace.replacedElement(value, jp);
+                    } catch (Exception e) {
+                        replacedValue = value;
+                    }
+                    logger.warn(replacedValue.replace("#log ", ""));
                 }
-                logger.warn(replacedValue.replace("#log ", ""));
             }
+
+        } catch (Exception e) {
+            logger.error("Error found processing comments: " + e.getMessage());
         }
+
     }
 
 }
