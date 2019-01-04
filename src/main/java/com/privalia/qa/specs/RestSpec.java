@@ -660,7 +660,7 @@ public class RestSpec extends BaseGSpec {
      * @throws Throwable
      */
     @And("^I add the file in '(.+?)' to the request$")
-    public void iAddTheFileInSchemasTestJsonToTheRequest(String filePath) throws Throwable {
+    public void iAddTheFileToTheRequest(String filePath) throws Throwable {
 
         URL url = getClass().getClassLoader().getResource(filePath);
         File file = new File(url.toURI());
