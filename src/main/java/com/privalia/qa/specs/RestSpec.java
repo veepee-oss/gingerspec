@@ -32,7 +32,10 @@ import io.restassured.path.json.JsonPath;
 import io.restassured.response.ResponseBody;
 import io.restassured.specification.RequestSpecification;
 
+import java.io.File;
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -649,5 +652,19 @@ public class RestSpec extends BaseGSpec {
         } else {
             this.setupApp(null, commonspec.getRestHost(), commonspec.getRestPort());
         }
+    }
+
+    /**
+     * Adds the specified file to the request as a form-params parameter
+     * (the request contentType must be changed to 'multipart/form-data')
+     * @throws Throwable
+     */
+    @And("^I add the file in '(.+?)' to the request$")
+    public void iAddTheFileToTheRequest(String filePath) throws Throwable {
+
+        URL url = getClass().getClassLoader().getResource(filePath);
+        File file = new File(url.toURI());
+
+        this.getCommonSpec().getRestRequest().multiPart(file);
     }
 }
