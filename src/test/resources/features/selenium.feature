@@ -1,6 +1,23 @@
 @web
 Feature: Selenium run test
 
+  Scenario: Finding a text anyware on the page
+    Given My app is running in '${DEMO_SITE_HOST}'
+    When I browse to '/'
+    And I wait '1' seconds
+    Then this text exists:
+    """
+    <h1 class="entry-title">Home</h1>
+    """
+    #log Testing variable replacement in text exists step
+    Then I save 'Home' in variable 'var'
+    Then this text exists:
+    """
+    <h1 class="entry-title">Home</h1>
+    """
+    And I wait '1' seconds
+
+
   @ignore @toocomplex
   Scenario: Test a file picker
     Given My app is running in '${DEMO_SITE_HOST}'
