@@ -1,6 +1,9 @@
 package com.privalia.qa.specs;
 
+import com.privalia.qa.utils.ThreadProperty;
 import cucumber.api.DataTable;
+import cucumber.api.PendingException;
+import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
@@ -388,8 +391,10 @@ public class KafkaGSpec extends BaseGSpec {
         commonspec.getKafkaUtils().modifyConsumerProperties("schema.registry.url", this.getCommonSpec().getKafkaUtils().getSchemaRegistryUrl());
 
 
+        this.kafkaTopicExist(topicName);
         Map<Object, Object> results = commonspec.getKafkaUtils().readTopicFromBeginning(topicName);
-        assertThat(results.containsValue(commonspec.getKafkaUtils().getAvroRecords().get(avroRecord))).as("Topic does not exist or the content does not match").isTrue();
+        this.commonspec.getLogger().debug("Found " + results.size() + "records in topic " + topicName);
+        assertThat(results.containsValue(commonspec.getKafkaUtils().getAvroRecords().get(avroRecord))).as("Topic does not contain message that matches the specified record").isTrue();
 
     }
 
@@ -432,6 +437,58 @@ public class KafkaGSpec extends BaseGSpec {
         this.getCommonSpec().getLogger().debug("Closing connection to kafka..");
         if (this.getCommonSpec().getKafkaUtils().getZkUtils() != null) {
             this.getCommonSpec().getKafkaUtils().getZkUtils().close();
+        }
+
+    }
+
+    /**
+     * Performs a partial property matching on the avro records returned
+     * @param topicName         Name of the topic to read messages from
+     * @param atLeast           Indicates to find at least the expectedCount. If ignored, asserts the exact quantity is found
+     * @param expectedCount     Expected amount of records to find that match the given conditions
+     * @param datatable         Expected conditions
+     * @throws Throwable
+     */
+    @And("^The kafka topic '(.+?)' has( at least)? '(.+?)' an avro message with:$")
+    public void theKafkaTopicHasAnAvroMessageWith(String topicName, String atLeast, int expectedCount, DataTable datatable) throws Throwable {
+
+        commonspec.getKafkaUtils().modifyConsumerProperties("value.deserializer", "io.confluent.kafka.serializers.KafkaAvroDeserializer");
+        assertThat(this.getCommonSpec().getKafkaUtils().getSchemaRegistryUrl()).as("Could not build avro consumer since no schema registry was defined").isNotNull();
+        commonspec.getKafkaUtils().modifyConsumerProperties("schema.registry.url", this.getCommonSpec().getKafkaUtils().getSchemaRegistryUrl());
+        this.kafkaTopicExist(topicName);
+
+        Map<Object, Object> results = commonspec.getKafkaUtils().readTopicFromBeginning(topicName);
+
+        int matches = results.size();
+        for (Object result: results.values()) {
+
+            if (result instanceof GenericRecord) {
+                GenericRecord avroMessage = (GenericRecord) result;
+
+                String jsonString = avroMessage.toString();
+
+                for (DataTableRow row : datatable.getGherkinRows()) {
+                    String expression = row.getCells().get(0);
+                    String condition = row.getCells().get(1);
+                    String expectedResult = row.getCells().get(2);
+
+                    String value = commonspec.getJSONPathString(jsonString, expression, null);
+                    try {
+                        commonspec.evaluateJSONElementOperation(value, condition, expectedResult);
+                    } catch (AssertionError e) {
+                        matches--;
+                        break;
+                    }
+                }
+            }
+        }
+
+        this.getCommonSpec().getLogger().debug("Found " + matches + "records in topic " + topicName + " that match the specified conditions");
+
+        if (atLeast != null) {
+            assertThat(matches).as("No matches found").isGreaterThanOrEqualTo(expectedCount);
+        } else {
+            assertThat(matches).as("No matches found").isEqualTo(expectedCount);
         }
 
     }

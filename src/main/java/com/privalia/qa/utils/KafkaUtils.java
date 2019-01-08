@@ -590,6 +590,8 @@ public class KafkaUtils {
                     avroRecord.put(entry.getKey(), ByteBuffer.wrap(new BigDecimal(value).unscaledValue().toByteArray()));
                 } else if (type.matches("long")) {
                     avroRecord.put(entry.getKey(), Long.parseLong(value));
+                } else if (type.matches("float")) {
+                    avroRecord.put(entry.getKey(), Float.parseFloat(value));
                 } else if (type.matches("string")) {
                     avroRecord.put(entry.getKey(), value);
                 } else if (type.matches("boolean")) {
@@ -634,6 +636,10 @@ public class KafkaUtils {
 
                             case "long":
                                 avroRecord.put(entry.getKey(), Long.parseLong(value));
+                                break;
+
+                            case "float":
+                                avroRecord.put(entry.getKey(), Float.parseFloat(value));
                                 break;
 
                             case "int":
