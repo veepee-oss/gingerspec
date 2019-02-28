@@ -1,7 +1,7 @@
 package com.privalia.qa.utils;
 
 import com.jayway.jsonpath.JsonPath;
-import cucumber.api.DataTable;
+import io.cucumber.datatable.DataTable;
 import org.hjson.JsonObject;
 import org.hjson.JsonType;
 import org.hjson.JsonValue;
@@ -44,13 +44,13 @@ public class JsonUtils {
         LinkedHashMap jsonAsMap = new LinkedHashMap();
 
 
-        for (int i = 0; i < modifications.raw().size(); i++) {
-            String composeKey = modifications.raw().get(i).get(0);
-            String operation = modifications.raw().get(i).get(1);
-            String newValue = modifications.raw().get(i).get(2);
+        for (int i = 0; i < modifications.height(); i++) {
+            String composeKey = modifications.row(i).get(0);
+            String operation = modifications.row(i).get(1);
+            String newValue = modifications.row(i).get(2);
 
-            if (modifications.raw().get(0).size() == 4) {
-                typeJsonObject = modifications.raw().get(i).get(3);
+            if (modifications.width() == 4) {
+                typeJsonObject = modifications.row(i).get(3);
             }
 
             JsonObject object = new JsonObject(JsonValue.readHjson(modifiedData).asObject());
@@ -186,10 +186,10 @@ public class JsonUtils {
 
         String modifiedData = data;
 
-        for (int i = 0; i < modifications.raw().size(); i++) {
-            String value = modifications.raw().get(i).get(0);
-            String operation = modifications.raw().get(i).get(1);
-            String newValue = modifications.raw().get(i).get(2);
+        for (int i = 0; i < modifications.height(); i++) {
+            String value = modifications.row(i).get(0);
+            String operation = modifications.row(i).get(1);
+            String newValue = modifications.row(i).get(2);
 
             switch (operation.toUpperCase()) {
                 case "DELETE":

@@ -176,7 +176,7 @@ public class KafkaUtils {
      *
      * @param topicName name of topic.
      * @return true if the topic has been created and false if the topic has not been created.
-     * @throws kafka.common.KafkaException
+     * @throws KafkaException
      */
     public boolean createTopic(String topicName) throws KafkaException {
         logger.debug("Creating topic with name: " + topicName);
@@ -190,7 +190,7 @@ public class KafkaUtils {
      *
      * @param topicName name of topic.
      * @return true if the topic has been deleted and false if the topic has not been deleted.
-     * @throws kafka.common.KafkaException
+     * @throws KafkaException
      */
     public boolean deleteTopic(String topicName) throws KafkaException, TopicAlreadyMarkedForDeletionException {
         logger.debug("Deleting topic with name: " + topicName);
@@ -203,10 +203,10 @@ public class KafkaUtils {
      * List all Kafka topics.
      *
      * @return list of topics.
-     * @throws kafka.common.KafkaException
+     * @throws KafkaException
      */
     public List<String> listTopics() throws KafkaException {
-        return scala.collection.JavaConversions.seqAsJavaList(zkUtils.getAllTopics());
+        return JavaConversions.seqAsJavaList(zkUtils.getAllTopics());
     }
 
 
@@ -215,7 +215,7 @@ public class KafkaUtils {
      *
      * @param topicName     name of topic.
      * @param numPartitions
-     * @throws kafka.common.KafkaException
+     * @throws KafkaException
      */
     public void modifyTopicPartitioning(String topicName, int numPartitions) throws KafkaException {
         if (AdminUtils.topicExists(zkUtils, topicName)) {

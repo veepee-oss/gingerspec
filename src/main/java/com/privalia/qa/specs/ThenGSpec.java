@@ -18,9 +18,9 @@ package com.privalia.qa.specs;
 
 import com.privalia.qa.utils.PreviousWebElements;
 import com.privalia.qa.utils.ThreadProperty;
-import cucumber.api.DataTable;
+
 import cucumber.api.java.en.Then;
-import gherkin.formatter.model.DataTableRow;
+import io.cucumber.datatable.DataTable;
 import org.assertj.core.api.Fail;
 import org.assertj.core.api.WritableAssertionInfo;
 import org.junit.Assert;
@@ -440,14 +440,24 @@ public class ThenGSpec extends BaseGSpec {
     public void matchWithExpresion(String envVar, DataTable table) throws Exception {
         String jsonString = ThreadProperty.get(envVar);
 
-        for (DataTableRow row : table.getGherkinRows()) {
-            String expression = row.getCells().get(0);
-            String condition = row.getCells().get(1);
-            String result = row.getCells().get(2);
+        for (List<String> row : table.asLists()) {
+            String expression = row.get(0);
+            String condition = row.get(1);
+            String result = row.get(2);
 
             String value = commonspec.getJSONPathString(jsonString, expression, null);
             commonspec.evaluateJSONElementOperation(value, condition, result);
         }
+
+
+//        for (DataTableRow row : table.getGherkinRows()) {
+//            String expression = row.getCells().get(0);
+//            String condition = row.getCells().get(1);
+//            String result = row.getCells().get(2);
+//
+//            String value = commonspec.getJSONPathString(jsonString, expression, null);
+//            commonspec.evaluateJSONElementOperation(value, condition, result);
+//        }
     }
 
     /*

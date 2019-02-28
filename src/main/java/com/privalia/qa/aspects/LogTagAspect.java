@@ -1,21 +1,21 @@
 package com.privalia.qa.aspects;
 
-import gherkin.I18n;
-import gherkin.formatter.Reporter;
-import gherkin.formatter.model.Comment;
-import gherkin.formatter.model.Step;
+import com.privalia.qa.cucumber.reporter.TestSourcesModel;
 import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
-
 /**
  * Adds the possibility of printing the comments from the feature files as info level messages when executing.
- * Using #log <message> in a feature file, will print the message in the CLI when executing the test
+ * Using #log <message> in a feature file, will print the message in the CLI when executing the test.
+ *
+ * The log message is captured right before is printed on console and altered using the {@link ReplacementAspect}
+ *
  * @author José Fernández
  */
 @Aspect
@@ -23,39 +23,25 @@ public class LogTagAspect {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
 
+    private TestSourcesModel testSources;
 
-    @Pointcut("execution (public void cucumber.runtime.Runtime.runStep(..)) && "
-            + "args (featurePath, step, reporter, i18n)")
-    protected void logStep(String featurePath, Step step, Reporter reporter, I18n i18n) {
+
+    @Pointcut("execution (* com.privalia.qa.cucumber.reporter.TestNGPrettyFormatter.formatComment(..)) && args(comment)")
+    protected void logStep(String comment) {
     }
 
-    @Before(value = "logStep(featurePath, step, reporter, i18n)")
-    public void beforeLogStep(JoinPoint jp, String featurePath, Step step, Reporter reporter, I18n i18n) throws Throwable {
+    @Around(value = "logStep(comment)")
+    public StringBuilder beforeLogStep(ProceedingJoinPoint pjp, String comment) throws Throwable {
 
+        String replacedValue;
         try {
-
-            List<Comment> comments = step.getComments();
-
-            for (Comment comment: comments) {
-
-                String value = comment.getValue();
-
-                if (value.toLowerCase().startsWith("#log")) {
-
-                    String replacedValue;
-                    try {
-                        ReplacementAspect replace = new ReplacementAspect();
-                        replacedValue = replace.replacedElement(value, jp);
-                    } catch (Exception e) {
-                        replacedValue = value;
-                    }
-                    logger.warn(replacedValue.replace("#log ", ""));
-                }
-            }
-
+            ReplacementAspect replace = new ReplacementAspect();
+            replacedValue = replace.replacedElement(comment, pjp);
         } catch (Exception e) {
-            logger.error("Error found processing comments: " + e.getMessage());
+            replacedValue = comment;
         }
+
+        return (StringBuilder) pjp.proceed(new Object[] {replacedValue});
 
     }
 

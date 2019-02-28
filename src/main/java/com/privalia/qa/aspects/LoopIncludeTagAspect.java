@@ -17,9 +17,22 @@
 package com.privalia.qa.aspects;
 
 import com.privalia.qa.exceptions.IncludeException;
+import cucumber.runtime.CucumberException;
 import cucumber.runtime.io.Resource;
+import cucumber.runtime.model.CucumberFeature;
+import cucumber.util.Encoding;
+import gherkin.AstBuilder;
+import gherkin.Parser;
+import gherkin.ParserException;
+import gherkin.TokenMatcher;
+import gherkin.ast.GherkinDocument;
+import gherkin.events.PickleEvent;
+import gherkin.pickles.Compiler;
+import gherkin.pickles.Pickle;
+import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,15 +44,25 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import static java.util.Objects.requireNonNull;
+
+/**
+ * Aspect for managing the @include, @background and @loop tags. This particulars tags must be handled right
+ * after the feature file is read
+ *
+ * @author José Fernández
+ */
 @Aspect
 public class LoopIncludeTagAspect {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
 
 
-    @Pointcut("execution (* cucumber.runtime.FeatureBuilder.read(..)) &&" + "args (resource)")
+    @Pointcut("execution (* cucumber.runtime.model.FeatureParser.read(..)) && args(resource)")
     protected void featureBuilderRead(Resource resource) {
     }
 
@@ -49,7 +72,8 @@ public class LoopIncludeTagAspect {
      * @throws Throwable exception
      */
     @Around(value = "featureBuilderRead(resource)")
-    public String aroundAddLoopTagPointcutScenario(Resource resource) throws Throwable {
+    public String aroundAddLoopTagPointcutScenario(ProceedingJoinPoint pjp, Resource resource) throws Throwable {
+
         List<String> lines = Files.readAllLines(Paths.get(resource.getPath()), StandardCharsets.UTF_8);
         String listParams;
         String paramReplace;
@@ -106,7 +130,9 @@ public class LoopIncludeTagAspect {
         }
         parseLines(lines, path);
         return String.join("\n", lines);
+
     }
+
 
     public void exampleLines (String name, String[] params, List<String> lines, int num) {
         lines.add(num, "| " + name + " | " + name + ".id |");

@@ -16,6 +16,8 @@
 
 package com.privalia.qa.utils;
 
+
+import com.privalia.qa.cucumber.testng.AbstractCucumberRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.ITestContext;
@@ -23,7 +25,7 @@ import org.testng.annotations.*;
 
 import java.lang.reflect.Method;
 
-public abstract class BaseGTest {
+public abstract class BaseGTest extends AbstractCucumberRunner {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
 

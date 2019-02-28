@@ -11,7 +11,7 @@
 
 	<groupId>com.privalia</groupId>
 	<artifactId>bdt-lib</artifactId>
-	<version>##VERSION##</version>
+	<version>2.0.0-SNAPSHOT</version>
 
 	<name>Privalia BDT framework</name>
 	<url>http://gitlab.privalia.pin/som-qa/bdt-lib</url>
@@ -200,16 +200,56 @@
 			<artifactId>junit-dep</artifactId>
 			<version>4.11</version>
 		</dependency>
+
+
+		<!--<dependency>-->
+			<!--<groupId>info.cukes</groupId>-->
+			<!--<artifactId>cucumber-java</artifactId>-->
+			<!--<version>${cucumber-java.version}</version>-->
+		<!--</dependency>-->
+		<!--<dependency>-->
+			<!--<groupId>info.cukes</groupId>-->
+			<!--<artifactId>cucumber-picocontainer</artifactId>-->
+			<!--<version>${cucumber-java.version}</version>-->
+		<!--</dependency>-->
+
+
 		<dependency>
-			<groupId>info.cukes</groupId>
+			<groupId>io.cucumber</groupId>
 			<artifactId>cucumber-java</artifactId>
-			<version>${cucumber-java.version}</version>
+			<version>4.2.2</version>
 		</dependency>
 		<dependency>
-			<groupId>info.cukes</groupId>
+			<groupId>io.cucumber</groupId>
 			<artifactId>cucumber-picocontainer</artifactId>
-			<version>${cucumber-java.version}</version>
+			<version>4.2.2</version>
+			<scope>test</scope>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/io.cucumber/cucumber-testng -->
+		<dependency>
+			<groupId>io.cucumber</groupId>
+			<artifactId>cucumber-testng</artifactId>
+			<version>4.2.3</version>
+		</dependency>
+		<dependency>
+			<groupId>io.cucumber</groupId>
+			<artifactId>cucumber-junit</artifactId>
+			<version>4.2.2</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.testng</groupId>
+			<artifactId>testng</artifactId>
+			<version>6.14.3</version>
+			<scope>provided</scope>
+		</dependency>
+
+
+
+
+
+
+
 		<dependency>
 			<groupId>org.assertj</groupId>
 			<artifactId>assertj-core</artifactId>
@@ -331,11 +371,11 @@
 			<version>1.2.3</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.testng</groupId>
-			<artifactId>testng</artifactId>
-			<scope>provided</scope>
-		</dependency>
+		<!--<dependency>-->
+			<!--<groupId>org.testng</groupId>-->
+			<!--<artifactId>testng</artifactId>-->
+			<!--<scope>provided</scope>-->
+		<!--</dependency>-->
 		<dependency>
 			<groupId>com.jcraft</groupId>
 			<artifactId>jsch</artifactId>
@@ -474,5 +514,5 @@
 			<artifactId>commons-beanutils</artifactId>
 			<version>1.9.3</version>
 		</dependency>
-	</dependencies>
+    </dependencies>
 </project>

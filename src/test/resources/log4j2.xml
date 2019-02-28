@@ -39,7 +39,7 @@
         <logger name="com.privalia.qa.aspects.ReplacementAspect" level="INFO" additivity="false">
             <appender-ref ref="Steps"/>
         </logger>
-        <logger name="com.privalia.qa.utils.CukesGHooks" level="INFO" additivity="false">
+        <logger name="com.privalia.qa.cucumber.reporter.TestNGPrettyFormatter" level="INFO" additivity="false">
             <appender-ref ref="Hooks"/>
         </logger>
         <logger name="com.privalia.qa.specs" level="DEBUG" additivity="false"/>

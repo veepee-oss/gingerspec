@@ -6,7 +6,7 @@ import cucumber.api.java.en.Then;
 import com.ning.http.client.Response;
 import com.privalia.qa.exceptions.DBException;
 import com.privalia.qa.utils.ThreadProperty;
-import cucumber.api.DataTable;
+
 import java.lang.reflect.InvocationTargetException;
 import java.net.UnknownHostException;
 import java.util.*;
@@ -15,6 +15,7 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.util.JSON;
+import io.cucumber.datatable.DataTable;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import com.datastax.driver.core.ColumnDefinitions;
 import com.datastax.driver.core.DataType;
@@ -143,15 +144,15 @@ public class BigDataGSpec extends BaseGSpec {
     public void createTableWithData(String table, String keyspace, DataTable datatable) {
         try {
             commonspec.getCassandraClient().useKeyspace(keyspace);
-            int attrLength = datatable.getGherkinRows().get(0).getCells().size();
+            int attrLength = datatable.width();
             Map<String, String> columns = new HashMap<String, String>();
             ArrayList<String> pk = new ArrayList<String>();
 
             for (int i = 0; i < attrLength; i++) {
-                columns.put(datatable.getGherkinRows().get(0).getCells().get(i),
-                        datatable.getGherkinRows().get(1).getCells().get(i));
-                if ((datatable.getGherkinRows().size() == 3) && datatable.getGherkinRows().get(2).getCells().get(i).equalsIgnoreCase("PK")) {
-                    pk.add(datatable.getGherkinRows().get(0).getCells().get(i));
+                columns.put(datatable.row(0).get(i),
+                        datatable.row(1).get(i));
+                if ((datatable.height() == 3) && datatable.row(2).get(i).equalsIgnoreCase("PK")) {
+                    pk.add(datatable.row(0).get(i));
                 }
             }
             if (pk.isEmpty()) {
@@ -176,11 +177,11 @@ public class BigDataGSpec extends BaseGSpec {
     public void insertData(String keyspace, String table, DataTable datatable) {
         try {
             commonspec.getCassandraClient().useKeyspace(keyspace);
-            int attrLength = datatable.getGherkinRows().get(0).getCells().size();
+            int attrLength = datatable.width();
             Map<String, Object> fields = new HashMap<String, Object>();
-            for (int e = 1; e < datatable.getGherkinRows().size(); e++) {
+            for (int e = 1; e < datatable.height(); e++) {
                 for (int i = 0; i < attrLength; i++) {
-                    fields.put(datatable.getGherkinRows().get(0).getCells().get(i), datatable.getGherkinRows().get(e).getCells().get(i));
+                    fields.put(datatable.row(0).get(i), datatable.row(e).get(i));
 
                 }
                 commonspec.getCassandraClient().insertData(keyspace + "." + table, fields);
@@ -604,14 +605,14 @@ public class BigDataGSpec extends BaseGSpec {
         commonspec.getCassandraClient().useKeyspace(keyspace);
         // Obtain the types and column names of the datatable
         // to return in a hashmap,
-        Map<String, String> dataTableColumns = extractColumnNamesAndTypes(data.raw().get(0));
+        Map<String, String> dataTableColumns = extractColumnNamesAndTypes(data.row(0));
         // check if the table has columns
         String query = "SELECT * FROM " + tableName + " LIMIT 1;";
         ResultSet res = commonspec.getCassandraClient().executeQuery(query);
         equalsColumns(res.getColumnDefinitions(), dataTableColumns);
         //receiving the string from the select with the columns
         // that belong to the dataTable
-        List<String> selectQueries = giveQueriesList(data, tableName, columnNames(data.raw().get(0)));
+        List<String> selectQueries = giveQueriesList(data, tableName, columnNames(data.row(0)));
         //Check the data  of cassandra with different queries
         int index = 1;
         for (String execQuery : selectQueries) {
@@ -619,7 +620,7 @@ public class BigDataGSpec extends BaseGSpec {
             List<Row> resAsList = res.all();
             assertThat(resAsList.size()).as("The query " + execQuery + " not return any result on Cassandra").isGreaterThan(0);
             assertThat(resAsList.get(0).toString()
-                    .substring(VALUE_SUBSTRING)).as("The resultSet is not as expected").isEqualTo(data.raw().get(index).toString());
+                    .substring(VALUE_SUBSTRING)).as("The resultSet is not as expected").isEqualTo(data.row(index).toString());
             index++;
         }
     }
@@ -637,9 +638,9 @@ public class BigDataGSpec extends BaseGSpec {
 
     private List<String> giveQueriesList(DataTable data, String tableName, String colNames) {
         List<String> queryList = new ArrayList<String>();
-        for (int i = 1; i < data.raw().size(); i++) {
+        for (int i = 1; i < data.height(); i++) {
             String query = "SELECT " + colNames + " FROM " + tableName;
-            List<String> row = data.raw().get(i);
+            List<String> row = data.row(i);
             query += conditionWhere(row, colNames.split(",")) + ";";
             queryList.add(query);
         }

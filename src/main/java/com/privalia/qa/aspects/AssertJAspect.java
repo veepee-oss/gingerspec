@@ -23,6 +23,10 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * This aspect provides a more detailed stacktrace in case of an Assertion error and prints
+ * other useful logging information
+ */
 @Aspect
 public class AssertJAspect {
 
