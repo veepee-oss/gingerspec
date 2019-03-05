@@ -1,9 +1,7 @@
 Feature: JSON replacements
 
   Scenario: Simplest read
-    #log prueba @{JSON.schemas/empty.json}
     Given I save '@{JSON.schemas/empty.json}' in variable 'VAR'
-    #log prueba 2 @{JSON.schemas/empty.json}
     Then I run '[ "!{VARASCD}" = "{}" ]' locally
 
   Scenario: Simplest read with failure message

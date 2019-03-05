@@ -36,7 +36,7 @@ import static com.privalia.qa.aspects.IgnoreTagAspect.ignoreReasons.NOREASON;
 import static com.privalia.qa.aspects.IgnoreTagAspect.ignoreReasons.NOTIGNORED;
 
 /**
- * Aspect for managing the @ignore annotation on a feature
+ * Aspect for managing the @ignore annotation on a feature/scenario
  */
 @Aspect
 public class IgnoreTagAspect {

@@ -352,13 +352,17 @@ public class TestNGPrettyFormatter implements ConcurrentEventListener, ColorAwar
 
     private void printTags(List<Tag> tags, String indent) {
         if (!tags.isEmpty()) {
-            out.println(indent + FixJava.join(FixJava.map(tags, tagNameMapper), " "));
+            Format format = formats.get("pending_arg");
+            StringBuilder result = new StringBuilder(format.text(FixJava.join(FixJava.map(tags, tagNameMapper), " ")));
+            out.println(indent + result);
         }
     }
 
     private void printPickleTags(List<PickleTag> tags, String indent) {
         if (!tags.isEmpty()) {
-            out.println(indent + FixJava.join(FixJava.map(tags, pickleTagNameMapper), " "));
+            Format format = formats.get("pending_arg");
+            StringBuilder result = new StringBuilder(format.text(FixJava.join(FixJava.map(tags, pickleTagNameMapper), " ")));
+            out.println(indent + result);
         }
     }
 

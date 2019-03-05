@@ -24,7 +24,7 @@ import java.util.List;
  * This is a custom implementation of {@link TestNGCucumberRunner} for running feature files
  * using TestNG. This implementation automatically adds glue files, feature files and
  * proper formatter options to all tests
- *<p>
+ *
  * @author Jose Fernandez
  */
 public class CucumberRunner {
@@ -77,7 +77,7 @@ public class CucumberRunner {
         //reporters.add("pretty");
         reporters.add("testng:" + targetExecutionsPath + clazz.getName() + ".xml");
 
-        /* include abode reportes to the "Plugins" of cucumber options*/
+        /* include abode reporters to the "Plugins" of cucumber options*/
         Field pluginFormatterNamesField = runtimeOptions.getClass().getDeclaredField("pluginFormatterNames");
         pluginFormatterNamesField.setAccessible(true);
         try {
