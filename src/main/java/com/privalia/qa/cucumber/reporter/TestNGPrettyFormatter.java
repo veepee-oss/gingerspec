@@ -26,10 +26,13 @@ import cucumber.util.FixJava;
 import cucumber.util.Mapper;
 import gherkin.ast.*;
 import gherkin.pickles.PickleTag;
+import io.cucumber.stepexpression.DataTableArgument;
+import io.cucumber.stepexpression.DocStringArgument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.PrintStream;
+import java.lang.reflect.Field;
 import java.util.List;
 
 
@@ -269,9 +272,56 @@ public class TestNGPrettyFormatter implements ConcurrentEventListener, ColorAwar
         String locationPadding = createPaddingToLocation(STEP_INDENT, keyword + stepText);
         String formattedStepText = formatStepText(keyword, stepText, formats.get(result.getStatus().lowerCaseName()), formats.get(result.getStatus().lowerCaseName() + "_arg"), testStep.getDefinitionArgument());
         out.println(STEP_INDENT + formattedStepText + locationPadding + getLocationText(testStep.getCodeLocation()));
+        printStepExtraArguments(formats.get("tag"), testStep);
+    }
+
+    /**
+     * This method was specifically created to print Docstrings and datatables
+     *
+     * Reflection had to be used since only doing {@link PickleStepTestStep#getStepArgument()} would return
+     * the arguments without the necessary replacements by {@link com.privalia.qa.aspects.ReplacementAspect}
+     *
+     * @param format    Format to apply
+     * @param testStep  PickleStepTestStep object where to get the elements
+     */
+    private void printStepExtraArguments(Format format, PickleStepTestStep testStep) {
+
+        if (testStep.getStepArgument().size() > 0) {
+
+            try {
+                Field definitionMatchField = testStep.getClass().getDeclaredField("definitionMatch");
+                definitionMatchField.setAccessible(true);
+                Object pickleStepDefinitionMatch = definitionMatchField.get(testStep);
+                Field argumentsField = pickleStepDefinitionMatch.getClass().getSuperclass().getDeclaredField("arguments");
+                argumentsField.setAccessible(true);
+                List<io.cucumber.stepexpression.Argument> arguments = (List<io.cucumber.stepexpression.Argument>) argumentsField.get(pickleStepDefinitionMatch);
+
+                for (io.cucumber.stepexpression.Argument argument: arguments) {
+
+                    if (argument instanceof DocStringArgument) {
+                        out.println(STEP_INDENT +  format.text("\"\"\""));
+                        out.println(STEP_INDENT +  format.text(argument.getValue().toString()));
+                        out.println(STEP_INDENT +  format.text("\"\"\""));
+                    }
+
+                    if (argument instanceof DataTableArgument) {
+                        out.println(STEP_INDENT +  format.text(argument.getValue().toString()));
+                    }
+
+                }
+
+            } catch (NoSuchFieldException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+
+        }
+
     }
 
     String formatStepText(String keyword, String stepText, Format textFormat, Format argFormat, List<Argument> arguments) {
+
         int beginIndex = 0;
         StringBuilder result = new StringBuilder(textFormat.text(keyword));
         for (Argument argument : arguments) {

@@ -38,6 +38,8 @@ public abstract class BaseGTest {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
 
+    protected String browser = "";
+
     /**
      * Use custom implementation of {@link TestNGCucumberRunner}
      */
@@ -111,6 +113,7 @@ public abstract class BaseGTest {
      */
     @BeforeMethod(alwaysRun = true)
     public void beforeGMethod(Method method) {
+        ThreadProperty.set("browser", this.browser);
     }
 
     /**

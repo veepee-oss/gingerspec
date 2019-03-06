@@ -25,7 +25,7 @@
         <aspect name="com.privalia.qa.aspects.IgnoreTagAspect"/>
         <aspect name="com.privalia.qa.aspects.AssertJAspect"/>
         <!--<aspect name="com.privalia.qa.aspects.SeleniumAspect"/>-->
-        <!--<aspect name="com.privalia.qa.aspects.BrowsersDataProviderAspect"/>-->
+        <aspect name="com.privalia.qa.aspects.BrowsersDataProviderAspect"/>
     </aspects>
     <weaver
             options="-Xlint:ignore -Xset:weaveJavaPackages=true,weaveJavaxPackages=true">

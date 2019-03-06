@@ -126,71 +126,71 @@ public class WhenGSpec extends BaseGSpec {
         commonspec.getPreviousWebElements().getPreviousWebElements().get(index).clear();
     }
 
-//    /**
-//     * Type a {@code text} on an numbered {@code index} previously found element.
-//     *
-//     * @param text
-//     * @param index
-//     */
-//    @When("^I type '(.+?)' on the element on index '(\\d+?)'$")
-//    public void seleniumType(@Transform(NullableStringConverter.class) String text, Integer index) {
-//        assertThat(this.commonspec, commonspec.getPreviousWebElements()).as("There are less found elements than required")
-//                .hasAtLeast(index);
-//        while (text.length() > 0) {
-//            if (-1 == text.indexOf("\\n")) {
-//                commonspec.getPreviousWebElements().getPreviousWebElements().get(index).sendKeys(text);
-//                text = "";
-//            } else {
-//                commonspec.getPreviousWebElements().getPreviousWebElements().get(index).sendKeys(text.substring(0, text.indexOf("\\n")));
-//                commonspec.getPreviousWebElements().getPreviousWebElements().get(index).sendKeys(Keys.ENTER);
-//                text = text.substring(text.indexOf("\\n") + 2);
-//            }
-//        }
-//    }
+    /**
+     * Type a {@code text} on an numbered {@code index} previously found element.
+     *
+     * @param text
+     * @param index
+     */
+    @When("^I type '(.+?)' on the element on index '(\\d+?)'$")
+    public void seleniumType(String text, Integer index) {
+        assertThat(this.commonspec, commonspec.getPreviousWebElements()).as("There are less found elements than required")
+                .hasAtLeast(index);
+        while (text.length() > 0) {
+            if (-1 == text.indexOf("\\n")) {
+                commonspec.getPreviousWebElements().getPreviousWebElements().get(index).sendKeys(text);
+                text = "";
+            } else {
+                commonspec.getPreviousWebElements().getPreviousWebElements().get(index).sendKeys(text.substring(0, text.indexOf("\\n")));
+                commonspec.getPreviousWebElements().getPreviousWebElements().get(index).sendKeys(Keys.ENTER);
+                text = text.substring(text.indexOf("\\n") + 2);
+            }
+        }
+    }
 
-//    /**
-//     * Send a {@code strokes} list on an numbered {@code url} previously found element or to the driver. strokes examples are "HOME, END"
-//     * or "END, SHIFT + HOME, DELETE". Each element in the stroke list has to be an element from
-//     * {@link Keys} (NULL, CANCEL, HELP, BACK_SPACE, TAB, CLEAR, RETURN, ENTER, SHIFT, LEFT_SHIFT,
-//     * CONTROL, LEFT_CONTROL, ALT, LEFT_ALT, PAUSE, ESCAPE, SPACE, PAGE_UP, PAGE_DOWN, END, HOME, LEFT, ARROW_LEFT, UP,
-//     * ARROW_UP, RIGHT, ARROW_RIGHT, DOWN, ARROW_DOWN, INSERT, DELETE, SEMICOLON, EQUALS, NUMPAD0, NUMPAD1, NUMPAD2,
-//     * NUMPAD3, NUMPAD4, NUMPAD5, NUMPAD6, NUMPAD7, NUMPAD8, NUMPAD9, MULTIPLY, ADD, SEPARATOR, SUBTRACT, DECIMAL,
-//     * DIVIDE, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, META, COMMAND, ZENKAKU_HANKAKU) , a plus sign (+), a
-//     * comma (,) or spaces ( )
-//     *
-//     * @param strokes
-//     * @param foo
-//     * @param index
-//     */
-//    @When("^I send '(.+?)'( on the element on index '(\\d+?)')?$")
-//    public void seleniumKeys(@Transform(ArrayListConverter.class) List<String> strokes, String foo, Integer index) {
-//        if (index != null) {
-//            assertThat(this.commonspec, commonspec.getPreviousWebElements()).as("There are less found elements than required")
-//                    .hasAtLeast(index);
-//        }
-//        assertThat(strokes).isNotEmpty();
-//
-//        for (String stroke : strokes) {
-//            if (stroke.contains("+")) {
-//                List<Keys> csl = new ArrayList<Keys>();
-//                for (String strokeInChord : stroke.split("\\+")) {
-//                    csl.add(Keys.valueOf(strokeInChord.trim()));
-//                }
-//                Keys[] csa = csl.toArray(new Keys[csl.size()]);
-//                if (index == null) {
-//                    new Actions(commonspec.getDriver()).sendKeys(commonspec.getDriver().findElement(By.tagName("body")), csa).perform();
-//                } else {
-//                    commonspec.getPreviousWebElements().getPreviousWebElements().get(index).sendKeys(csa);
-//                }
-//            } else {
-//                if (index == null) {
-//                    new Actions(commonspec.getDriver()).sendKeys(commonspec.getDriver().findElement(By.tagName("body")), Keys.valueOf(stroke)).perform();
-//                } else {
-//                    commonspec.getPreviousWebElements().getPreviousWebElements().get(index).sendKeys(Keys.valueOf(stroke));
-//                }
-//            }
-//        }
-//    }
+    /**
+     * Send a {@code strokes} list on an numbered {@code url} previously found element or to the driver. strokes examples are "HOME, END"
+     * or "END, SHIFT + HOME, DELETE". Each element in the stroke list has to be an element from
+     * {@link Keys} (NULL, CANCEL, HELP, BACK_SPACE, TAB, CLEAR, RETURN, ENTER, SHIFT, LEFT_SHIFT,
+     * CONTROL, LEFT_CONTROL, ALT, LEFT_ALT, PAUSE, ESCAPE, SPACE, PAGE_UP, PAGE_DOWN, END, HOME, LEFT, ARROW_LEFT, UP,
+     * ARROW_UP, RIGHT, ARROW_RIGHT, DOWN, ARROW_DOWN, INSERT, DELETE, SEMICOLON, EQUALS, NUMPAD0, NUMPAD1, NUMPAD2,
+     * NUMPAD3, NUMPAD4, NUMPAD5, NUMPAD6, NUMPAD7, NUMPAD8, NUMPAD9, MULTIPLY, ADD, SEPARATOR, SUBTRACT, DECIMAL,
+     * DIVIDE, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, META, COMMAND, ZENKAKU_HANKAKU) , a plus sign (+), a
+     * comma (,) or spaces ( )
+     *
+     * @param strokes
+     * @param foo
+     * @param index
+     */
+    @When("^I send '(.+?)'( on the element on index '(\\d+?)')?$")
+    public void seleniumKeys(List<String> strokes, String foo, Integer index) {
+        if (index != null) {
+            assertThat(this.commonspec, commonspec.getPreviousWebElements()).as("There are less found elements than required")
+                    .hasAtLeast(index);
+        }
+        assertThat(strokes).isNotEmpty();
+
+        for (String stroke : strokes) {
+            if (stroke.contains("+")) {
+                List<Keys> csl = new ArrayList<Keys>();
+                for (String strokeInChord : stroke.split("\\+")) {
+                    csl.add(Keys.valueOf(strokeInChord.trim()));
+                }
+                Keys[] csa = csl.toArray(new Keys[csl.size()]);
+                if (index == null) {
+                    new Actions(commonspec.getDriver()).sendKeys(commonspec.getDriver().findElement(By.tagName("body")), csa).perform();
+                } else {
+                    commonspec.getPreviousWebElements().getPreviousWebElements().get(index).sendKeys(csa);
+                }
+            } else {
+                if (index == null) {
+                    new Actions(commonspec.getDriver()).sendKeys(commonspec.getDriver().findElement(By.tagName("body")), Keys.valueOf(stroke)).perform();
+                } else {
+                    commonspec.getPreviousWebElements().getPreviousWebElements().get(index).sendKeys(Keys.valueOf(stroke));
+                }
+            }
+        }
+    }
 
     /**
      * Choose an @{code option} from a select webelement found previously
