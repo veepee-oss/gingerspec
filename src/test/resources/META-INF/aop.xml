@@ -24,7 +24,7 @@
         <aspect name="com.privalia.qa.aspects.LogTagAspect"/>
         <aspect name="com.privalia.qa.aspects.IgnoreTagAspect"/>
         <aspect name="com.privalia.qa.aspects.AssertJAspect"/>
-        <!--<aspect name="com.privalia.qa.aspects.SeleniumAspect"/>-->
+        <aspect name="com.privalia.qa.aspects.SeleniumAspect"/>
         <aspect name="com.privalia.qa.aspects.BrowsersDataProviderAspect"/>
     </aspects>
     <weaver

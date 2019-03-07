@@ -30,11 +30,11 @@ import java.lang.reflect.Method;
 
 /**
  * This is a custom implementation of {@link AbstractTestNGCucumberTests} that makes use of the custom {@link CucumberRunner}
- * class. Test classes must extend this class in order to be executed with TestNG
+ * class. Test classes must extend this class in order to be executed with TestNG and use the library steps
  *
  * @author Jose Fernandez
  */
-public abstract class BaseGTest {
+abstract public class BaseGTest {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
 
@@ -131,4 +131,5 @@ public abstract class BaseGTest {
     @AfterClass()
     public void afterGClass() {
     }
+
 }

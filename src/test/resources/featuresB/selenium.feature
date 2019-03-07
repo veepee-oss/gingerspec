@@ -7,7 +7,7 @@ Feature: Selenium run test
     And I wait '1' seconds
     Then this text exists:
     """
-    <h1 class="entry-title">${DEMO_SITE_HOST}</h1>
+    <h1 class="entry-title">Home</h1>
     """
     #log Testing variable replacement in text exists step
     Then I save 'Home' in variable 'var'

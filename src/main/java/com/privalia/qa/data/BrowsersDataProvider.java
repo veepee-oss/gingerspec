@@ -41,7 +41,7 @@ public final class BrowsersDataProvider {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BrowsersDataProvider.class);
 
-    private BrowsersDataProvider() {
+    public BrowsersDataProvider() {
     }
 
     /**
@@ -53,13 +53,13 @@ public final class BrowsersDataProvider {
      * @throws Exception exception
      */
     @DataProvider(parallel = true)
-    public static Iterator<String[]> availableBrowsers(ITestContext context, Constructor<?> testConstructor)
+    public static Object[] availableBrowsers(ITestContext context, Constructor<?> testConstructor)
             throws Exception {
 
         Map<String, String> map = new HashMap<String, String>();
         List<String> browsers = gridBrowsers(map);
 
-        return buildIterator(browsers);
+        return (Object[]) browsers.toArray();
     }
 
 
@@ -72,7 +72,7 @@ public final class BrowsersDataProvider {
      * @throws Exception exception
      */
     @DataProvider(parallel = true)
-    public static Iterator<String[]> availableUniqueBrowsers(ITestContext context, Constructor<?> testConstructor)
+    public static Object[] availableUniqueBrowsers(ITestContext context, Constructor<?> testConstructor)
             throws Exception {
 
         Map<String, String> map = new HashMap<String, String>();
@@ -83,7 +83,12 @@ public final class BrowsersDataProvider {
         browsers.clear();
         browsers.addAll(hs);
 
-        return buildIterator(browsers);
+        return (Object[]) browsers.toArray();
+    }
+
+    @DataProvider(parallel = true)
+    public Object[] test() {
+        return new Object[][]{{"1", "2", "3"}};
     }
 
     /**
@@ -95,14 +100,14 @@ public final class BrowsersDataProvider {
      * @throws Exception
      */
     @DataProvider(parallel = true)
-    public static Iterator<String[]> availableIOSBrowsers(ITestContext context, Constructor<?> testConstructor)
+    public static Object[] availableIOSBrowsers(ITestContext context, Constructor<?> testConstructor)
             throws Exception {
 
         Map<String, String> map = new HashMap<String, String>();
         map.put("platformName", "iOS");
         List<String> browsers = gridBrowsers(map);
 
-        return buildIterator(browsers);
+        return (Object[]) browsers.toArray();
     }
 
     /**
@@ -114,35 +119,14 @@ public final class BrowsersDataProvider {
      * @throws Exception
      */
     @DataProvider(parallel = true)
-    public static Iterator<String[]> availableMobileBrowsers(ITestContext context, Constructor<?> testConstructor)
+    public static Object[] availableMobileBrowsers(ITestContext context, Constructor<?> testConstructor)
             throws Exception {
 
         Map<String, String> map = new HashMap<String, String>();
         map.put("platformName", "(Android|iOS)");
         List<String> browsers = gridBrowsers(map);
 
-        return buildIterator(browsers);
-    }
-
-    /**
-     * Build an String Iterator from String List.
-     *
-     * @param browsers browsers
-     * @return an iterator
-     */
-    private static Iterator<String[]> buildIterator(List<String> browsers) {
-
-        List<String[]> lData = Lists.newArrayList();
-
-        for (String s : browsers) {
-            lData.add(new String[]{s});
-        }
-
-        if (lData.size() == 0) {
-            lData.add(new String[]{""});
-        }
-
-        return lData.iterator();
+        return (Object[]) browsers.toArray();
     }
 
     /**

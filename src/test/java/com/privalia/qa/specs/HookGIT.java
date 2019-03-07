@@ -18,16 +18,18 @@ package com.privalia.qa.specs;
 import com.privalia.qa.data.BrowsersDataProvider;
 import com.privalia.qa.utils.BaseGTest;
 import cucumber.api.CucumberOptions;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Factory;
 
 @CucumberOptions(
         features = {"src/test/resources/featuresB/selenium.feature"},
-        glue = "com.privalia.qa.specs")
+        glue = "com.privalia.qa.specs"
+)
 public class HookGIT extends BaseGTest {
 
-//    @Factory(enabled = false, dataProviderClass = BrowsersDataProvider.class, dataProvider = "availableUniqueBrowsers")
-//    public HookGIT(String browser) {
-//        this.browser = browser;
-//    }
+    @Factory(dataProviderClass = BrowsersDataProvider.class, dataProvider = "availableUniqueBrowsers")
+    public HookGIT(String browser) {
+        this.browser = browser;
+    }
 
 }
