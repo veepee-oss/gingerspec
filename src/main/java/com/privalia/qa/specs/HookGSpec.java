@@ -21,11 +21,12 @@ import com.ning.http.client.AsyncHttpClientConfig;
 import com.privalia.qa.utils.ThreadProperty;
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
-import cucumber.api.java.BeforeStep;
 import io.restassured.http.ContentType;
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.remote.CommandInfo;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.HttpCommandExecutor;
@@ -33,6 +34,10 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.http.HttpClient;
 import org.openqa.selenium.remote.internal.ApacheHttpClient;
 import org.openqa.selenium.remote.internal.HttpClientFactory;
+
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -69,6 +74,11 @@ public class HookGSpec extends BaseGSpec {
      */
     @Before(order = 0)
     public void globalSetup() {
+        /*Removes unnecessary logging messages that are produced by dependencies that make use of java.util.logging.Logger*/
+        Logger rootLogger = LogManager.getLogManager().getLogger("");
+        rootLogger.setLevel(Level.WARNING);
+
+        /*Clears the exceptions stacktrace for the new test*/
         commonspec.getExceptions().clear();
     }
 
@@ -78,7 +88,7 @@ public class HookGSpec extends BaseGSpec {
      *
      * @throws MalformedURLException
      */
-    @Before(order = ORDER_10, value = {"@mobile,@web"})
+    @Before(order = ORDER_10, value = {"@mobile or @web"})
     public void seleniumSetup() throws MalformedURLException {
         String grid = System.getProperty("SELENIUM_GRID");
         if (grid == null) {
@@ -95,18 +105,22 @@ public class HookGSpec extends BaseGSpec {
         commonspec.setBrowserName(browser);
         commonspec.getLogger().debug("Setting up selenium for {}", browser);
 
-        DesiredCapabilities capabilities = null;
+        //DesiredCapabilities capabilities = null;
+        MutableCapabilities capabilities = null;
+
 
         switch (browser.toLowerCase()) {
             case "chrome":
                 ChromeOptions chromeOptions = new ChromeOptions();
                 chromeOptions.addArguments("--no-sandbox");
                 chromeOptions.addArguments("--ignore-certificate-errors");
-                capabilities = DesiredCapabilities.chrome();
+                //capabilities = DesiredCapabilities.chrome();
+                capabilities = new ChromeOptions();
                 capabilities.setCapability(ChromeOptions.CAPABILITY, chromeOptions);
                 break;
             case "firefox":
-                capabilities = DesiredCapabilities.firefox();
+                //capabilities = DesiredCapabilities.firefox();
+                capabilities = new FirefoxOptions();
                 break;
             case "phantomjs":
                 capabilities = DesiredCapabilities.phantomjs();
@@ -130,11 +144,12 @@ public class HookGSpec extends BaseGSpec {
                 throw new WebDriverException("Unknown browser: " + browser);
         }
 
-        capabilities.setVersion(version);
+        //capabilities.setVersion(version);
 
         grid = "http://" + grid + "/wd/hub";
         HttpClient.Factory factory = new ApacheHttpClient.Factory(new HttpClientFactory(60000, 60000));
         HttpCommandExecutor executor = new HttpCommandExecutor(new HashMap<String, CommandInfo>(), new URL(grid), factory);
+        executor.setLocalLogs(null);
         commonspec.setDriver(new RemoteWebDriver(executor, capabilities));
         commonspec.getDriver().manage().timeouts().pageLoadTimeout(PAGE_LOAD_TIMEOUT, TimeUnit.SECONDS);
         commonspec.getDriver().manage().timeouts().implicitlyWait(IMPLICITLY_WAIT, TimeUnit.SECONDS);
@@ -152,7 +167,7 @@ public class HookGSpec extends BaseGSpec {
     /**
      * Close selenium web driver.
      */
-    @After(order = ORDER_20, value = {"@mobile,@web"})
+    @After(order = ORDER_20, value = {"@mobile or @web"})
     public void seleniumTeardown() {
         if (commonspec.getDriver() != null) {
             commonspec.getLogger().debug("Shutdown Selenium client");

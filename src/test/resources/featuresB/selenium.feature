@@ -13,7 +13,7 @@ Feature: Selenium run test
     Then I save 'Home' in variable 'var'
     Then this text exists:
     """
-    <h1 class="entry-title">Home</h1>
+    <h1 class="entry-title">!{var}</h1>
     """
     And I wait '1' seconds
 

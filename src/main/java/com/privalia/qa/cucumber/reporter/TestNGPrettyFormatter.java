@@ -254,10 +254,12 @@ public class TestNGPrettyFormatter implements ConcurrentEventListener, ColorAwar
     private void printComments(PickleStepTestStep testStep, TestCase testCase) {
         String comment = testSources.getRawLineString(testCase, testStep.getStepLine() - 2);
 
-        if (comment.substring(0, 4).toLowerCase().matches("#log")) {
-            StringBuilder formattedComment = formatComment(comment);
-            out.println(STEP_INDENT + formattedComment);
-        }
+        try {
+            if (comment.substring(0, 4).toLowerCase().matches("#log")) {
+                StringBuilder formattedComment = formatComment(comment);
+                out.println(STEP_INDENT + formattedComment);
+            }
+        } catch (Exception e) { }
     }
 
     private StringBuilder formatComment(String comment) {
