@@ -21,6 +21,7 @@ import com.ning.http.client.cookie.Cookie;
 import com.privalia.qa.utils.RemoteSSHConnection;
 import com.privalia.qa.utils.ThreadProperty;
 
+import cucumber.api.PendingException;
 import cucumber.api.java.en.Given;
 import io.cucumber.datatable.DataTable;
 import org.openqa.selenium.WebElement;

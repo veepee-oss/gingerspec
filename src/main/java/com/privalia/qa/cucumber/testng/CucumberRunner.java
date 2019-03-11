@@ -75,7 +75,7 @@ public class CucumberRunner {
 
         /* Include TestNG reporter (store TestNG reports under /target/executions/com.mypackage.myClass.xml) */
         //reporters.add("pretty");
-        reporters.add("testng:" + targetExecutionsPath + clazz.getName() + ".xml"); //testng reporter is causing an ugly exception when a selenium test fails
+        reporters.add("testng:" + targetExecutionsPath + clazz.getName() + ".xml");
 
         /* include abode reporters to the "Plugins" of cucumber options*/
         Field pluginFormatterNamesField = runtimeOptions.getClass().getDeclaredField("pluginFormatterNames");

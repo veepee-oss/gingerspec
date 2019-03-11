@@ -17,13 +17,10 @@
 package com.privalia.qa.aspects;
 
 
-import com.privalia.qa.cucumber.reporter.TestNGPrettyFormatter;
 import com.privalia.qa.exceptions.NonReplaceableException;
 import com.privalia.qa.specs.CommonG;
 import com.privalia.qa.utils.ThreadProperty;
-import cucumber.api.Argument;
 import cucumber.api.TestStep;
-import cucumber.runtime.formatter.Format;
 import gherkin.ast.*;
 import io.cucumber.cucumberexpressions.Group;
 import io.cucumber.stepexpression.DataTableArgument;
@@ -37,8 +34,6 @@ import org.apache.commons.configuration2.builder.fluent.Parameters;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.configuration2.tree.OverrideCombiner;
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
@@ -138,55 +133,62 @@ public class ReplacementAspect {
     public void aroundReplacementArguments(JoinPoint jp) throws NoSuchFieldException, IllegalAccessException, FileNotFoundException, NonReplaceableException, ConfigurationException, URISyntaxException {
 
         Object match = jp.getThis();
-        Field argumentsField = match.getClass().getSuperclass().getDeclaredField("arguments");
-        argumentsField.setAccessible(true);
-        List<io.cucumber.stepexpression.Argument> arguments = (List<io.cucumber.stepexpression.Argument>) argumentsField.get(match);
 
-        for (io.cucumber.stepexpression.Argument argument : arguments) {
+        if (!match.getClass().getName().matches("cucumber.runner.UndefinedPickleStepDefinitionMatch")) {
 
-            if (argument.getValue() != null) {
+            Field argumentsField = match.getClass().getSuperclass().getDeclaredField("arguments");
+            argumentsField.setAccessible(true);
+            List<io.cucumber.stepexpression.Argument> arguments = (List<io.cucumber.stepexpression.Argument>) argumentsField.get(match);
 
-                //If is a normal expression argument
-                if (argument instanceof ExpressionArgument) {
-                    ExpressionArgument expressionArgument = (ExpressionArgument) argument;
-                    Field textField = expressionArgument.getClass().getDeclaredField("argument");
-                    textField.setAccessible(true);
-                    io.cucumber.cucumberexpressions.Argument textArgument = (io.cucumber.cucumberexpressions.Argument) textField.get(expressionArgument);
-                    String currentTextValue = textArgument.getGroup().getValue();
-                    String replacedValue = replacedElement(currentTextValue, jp);
+            for (io.cucumber.stepexpression.Argument argument : arguments) {
 
-                    Group group = textArgument.getGroup();
-                    Field valueField = group.getClass().getDeclaredField("value");
-                    valueField.setAccessible(true);
-                    valueField.set(group, replacedValue);
-                }
+                if (argument.getValue() != null) {
 
-                //If is a datatable argument
-                if (argument instanceof DataTableArgument) {
-                    DataTableArgument dataTabeArgument = (DataTableArgument) argument;
-                    Field listField = dataTabeArgument.getClass().getDeclaredField("argument");
-                    listField.setAccessible(true);
-                    List<List<String>> rows = (List<List<String>>) listField.get(dataTabeArgument);
+                    //If is a normal expression argument
+                    if (argument instanceof ExpressionArgument) {
+                        ExpressionArgument expressionArgument = (ExpressionArgument) argument;
+                        Field textField = expressionArgument.getClass().getDeclaredField("argument");
+                        textField.setAccessible(true);
+                        io.cucumber.cucumberexpressions.Argument textArgument = (io.cucumber.cucumberexpressions.Argument) textField.get(expressionArgument);
+                        String currentTextValue = textArgument.getGroup().getValue();
+                        String replacedValue = replacedElement(currentTextValue, jp);
 
-                    for (List<String> row : rows) {
-                        for (int i = 0; i <= row.size() - 1; i++) {
-                            row.set(i, replacedElement(row.get(i), jp));
-                        }
+                        Group group = textArgument.getGroup();
+                        Field valueField = group.getClass().getDeclaredField("value");
+                        valueField.setAccessible(true);
+                        valueField.set(group, replacedValue);
                     }
 
-                    listField.set(dataTabeArgument, rows);
-                }
+                    //If is a datatable argument
+                    if (argument instanceof DataTableArgument) {
+                        DataTableArgument dataTabeArgument = (DataTableArgument) argument;
+                        Field listField = dataTabeArgument.getClass().getDeclaredField("argument");
+                        listField.setAccessible(true);
+                        List<List<String>> rows = (List<List<String>>) listField.get(dataTabeArgument);
 
-                //If is a Docstring argument
-                if (argument instanceof DocStringArgument) {
-                    DocStringArgument docStringArgument = (DocStringArgument) argument;
-                    Field docstringField = docStringArgument.getClass().getDeclaredField("argument");
-                    docstringField.setAccessible(true);
-                    String docStringValue = (String) docstringField.get(docStringArgument);
-                    String replacedDocStringValue = replacedElement(docStringValue, jp);
-                    docstringField.set(docStringArgument, replacedDocStringValue);
+                        for (List<String> row : rows) {
+                            for (int i = 0; i <= row.size() - 1; i++) {
+                                row.set(i, replacedElement(row.get(i), jp));
+                            }
+                        }
+
+                        listField.set(dataTabeArgument, rows);
+                    }
+
+                    //If is a Docstring argument
+                    if (argument instanceof DocStringArgument) {
+                        DocStringArgument docStringArgument = (DocStringArgument) argument;
+                        Field docstringField = docStringArgument.getClass().getDeclaredField("argument");
+                        docstringField.setAccessible(true);
+                        String docStringValue = (String) docstringField.get(docStringArgument);
+                        String replacedDocStringValue = replacedElement(docStringValue, jp);
+                        docstringField.set(docStringArgument, replacedDocStringValue);
+                    }
                 }
             }
+
+        } else {
+            logger.error("Incorrect step definition match in Feature. Could not apply replacements");
         }
     }
 

@@ -18,10 +18,9 @@ package com.privalia.qa.specs;
 
 import com.csvreader.CsvReader;
 import com.ning.http.client.Response;
-//import com.privalia.qa.cucumber.converter.ArrayListConverter;
+import com.privalia.qa.cucumber.converter.ArrayListConverter;
+import com.privalia.qa.cucumber.converter.NullableStringConverter;
 import com.privalia.qa.utils.ThreadProperty;
-//import com.privalia.qa.cucumber.converter.NullableStringConverter;
-//import cucumber.api.Transform;
 
 import cucumber.api.java.en.When;
 import io.cucumber.datatable.DataTable;
@@ -129,11 +128,15 @@ public class WhenGSpec extends BaseGSpec {
     /**
      * Type a {@code text} on an numbered {@code index} previously found element.
      *
-     * @param text
+     * @param input
      * @param index
      */
     @When("^I type '(.+?)' on the element on index '(\\d+?)'$")
-    public void seleniumType(String text, Integer index) {
+    public void seleniumType(String input, Integer index) {
+
+        NullableStringConverter converter = new NullableStringConverter();
+        String text = converter.transform(input);
+
         assertThat(this.commonspec, commonspec.getPreviousWebElements()).as("There are less found elements than required")
                 .hasAtLeast(index);
         while (text.length() > 0) {
@@ -163,7 +166,11 @@ public class WhenGSpec extends BaseGSpec {
      * @param index
      */
     @When("^I send '(.+?)'( on the element on index '(\\d+?)')?$")
-    public void seleniumKeys(List<String> strokes, String foo, Integer index) {
+    public void seleniumKeys(String text, Integer index) {
+
+        ArrayListConverter converter = new ArrayListConverter();
+        List<String> strokes = converter.transform(text);
+
         if (index != null) {
             assertThat(this.commonspec, commonspec.getPreviousWebElements()).as("There are less found elements than required")
                     .hasAtLeast(index);
