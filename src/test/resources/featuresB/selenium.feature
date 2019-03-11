@@ -32,7 +32,7 @@ Feature: Selenium run test
     When I browse to '/registration'
     When '1' elements exists with 'id:name_3_firstname'
     Then I type 'testUser' on the element on index '0'
-    Then I send 'ENTER' n the element on index '0'
+    Then I send 'ENTER' on the element on index '0'
     And I wait '1' seconds
     When '7' elements exists with 'class:legend_txt'
     And I wait '2' seconds

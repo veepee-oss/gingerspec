@@ -100,6 +100,7 @@ public class HookGSpec extends BaseGSpec {
             fail("Non available browsers");
         }
 
+        commonspec.getLogger().info("Using browser '{}'", b);
         String browser = b.split("_")[0];
         String version = b.split("_")[1];
         commonspec.setBrowserName(browser);
