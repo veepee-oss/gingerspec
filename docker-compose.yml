@@ -37,18 +37,18 @@
 version: '3'
 
 services:
-#  mysql:
-#    image: 'mysql:5.6'
-#    environment:
-#      MYSQL_ROOT_PASSWORD: "mysql"
-#    ports:
-#      - "3306:3306"
-#  postgres:
-#    image: 'postgres:9.6.8'
-#    environment:
-#      POSTGRES_PASSWORD: 'postgres'
-#    ports:
-#      - "5432:5432"
+  mysql:
+    image: 'mysql:5.6'
+    environment:
+      MYSQL_ROOT_PASSWORD: "mysql"
+    ports:
+      - "3306:3306"
+  postgres:
+    image: 'postgres:9.6.8'
+    environment:
+      POSTGRES_PASSWORD: 'postgres'
+    ports:
+      - "5432:5432"
   rest-server:
     image: 'harbor.privalia-test.com/qa/privalia-rest-server:0.1.0'
     ports:
