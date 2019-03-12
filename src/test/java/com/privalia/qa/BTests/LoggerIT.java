@@ -19,8 +19,13 @@ import com.privalia.qa.utils.BaseGTest;
 import cucumber.api.CucumberOptions;
 
 @CucumberOptions(
-        features = {"src/test/resources/featuresB/loopTag.feature"},
+        features = {
+        "src/test/resources/featuresB/titlesReplacements.feature",
+        "src/test/resources/featuresB/logger.feature",
+        "src/test/resources/featuresB/backgroundlogger.feature",
+        "src/test/resources/featuresB/outlineReplacements.feature"
+        },
         glue = "com.privalia.qa.specs")
-public class LoopTagAspectIT extends BaseGTest {
+public class LoggerIT extends BaseGTest {
 
 }

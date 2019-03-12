@@ -13,14 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.privalia.qa.BTests;
+package com.privalia.qa.utils;
 
-import com.privalia.qa.utils.BaseGTest;
-import cucumber.api.CucumberOptions;
+import org.testng.annotations.Test;
 
-@CucumberOptions(
-        features = {"src/test/resources/featuresB/loopTag.feature"},
-        glue = "com.privalia.qa.specs")
-public class LoopTagAspectIT extends BaseGTest {
+import static org.assertj.core.api.Assertions.assertThat;
 
+public class ExceptionListTest {
+
+    @Test
+    public void test() {
+        assertThat(ExceptionList.INSTANCE.getExceptions()).as("Non empty Exception list on boot").hasSize(0);
+    }
 }

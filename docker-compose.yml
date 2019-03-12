@@ -49,10 +49,10 @@ services:
 #      POSTGRES_PASSWORD: 'postgres'
 #    ports:
 #      - "5432:5432"
-#  rest-server:
-#    image: 'harbor.privalia-test.com/qa/privalia-rest-server:0.1.0'
-#    ports:
-#      - "3000:3000"
+  rest-server:
+    image: 'harbor.privalia-test.com/qa/privalia-rest-server:0.1.0'
+    ports:
+      - "3000:3000"
   demo-site:
     image: 'harbor.privalia-test.com/qa/privalia-front-image:0.1.0'
     ports:

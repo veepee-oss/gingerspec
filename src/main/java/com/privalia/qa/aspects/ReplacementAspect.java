@@ -79,6 +79,7 @@ public class ReplacementAspect {
 
     /**
      * replaces any variable placeholder in the scenario/Scenario Outline title.
+     *
      * @param jp
      * @param tags
      * @param location
@@ -118,7 +119,7 @@ public class ReplacementAspect {
     /**
      * When a step is about to be executed, the Match#getArguments method is called. this function retrieves the the arguments that
      * are going to be used when executing the glue method.
-     *
+     * <p>
      * This method captures this event and replaces the variables with their appropriate value using reflection
      *
      * @param jp
@@ -142,15 +143,18 @@ public class ReplacementAspect {
 
             for (io.cucumber.stepexpression.Argument argument : arguments) {
 
-                if (argument.getValue() != null) {
+                //if (argument.getValue() != null) {
 
-                    //If is a normal expression argument
-                    if (argument instanceof ExpressionArgument) {
-                        ExpressionArgument expressionArgument = (ExpressionArgument) argument;
-                        Field textField = expressionArgument.getClass().getDeclaredField("argument");
-                        textField.setAccessible(true);
-                        io.cucumber.cucumberexpressions.Argument textArgument = (io.cucumber.cucumberexpressions.Argument) textField.get(expressionArgument);
-                        String currentTextValue = textArgument.getGroup().getValue();
+                //If is a normal expression argument
+                if (argument instanceof ExpressionArgument) {
+                    ExpressionArgument expressionArgument = (ExpressionArgument) argument;
+                    Field textField = expressionArgument.getClass().getDeclaredField("argument");
+                    textField.setAccessible(true);
+                    io.cucumber.cucumberexpressions.Argument textArgument = (io.cucumber.cucumberexpressions.Argument) textField.get(expressionArgument);
+                    String currentTextValue = textArgument.getGroup().getValue();
+
+                    /*In steps with optional params, the argument could be null*/
+                    if (currentTextValue != null) {
                         String replacedValue = replacedElement(currentTextValue, jp);
 
                         Group group = textArgument.getGroup();
@@ -158,33 +162,34 @@ public class ReplacementAspect {
                         valueField.setAccessible(true);
                         valueField.set(group, replacedValue);
                     }
-
-                    //If is a datatable argument
-                    if (argument instanceof DataTableArgument) {
-                        DataTableArgument dataTabeArgument = (DataTableArgument) argument;
-                        Field listField = dataTabeArgument.getClass().getDeclaredField("argument");
-                        listField.setAccessible(true);
-                        List<List<String>> rows = (List<List<String>>) listField.get(dataTabeArgument);
-
-                        for (List<String> row : rows) {
-                            for (int i = 0; i <= row.size() - 1; i++) {
-                                row.set(i, replacedElement(row.get(i), jp));
-                            }
-                        }
-
-                        listField.set(dataTabeArgument, rows);
-                    }
-
-                    //If is a Docstring argument
-                    if (argument instanceof DocStringArgument) {
-                        DocStringArgument docStringArgument = (DocStringArgument) argument;
-                        Field docstringField = docStringArgument.getClass().getDeclaredField("argument");
-                        docstringField.setAccessible(true);
-                        String docStringValue = (String) docstringField.get(docStringArgument);
-                        String replacedDocStringValue = replacedElement(docStringValue, jp);
-                        docstringField.set(docStringArgument, replacedDocStringValue);
-                    }
                 }
+
+                //If is a datatable argument
+                if (argument instanceof DataTableArgument) {
+                    DataTableArgument dataTabeArgument = (DataTableArgument) argument;
+                    Field listField = dataTabeArgument.getClass().getDeclaredField("argument");
+                    listField.setAccessible(true);
+                    List<List<String>> rows = (List<List<String>>) listField.get(dataTabeArgument);
+
+                    for (List<String> row : rows) {
+                        for (int i = 0; i <= row.size() - 1; i++) {
+                            row.set(i, replacedElement(row.get(i), jp));
+                        }
+                    }
+
+                    listField.set(dataTabeArgument, rows);
+                }
+
+                //If is a Docstring argument
+                if (argument instanceof DocStringArgument) {
+                    DocStringArgument docStringArgument = (DocStringArgument) argument;
+                    Field docstringField = docStringArgument.getClass().getDeclaredField("argument");
+                    docstringField.setAccessible(true);
+                    String docStringValue = (String) docstringField.get(docStringArgument);
+                    String replacedDocStringValue = replacedElement(docStringValue, jp);
+                    docstringField.set(docStringArgument, replacedDocStringValue);
+                }
+                //}
             }
 
         } else {
