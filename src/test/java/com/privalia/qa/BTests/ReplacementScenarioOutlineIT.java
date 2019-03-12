@@ -19,9 +19,9 @@ import com.privalia.qa.utils.BaseGTest;
 import cucumber.api.CucumberOptions;
 
 @CucumberOptions(
-        features = {"src/test/resources/featuresB/replacementDataTable.feature"},
+        features = {"src/test/resources/featuresB/replacementScenarioOutline.feature"},
         glue = "com.privalia.qa.specs")
-public class ReplacementDataTableIT extends BaseGTest {
+public class ReplacementScenarioOutlineIT extends BaseGTest {
 
 
 }
