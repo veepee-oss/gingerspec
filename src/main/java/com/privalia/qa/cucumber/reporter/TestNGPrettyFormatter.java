@@ -307,7 +307,10 @@ public class TestNGPrettyFormatter implements ConcurrentEventListener, ColorAwar
                     }
 
                     if (argument instanceof DataTableArgument) {
-                        out.println(STEP_INDENT +  format.text(argument.getValue().toString()));
+                        String[] rows = argument.getValue().toString().split("\n");
+                        for (String row : rows) {
+                            out.println(STEP_INDENT +  format.text(row.trim()));
+                        }
                     }
 
                 }
