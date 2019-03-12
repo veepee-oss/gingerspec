@@ -188,7 +188,7 @@ public class RestSpec extends BaseGSpec {
      * @throws Exception
      */
     @When("^I send a '(.+?)' request to '(.+?)'( with user and password '(.+:.+?)')? based on '([^:]+?)'( as '(json|string)')? with:$")
-    public void sendRequestDataTable(String requestType, String endPoint, String foo, String loginInfo, String baseData, String baz, String type, DataTable modifications) throws Exception {
+    public void sendRequestDataTable(String requestType, String endPoint, String loginInfo, String baseData, String type, DataTable modifications) throws Exception {
 
         String user = null;
         String password = null;

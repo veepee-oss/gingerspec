@@ -467,7 +467,7 @@ public class ThenGSpec extends BaseGSpec {
      * @param value
      *
      */
-    @Then("^'(?s)(.+?)' ((?!.*with).+?) '(.+?)'$")
+    @Then("^'(.+?)' ((is|matches|is higher than|is lower than|contains|is different from)) '(.+?)'$")
     public void checkValue(String envVar, String operation, String value) throws Exception {
         switch (operation.toLowerCase()) {
             case "is":

@@ -20,7 +20,7 @@ package com.privalia.qa.aspects;
 import com.privalia.qa.exceptions.NonReplaceableException;
 import com.privalia.qa.specs.CommonG;
 import com.privalia.qa.utils.ThreadProperty;
-import cucumber.api.TestStep;
+import cucumber.runtime.StepDefinitionMatch;
 import gherkin.ast.*;
 import io.cucumber.cucumberexpressions.Group;
 import io.cucumber.stepexpression.DataTableArgument;
@@ -57,7 +57,7 @@ public class ReplacementAspect {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
 
-    private TestStep lastEchoedStep;
+    private StepDefinitionMatch lastEchoedStep;
 
     @Pointcut("execution (gherkin.ast.Scenario.new(..)) && args(tags, location, keyword, name, description, steps)")
     protected void replacementScenarios(List<Tag> tags, Location location, String keyword, String name, String description, List<Step> steps) {
@@ -135,7 +135,14 @@ public class ReplacementAspect {
 
         Object match = jp.getThis();
 
-        if (!match.getClass().getName().matches("cucumber.runner.UndefinedPickleStepDefinitionMatch")) {
+        /*To avoid executing replacement on the same step several times*/
+        if (match.equals(lastEchoedStep)) {
+            return;
+        } else {
+            lastEchoedStep = (StepDefinitionMatch) match;
+        }
+
+        if (match.getClass().getName().matches("cucumber.runner.PickleStepDefinitionMatch")) {
 
             Field argumentsField = match.getClass().getSuperclass().getDeclaredField("arguments");
             argumentsField.setAccessible(true);
