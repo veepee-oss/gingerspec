@@ -38,7 +38,7 @@ public class KafkaGSpec extends BaseGSpec {
      * @throws UnknownHostException exception
      */
     @Given("^I connect to kafka at '(.+?)'( using path '(.+?)')?$")
-    public void connectKafka(String zkHost, String foo, String zkPath) throws UnknownHostException {
+    public void connectKafka(String zkHost, String zkPath) throws UnknownHostException {
         String zkPort = zkHost.split(":")[1];
         zkHost = zkHost.split(":")[0];
         commonspec.getKafkaUtils().setZkHost(zkHost, zkPort, zkPath);
@@ -98,7 +98,7 @@ public class KafkaGSpec extends BaseGSpec {
      * @param message    string that you send to topic
      */
     @When("^I send a message '(.+?)' to the kafka topic named '(.+?)'( with key '(.+?)')?( if not exists)?$")
-    public void sendAMessage(String message, String topic_name, String foo, String recordKey, String ifExists) throws Exception {
+    public void sendAMessage(String message, String topic_name, String recordKey, String ifExists) throws Exception {
         if (ifExists != null) {
             Map<Object, Object> result = commonspec.getKafkaUtils().readTopicFromBeginning(topic_name);
             if (result.containsKey(recordKey)) {
@@ -124,7 +124,7 @@ public class KafkaGSpec extends BaseGSpec {
      * @throws TimeoutException
      */
     @Given("I send a message '(.+?)' to the kafka topic named '(.+?)'( with key '(.+?)')? with:$")
-    public void sendAMessageWithDatatable(String message, String topic_name, String foo, String recordKey, DataTable table) throws InterruptedException, ExecutionException, TimeoutException {
+    public void sendAMessageWithDatatable(String message, String topic_name, String recordKey, DataTable table) throws InterruptedException, ExecutionException, TimeoutException {
 
         //todo fix the datatable logic
 //        /*Modify properties of producer*/
@@ -280,7 +280,7 @@ public class KafkaGSpec extends BaseGSpec {
      * @throws Throwable
      */
     @Then("^I create the avro record '(.+?)' from the schema in '(.+?)'( based on '(.+?)')? with:$")
-    public void iCreateTheAvroRecordRecord(String recordName, String schemaFile, String foo, String seedFile, DataTable table) throws Throwable {
+    public void iCreateTheAvroRecordRecord(String recordName, String schemaFile, String seedFile, DataTable table) throws Throwable {
 
         String schemaString = commonspec.retrieveData(schemaFile, "json");
         this.createRecord(recordName, schemaString, seedFile, table);
@@ -297,7 +297,7 @@ public class KafkaGSpec extends BaseGSpec {
      * @throws Throwable
      */
     @Then("^I create the avro record '(.+?)' using version '(.+?)' of subject '(.+?)' from registry( based on '(.+?)')? with:$")
-    public void iCreateTheAvroRecordRecordUsingVersionOfSubjectRecordFromRegistryWith(String recordName, String versionNumber, String subject, String foo, String seedFile, DataTable table) throws Throwable {
+    public void iCreateTheAvroRecordRecordUsingVersionOfSubjectRecordFromRegistryWith(String recordName, String versionNumber, String subject, String seedFile, DataTable table) throws Throwable {
 
         String schema = this.commonspec.getKafkaUtils().getSchemaFromRegistry(subject, versionNumber);
         this.createRecord(recordName, schema, seedFile, table);
@@ -350,7 +350,7 @@ public class KafkaGSpec extends BaseGSpec {
      * @throws Throwable
      */
     @When("^I send the avro record '(.+?)' to the kafka topic '(.+?)'( with key '(.+?)')? with:$")
-    public void iSendTheAvroRecordRecordToTheKafkaTopic(String genericRecord, String topicName, String foo, String recordKey, DataTable table) throws Throwable {
+    public void iSendTheAvroRecordRecordToTheKafkaTopic(String genericRecord, String topicName, String recordKey, DataTable table) throws Throwable {
 
         //todo fix the datatable logic
 //        /*Modify properties of producer*/
