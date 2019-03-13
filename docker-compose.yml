@@ -49,10 +49,10 @@ services:
 #      POSTGRES_PASSWORD: 'postgres'
 #    ports:
 #      - "5432:5432"
-#  rest-server:
-#    image: 'harbor.privalia-test.com/qa/privalia-rest-server:0.1.0'
-#    ports:
-#      - "3000:3000"
+  rest-server:
+    image: 'harbor.privalia-test.com/qa/privalia-rest-server:0.1.0'
+    ports:
+      - "3000:3000"
 #  demo-site:
 #    image: 'harbor.privalia-test.com/qa/privalia-front-image:0.1.0'
 #    ports:
@@ -75,14 +75,14 @@ services:
 #      SELENIUM_GRID: 'selenium-grid:4444'
 #    ports:
 #      - "5901:5900"
-  kafka:
-    image: 'landoop/fast-data-dev:1.0.1'
-    ports:
-     - "2181:2181"
-     - "3030:3030"
-     - "8081:8081"
-     - "8082:8082"
-     - "8083:8083"
-     - "9092:9092"
-    environment:
-     - ADV_HOST=localhost
+#  kafka:
+#    image: 'landoop/fast-data-dev:1.0.1'
+#    ports:
+#     - "2181:2181"
+#     - "3030:3030"
+#     - "8081:8081"
+#     - "8082:8082"
+#     - "8083:8083"
+#     - "9092:9092"
+#    environment:
+#     - ADV_HOST=localhost

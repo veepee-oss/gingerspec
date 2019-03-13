@@ -429,37 +429,6 @@ public class ThenGSpec extends BaseGSpec {
         commonspec.setSeleniumCookies(commonspec.getDriver().manage().getCookies());
     }
 
-    /**
-     * Check if expression defined by JSOPath (http://goessner.net/articles/JsonPath/index.html)
-     * match in JSON stored in a environment variable.
-     *
-     * @param envVar environment variable where JSON is stored
-     * @param table  data table in which each row stores one expression
-     */
-    @Then("^'(.+?)' matches the following cases:.$")
-    public void matchWithExpresion(String envVar, DataTable table) throws Exception {
-        String jsonString = ThreadProperty.get(envVar);
-
-        for (List<String> row : table.asLists()) {
-            String expression = row.get(0);
-            String condition = row.get(1);
-            String result = row.get(2);
-
-            String value = commonspec.getJSONPathString(jsonString, expression, null);
-            commonspec.evaluateJSONElementOperation(value, condition, result);
-        }
-
-
-//        for (DataTableRow row : table.getGherkinRows()) {
-//            String expression = row.getCells().get(0);
-//            String condition = row.getCells().get(1);
-//            String result = row.getCells().get(2);
-//
-//            String value = commonspec.getJSONPathString(jsonString, expression, null);
-//            commonspec.evaluateJSONElementOperation(value, condition, result);
-//        }
-    }
-
     /*
      * Check value stored in environment variable "is|matches|is higher than|is lower than|contains|is different from" to value provided
      *
