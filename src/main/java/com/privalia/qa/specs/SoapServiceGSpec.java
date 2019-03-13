@@ -22,6 +22,8 @@ import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import io.cucumber.datatable.DataTable;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class SoapServiceGSpec extends BaseGSpec {
@@ -103,39 +105,38 @@ public class SoapServiceGSpec extends BaseGSpec {
     @Then("^The response matches the following cases:$")
     public void theResponseMatchesTheFollowingCases(DataTable results) throws Throwable {
 
-        //todo fix the datatable logic
-//        String response = this.commonspec.getLastSoapResponse();
-//
-//        for (DataTableRow row : results.getGherkinRows()) {
-//            String variable = row.getCells().get(0);
-//            String condition = row.getCells().get(1);
-//            String result = row.getCells().get(2);
-//
-//            switch (condition) {
-//
-//                case "equal":
-//                    assertThat(this.commonspec.getSoapServiceClient().evaluateXml(response, variable)).matches(result);
-//                    break;
-//
-//                case "not equal":
-//                    assertThat(this.commonspec.getSoapServiceClient().evaluateXml(response, variable)).doesNotMatch(result);
-//                    break;
-//
-//                case "contains":
-//                    assertThat(this.commonspec.getSoapServiceClient().evaluateXml(response, variable)).contains(result);
-//                    break;
-//
-//                case "does not contain":
-//                    assertThat(this.commonspec.getSoapServiceClient().evaluateXml(response, variable)).doesNotContain(result);
-//                    break;
-//
-//                case "length":
-//                    assertThat(this.commonspec.getSoapServiceClient().evaluateXml(response, variable).length()).isEqualTo(Integer.parseInt(result));
-//                    break;
-//
-//                default:
-//                    Assertions.fail("Not implemented condition: " + condition);
-//            }
-//        }
+        String response = this.commonspec.getLastSoapResponse();
+
+        for (List<String> row : results.asLists()) {
+            String variable = row.get(0);
+            String condition = row.get(1);
+            String result = row.get(2);
+
+            switch (condition) {
+
+                case "equal":
+                    assertThat(this.commonspec.getSoapServiceClient().evaluateXml(response, variable)).matches(result);
+                    break;
+
+                case "not equal":
+                    assertThat(this.commonspec.getSoapServiceClient().evaluateXml(response, variable)).doesNotMatch(result);
+                    break;
+
+                case "contains":
+                    assertThat(this.commonspec.getSoapServiceClient().evaluateXml(response, variable)).contains(result);
+                    break;
+
+                case "does not contain":
+                    assertThat(this.commonspec.getSoapServiceClient().evaluateXml(response, variable)).doesNotContain(result);
+                    break;
+
+                case "length":
+                    assertThat(this.commonspec.getSoapServiceClient().evaluateXml(response, variable).length()).isEqualTo(Integer.parseInt(result));
+                    break;
+
+                default:
+                    Assertions.fail("Not implemented condition: " + condition);
+            }
+        }
     }
 }
