@@ -56,6 +56,8 @@
         <logger name="kafka.admin" level="OFF"/>
         <logger name="org.elasticsearch.client.transport" level="OFF"/>
         <logger name="com.ning.http.client.AsyncHttpClientAsyncHttpClient" level="ERROR"/>
+        <logger name="io.confluent.kafka" level="WARN"/>
+        <logger name="kafka.utils" level="WARN"/>
 
         <!--To make the output of SoapService logs less verbose when using debug option-->
         <logger name="com.predic8" level="WARN"/>

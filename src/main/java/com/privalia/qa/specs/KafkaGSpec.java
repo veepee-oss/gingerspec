@@ -349,8 +349,6 @@ public class KafkaGSpec extends BaseGSpec {
     @When("^I send the avro record '(.+?)' to the kafka topic '(.+?)'( with key '(.+?)')? with:$")
     public void iSendTheAvroRecordRecordToTheKafkaTopic(String genericRecord, String topicName, String recordKey, DataTable table) throws Throwable {
 
-        //todo fix the datatable logic
-
         for (List<String> row : table.asLists()) {
             String key = row.get(0);
             String value = row.get(1);
@@ -376,8 +374,6 @@ public class KafkaGSpec extends BaseGSpec {
      */
     @Then("^The kafka topic '(.+?)' has an avro message '(.+?)' with:$")
     public void theKafkaTopicAvroTopicHasAnAvroMessageRecordWith(String topicName, String avroRecord, DataTable dataTable) throws Throwable {
-
-        //todo fix the datatable logic
 
         for (List<String> row : dataTable.asLists()) {
             String key = row.get(0);
@@ -423,8 +419,6 @@ public class KafkaGSpec extends BaseGSpec {
     @Then("^I configure the kafka producer with:$")
     public void iConfigureProducerProperties(DataTable dataTable) {
 
-        //todo fix the datatable logic
-
         for (List<String> row : dataTable.asLists()) {
             String key = row.get(0);
             String value = row.get(1);
@@ -455,7 +449,6 @@ public class KafkaGSpec extends BaseGSpec {
     @And("^The kafka topic '(.+?)' has( at least)? '(.+?)' an avro message with:$")
     public void theKafkaTopicHasAnAvroMessageWith(String topicName, String atLeast, int expectedCount, DataTable datatable) throws Throwable {
 
-        //todo fix the datatable logic
         commonspec.getKafkaUtils().modifyConsumerProperties("value.deserializer", "io.confluent.kafka.serializers.KafkaAvroDeserializer");
         assertThat(this.getCommonSpec().getKafkaUtils().getSchemaRegistryUrl()).as("Could not build avro consumer since no schema registry was defined").isNotNull();
         commonspec.getKafkaUtils().modifyConsumerProperties("schema.registry.url", this.getCommonSpec().getKafkaUtils().getSchemaRegistryUrl());
