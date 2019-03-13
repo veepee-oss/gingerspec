@@ -142,11 +142,10 @@ public class SqlDatabaseGSpec extends BaseGSpec {
     @Then("^I check that result is:$")
     public void compareTable(DataTable dataTable) {
 
-        //todo fix the datatable logic
-//        List<List<String>> previousResult = this.commonspec.getPreviousSqlResult();
-//        assertThat(previousResult).as("The last SQL query returned a null result").isNotNull();
-//        assertThat(previousResult.size()).as("The last SQL query did not returned any rows").isNotEqualTo(0);
-//        assertThat(dataTable.raw()).as("The returned and the expected results do not match.").isEqualTo(previousResult);
+        List<List<String>> previousResult = this.commonspec.getPreviousSqlResult();
+        assertThat(previousResult).as("The last SQL query returned a null result").isNotNull();
+        assertThat(previousResult.size()).as("The last SQL query did not returned any rows").isNotEqualTo(0);
+        assertThat(dataTable.asLists()).as("The returned and the expected results do not match.").isEqualTo(previousResult);
 
     }
 
