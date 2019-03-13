@@ -22,7 +22,7 @@
 #
 # So, make sure this ports are available in the host machine. To Execute all tests:
 #
-# $ mvn clean install -DVERSION=1.0 -DSLEEPTEST=3 -DAGENT_LIST=1,2 -DVARNAME=foo -DPOSTGRES_HOST=localhost
+# $ mvn clean install -DVERSION=1.0 -DSLEEPTEST=3 -DAGENT_LIST=1,2 -DVARNAME=foo -DWAIT=1 -DPOSTGRES_HOST=localhost
 #        -DMYSQL_HOST=localhost -DREST_SERVER_HOST=localhost -DDEMO_SITE_HOST=demo-site -DSELENIUM_GRID=localhost:4444
 #        -DZOOKEEPER_HOST=localhost -DSCHEMA_REGISTRY_HOST=localhost
 #
@@ -49,40 +49,40 @@ services:
       POSTGRES_PASSWORD: 'postgres'
     ports:
       - "5432:5432"
-#  rest-server:
-#    image: 'harbor.privalia-test.com/qa/privalia-rest-server:0.1.0'
-#    ports:
-#      - "3000:3000"
-#  demo-site:
-#    image: 'harbor.privalia-test.com/qa/privalia-front-image:0.1.0'
-#    ports:
-#      - "80:80"
-#  selenium-grid:
-#    image: 'harbor.privalia-test.com/qa/privalia-selenium-hub:3.9.1'
-#    ports:
-#      - "4444:4444"
-#  selenium-chrome:
-#    image: 'harbor.privalia-test.com/qa/privalia-selenium-chrome:64'
-#    environment:
-#      ID: 'myBrowser'
-#      SELENIUM_GRID: 'selenium-grid:4444'
-#    ports:
-#      - "5900:5900"
-#  selenium-firefox:
-#    image: 'harbor.privalia-test.com/qa/privalia-selenium-firefox:60'
-#    environment:
-#      ID: 'myBrowser'
-#      SELENIUM_GRID: 'selenium-grid:4444'
-#    ports:
-#      - "5901:5900"
-#  kafka:
-#    image: 'landoop/fast-data-dev:1.0.1'
-#    ports:
-#     - "2181:2181"
-#     - "3030:3030"
-#     - "8081:8081"
-#     - "8082:8082"
-#     - "8083:8083"
-#     - "9092:9092"
-#    environment:
-#     - ADV_HOST=localhost
+  rest-server:
+    image: 'harbor.privalia-test.com/qa/privalia-rest-server:0.1.0'
+    ports:
+      - "3000:3000"
+  demo-site:
+    image: 'harbor.privalia-test.com/qa/privalia-front-image:0.1.0'
+    ports:
+      - "80:80"
+  selenium-grid:
+    image: 'harbor.privalia-test.com/qa/privalia-selenium-hub:3.9.1'
+    ports:
+      - "4444:4444"
+  selenium-chrome:
+    image: 'harbor.privalia-test.com/qa/privalia-selenium-chrome:64'
+    environment:
+      ID: 'myBrowser'
+      SELENIUM_GRID: 'selenium-grid:4444'
+    ports:
+      - "5900:5900"
+  selenium-firefox:
+    image: 'harbor.privalia-test.com/qa/privalia-selenium-firefox:60'
+    environment:
+      ID: 'myBrowser'
+      SELENIUM_GRID: 'selenium-grid:4444'
+    ports:
+      - "5901:5900"
+  kafka:
+    image: 'landoop/fast-data-dev:1.0.1'
+    ports:
+     - "2181:2181"
+     - "3030:3030"
+     - "8081:8081"
+     - "8082:8082"
+     - "8083:8083"
+     - "9092:9092"
+    environment:
+     - ADV_HOST=localhost

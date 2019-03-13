@@ -2,7 +2,7 @@ Feature: JSON replacements
 
   Scenario: Simplest read
     Given I save '@{JSON.schemas/empty.json}' in variable 'VAR'
-    Then I run '[ "!{VARASCD}" = "{}" ]' locally
+    Then I run '[ "!{VAR}" = "{}" ]' locally
 
   Scenario: Simplest read with failure message
     Given I save '@{JSON.schemas/otherempty.json}' in variable 'VAR'
