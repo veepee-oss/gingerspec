@@ -17,18 +17,17 @@
 package com.privalia.qa.aspects;
 
 import com.privalia.qa.utils.ThreadProperty;
-
-import gherkin.ast.*;
-import org.aspectj.lang.JoinPoint;
+import gherkin.ast.Examples;
+import gherkin.ast.Location;
+import gherkin.ast.Step;
+import gherkin.ast.Tag;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Field;
 import java.util.List;
 
 /**

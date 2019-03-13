@@ -16,7 +16,6 @@
 
 package com.privalia.qa.aspects;
 
-import com.google.common.collect.Lists;
 import com.privalia.qa.specs.BaseGSpec;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -28,7 +27,6 @@ import org.testng.ITestContext;
 
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * This Aspect verifies if the maven variable FORCE_BROWSER exists when executing selenium related tests

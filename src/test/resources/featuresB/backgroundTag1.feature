@@ -8,7 +8,7 @@ Feature: Background aspect tests
     Given I run '[ "SHOULD_RUN" = "FAIL_RUN" ]' locally
   @/BACKGROUND
     Given I run '[ "SHOULD_RUN" = "SHOULD_RUN" ]' locally
-    ∫
+
   Scenario: default scenario for background1
     Given I run '[ "SHOULD_RUN" = "SHOULD_RUN" ]' locally
 
