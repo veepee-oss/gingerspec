@@ -126,15 +126,13 @@ public class KafkaGSpec extends BaseGSpec {
     @Given("I send a message '(.+?)' to the kafka topic named '(.+?)'( with key '(.+?)')? with:$")
     public void sendAMessageWithDatatable(String message, String topic_name, String recordKey, DataTable table) throws InterruptedException, ExecutionException, TimeoutException {
 
-        //todo fix the datatable logic
-//        /*Modify properties of producer*/
-//        for (DataTableRow row : table.getGherkinRows()) {
-//            String key = row.getCells().get(0);
-//            String value = row.getCells().get(1);
-//            commonspec.getKafkaUtils().modifyProducerProperties(key, value);
-//        }
-//
-//        commonspec.getKafkaUtils().sendAndConfirmMessage(message, recordKey, topic_name, 1);
+        for (List<String> row : table.asLists()) {
+            String key = row.get(0);
+            String value = row.get(1);
+            commonspec.getKafkaUtils().modifyProducerProperties(key, value);
+        }
+
+        commonspec.getKafkaUtils().sendAndConfirmMessage(message, recordKey, topic_name, 1);
 
     }
 
@@ -231,21 +229,19 @@ public class KafkaGSpec extends BaseGSpec {
     @Then("^The kafka topic '(.+?)' has a message containing '(.+?)'( as key)? with:$")
     public void theKafkaTopicStringTopicHasAMessageContainingHelloWith(String topicName, String message, String isKey, DataTable dataTable) throws Throwable {
 
-        //todo fix the datatable logic
-//        /*Modify properties of consumer*/
-//        for (DataTableRow row : dataTable.getGherkinRows()) {
-//            String key = row.getCells().get(0);
-//            String value = row.getCells().get(1);
-//            commonspec.getKafkaUtils().modifyConsumerProperties(key, value);
-//        }
-//
-//        Map<Object, Object> results = commonspec.getKafkaUtils().readTopicFromBeginning(topicName);
-//
-//        if (isKey != null) {
-//            assertThat(results.containsKey(this.getFinalMessage("key.deserializer", message))).as("Topic does not exist or the content does not match").isTrue();
-//        } else {
-//            assertThat(results.containsValue(this.getFinalMessage("value.deserializer", message))).as("Topic does not exist or the content does not match").isTrue();
-//        }
+        for (List<String> row : dataTable.asLists()) {
+            String key = row.get(0);
+            String value = row.get(1);
+            commonspec.getKafkaUtils().modifyConsumerProperties(key, value);
+        }
+
+        Map<Object, Object> results = commonspec.getKafkaUtils().readTopicFromBeginning(topicName);
+
+        if (isKey != null) {
+            assertThat(results.containsKey(this.getFinalMessage("key.deserializer", message))).as("Topic does not exist or the content does not match").isTrue();
+        } else {
+            assertThat(results.containsValue(this.getFinalMessage("value.deserializer", message))).as("Topic does not exist or the content does not match").isTrue();
+        }
 
     }
 
@@ -315,29 +311,30 @@ public class KafkaGSpec extends BaseGSpec {
      */
     private void createRecord(String recordName, String schemaString, String seedFile, DataTable table) throws Exception {
 
-        //todo fix the datatable logic
-//        if (seedFile != null) {
-//            commonspec.getLogger().debug("Building Avro record from seed file");
-//
-//            // Retrieve data
-//            String seedJson = commonspec.retrieveData(seedFile, "json", "ISO-8859-1");
-//
-//            // Modify data
-//            commonspec.getLogger().debug("Modifying data {} as {}", seedJson, "json");
-//            String modifiedData = commonspec.modifyData(seedJson, "json", table).toString();
-//
-//            commonspec.getKafkaUtils().createGenericRecord(recordName, modifiedData, schemaString);
-//
-//        } else {
-//            commonspec.getLogger().debug("Building Avro record from datatable");
-//
-//            Map<String, String> properties = new HashMap<>();
-//            for (DataTableRow row : table.getGherkinRows()) {
-//                properties.put(row.getCells().get(0), row.getCells().get(1));
-//            }
-//
-//            commonspec.getKafkaUtils().createGenericRecord(recordName, properties, schemaString);
-//        }
+
+        if (seedFile != null) {
+            commonspec.getLogger().debug("Building Avro record from seed file");
+
+            // Retrieve data
+            String seedJson = commonspec.retrieveData(seedFile, "json", "ISO-8859-1");
+
+            // Modify data
+            commonspec.getLogger().debug("Modifying data {} as {}", seedJson, "json");
+            String modifiedData = commonspec.modifyData(seedJson, "json", table).toString();
+
+            commonspec.getKafkaUtils().createGenericRecord(recordName, modifiedData, schemaString);
+
+        } else {
+            commonspec.getLogger().debug("Building Avro record from datatable");
+
+            Map<String, String> properties = new HashMap<>();
+
+            for (List<String> row : table.asLists()) {
+                properties.put(row.get(0), row.get(1));
+            }
+
+            commonspec.getKafkaUtils().createGenericRecord(recordName, properties, schemaString);
+        }
     }
 
     /**
@@ -353,18 +350,18 @@ public class KafkaGSpec extends BaseGSpec {
     public void iSendTheAvroRecordRecordToTheKafkaTopic(String genericRecord, String topicName, String recordKey, DataTable table) throws Throwable {
 
         //todo fix the datatable logic
-//        /*Modify properties of producer*/
-//        for (DataTableRow row : table.getGherkinRows()) {
-//            String key = row.getCells().get(0);
-//            String value = row.getCells().get(1);
-//            commonspec.getKafkaUtils().modifyProducerProperties(key, value);
-//        }
-//
-//        commonspec.getKafkaUtils().modifyProducerProperties("value.serializer", "io.confluent.kafka.serializers.KafkaAvroSerializer");
-//
-//        GenericRecord record = commonspec.getKafkaUtils().getAvroRecords().get(genericRecord);
-//        assertThat(record).as("No generic record found with name " + genericRecord).isNotNull();
-//        commonspec.getKafkaUtils().sendAndConfirmMessage(genericRecord, recordKey, topicName, 1);
+
+        for (List<String> row : table.asLists()) {
+            String key = row.get(0);
+            String value = row.get(1);
+            commonspec.getKafkaUtils().modifyProducerProperties(key, value);
+        }
+
+        commonspec.getKafkaUtils().modifyProducerProperties("value.serializer", "io.confluent.kafka.serializers.KafkaAvroSerializer");
+
+        GenericRecord record = commonspec.getKafkaUtils().getAvroRecords().get(genericRecord);
+        assertThat(record).as("No generic record found with name " + genericRecord).isNotNull();
+        commonspec.getKafkaUtils().sendAndConfirmMessage(genericRecord, recordKey, topicName, 1);
 
     }
 
@@ -381,22 +378,22 @@ public class KafkaGSpec extends BaseGSpec {
     public void theKafkaTopicAvroTopicHasAnAvroMessageRecordWith(String topicName, String avroRecord, DataTable dataTable) throws Throwable {
 
         //todo fix the datatable logic
-//        /*Modify properties of consumer*/
-//        for (DataTableRow row : dataTable.getGherkinRows()) {
-//            String key = row.getCells().get(0);
-//            String value = row.getCells().get(1);
-//            commonspec.getKafkaUtils().modifyConsumerProperties(key, value);
-//        }
-//
-//        commonspec.getKafkaUtils().modifyConsumerProperties("value.deserializer", "io.confluent.kafka.serializers.KafkaAvroDeserializer");
-//        assertThat(this.getCommonSpec().getKafkaUtils().getSchemaRegistryUrl()).as("Could not build avro consumer since no schema registry was defined").isNotNull();
-//        commonspec.getKafkaUtils().modifyConsumerProperties("schema.registry.url", this.getCommonSpec().getKafkaUtils().getSchemaRegistryUrl());
-//
-//
-//        this.kafkaTopicExist(topicName);
-//        Map<Object, Object> results = commonspec.getKafkaUtils().readTopicFromBeginning(topicName);
-//        this.commonspec.getLogger().debug("Found " + results.size() + "records in topic " + topicName);
-//        assertThat(results.containsValue(commonspec.getKafkaUtils().getAvroRecords().get(avroRecord))).as("Topic does not contain message that matches the specified record").isTrue();
+
+        for (List<String> row : dataTable.asLists()) {
+            String key = row.get(0);
+            String value = row.get(1);
+            commonspec.getKafkaUtils().modifyConsumerProperties(key, value);
+        }
+
+        commonspec.getKafkaUtils().modifyConsumerProperties("value.deserializer", "io.confluent.kafka.serializers.KafkaAvroDeserializer");
+        assertThat(this.getCommonSpec().getKafkaUtils().getSchemaRegistryUrl()).as("Could not build avro consumer since no schema registry was defined").isNotNull();
+        commonspec.getKafkaUtils().modifyConsumerProperties("schema.registry.url", this.getCommonSpec().getKafkaUtils().getSchemaRegistryUrl());
+
+
+        this.kafkaTopicExist(topicName);
+        Map<Object, Object> results = commonspec.getKafkaUtils().readTopicFromBeginning(topicName);
+        this.commonspec.getLogger().debug("Found " + results.size() + "records in topic " + topicName);
+        assertThat(results.containsValue(commonspec.getKafkaUtils().getAvroRecords().get(avroRecord))).as("Topic does not contain message that matches the specified record").isTrue();
 
     }
 
@@ -408,13 +405,13 @@ public class KafkaGSpec extends BaseGSpec {
     @Then("^I configure the kafka consumers with:$")
     public void iConfigureConsumerProperties(DataTable dataTable) {
 
-        //todo fix the datatable logic
-//        for (DataTableRow row : dataTable.getGherkinRows()) {
-//            String key = row.getCells().get(0);
-//            String value = row.getCells().get(1);
-//            this.getCommonSpec().getLogger().debug("Setting kafka consumer property: " + key + " -> " + value);
-//            commonspec.getKafkaUtils().modifyConsumerProperties(key, value);
-//        }
+        for (List<String> row : dataTable.asLists()) {
+            String key = row.get(0);
+            String value = row.get(1);
+            this.getCommonSpec().getLogger().debug("Setting kafka consumer property: " + key + " -> " + value);
+            commonspec.getKafkaUtils().modifyConsumerProperties(key, value);
+        }
+
     }
 
 
@@ -427,12 +424,14 @@ public class KafkaGSpec extends BaseGSpec {
     public void iConfigureProducerProperties(DataTable dataTable) {
 
         //todo fix the datatable logic
-//        for (DataTableRow row : dataTable.getGherkinRows()) {
-//            String key = row.getCells().get(0);
-//            String value = row.getCells().get(1);
-//            this.getCommonSpec().getLogger().debug("Setting kafka producer property: " + key + " -> " + value);
-//            commonspec.getKafkaUtils().modifyProducerProperties(key, value);
-//        }
+
+        for (List<String> row : dataTable.asLists()) {
+            String key = row.get(0);
+            String value = row.get(1);
+            this.getCommonSpec().getLogger().debug("Setting kafka producer property: " + key + " -> " + value);
+            commonspec.getKafkaUtils().modifyProducerProperties(key, value);
+        }
+
     }
 
     @Then("^I close the connection to kafka$")
@@ -457,44 +456,45 @@ public class KafkaGSpec extends BaseGSpec {
     public void theKafkaTopicHasAnAvroMessageWith(String topicName, String atLeast, int expectedCount, DataTable datatable) throws Throwable {
 
         //todo fix the datatable logic
-//        commonspec.getKafkaUtils().modifyConsumerProperties("value.deserializer", "io.confluent.kafka.serializers.KafkaAvroDeserializer");
-//        assertThat(this.getCommonSpec().getKafkaUtils().getSchemaRegistryUrl()).as("Could not build avro consumer since no schema registry was defined").isNotNull();
-//        commonspec.getKafkaUtils().modifyConsumerProperties("schema.registry.url", this.getCommonSpec().getKafkaUtils().getSchemaRegistryUrl());
-//        this.kafkaTopicExist(topicName);
-//
-//        Map<Object, Object> results = commonspec.getKafkaUtils().readTopicFromBeginning(topicName);
-//
-//        int matches = results.size();
-//        for (Object result: results.values()) {
-//
-//            if (result instanceof GenericRecord) {
-//                GenericRecord avroMessage = (GenericRecord) result;
-//
-//                String jsonString = avroMessage.toString();
-//
-//                for (DataTableRow row : datatable.getGherkinRows()) {
-//                    String expression = row.getCells().get(0);
-//                    String condition = row.getCells().get(1);
-//                    String expectedResult = row.getCells().get(2);
-//
-//                    String value = commonspec.getJSONPathString(jsonString, expression, null);
-//                    try {
-//                        commonspec.evaluateJSONElementOperation(value, condition, expectedResult);
-//                    } catch (AssertionError e) {
-//                        matches--;
-//                        break;
-//                    }
-//                }
-//            }
-//        }
-//
-//        this.getCommonSpec().getLogger().debug("Found " + matches + "records in topic " + topicName + " that match the specified conditions");
-//
-//        if (atLeast != null) {
-//            assertThat(matches).as("No matches found").isGreaterThanOrEqualTo(expectedCount);
-//        } else {
-//            assertThat(matches).as("No matches found").isEqualTo(expectedCount);
-//        }
+        commonspec.getKafkaUtils().modifyConsumerProperties("value.deserializer", "io.confluent.kafka.serializers.KafkaAvroDeserializer");
+        assertThat(this.getCommonSpec().getKafkaUtils().getSchemaRegistryUrl()).as("Could not build avro consumer since no schema registry was defined").isNotNull();
+        commonspec.getKafkaUtils().modifyConsumerProperties("schema.registry.url", this.getCommonSpec().getKafkaUtils().getSchemaRegistryUrl());
+        this.kafkaTopicExist(topicName);
+
+        Map<Object, Object> results = commonspec.getKafkaUtils().readTopicFromBeginning(topicName);
+
+        int matches = results.size();
+        for (Object result: results.values()) {
+
+            if (result instanceof GenericRecord) {
+                GenericRecord avroMessage = (GenericRecord) result;
+
+                String jsonString = avroMessage.toString();
+
+                for (List<String> row : datatable.asLists()) {
+                    String expression = row.get(0);
+                    String condition = row.get(1);
+                    String expectedResult = row.get(2);
+
+                    String value = commonspec.getJSONPathString(jsonString, expression, null);
+                    try {
+                        commonspec.evaluateJSONElementOperation(value, condition, expectedResult);
+                    } catch (AssertionError e) {
+                        matches--;
+                        break;
+                    }
+
+                }
+            }
+        }
+
+        this.getCommonSpec().getLogger().debug("Found " + matches + "records in topic " + topicName + " that match the specified conditions");
+
+        if (atLeast != null) {
+            assertThat(matches).as("No matches found").isGreaterThanOrEqualTo(expectedCount);
+        } else {
+            assertThat(matches).as("No matches found").isEqualTo(expectedCount);
+        }
 
     }
 }
