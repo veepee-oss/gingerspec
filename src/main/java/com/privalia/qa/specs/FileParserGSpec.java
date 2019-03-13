@@ -166,21 +166,20 @@ public class FileParserGSpec extends BaseGSpec {
 
         assertThat(this.commonspec.getLastFileParseRecord()).as("No record was selected in a previous step").isNotNull();
 
-        //todo fix the datatable structure
-//        for (DataTableRow row : dataTable.getGherkinRows()) {
-//            String columnName = row.getCells().get(0);
-//            String condition = row.getCells().get(1);
-//            String expectedValue = row.getCells().get(2);
-//
-//            //I use the the function to filter records to also perfom a bsic matching of expected conditions.
-//            //The record is inserted on a list and the list is passed throught the filter. If the output still contains
-//            //the record, means that the record match the condition
-//            List<Map<String, String>> recordList = new ArrayList<>();
-//            recordList.add(this.commonspec.getLastFileParseRecord());
-//            int size = this.commonspec.getFileParserUtil().filterRecordThatMatches(recordList, columnName, expectedValue, condition).size();
-//            assertThat(size).as("The value of the column " + columnName + " did not match the expected condition (" +  condition + " " + expectedValue).isNotZero();
-//
-//        }
+        for (List<String> row : dataTable.asLists()) {
+            String columnName = row.get(0);
+            String condition = row.get(1);
+            String expectedValue = row.get(2);
+
+            //I use the the function to filter records to also perfom a bsic matching of expected conditions.
+            //The record is inserted on a list and the list is passed throught the filter. If the output still contains
+            //the record, means that the record match the condition
+            List<Map<String, String>> recordList = new ArrayList<>();
+            recordList.add(this.commonspec.getLastFileParseRecord());
+            int size = this.commonspec.getFileParserUtil().filterRecordThatMatches(recordList, columnName, expectedValue, condition).size();
+            assertThat(size).as("The value of the column " + columnName + " did not match the expected condition (" +  condition + " " + expectedValue).isNotZero();
+
+        }
 
     }
 
