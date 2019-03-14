@@ -21,7 +21,7 @@ import cucumber.api.CucumberOptions;
 import org.testng.annotations.Test;
 
 @CucumberOptions(
-        features = {"src/test/resources/featuresB/zookeeperSteps.feature"},
+        features = {"src/test/resources/features/zookeeperSteps.feature"},
         glue = "com.privalia.qa.specs")
 public class ZookeeperStepsIT extends BaseTest {
 

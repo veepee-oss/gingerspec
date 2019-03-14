@@ -19,7 +19,7 @@ import com.privalia.qa.utils.BaseTest;
 import cucumber.api.CucumberOptions;
 
 @CucumberOptions(
-        features = {"src/test/resources/featuresB/kafkaSteps.feature"},
+        features = {"src/test/resources/features/kafkaSteps.feature"},
         glue = "com.privalia.qa.specs")
 public class KafkaStepsIT extends BaseTest {
 

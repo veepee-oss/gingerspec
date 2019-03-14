@@ -13,16 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.privalia.qa.BTests;
-
+package com.privalia.qa.ATests;
 
 import com.privalia.qa.utils.BaseGTest;
 import cucumber.api.CucumberOptions;
 
 @CucumberOptions(
-        features = {"src/test/resources/featuresB/mongoSteps.feature"},
-        glue = "com.privalia.qa.specs")
-public class MongoStepsIT extends BaseGTest {
-
+        features = {"src/test/resources/features/ignored.feature"},
+        glue = "com.privalia.qa.specs"
+)
+public class IgnoreTagAspectIT extends BaseGTest {
 
 }

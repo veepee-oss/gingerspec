@@ -13,15 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.privalia.qa.BTests;
+package com.privalia.qa.ATests;
 
 import com.privalia.qa.utils.BaseGTest;
 import cucumber.api.CucumberOptions;
 
 @CucumberOptions(
-        features = {"src/test/resources/featuresB/runOnEnvTag.feature"},
+        features = {
+        "src/test/resources/features/titlesReplacements.feature",
+        "src/test/resources/features/logger.feature",
+        "src/test/resources/features/backgroundlogger.feature",
+        "src/test/resources/features/outlineReplacements.feature"
+        },
         glue = "com.privalia.qa.specs")
-public class RunOnEnvTagIT extends BaseGTest {
-
+public class LoggerIT extends BaseGTest {
 
 }

@@ -19,7 +19,7 @@ import com.privalia.qa.utils.BaseGTest;
 import cucumber.api.CucumberOptions;
 
 @CucumberOptions(
-        features = {"src/test/resources/featuresB/executeCommand.feature"},
+        features = {"src/test/resources/features/executeCommand.feature"},
         glue = "com.privalia.qa.specs")
 public class GivenGIT extends BaseGTest {
 

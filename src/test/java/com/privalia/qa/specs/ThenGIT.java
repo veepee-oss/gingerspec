@@ -21,7 +21,7 @@ import cucumber.api.CucumberOptions;
 import org.testng.annotations.Factory;
 
 @CucumberOptions(
-        features = {"src/test/resources/featuresB/readWebElementTextToVariable.feature"},
+        features = {"src/test/resources/features/readWebElementTextToVariable.feature"},
         glue = "com.privalia.qa.specs")
 public class ThenGIT extends BaseTest {
 

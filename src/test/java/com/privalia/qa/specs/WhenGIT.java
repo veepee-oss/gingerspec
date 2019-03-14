@@ -20,8 +20,8 @@ import cucumber.api.CucumberOptions;
 
 @CucumberOptions(
         features = {
-                "src/test/resources/featuresB/createJSONFile.feature",
-                "src/test/resources/featuresB/readFileToVariable.feature"
+                "src/test/resources/features/createJSONFile.feature",
+                "src/test/resources/features/readFileToVariable.feature"
         },
         glue = "com.privalia.qa.specs")
 public class WhenGIT extends BaseGTest {

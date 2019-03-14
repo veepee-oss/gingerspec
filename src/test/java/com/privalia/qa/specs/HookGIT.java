@@ -22,7 +22,7 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Factory;
 
 @CucumberOptions(
-        features = {"src/test/resources/featuresB/selenium.feature"},
+        features = {"src/test/resources/features/selenium.feature"},
         glue = "com.privalia.qa.specs"
 )
 public class HookGIT extends BaseGTest {

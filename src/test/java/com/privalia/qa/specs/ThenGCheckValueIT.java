@@ -19,7 +19,7 @@ import com.privalia.qa.utils.BaseGTest;
 import cucumber.api.CucumberOptions;
 
 @CucumberOptions(
-        features = {"src/test/resources/featuresB/checkValue.feature"},
+        features = {"src/test/resources/features/checkValue.feature"},
         glue = "com.privalia.qa.specs")
 public class ThenGCheckValueIT extends BaseGTest {
 
