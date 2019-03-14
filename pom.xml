@@ -185,13 +185,6 @@
 					</execution>
 				</executions>
 			</plugin>
-			<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.4</version> <configuration> <outputDirectory>target/site/apidocs</outputDirectory>
-                </configuration> <executions> <execution> <id>javadoc</id> <goals> <goal>jar</goal>
-                </goals> <phase>package</phase> </execution> <execution> <id>annotation</id>
-                <goals> <goal>jar</goal> </goals> <phase>package</phase> <configuration>
-                <doclet> AnnotationsDoclet </doclet> <docletPath> ../../classes </docletPath>
-                </configuration> </execution> </executions> </plugin> -->
 		</plugins>
 	</build>
 	<dependencies>
@@ -200,20 +193,6 @@
 			<artifactId>junit-dep</artifactId>
 			<version>4.11</version>
 		</dependency>
-
-
-		<!--<dependency>-->
-			<!--<groupId>info.cukes</groupId>-->
-			<!--<artifactId>cucumber-java</artifactId>-->
-			<!--<version>${cucumber-java.version}</version>-->
-		<!--</dependency>-->
-		<!--<dependency>-->
-			<!--<groupId>info.cukes</groupId>-->
-			<!--<artifactId>cucumber-picocontainer</artifactId>-->
-			<!--<version>${cucumber-java.version}</version>-->
-		<!--</dependency>-->
-
-
 		<dependency>
 			<groupId>io.cucumber</groupId>
 			<artifactId>cucumber-java</artifactId>
@@ -225,7 +204,6 @@
 			<version>4.2.2</version>
 			<scope>test</scope>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/io.cucumber/cucumber-testng -->
 		<dependency>
 			<groupId>io.cucumber</groupId>
 			<artifactId>cucumber-testng</artifactId>
@@ -243,13 +221,6 @@
 			<version>6.14.3</version>
 			<scope>provided</scope>
 		</dependency>
-
-
-
-
-
-
-
 		<dependency>
 			<groupId>org.assertj</groupId>
 			<artifactId>assertj-core</artifactId>
@@ -360,22 +331,12 @@
 			<artifactId>json-path</artifactId>
 			<version>2.2.0</version>
 		</dependency>
-		<!--<dependency> -->
-		<!--<groupId>org.mockito</groupId> -->
-		<!--<artifactId>mockito-core</artifactId> -->
-		<!--<version>LATEST</version> -->
-		<!--</dependency> -->
 		<dependency>
 			<groupId>org.skyscreamer</groupId>
 			<artifactId>jsonassert</artifactId>
 			<version>1.2.3</version>
 			<scope>test</scope>
 		</dependency>
-		<!--<dependency>-->
-			<!--<groupId>org.testng</groupId>-->
-			<!--<artifactId>testng</artifactId>-->
-			<!--<scope>provided</scope>-->
-		<!--</dependency>-->
 		<dependency>
 			<groupId>com.jcraft</groupId>
 			<artifactId>jsch</artifactId>
