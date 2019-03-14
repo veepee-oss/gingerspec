@@ -16,7 +16,9 @@
 
 package com.privalia.qa.cucumber.reporter;
 
+import com.privalia.qa.utils.ThreadProperty;
 import cucumber.api.*;
+import cucumber.api.Scenario;
 import cucumber.api.event.*;
 import cucumber.api.formatter.ColorAware;
 import cucumber.api.formatter.NiceAppendable;
@@ -43,7 +45,10 @@ import java.util.List;
  *
  * This class is responsible for printing the steps/features/scenarios to console. This is a custom
  * implementation of the cucumber PrettyFormatter that allow more flexibility with colors and other
- * formatting options. Error messages generated from other classes are printed using the standard log4j
+ * formatting options. Error messages generated from other classes are printed using the standard log4j.
+ *
+ * Unlike regular {@link cucumber.runtime.formatter.PrettyFormatter}, this formatter prints steps BEFORE
+ * they are executed, given real-time feedback to the user about the test progress
  *
  * @author Jose Fernandez
  */
@@ -170,6 +175,18 @@ public class TestNGPrettyFormatter implements ConcurrentEventListener, ColorAwar
             currentTestCase = event.testCase;
         } else {
             printScenarioDefinition(event.testCase);
+        }
+
+        /*dataSet is used to correctly create the folder name under target/executions when screenshot is taken*/
+        /*Why here you may wonder?.... why not?*/
+        try {
+            String feature = testSources.getFeature(event.getTestCase().getUri()).getName();
+            String scenario = event.testCase.getName();
+            ThreadProperty.set("dataSet", feature + "." + scenario);
+            ThreadProperty.set("feature", feature);
+            ThreadProperty.set("scenario", scenario);
+        } catch (Exception e) {
+            ThreadProperty.set("dataSet", "");
         }
     }
 
