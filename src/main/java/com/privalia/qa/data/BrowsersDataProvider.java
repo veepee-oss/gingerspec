@@ -86,11 +86,6 @@ public final class BrowsersDataProvider {
         return (Object[]) browsers.toArray();
     }
 
-    @DataProvider(parallel = true)
-    public Object[] test() {
-        return new Object[][]{{"1", "2", "3"}};
-    }
-
     /**
      * Get the browsers available with "iOS" as platformName in a selenium grid.
      *
@@ -193,6 +188,8 @@ public final class BrowsersDataProvider {
                     }
                 }
             }
+        } else {
+            LOGGER.warn("No Selenium Grid address specified!. Please use -DSELENIUM_GRID to supply a valid address");
         }
         // Sort response
         Collections.sort(response);

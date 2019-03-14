@@ -62,6 +62,8 @@ public class TestNGPrettyFormatter implements ConcurrentEventListener, ColorAwar
 
     private static final String EXAMPLES_INDENT = "    ";
 
+    private static final String TABLES_INDENT = "     ";
+
     private final TestSourcesModel testSources = new TestSourcesModel();
 
     private final NiceAppendable out;
@@ -318,23 +320,21 @@ public class TestNGPrettyFormatter implements ConcurrentEventListener, ColorAwar
                 for (io.cucumber.stepexpression.Argument argument: arguments) {
 
                     if (argument instanceof DocStringArgument) {
-                        out.println(STEP_INDENT +  format.text("\"\"\""));
-                        out.println(STEP_INDENT +  format.text(argument.getValue().toString()));
-                        out.println(STEP_INDENT +  format.text("\"\"\""));
+                        out.println(TABLES_INDENT +  format.text("\"\"\""));
+                        out.println(TABLES_INDENT +  format.text(argument.getValue().toString()));
+                        out.println(TABLES_INDENT +  format.text("\"\"\""));
                     }
 
                     if (argument instanceof DataTableArgument) {
                         String[] rows = argument.getValue().toString().split("\n");
                         for (String row : rows) {
-                            out.println(STEP_INDENT +  format.text(row.trim()));
+                            out.println(TABLES_INDENT +  format.text(row.trim()));
                         }
                     }
 
                 }
 
-            } catch (NoSuchFieldException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
+            } catch (NoSuchFieldException | IllegalAccessException e) {
                 e.printStackTrace();
             }
 
