@@ -48,7 +48,7 @@ import java.util.List;
  * formatting options. Error messages generated from other classes are printed using the standard log4j.
  *
  * Unlike regular {@link cucumber.runtime.formatter.PrettyFormatter}, this formatter prints steps BEFORE
- * they are executed, given real-time feedback to the user about the test progress
+ * they are executed, giving real-time feedback to the user about the test progress
  *
  * @author Jose Fernandez
  */
@@ -300,7 +300,7 @@ public class TestNGPrettyFormatter implements ConcurrentEventListener, ColorAwar
      * This method was specifically created to print Docstrings and datatables
      *
      * Reflection had to be used since only doing {@link PickleStepTestStep#getStepArgument()} would return
-     * the arguments without the necessary replacements by {@link com.privalia.qa.aspects.ReplacementAspect}
+     * the arguments without the necessary replacements done by {@link com.privalia.qa.aspects.ReplacementAspect}
      *
      * @param format    Format to apply
      * @param testStep  PickleStepTestStep object where to get the elements
