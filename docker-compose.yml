@@ -1,5 +1,5 @@
 ######################################################################################################
-# This is a docker-compose file that starts the necessary containers for testing the bdt-lib library
+# This is a docker-compose file that starts the necessary containers for testing the GingerSpec library
 #
 # In order to use it, go to the root folder of the project and execute
 #

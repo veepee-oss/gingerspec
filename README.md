@@ -1,4 +1,4 @@
-Privalia bdt-lib
+Privalia GingerSpec
 ===========
 
 Privalia Acceptance Test library
@@ -33,7 +33,7 @@ _**group execution**_
 
 ## ASPECTS
 
-As part of BDT implementation, there are a couple of AspectJ aspects which may be useful for your scenarios:
+As part of GingerSpec implementation, there are a couple of AspectJ aspects which may be useful for your scenarios:
 
 - **RunOnTagAspect**:
 
