@@ -32,6 +32,8 @@ import java.util.regex.Pattern;
 
 import static com.jayway.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchema;
 import static com.privalia.qa.assertions.Assertions.assertThat;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
 
 
 /**
@@ -512,6 +514,30 @@ public class ThenGSpec extends BaseGSpec {
     @Then("^I clear headers from previous request.$")
     public void clearHeaders() throws Throwable {
         commonspec.getHeaders().clear();
+    }
+    /**
+     * Takes the value of any the web element property passed by parameter and checks its value
+     *
+     * @throws IllegalAccessException, NoSuchFieldException, ClassNotFoundException
+     */
+
+
+    @Then("^the element with '([^:]*?):(.+?)' has '(.+?)' in custom property '(.+?)'$")
+    public void theElementOnIndexHasTextInCustomPropertyName(String method, String element, String textValue, String customProperty) throws IllegalAccessException, NoSuchFieldException, ClassNotFoundException {
+
+        List<WebElement> wel = commonspec.locateElement(method, element, 1);
+        PreviousWebElements pwel = new PreviousWebElements(wel);
+        commonspec.setPreviousWebElements(pwel);
+        String textInAttribute = commonspec.getPreviousWebElements().getPreviousWebElements().get(0).getAttribute(customProperty);
+
+        if (textInAttribute != null) {
+            this.commonspec.getLogger().info("the element {} have text -> {} in property -> {}", element, textInAttribute, customProperty);
+            assertTrue(textInAttribute.equalsIgnoreCase(textValue));
+        } else {
+            this.commonspec.getLogger().info("the element {} doesn't have this property -> {}", element, customProperty);
+            assertNotNull(textInAttribute);
+
+        }
     }
 
 }
