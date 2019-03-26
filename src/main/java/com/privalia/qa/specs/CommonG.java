@@ -610,7 +610,7 @@ public class CommonG {
         } else if ("xpath".equals(method)) {
             return By.xpath(element);
         } else if ("css".equals(method)) {
-            return By.className(element);
+            return By.cssSelector(element);
         }
 
         fail("Unknown method: " + method);
