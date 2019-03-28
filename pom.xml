@@ -3,12 +3,6 @@
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>com.privalia</groupId>
-		<artifactId>parent</artifactId>
-		<version>1.0.1-SNAPSHOT</version>
-	</parent>
-
 	<groupId>com.privalia</groupId>
 	<artifactId>gingerspec</artifactId>
 	<version>##VERSION##</version>
@@ -23,7 +17,33 @@
 		<tag>HEAD</tag>
 	</scm>
 
+	<distributionManagement> <!-- Remote Artifactory repository URL where to store the artifacts created after a "mvn deploy"-->
+		<repository>
+			<id>releases</id>
+			<name>libs-release</name>
+			<url>http://artifactory.mkp.privalia.pin/artifactory/privalia-maven2</url>
+		</repository>
+		<snapshotRepository>
+			<id>snapshots</id>
+			<name>libs-snapshot</name>
+			<url>http://artifactory.mkp.privalia.pin/artifactory/privalia-maven2</url>
+		</snapshotRepository>
+	</distributionManagement>
+
+	<organization>
+		<name>Privalia</name>
+		<url>https://es.privalia.com/</url>
+	</organization>
+
 	<inceptionYear>2014</inceptionYear>
+
+	<licenses>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
 
 	<developers>
 		<developer>
@@ -104,20 +124,37 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.19.1</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<version>2.8.2</version>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>
+				<version>2.19.1</version>
 				<configuration>
-					<argLine>${jacoco-IT-argline}
+					<argLine>
 						-javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/1.8.8/aspectjweaver-1.8.8.jar
 						-Xms512m -Xmx1536m
 					</argLine>
+					<reportsDirectory>${project.build.directory}/failsafe-reports</reportsDirectory>
 				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>integration-test</goal>
+							<goal>verify</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.5</version>
 				<configuration>
 					<source>1.8</source>
 					<target>1.8</target>
@@ -126,6 +163,7 @@
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.7.5.201505241946</version>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -162,11 +200,31 @@
 			<plugin>
 				<groupId>com.mycila</groupId>
 				<artifactId>license-maven-plugin</artifactId>
+				<version>2.11</version>
 				<configuration>
+					<mapping>
+						<java>SLASHSTAR_STYLE</java>
+						<!-- <scala>SLASHSTAR_STYLE</scala> -->
+						<ts>SLASHSTAR_STYLE</ts>
+						<scss>JAVADOC_STYLE</scss>
+					</mapping>
+					<useDefaultExcludes>true</useDefaultExcludes>
+					<header>com/mycila/maven/plugin/license/templates/APACHE-2.txt</header>
+					<properties>
+						<owner>${project.organization.name}</owner>
+						<email>${project.organization.url}</email>
+						<failOnMissingHeader>true</failOnMissingHeader>
+					</properties>
+					<includes>
+						<include>**/src/**</include>
+					</includes>
 					<excludes>
 						<exclude>**/.*/**</exclude>
+						<exclude>**/_themes/privalia/**</exclude>
 						<exclude>**/*.rst</exclude>
 						<exclude>**/*.feature</exclude>
+						<exclude>**/README*</exclude>
+						<exclude>**/node*/**</exclude>
 						<exclude>**/*.conf</exclude>
 						<exclude>**/*.sh</exclude>
 					</excludes>
@@ -185,13 +243,6 @@
 					</execution>
 				</executions>
 			</plugin>
-			<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.4</version> <configuration> <outputDirectory>target/site/apidocs</outputDirectory>
-                </configuration> <executions> <execution> <id>javadoc</id> <goals> <goal>jar</goal>
-                </goals> <phase>package</phase> </execution> <execution> <id>annotation</id>
-                <goals> <goal>jar</goal> </goals> <phase>package</phase> <configuration>
-                <doclet> AnnotationsDoclet </doclet> <docletPath> ../../classes </docletPath>
-                </configuration> </execution> </executions> </plugin> -->
 		</plugins>
 	</build>
 	<dependencies>
@@ -258,16 +309,6 @@
 			<version>${guava.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>net.jpountz.lz4</groupId>
-			<artifactId>lz4</artifactId>
-			<version>${lz4.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpclient</artifactId>
-			<version>${httpclient.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>org.mongodb</groupId>
 			<artifactId>mongo-java-driver</artifactId>
 			<version>${mongo-java-driver.version}</version>
@@ -320,11 +361,6 @@
 			<artifactId>json-path</artifactId>
 			<version>2.2.0</version>
 		</dependency>
-		<!--<dependency> -->
-		<!--<groupId>org.mockito</groupId> -->
-		<!--<artifactId>mockito-core</artifactId> -->
-		<!--<version>LATEST</version> -->
-		<!--</dependency> -->
 		<dependency>
 			<groupId>org.skyscreamer</groupId>
 			<artifactId>jsonassert</artifactId>
@@ -334,7 +370,8 @@
 		<dependency>
 			<groupId>org.testng</groupId>
 			<artifactId>testng</artifactId>
-			<scope>provided</scope>
+			<version>6.9.9</version>
+			<!--<scope>provided</scope>-->
 		</dependency>
 		<dependency>
 			<groupId>com.jcraft</groupId>
@@ -381,11 +418,6 @@
 					<artifactId>slf4j-log4j12</artifactId>
 				</exclusion>
 			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>com.auth0</groupId>
-			<artifactId>java-jwt</artifactId>
-			<version>2.1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.avro</groupId>
