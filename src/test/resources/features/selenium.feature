@@ -112,4 +112,4 @@ Feature: Selenium run test
     When I browse to '/registration'
     And I wait '1' seconds
     And '3' elements exists with 'css:input[name='radio_4[]']'
-    Then the element in index '1' has 'radio_4[]' in custom property 'name'
+    Then the element in index '1' has 'radio_4[]' in property 'name'

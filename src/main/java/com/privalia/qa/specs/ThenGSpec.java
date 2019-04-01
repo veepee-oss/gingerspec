@@ -521,26 +521,24 @@ public class ThenGSpec extends BaseGSpec {
     }
 
     /**
-     * You can check a specific value of a specific webElement property of a specific webElement
-     * with string passed by parameter
-     * @param index  position of the element in the array of webElements found
-     * @param textValue  value expected in the property
-     * @param customProperty  property of webElement that you want to check
+     * Verifies if the value of a property of the webelement referenced by index matches the given value
+     *
+     * @param index             Position of the element in the array of webElements
+     * @param textValue         Value expected in the property
+     * @param customProperty    Property of webElement to verify
      *
      * @throws IllegalAccessException, NoSuchFieldException, ClassNotFoundException,Melos
      */
-
-
-    @Then("^the element in index '(.+?)' has '(.+?)' in custom property '(.+?)'$")
+    @Then("^the element in index '(.+?)' has '(.+?)' in property '(.+?)'$")
     public void theElementOnIndexHasTextInCustomPropertyName(int index, String textValue, String customProperty) throws IllegalAccessException, NoSuchFieldException, ClassNotFoundException {
 
         List<WebElement> wel = commonspec.getPreviousWebElements().getPreviousWebElements();
         assertThat(wel.size()).as("The last step did not find elements").isNotZero();
 
         String value = wel.get(index) .getAttribute(customProperty);
-        assertThat(value).as("the element doesn't have the property", customProperty).isNotEmpty().isNotNull();
+        assertThat(value).as("The element doesn't have the property '%s'", customProperty).isNotEmpty().isNotNull();
 
-        assertThat(value).as("the element doesn't have the text").isEqualToIgnoringCase(textValue);
+        assertThat(value).as("The property '%s' doesn't have the text '%s'", customProperty, textValue).isEqualToIgnoringCase(textValue);
 
     }
 
