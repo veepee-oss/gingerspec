@@ -32,10 +32,13 @@ import java.util.regex.Pattern;
 
 import static com.jayway.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchema;
 import static com.privalia.qa.assertions.Assertions.assertThat;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
 
 
 /**
  * Generic Then Specs.
+ *
  * @see <a href="ThenGSpec-annotations.html">Then Steps &amp; Matching Regex</a>
  */
 public class ThenGSpec extends BaseGSpec {
@@ -315,11 +318,12 @@ public class ThenGSpec extends BaseGSpec {
     /**
      * Verifies the HTTP code of the service response. Additionally, the step can also verify if the returned response
      * has an specific length, contains a string or matches a json schema.
-     * @param expectedStatus    Expected HTTP response code
-     * @param foo               regex needed to match method
-     * @param expectedLength    Expected lenght of the response
-     * @param expectedText      Text to look for in the response
-     * @param expectedSchema    Json schema to match the response (i.e. schemas/test-schema.json)
+     *
+     * @param expectedStatus Expected HTTP response code
+     * @param foo            regex needed to match method
+     * @param expectedLength Expected lenght of the response
+     * @param expectedText   Text to look for in the response
+     * @param expectedSchema Json schema to match the response (i.e. schemas/test-schema.json)
      */
     @Then("^the service response status must be '(.*?)'( and its response length must be '(.*?)'| and its response must contain the text '(.*?)'| and its response matches the schema in '(.*?)')?.$")
     public void assertResponseStatusLength(Integer expectedStatus, String foo, Integer expectedLength, String expectedText, String expectedSchema) {
@@ -329,7 +333,7 @@ public class ThenGSpec extends BaseGSpec {
                     assertThat(r.getStatusCode()).isEqualTo(expectedStatus);
                     assertThat((r.getResponse()).length()).isEqualTo(expectedLength);
                 });
-            } else  if (foo.contains("text")) {
+            } else if (foo.contains("text")) {
                 WritableAssertionInfo assertionInfo = new WritableAssertionInfo();
                 Pattern pattern = CommonG.matchesOrContains(expectedText);
                 assertThat(Optional.of(commonspec.getResponse())).hasValueSatisfying(r -> {
@@ -493,7 +497,8 @@ public class ThenGSpec extends BaseGSpec {
 
     /**
      * Takes the content of a webElement and stores it in the thread environment variable passed as parameter
-     * @param index position of the element in the array of webElements found
+     *
+     * @param index  position of the element in the array of webElements found
      * @param envVar name of the thread environment variable where to store the text
      */
     @Then("^I save content of element in index '(\\d+?)' in environment variable '(.+?)'$")
@@ -507,11 +512,34 @@ public class ThenGSpec extends BaseGSpec {
     /**
      * Clears the headers set by any previous request. A request will reuse the headers/cookies
      * that were set in any previous call within the same scenario
+     *
      * @throws Throwable
      */
     @Then("^I clear headers from previous request.$")
     public void clearHeaders() throws Throwable {
         commonspec.getHeaders().clear();
+    }
+
+    /**
+     * Verifies if the value of a property of the webelement referenced by index matches the given value
+     *
+     * @param index             Position of the element in the array of webElements
+     * @param textValue         Value expected in the property
+     * @param customProperty    Property of webElement to verify
+     *
+     * @throws IllegalAccessException, NoSuchFieldException, ClassNotFoundException,Melos
+     */
+    @Then("^the element in index '(.+?)' has '(.+?)' in property '(.+?)'$")
+    public void theElementOnIndexHasTextInCustomPropertyName(int index, String textValue, String customProperty) throws IllegalAccessException, NoSuchFieldException, ClassNotFoundException {
+
+        List<WebElement> wel = commonspec.getPreviousWebElements().getPreviousWebElements();
+        assertThat(wel.size()).as("The last step did not find elements").isNotZero();
+
+        String value = wel.get(index) .getAttribute(customProperty);
+        assertThat(value).as("The element doesn't have the property '%s'", customProperty).isNotEmpty().isNotNull();
+
+        assertThat(value).as("The property '%s' doesn't have the text '%s'", customProperty, textValue).isEqualToIgnoringCase(textValue);
+
     }
 
 }

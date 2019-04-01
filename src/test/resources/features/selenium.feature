@@ -106,3 +106,10 @@ Feature: Selenium run test
     When I click on the element on index '0'
     When '1' elements exists with 'id:myDIV'
     And the element on index '0' IS NOT displayed
+
+  Scenario: Testing if a specific webelement has an especific value in an especific css property
+    Given My app is running in '${DEMO_SITE_HOST}'
+    When I browse to '/registration'
+    And I wait '1' seconds
+    And '3' elements exists with 'css:input[name='radio_4[]']'
+    Then the element in index '1' has 'radio_4[]' in property 'name'
