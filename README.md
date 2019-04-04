@@ -1,195 +1,160 @@
-Privalia GingerSpec
-===========
-
-Privalia Acceptance Test library
-
- * Cucumber for test definition 
- * TestNG for execution
- * AsyncHTTP Client
- * Selenium 
- * JSONPath
- * AssertJ
-
-Testing runtime to rule over Privalia's acceptance tests
-
-After modifying, to check changes in your local project do:
-mvn clean install -Dmaven.test.skip=true (tests skip temporarily)
-
-## EXECUTION
-
-These tests are suposed to be executed as follows:
-
-` mvn verify [-D\<ENV_VAR>=\<VALUE>] [-Dit.test=\<TEST_TO_EXECUTE>|-Dgroups=\<GROUP_TO_EXECUTE>] `
-
-Examples:
-
-_**single class execution**_
-
-` mvn verify -DSECS=AGENT_LIST=1,2 -Dit.test=com.privalia.qa.ATests.LoopTagAspectIT `
-
-_**group execution**_
-
-` mvn verify -DSECS=5 -Dgroups=hol `
-
-## ASPECTS
-
-As part of GingerSpec implementation, there are a couple of AspectJ aspects which may be useful for your scenarios:
-
-- **RunOnTagAspect**:
-
-` @runOnEnv(METRIC_HOST) `
-
-` @skipOnEnv(METRIC_HOST) `
-
-An AspectJ aspect could handle cucumber tags so that the annotated scenario will be overseen if no environment variable METRIC_HOST exists and has value (so that no traces of it execution show up)
-
-_Example @runOnEnv:_
-
-```
-    @runOnEnv(SECS)
-	Scenario: Dummy scenario
-      And I wait '${SECS}' seconds
+```  
+  
+  /$$$$$$  /$$                                          /$$$$$$                               
+ /$$__  $$|__/                                         /$$__  $$                              
+| $$  \__/ /$$ /$$$$$$$   /$$$$$$   /$$$$$$   /$$$$$$ | $$  \__/  /$$$$$$   /$$$$$$   /$$$$$$$
+| $$ /$$$$| $$| $$__  $$ /$$__  $$ /$$__  $$ /$$__  $$|  $$$$$$  /$$__  $$ /$$__  $$ /$$_____/
+| $$|_  $$| $$| $$  \ $$| $$  \ $$| $$$$$$$$| $$  \__/ \____  $$| $$  \ $$| $$$$$$$$| $$      
+| $$  \ $$| $$| $$  | $$| $$  | $$| $$_____/| $$       /$$  \ $$| $$  | $$| $$_____/| $$      
+|  $$$$$$/| $$| $$  | $$|  $$$$$$$|  $$$$$$$| $$      |  $$$$$$/| $$$$$$$/|  $$$$$$$|  $$$$$$$
+ \______/ |__/|__/  |__/ \____  $$ \_______/|__/       \______/ | $$____/  \_______/ \_______/
+                         /$$  \ $$                              | $$                          
+                        |  $$$$$$/                              | $$                          
+                         \______/                               |__/ 
 ```
 
-This scenario will ONLY be executed if environment vairable SECS is defined.
+Privalia Acceptance Test library. Testing runtime to rule over Privalia's acceptance tests
 
 
-_Example @skipOnEnv:_
+[![Build Status](https://travis-ci.org/rest-assured/rest-assured.svg)](https://travis-ci.org/rest-assured/rest-assured)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.rest-assured/rest-assured/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.rest-assured/rest-assured)
+[![Javadoc](https://javadoc-badge.appspot.com/io.rest-assured/rest-assured.svg)](http://www.javadoc.io/doc/io.rest-assured/rest-assured)
 
-```
-    @skipOnEnv(SECS_2)
-	Scenario: Dummy scenario
-      And I wait '${SECS}' seconds
-```
-
-This scenario will be omitted if environment vairable SECS_2 is defined.
-
-- **IgnoreTagAspect**
-
-An AspectJ aspect that allows the skipping of an scenario or a feature. To do so a tag must be used before the scenario or the feature. Additionally an ignored reason can be set.
-
-```
- @ignore @manual
- @ignore @unimplemented
- @ignore @toocomplex
- @ignore @tillfixed(DCS-XXX)
-```
-
-This last ignored reason is associated to a ticket in Jira. After executing the test class the ticket link is shown as execution result.
-
-- **IncludeTagAspect**
-
-An AspectJ aspect that includes an scenario before the taged one. It manages parameters as well. Scenario name of the included feature can not contain spaces. Parameters should be wrapped in []
-
-` @include(feature:<feature>,scenario:<scenario>)`
-
-` @include(feature:<feature>,scenario:<scenario>,params:<params>)`
+## Project Intro/Objective
+The purpose of this project is to provide a generic BDT (behaviour driven testing) library with common BDD steps and extended gherkin language. 
 
 
-_Examples:_
-
-This will execute the scenario "Not_so_dummy_scenario" from the feature file sample.feature before executing "Dummy scenario" 
-```
-    @include(feature:sample.feature,scenario:Not_so_dummy_scenario)
-    Scenario: Dummy scenario
-          And I wait '1' seconds
-```
-
-Similarly, this will execute the scenario "Not_so_dummy_scenario" from the feature file sample.feature but will inject the variables time1=1 and time2=2
-```
-    @include(feature:sample.feature,scenario:Not_so_dummy_scenario,params:[time1:1,time2:2])
-    Scenario: Dummy scenario
-          And I wait '1' seconds
-```
-
-to make use of the variables time1 and time2 in the scenario "Not_so_dummy_scenario":
-```
-    Feature: Included Feature
-    
-      Scenario: Not_so_dummy_scenario
-        And I wait '<time1>' seconds
-        And I wait '<time2>' seconds
-```
+### Technologies
+* Cucumber for test definition   
+* TestNG for execution  
+* AsyncHTTP Client  
+* Selenium   
+* JSONPath  
+* AssertJ
 
 
-- **LoopTagAspect**
+## Getting Started
 
-An AspectJ aspect that allows looping over scenarios. Using this tag before an scenario will convert this scenario into an scenario outline, changing parameter defined "NAME" for every element in the environment variable list received.
+After modifying, to check changes in your local project do:  
 
-` @loop(LIST_PARAM,NAME)`
+`mvn clean install -Dmaven.test.skip=true` (tests skip temporarily)  
+  
+#### Execution  
+  
+Individual tests are supposed to be executed as follows:  
+  
+` 
+mvn verify [-D\<ENV_VAR>=\<VALUE>] [-Dit.test=\<TEST_TO_EXECUTE>|-Dgroups=\<GROUP_TO_EXECUTE>] 
+`  
+  
+Examples:  
+  
+_**single class execution**_  
+  
+` mvn verify -DSECS=AGENT_LIST=1,2 -Dit.test=com.privalia.qa.ATests.LoopTagAspectIT `  
+  
+_**group execution**_  
+  
+` mvn verify -DSECS=5 -Dgroups=hol `  
 
-Being LIST_PARAM: `-DLIST_PARAM=elem1,elem2,elem3`
+<br>
 
-_Examples:_
+## Using the library
 
-```
-  @loop(AGENT_LIST,VAR_NAME)
-  Scenario: write <VAR_NAME> a file the final result of the scenario.
-    Given I run 'echo <VAR_NAME> >> testOutput.txt' locally
-```
+You must use the following dependency in your testng project to get access to all GingerSpec library functionality
 
-```
-  @loop(AGENT_LIST,VAR_NAME)
-  Scenario: With scenarios outlines and datatables
-    Given I create file 'testSOATtag<VAR_NAME.id>.json' based on 'schemas/simple<VAR_NAME>.json' as 'json' with:
-      | $.a | REPLACE | @{JSON.schemas/empty.json}     | object   |
-    Given I save '@{JSON.testSOATtag<VAR_NAME.id>.json}' in variable 'VAR'
-    Then I run '[ "!{VAR}" = "{"a":{}}" ]' locally
+``` 
+<dependency>
+      <groupId>com.privalia</groupId>
+      <artifactId>gingerspec</artifactId>
+      <version>1.0.0</version>
+</dependency>
+``` 
+
+However, we strongly suggest you to make use of the special archetype for GingerSpec based projects: '**automation-archetype**'. Just run the following command in your terminal
+
+``` 
+mvn -U archetype:generate -DarchetypeGroupId=com.privalia -DarchetypeArtifactId=automation-archetype
+``` 
+
+This will create a ready-to-use project based on a template with best practices and examples that you can modify in the way you see fit for your needs
+
+
+
+## Aspects  
+  
+As part of GingerSpec implementation, there are a couple of AspectJ aspects which may be useful for your scenarios:  
+  
+- **RunOnTagAspect**:  Allow the conditional execution of scenarios based on a given environment variable
+  
+``` 
+     @runOnEnv(METRIC_HOST)
+     @skipOnEnv(METRIC_HOST)
 ```
 
-`-DAGENT_LIST=1,2`
+<br>
+  
+- **IgnoreTagAspect**  
+  
+An AspectJ aspect that allows to skip an scenario or a whole feature. To do so, a tag must be used before the scenario or the feature keyword. Additionally an ignored reason can be set.  
+  
+  
+``` 
+    @ignore @manual
+    @ignore @unimplemented
+    @ignore @toocomplex
+    @ignore @tillfixed(DCS-XXX)
+``` 
 
-More examples can be found in [Loop feature](src/test/resources/features/loopTag.feature)
+   
+  <br>
+  
+- **IncludeTagAspect**: An AspectJ aspect that includes an scenario before the tagged one. It manages parameters as well. Scenario name of the included feature can not contain spaces. Parameters should be wrapped in []  
 
-
-- **Background Tag**
-
-An AspectJ aspect included in loopTagAspect that allows conditional backgrounds. Its used inside the Background label as can be seen in the examples:
-
+  
 ```
-@background(VAR)        // Beginning of conditional block of steps
-   Given X
-   When  Y
-   Then  Z
-@/background            // End of block
-  ```
-
-Being VAR: `-DVAR=value`
-
-_Examples:_
-
+   @include(feature:<feature>,scenario:<scenario>)
+   @include(feature:<feature>,scenario:<scenario>,params:<params>) 
 ```
-  Background:
-    Given I run '[ "SHOULD_RUN" = "SHOULD_RUN" ]' locally
-  @background(WAIT_NO)
-    Given I run '[ "SHOULD_RUN" = "FAIL_RUN" ]' locally
-    Given I run '[ "SHOULD_RUN" = "FAIL_RUN" ]' locally
-    Given I run '[ "SHOULD_RUN" = "FAIL_RUN" ]' locally
-  @/background
-    Given I run '[ "SHOULD_RUN" = "SHOULD_RUN" ]' locally
+  
+  <br>
+  
+- **LoopTagAspect**: An AspectJ aspect that allows looping over scenarios. Using this tag before an scenario will convert this scenario into an scenario outline
+     
+  
 ```
+    @loop(LIST_PARAM,NAME)
+```  
+  
+If LIST_PARAM: `-DLIST_PARAM=elem1,elem2,elem3`, pthe escenario is executed three times, first time with NAME=elem1, second time with NAME=elem2 and third time with NAME=elem3
+  
+  
+  <br>
+  
+- **Background Tag**: An AspectJ aspect included in loopTagAspect that allows conditional backgrounds, or conditional executions of group of steps based in a environmental variable.
+  
+  
+```  
+    @background(VAR)        	// Beginning of conditional block of steps  
+     Given X When  Y Then  Z
+    @/background            	// End of block  
+ ```  
+Being VAR: `-DVAR=value`  
+  
+<br>
 
-If the test above its executed *WITH* `-DWAIT_NO=value` then the background will be:
+## Contributing Members to GingerSpec
+
+**QA Team Lead: [Oleksandr Tarasyuk](https://github.com/alejandro2003) (@oleksandr.tarasyuk)**
+
+#### Other Members:
+
+|Name     |  Slack Handle   | 
+|---------|-----------------|
+|[Jose Fernandez Duque](https://github.com/josefd8)| @josefd8        |
 
 
-```
-   Background:
-     Given I run '[ "SHOULD_RUN" = "SHOULD_RUN" ]' locally
-     Given I run '[ "SHOULD_RUN" = "FAIL_RUN" ]' locally
-     Given I run '[ "SHOULD_RUN" = "FAIL_RUN" ]' locally
-     Given I run '[ "SHOULD_RUN" = "FAIL_RUN" ]' locally
-     Given I run '[ "SHOULD_RUN" = "SHOULD_RUN" ]' locally
-```
+<br>
 
-On the other hand, if it is executed *WITHOUT* the environment variable, the background will be:
-
-```
-   Background:
-     Given I run '[ "SHOULD_RUN" = "SHOULD_RUN" ]' locally
-     Given I run '[ "SHOULD_RUN" = "SHOULD_RUN" ]' locally
-```
-
-
-In conclusion, if environment variable is defined the code below the tag would be included as part of the background, if not, it will be omitted.
-
-More examples can be found in [Background feature](src/test/resources/features/backgroundTag1.feature)
+## Contact
+* You can find a more in depth docs/manuals [here](https://confluence.vptech.eu/pages/viewpage.action?spaceKey=QAP&title=Automation+with+Java+BDD+Framework+Ecosystem).  
