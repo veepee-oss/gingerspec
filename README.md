@@ -63,6 +63,18 @@ _**group execution**_
   
 ` mvn verify -DSECS=5 -Dgroups=hol `  
 
+_**print log at DEBUG level when running a test**_
+
+` mvn verify -DSECS=AGENT_LIST=1,2 -Dit.test=com.privalia.qa.ATests.LoopTagAspectIT -DlogLevel=DEBUG`
+
+_**-DSELENIUM_GRID and -DFORCE_BROWSER for Selenium features**_
+
+` mvn verify -Dit.test=com.privalia.myproject.mypackage.CucumberSeleniumIT -DSELENIUM_GRID=127.0.0.1:4444`
+
+_**-Dmaven.failsafe.debug to debug with maven and IDE.**_
+
+` mvn verify -DSECS=AGENT_LIST=1,2 -Dit.test=com.privalia.qa.ATests.LoopTagAspectIT -Dmaven.failsafe.debug`
+
 <br>
 
 ## Using the library
