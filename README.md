@@ -26,11 +26,15 @@ The purpose of this project is to provide a generic BDT (behaviour driven testin
 
 ### Technologies
 * Cucumber for test definition   
-* TestNG for execution  
-* AsyncHTTP Client  
-* Selenium   
-* JSONPath  
+* TestNG for execution    
+* Selenium     
 * AssertJ
+* SQL (PostgreSQL & MySQL)
+* rest-assured
+* SSH support
+* Files manipulation
+* WebServices
+* Kafka & ZooKeeper
 
 
 ## Getting Started
@@ -38,6 +42,8 @@ The purpose of this project is to provide a generic BDT (behaviour driven testin
 After modifying, to check changes in your local project do:  
 
 `mvn clean install -Dmaven.test.skip=true` (tests skip temporarily)  
+
+If you want to execute all the integration tests in the library
   
 #### Execution  
   
@@ -87,62 +93,62 @@ As part of GingerSpec implementation, there are a couple of AspectJ aspects whic
   
 - **RunOnTagAspect**:  Allow the conditional execution of scenarios based on a given environment variable
   
-``` 
-     @runOnEnv(METRIC_HOST)
-     @skipOnEnv(METRIC_HOST)
-```
-
-<br>
-  
-- **IgnoreTagAspect**  
-  
-An AspectJ aspect that allows to skip an scenario or a whole feature. To do so, a tag must be used before the scenario or the feature keyword. Additionally an ignored reason can be set.  
-  
-  
-``` 
-    @ignore @manual
-    @ignore @unimplemented
-    @ignore @toocomplex
-    @ignore @tillfixed(DCS-XXX)
-``` 
-
-   
-  <br>
+- **IgnoreTagAspect**: An AspectJ aspect that allows to skip an scenario or a whole feature. To do so, a tag must be used before the scenario or the feature keyword. Additionally an ignored reason can be set.  
   
 - **IncludeTagAspect**: An AspectJ aspect that includes an scenario before the tagged one. It manages parameters as well. Scenario name of the included feature can not contain spaces. Parameters should be wrapped in []  
 
-  
-```
-   @include(feature:<feature>,scenario:<scenario>)
-   @include(feature:<feature>,scenario:<scenario>,params:<params>) 
-```
-  
-  <br>
-  
 - **LoopTagAspect**: An AspectJ aspect that allows looping over scenarios. Using this tag before an scenario will convert this scenario into an scenario outline
-     
   
-```
-    @loop(LIST_PARAM,NAME)
-```  
+- **BackgroundTagAspect**: An AspectJ aspect included in loopTagAspect that allows conditional backgrounds, or conditional executions of group of steps based in a environmental variable.
+
+- **ReplacementAspect**: Allows the use of variables in the Feature file. Variables are enclosed in #{}, ${}, @{} and !{} symbols and could be global (feature level) or local (scenario level)
   
-If LIST_PARAM: `-DLIST_PARAM=elem1,elem2,elem3`, pthe escenario is executed three times, first time with NAME=elem1, second time with NAME=elem2 and third time with NAME=elem3
-  
+- **LogTagAspect**: Allows comments in the feature file to be printed in console when tests are executed.
   
   <br>
   
-- **Background Tag**: An AspectJ aspect included in loopTagAspect that allows conditional backgrounds, or conditional executions of group of steps based in a environmental variable.
   
-  
-```  
-    @background(VAR)        	// Beginning of conditional block of steps  
-     Given X When  Y Then  Z
-    @/background            	// End of block  
- ```  
-Being VAR: `-DVAR=value`  
-  
-<br>
+## Steps
 
+GingerSpec contains tons of predefined Gherkin steps ready to use in your own features. The steps cover a wide range of functionality, from steps for testing Rest endpoints, perform front-end etsting using selenium, and even for testing kafka services!
+
+
+_Testing Rest services_
+```
+Scenario: A successful response with a valid body is returned
+        Given I securely send requests to 'jsonplaceholder.typicode.com:443'
+        When I send a 'GET' request to '/posts'
+        Then the service response status must be '200'
+        And I save element '$.[0].userId' in environment variable 'USER_ID'
+        Then '!{USER_ID}' matches '1'
+```
+
+
+_Testing a web page_
+```
+  Scenario: Test send keys function
+    Given My app is running in 'mytestpage.com'
+    When I browse to '/registration'
+    When '1' elements exists with 'id:name_3_firstname'
+    Then I type 'testUser' on the element on index '0'
+    Then I send 'ENTER' on the element on index '0'
+```
+
+_Testing a kafka service_
+```
+Scenario: Send message to kafka topic
+    Given I connect to kafka at 'myzookeeperaddress:2181'
+    Given I create a Kafka topic named 'testqa' if it doesn't exists
+    Then A kafka topic named 'testqa' exists
+    Given I send a message 'hello' to the kafka topic named 'testqa'
+    Then The kafka topic 'testqa' has a message containing 'hello'
+    Then I close the connection to kafka
+```
+  
+
+And many many more!  
+
+  
 ## Contributing Members to GingerSpec
 
 **QA Team Lead: [Oleksandr Tarasyuk](https://github.com/alejandro2003) (@oleksandr.tarasyuk)**
