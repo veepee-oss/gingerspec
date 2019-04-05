@@ -21,7 +21,9 @@ Privalia Acceptance Test library. Testing runtime to rule over Privalia's accept
 [![Javadoc](https://javadoc-badge.appspot.com/io.rest-assured/rest-assured.svg)](http://www.javadoc.io/doc/io.rest-assured/rest-assured)
 
 ## Project Intro/Objective
-The purpose of this project is to provide a generic BDT (behaviour driven testing) library with common BDD steps and extended gherkin language. 
+The purpose of this project is to provide a generic BDT (behaviour driven testing) library with common BDD steps and extended gherkin language.
+
+GingerSpec provides common functionality that can be reused by different test projects, It encourage code reusability, as we test (in most of the cases) the same, it will help our QA Community to get our objectives much faster. It focus on the reuse of actions (also steps or keytabs) that implement low level functionality and that can be organized to create much more complex features 
 
 
 ### Technologies
