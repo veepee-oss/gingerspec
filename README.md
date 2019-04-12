@@ -13,16 +13,7 @@
                          \______/                               |__/ 
 ```
 
-![Ginger](doc/ginger.svg)
-<div>Icons made by <a href="https://www.freepik.com/" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" 			    title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" 			    title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
-
-
 Privalia Acceptance Test library. Testing runtime to rule over Privalia's acceptance tests
-
-
-[![Build Status](https://travis-ci.org/rest-assured/rest-assured.svg)](https://travis-ci.org/rest-assured/rest-assured)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.rest-assured/rest-assured/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.rest-assured/rest-assured)
-[![Javadoc](https://javadoc-badge.appspot.com/io.rest-assured/rest-assured.svg)](http://www.javadoc.io/doc/io.rest-assured/rest-assured)
 
 ## Project Intro/Objective
 The purpose of this project is to provide a generic BDT (behaviour driven testing) library with common BDD steps and extended gherkin language.
@@ -49,7 +40,7 @@ After modifying, to check changes in your local project do:
 
 `mvn clean install -Dmaven.test.skip=true` (tests skip temporarily)  
 
-If you want to execute all the integration tests in the library
+If you want to execute all the integration tests in the library, please take a look at the docker-compose file for more information
   
 #### Execution  
   
@@ -133,12 +124,12 @@ GingerSpec contains tons of predefined Gherkin steps ready to use in your own fe
 
 _Testing Rest services_
 ```
-Scenario: A successful response with a valid body is returned
-        Given I securely send requests to 'jsonplaceholder.typicode.com:443'
-        When I send a 'GET' request to '/posts'
-        Then the service response status must be '200'
-        And I save element '$.[0].userId' in environment variable 'USER_ID'
-        Then '!{USER_ID}' matches '1'
+  Scenario: A successful response with a valid body is returned
+    Given I securely send requests to 'jsonplaceholder.typicode.com:443'
+    When I send a 'GET' request to '/posts'
+    Then the service response status must be '200'
+    And I save element '$.[0].userId' in environment variable 'USER_ID'
+    Then '!{USER_ID}' matches '1'
 ```
 
 
