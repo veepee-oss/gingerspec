@@ -1,0 +1,35 @@
+language: java
+sudo: false
+
+services:
+  - docker
+
+cache:
+  directories:
+  - $HOME/.m2
+  
+stages:
+  - clean
+  - test
+  - integration
+  - name: deploy
+    if: branch = master
+
+jobs:
+  include:
+  
+  - stage: clean
+    name: "Clean workspace"
+    script: mvn clean
+    
+  - stage: test
+    name: "Tesing in Java 8"
+    jdk: oraclejdk8
+    script: mvn clean install -Dmaven.test.skip=true
+  - jdk: openjdk10
+    name: "Tesing in Java 10"
+    script: mvn clean install -Dmaven.test.skip=true
+  - jdk: openjdk11
+    name: "Tesing in Java 11"
+    script: mvn clean install -Dmaven.test.skip=true
+    
