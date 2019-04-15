@@ -5,29 +5,32 @@
 
 	<groupId>com.privalia</groupId>
 	<artifactId>gingerspec</artifactId>
-	<version>##VERSION##</version>
+	<version>1.0-SNAPSHOT</version>
 
 	<name>Privalia GingerSpec framework</name>
-	<url>http://gitlab.privalia.pin/som-qa/bdt-lib</url>
+	<description>Privalia Acceptance Test library. Testing runtime to rule over Privalia's acceptance tests.</description>
+	<url>https://github.com/PrivaliaTech/gingerspec</url>
+
 	<scm>
-		<url>http://gitlab.privalia.pin/som-qa/bdt-lib</url>
-		<connection>scm:git:git@gitlab.privalia.pin:som-qa/bdt-lib.git</connection>
-		<developerConnection>scm:git:git@gitlab.privalia.pin:som-qa/bdt-lib.git
-		</developerConnection>
-		<tag>HEAD</tag>
+		<connection>scm:git:https://github.com/PrivaliaTech/gingerspec.git</connection>
+		<url>https://github.com/PrivaliaTech/gingerspec</url>
 	</scm>
 
-	<distributionManagement> <!-- Remote Artifactory repository URL where to store the artifacts created after a "mvn deploy"-->
-		<repository>
-			<id>releases</id>
-			<name>libs-release</name>
-			<url>http://artifactory.mkp.privalia.pin/artifactory/privalia-maven2</url>
-		</repository>
+	<distributionManagement>
+		<site>
+			<id>api.wiki</id>
+			<url>https://github.com/PrivaliaTech/gingerspec/blob/master/README.md</url>
+		</site>
+
 		<snapshotRepository>
-			<id>snapshots</id>
-			<name>libs-snapshot</name>
-			<url>http://artifactory.mkp.privalia.pin/artifactory/privalia-maven2</url>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
 		</snapshotRepository>
+		<repository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+		</repository>
+
 	</distributionManagement>
 
 	<organization>
