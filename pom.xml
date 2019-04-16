@@ -3,12 +3,12 @@
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.privalia</groupId>
+	<groupId>com.github.privaliatech</groupId>
 	<artifactId>gingerspec</artifactId>
 	<version>1.0-SNAPSHOT</version>
 
 	<name>Privalia GingerSpec framework</name>
-	<description>Privalia Acceptance Test library. Testing runtime to rule over Privalia's acceptance tests.</description>
+	<description>Acceptance Test library. Testing runtime to rule over Privalia's acceptance tests.</description>
 	<url>https://github.com/PrivaliaTech/gingerspec</url>
 
 	<scm>
