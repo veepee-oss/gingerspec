@@ -63,6 +63,7 @@ public class GivenGSpec extends BaseGSpec {
      * @param position position from a search result
      * @param element  key in the json response to be saved
      * @param envVar   thread environment variable where to store the value
+     * @param foo       required variable for gherkin in optional parameters
      * @throws IllegalAccessException exception
      * @throws IllegalArgumentException exception
      * @throws SecurityException exception

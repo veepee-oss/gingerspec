@@ -42,12 +42,14 @@ public class FileParserGSpec extends BaseGSpec {
 
     /**
      * Parse the given file according to the rules described in the XML configuration file
-     * The operation returns a list of 'records' (List<Map<String, String>>) that is stored internally
+     * The operation returns a list of 'records' (List(Map(String, String))) that is stored internally
      * for further operations
      *
      * @param fileToParse           Location of the file to parse
      * @param XMLDefinitionFile     Location of the XML configuration file
-     * @throws Throwable
+     * @throws IOException          IOException
+     * @throws JAXBException        JAXBException
+     * @throws URISyntaxException   URISyntaxException
      */
     @Given("^I parse the file located at '(.+?)' using the template defined in '(.+?)'$")
     public void iParseTheFileLocatedAtUsingTheTemplateDefinedIn(String fileToParse, String XMLDefinitionFile) throws IOException, JAXBException, URISyntaxException {
@@ -107,9 +109,9 @@ public class FileParserGSpec extends BaseGSpec {
 
     /**
      * Verifies that for the record located at the given position, the column contains the expected value
-     * @param position
-     * @param columnName
-     * @param valueExpected
+     * @param position          position
+     * @param columnName        columnName
+     * @param valueExpected     valueExpected
      */
     @And("^the record at position '(\\d+)' at column '(.+?)' has the value '(.+?)'$")
     public void theRecordAtPositionAtColumnColumnHasTheValueValue(int position, String columnName, String valueExpected) {
@@ -134,7 +136,7 @@ public class FileParserGSpec extends BaseGSpec {
     /**
      * Returns the record at the specified position in the set
      * @param rowNUmber     Index (starting by 0)
-     * @throws Throwable
+     * @throws Throwable    Throwable
      */
     @Then("^I get the record at position '(\\d+)'$")
     public void iGetTheRecordAtPosition(int rowNUmber) throws Throwable {
