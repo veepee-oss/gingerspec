@@ -28,8 +28,8 @@ public final class HashUtils {
     /**
      * doHash.
      *
-     * @param str
-     * @return String
+     * @param str the string
+     * @return resulting string
      */
     public static String doHash(String str) {
 

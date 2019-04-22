@@ -31,8 +31,9 @@ public class HttpResponse {
     /**
      * Constructor of an HttpResponse.
      *
-     * @param statusCode
-     * @param response
+     * @param statusCode the status code
+     * @param response   the response
+     * @param cookies    the list of cookies
      */
     public HttpResponse(Integer statusCode, String response, List<Cookie> cookies) {
         this.statusCode = statusCode;

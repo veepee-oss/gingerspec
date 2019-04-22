@@ -27,10 +27,9 @@ public class JsonUtils {
      *
      * @param data          string containing the information
      * @param type          type of information, it can be: json
-     * @param modifications modifications to apply with a format:
-     *                      WHERE,ACTION,VALUE
-     * @return String
-     * @throws Exception
+     * @param modifications modifications to apply with a format:                      WHERE,ACTION,VALUE
+     * @return resulting string
+     * @throws Exception the exception
      */
     public String modifyDataJson(String data, String type, DataTable modifications) throws Exception {
         String modifiedData = data;
@@ -177,10 +176,9 @@ public class JsonUtils {
      *
      * @param data          string containing the information
      * @param type          type of information, it can be: string
-     * @param modifications modifications to apply with a format:
-     *                      WHERE,ACTION,VALUE
-     * @return String
-     * @throws Exception
+     * @param modifications modifications to apply with a format:                      WHERE,ACTION,VALUE
+     * @return resulting string
+     * @throws Exception the exception
      */
     public String modifyDataString(String data, String type, DataTable modifications) throws Exception {
 

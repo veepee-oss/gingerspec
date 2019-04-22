@@ -152,21 +152,25 @@ public class ReplacementAspect {
     /**
      * Replaces every placeholded element, enclosed in #{} with the
      * corresponding value in a properties file.
-     *
+     * <p>
      * The file that contains all common configuration for the project (environment
      * independent configuration) must be located in /resources/configuration/common.properties
-     *
+     * <p>
      * Environment-specific configuration can be located in a separated file. This configuration can
      * override the configuration from the common file. All environment specific configuration files
      * can be included at runtime via maven variable, setting the 'env' to the name of the file.
-     *
+     * <p>
      * for example, to use properties from the file pre.properties located in
      * /resources/configuration/pre.properties, just pass -Denv=pre when
      * running your tests
      *
      * @param element element to be replaced
-     * @param pjp JoinPoint
-     * @return String
+     * @param pjp     JoinPoint
+     * @return resulting string
+     * @throws ConfigurationException  ConfigurationException
+     * @throws URISyntaxException      URISyntaxException
+     * @throws NonReplaceableException NonReplaceableException
+     * @throws FileNotFoundException   FileNotFoundException
      */
     protected String replacePropertyPlaceholders(String element, JoinPoint pjp) throws ConfigurationException, URISyntaxException, NonReplaceableException, FileNotFoundException {
 

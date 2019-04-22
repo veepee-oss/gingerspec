@@ -57,7 +57,7 @@ public class HookGSpec extends BaseGSpec {
     /**
      * Default constructor.
      *
-     * @param spec
+     * @param spec  commonG object
      */
     public HookGSpec(CommonG spec) {
         this.commonspec = spec;
@@ -75,7 +75,7 @@ public class HookGSpec extends BaseGSpec {
     /**
      * Connect to selenium.
      *
-     * @throws MalformedURLException
+     * @throws MalformedURLException    MalformedURLException
      */
     @Before(order = ORDER_10, value = {"@mobile,@web"})
     public void seleniumSetup() throws MalformedURLException {

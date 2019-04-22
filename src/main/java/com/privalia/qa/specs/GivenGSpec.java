@@ -34,6 +34,7 @@ import static com.privalia.qa.assertions.Assertions.assertThat;
 
 /**
  * Generic Given Specs.
+ *
  * @see <a href="GivenGSpec-annotations.html">Given Steps &amp; Matching Regex</a>
  */
 public class GivenGSpec extends BaseGSpec {
@@ -60,18 +61,11 @@ public class GivenGSpec extends BaseGSpec {
      * This will help to save the result of a jsonpath expression evaluated over
      * previous stored variable.
      *
+     * @param foo      required variable for gherkin in optional parameters
      * @param position position from a search result
      * @param element  key in the json response to be saved
      * @param envVar   thread environment variable where to store the value
-     * @param foo       required variable for gherkin in optional parameters
-     * @throws IllegalAccessException exception
-     * @throws IllegalArgumentException exception
-     * @throws SecurityException exception
-     * @throws NoSuchFieldException exception
-     * @throws ClassNotFoundException exception
-     * @throws InstantiationException exception
-     * @throws InvocationTargetException exception
-     * @throws NoSuchMethodException exception
+     * @throws Exception the exception
      */
     @Given("^I save element (in position \'(.+?)\' in )?\'(.+?)\' in environment variable \'(.+?)\'.$")
     public void saveElementEnvironment(String foo, String position, String element, String envVar) throws Exception {
@@ -104,19 +98,11 @@ public class GivenGSpec extends BaseGSpec {
 
     /**
      * Specify a custom map of headers to be added to future requests
-     * @param modifications DataTable containing the custom set of headers to be
-     *                      added to the requests. Syntax will be:
-     *                      {@code
+     *
+     * @param modifications DataTable containing the custom set of headers to be                      added to the requests. Syntax will be:                      {@code
      *                      | <key> | <value> |
-     *                      }
-     *                      where:
-     *                      key: header key name
-     *                      value: value for tue key
-     *                      for example:
-     *                      if we want to add the header "token" with value "12345678", to the request header
-     *                      the modification will be:
-     *                      | token | 12345678 |
-     * @throws Exception
+     *                      }                      where:                      key: header key name                      value: value for tue key                      for example:                      if we want to add the header "token" with value "12345678", to the request header                      the modification will be:                      | token | 12345678 |
+     * @throws Throwable the throwable
      */
     @Given("^I set headers:.$")
     public void setHeaders(DataTable modifications) throws Throwable {
@@ -144,7 +130,8 @@ public class GivenGSpec extends BaseGSpec {
     /**
      * Browse to {@code url} using the current browser.
      *
-     * @param path path of running app
+     * @param isSecured If the connection should be secured
+     * @param path      path of running app
      * @throws Exception exception
      */
     @Given("^I( securely)? browse to '(.+?)'$")
@@ -191,8 +178,9 @@ public class GivenGSpec extends BaseGSpec {
     /**
      * Send requests to {@code restHost @code restPort}.
      *
-     * @param restHost host where api is running
-     * @param restPort port where api is running
+     * @param isSecured If the connection should be secured
+     * @param restHost  host where api is running
+     * @param restPort  port where api is running
      */
     @Given("^I( securely)? send requests to '([^:]+?)(:.+?)?'.$")
     public void setupRestClient(String isSecured, String restHost, String restPort) {
@@ -228,8 +216,11 @@ public class GivenGSpec extends BaseGSpec {
         commonspec.getDriver().manage().window().maximize();
     }
 
+
     /**
      * Switches to a frame/ iframe.
+     *
+     * @param index the index
      */
     @Given("^I switch to the iframe on index '(\\d+?)'$")
     public void seleniumSwitchFrame(Integer index) {
@@ -244,9 +235,10 @@ public class GivenGSpec extends BaseGSpec {
     /**
      * Swith to the iFrame where id matches idframe
      *
+     * @param method  the method
      * @param idframe iframe to swith to
      * @throws IllegalAccessException exception
-     * @throws NoSuchFieldException exception
+     * @throws NoSuchFieldException   exception
      * @throws ClassNotFoundException exception
      */
     @Given("^I switch to iframe with '([^:]*?):(.+?)'$")
@@ -280,11 +272,12 @@ public class GivenGSpec extends BaseGSpec {
      * Opens a ssh connection to remote host
      *
      * @param remoteHost remote host
-     * @param user remote user
-     * @param password (required if pemFile null)
-     * @param pemFile (required if password null)
+     * @param user       remote user
+     * @param foo        the foo
+     * @param password   (required if pemFile null)
+     * @param bar        the bar
+     * @param pemFile    (required if password null)
      * @throws Exception exception
-     *
      */
     @Given("^I open a ssh connection to '(.+?)' with user '(.+?)'( and password '(.+?)')?( using pem file '(.+?)')?$")
     public void openSSHConnection(String remoteHost, String user, String foo, String password, String bar, String pemFile) throws Exception {
@@ -304,6 +297,13 @@ public class GivenGSpec extends BaseGSpec {
         }
     }
 
+    /**
+     * Add sso token list.
+     *
+     * @param ssoCookies the sso cookies
+     * @param tokenList  the token list
+     * @return the list
+     */
     public List<Cookie> addSsoToken(HashMap<String, String> ssoCookies, String[] tokenList) {
         List<Cookie> cookiesAttributes = new ArrayList<>();
 
@@ -315,6 +315,13 @@ public class GivenGSpec extends BaseGSpec {
         return cookiesAttributes;
     }
 
+    /**
+     * Copy from remote file.
+     *
+     * @param remotePath the remote path
+     * @param localPath  the local path
+     * @throws Exception the exception
+     */
     /*
      * Copies file/s from remote system into local system
      *
@@ -331,8 +338,8 @@ public class GivenGSpec extends BaseGSpec {
     /**
      * Copies file/s from local system to remote system
      *
+     * @param localPath  path where file is located
      * @param remotePath path where file is going to be copy
-     * @param localPath path where file is located
      * @throws Exception exception
      */
     @Given("^I outbound copy '(.+?)' through a ssh connection to '(.+?)'$")
@@ -343,13 +350,13 @@ public class GivenGSpec extends BaseGSpec {
     /**
      * Executes the command specified in local system
      *
-     * @param command command to be run locally
-     * @param foo regex needed to match method
+     * @param command    command to be run locally
+     * @param foo        regex needed to match method
      * @param exitStatus command exit status
-     * @param bar regex needed to match method
-     * @param envVar environment variable name
+     * @param bar        regex needed to match method
+     * @param envVar     environment variable name
      * @throws Exception exception
-     **/
+     */
     @Given("^I run '(.+?)' locally( with exit status '(.+?)')?( and save the value in environment variable '(.+?)')?$")
     public void executeLocalCommand(String command, String foo, Integer exitStatus, String bar, String envVar) throws Exception {
         if (exitStatus == null) {
@@ -365,13 +372,13 @@ public class GivenGSpec extends BaseGSpec {
     /**
      * Executes the command specified in remote system
      *
-     * @param command command to be run locally
-     * @param foo regex needed to match method
+     * @param command    command to be run locally
+     * @param foo        regex needed to match method
      * @param exitStatus command exit status
-     * @param bar regex needed to match method
-     * @param envVar environment variable name
+     * @param bar        regex needed to match method
+     * @param envVar     environment variable name
      * @throws Exception exception
-     **/
+     */
     @Given("^I run '(.+?)' in the ssh connection( with exit status '(.+?)')?( and save the value in environment variable '(.+?)')?$")
     public void executeCommand(String command, String foo, Integer exitStatus, String bar, String envVar) throws Exception {
         if (exitStatus == null) {

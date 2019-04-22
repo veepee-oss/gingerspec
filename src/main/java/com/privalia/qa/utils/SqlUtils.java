@@ -75,15 +75,16 @@ public class SqlUtils {
 
     /**
      * Attempts to establish a connection with the given parameters. The DriverManager attempts to select an appropriate driver from the set of registered JDBC drivers.
-     * @param host          URL of remote host
-     * @param port          Database port
-     * @param dataBaseType  Database type (currently MYSQL/POSTGRESQL)
-     * @param dataBaseName  Name of the remote database
-     * @param security      True if secure connection
-     * @param user          Database user
-     * @param password      Database password
-     * @throws ClassNotFoundException
-     * @throws SQLException
+     *
+     * @param host         URL of remote host
+     * @param port         Database port
+     * @param dataBaseType Database type (currently MYSQL/POSTGRESQL)
+     * @param dataBaseName Name of the remote database
+     * @param security     True if secure connection
+     * @param user         Database user
+     * @param password     Database password
+     * @throws ClassNotFoundException the class not found exception
+     * @throws SQLException           the sql exception
      */
     public void connect(String host, int port, String dataBaseType, String dataBaseName, Boolean security, String user, String password) throws ClassNotFoundException, SQLException {
 
@@ -137,11 +138,10 @@ public class SqlUtils {
     /**
      * Executes the given SQL statement, which may be an INSERT, UPDATE, or DELETE statement
      * or an SQL statement that returns nothing, such as an SQL DDL statement.
-     * @param query An SQL Data Manipulation Language (DML) statement, such as INSERT, UPDATE or DELETE;
-     *              or an SQL statement that returns nothing, such as a DDL statement.
-     * @return either (1) the row count for SQL Data Manipulation Language (DML) statements
-     * or (2) 0 for SQL statements that return nothing
-     * @throws SQLException
+     *
+     * @param query An SQL Data Manipulation Language (DML) statement, such as INSERT, UPDATE or DELETE;              or an SQL statement that returns nothing, such as a DDL statement.
+     * @return either (1) the row count for SQL Data Manipulation Language (DML) statements or (2) 0 for SQL statements that return nothing
+     * @throws SQLException the sql exception
      */
     public int executeUpdateQuery(String query) throws SQLException {
 
@@ -156,14 +156,15 @@ public class SqlUtils {
 
     /**
      * Executes the given SQL statement, which returns a single ResultSet object. Instead of a ResultSet, this method
-     * returns a List of lists (List<List<String>>). This method will return in the first list the
+     * returns a List of List . This method will return in the first list the
      * columns name, and the remaining lists are the rows (if the query returned any). So, this method
      * will always return at least 1 List (size 1).
      * This way of representing a ResultSet is very similar to the structure of a {@link cucumber.api.DataTable} in
      * cucumber, making the comparison easier
+     *
      * @param query An SQL statement to be sent to the database, typically a static SQL SELECT statement
      * @return A list of Lists
-     * @throws SQLException
+     * @throws SQLException SQLException
      */
     public List<List<String>> executeSelectQuery(String query) throws SQLException {
 
@@ -211,11 +212,13 @@ public class SqlUtils {
 
     /**
      * Executes the given SQL statement, which may return multiple results
-     * If the SQL statement returned a ResultSet, it is converted to a List<List<String>> and stored
+     * If the SQL statement returned a ResultSet, it is converted to a List of List and stored
      * in an accessible variable in case it needs to be used
+     *
      * @param reader A Reader object that contains the file
      * @return true if the result is a ResultSet object; false if it is an update count or there are no results
-     * @throws SQLException
+     * @throws SQLException the sql exception
+     * @throws IOException  the io exception
      */
     public boolean executeQuery(Reader reader) throws SQLException, IOException {
 
@@ -236,8 +239,10 @@ public class SqlUtils {
 
     /**
      * Verify if a table exists
+     *
      * @param tableName Table name
      * @return true if the table exists, false otherwise
+     * @throws SQLException the sql exception
      */
     public boolean verifyTable(String tableName) throws SQLException {
 
@@ -266,7 +271,8 @@ public class SqlUtils {
 
     /**
      * Verify the state of the connection
-     * @return
+     *
+     * @return boolean
      */
     public boolean connectionStatus() {
 
@@ -282,6 +288,8 @@ public class SqlUtils {
 
     /**
      * Closes the connection to the database
+     *
+     * @throws SQLException the sql exception
      */
     public void disconnect() throws SQLException {
 

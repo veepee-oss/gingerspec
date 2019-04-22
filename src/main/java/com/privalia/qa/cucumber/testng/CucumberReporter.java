@@ -118,11 +118,13 @@ public class CucumberReporter implements Formatter, Reporter {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass()
             .getCanonicalName());
+
     /**
      * Constructor of cucumberReporter.
      *
-     * @param url url
-     * @param cClass class
+     * @param url        url
+     * @param cClass     class
+     * @param additional the additional
      * @throws IOException exception
      */
     public CucumberReporter(String url, String cClass, String additional) throws IOException {

@@ -67,7 +67,8 @@ public class SoapServiceUtils {
 
     /**
      * Gets the address of the remote wsdl
-     * @return
+     *
+     * @return wsdl address
      */
     public String getWsdlAddress() {
         return wsdlAddress;
@@ -100,7 +101,8 @@ public class SoapServiceUtils {
 
     /**
      * Returns name of the first service found in the WSDL description
-     * @return
+     *
+     * @return service name
      */
     public String getServiceName() {
         return this.getDefs().getServices().get(0).getName();
@@ -108,7 +110,8 @@ public class SoapServiceUtils {
 
     /**
      * Returns Target Namespace
-     * @return
+     *
+     * @return target name space
      */
     public String getTargetNameSpace() {
         return this.getDefs().getTargetNamespace();
@@ -130,7 +133,8 @@ public class SoapServiceUtils {
     /**
      * Returns a Map with all the posible SOAP operations for the the first service
      * found in the WSDL file
-     * @return  Map containing action name -> corresponding soap action
+     *
+     * @return Map containing action name/corresponding soap action
      */
     public Map<String, String> getAvailableSoapActions() {
 
@@ -156,9 +160,14 @@ public class SoapServiceUtils {
 
     /**
      * Alter the given XML request with the given values in the Map
-     * @param request       Request in XML format
-     * @param variables     Map describing the list of variables and the corresponding value
-     * @return              XML String with the changes
+     *
+     * @param request   Request in XML format
+     * @param variables Map describing the list of variables and the corresponding value
+     * @return XML String with the changes
+     * @throws IOException                  IOException
+     * @throws SAXException                 SAXException
+     * @throws ParserConfigurationException ParserConfigurationException
+     * @throws TransformerException         TransformerException
      */
     public String transformXml(String request, Map<String, String> variables) throws IOException, SAXException, ParserConfigurationException, TransformerException {
 
@@ -184,9 +193,13 @@ public class SoapServiceUtils {
 
     /**
      * Given an String representing an XML object, returns the value of the given variable
-     * @param xmlString      XML String
-     * @param variable       Variable to look for in the body
-     * @return               The value of the variable, or null if not found
+     *
+     * @param xmlString XML String
+     * @param variable  Variable to look for in the body
+     * @return The value of the variable, or null if not found
+     * @throws ParserConfigurationException ParserConfigurationException
+     * @throws IOException                  IOException
+     * @throws SAXException                 SAXException
      */
     public String evaluateXml(String xmlString, String variable) throws ParserConfigurationException, IOException, SAXException {
 
@@ -209,11 +222,12 @@ public class SoapServiceUtils {
 
     /**
      * Alter the given XML request with the given values in the Map before executing the given method
-     * @param ActionName    Action name. This name with be mapped to the corresponding SOAPAction
-     * @param request       XML message to send as string
-     * @param variables     Map describing the list of variables and the corresponding value
-     * @return              a {@link SOAPMessage} object
-     * @throws Exception
+     *
+     * @param ActionName Action name. This name with be mapped to the corresponding SOAPAction
+     * @param request    XML message to send as string
+     * @param variables  Map describing the list of variables and the corresponding value
+     * @return a {@link SOAPMessage} object
+     * @throws Exception the exception
      */
     public String executeMethodWithParams(String ActionName, String request, Map<String, String> variables) throws Exception {
 
@@ -224,10 +238,11 @@ public class SoapServiceUtils {
 
     /**
      * Executes the given method in the remote webservice
-     * @param ActionName    Action name. This name with be mapped to the corresponding SOAPAction
-     * @param request       XML message to send as string
-     * @return              a {@link SOAPMessage} object
-     * @throws Exception
+     *
+     * @param ActionName Action name. This name with be mapped to the corresponding SOAPAction
+     * @param request    XML message to send as string
+     * @return a {@link SOAPMessage} object
+     * @throws Exception the exception
      */
     public String executeMethod(String ActionName, String request) throws Exception {
 
@@ -257,7 +272,7 @@ public class SoapServiceUtils {
      * @param endpointUrl       URL of the web service
      * @param soapActionUri     Action/Method in the remote webservice to execute
      * @param data              Request (as XML string data)
-     * @return
+     * @return SOAPMessage object
      * @throws Exception
      */
     private SOAPMessage invoke(QName serviceName, QName portName, String endpointUrl,
