@@ -11,9 +11,13 @@ cache:
 stages:
   - clean
   - test
-  - integration
   - name: deploy
     if: branch = master
+
+## export GPG details
+before_install:
+  - echo $GPG_SECRET_KEYS | base64 --decode | $GPG_EXECUTABLE --import
+  - echo $GPG_OWNERTRUST | base64 --decode | $GPG_EXECUTABLE --import-ownertrust
 
 jobs:
   include:
@@ -26,4 +30,9 @@ jobs:
     name: "Tesing in Java 8"
     jdk: oraclejdk8
     script: mvn clean install -Dmaven.test.skip=true
+
+  - stage: deploy
+    name: "Deploy artifact to Maven central"
+    jdk: oraclejdk8
+    script: mvn clean deploy --settings cd/mvnsettings.xml -P sign,build-extras -Dmaven.test.skip=true
     
