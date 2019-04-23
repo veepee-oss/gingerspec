@@ -176,7 +176,7 @@ public class KafkaUtils {
      *
      * @param topicName name of topic.
      * @return true if the topic has been created and false if the topic has not been created.
-     * @throws kafka.common.KafkaException
+     * @throws KafkaException the kafka exception
      */
     public boolean createTopic(String topicName) throws KafkaException {
         logger.debug("Creating topic with name: " + topicName);
@@ -190,7 +190,8 @@ public class KafkaUtils {
      *
      * @param topicName name of topic.
      * @return true if the topic has been deleted and false if the topic has not been deleted.
-     * @throws kafka.common.KafkaException
+     * @throws KafkaException                         the kafka exception
+     * @throws TopicAlreadyMarkedForDeletionException the topic already marked for deletion exception
      */
     public boolean deleteTopic(String topicName) throws KafkaException, TopicAlreadyMarkedForDeletionException {
         logger.debug("Deleting topic with name: " + topicName);
@@ -203,7 +204,7 @@ public class KafkaUtils {
      * List all Kafka topics.
      *
      * @return list of topics.
-     * @throws kafka.common.KafkaException
+     * @throws KafkaException the kafka exception
      */
     public List<String> listTopics() throws KafkaException {
         return scala.collection.JavaConversions.seqAsJavaList(zkUtils.getAllTopics());
@@ -214,8 +215,8 @@ public class KafkaUtils {
      * Modify number of partition of a Kafka topic.
      *
      * @param topicName     name of topic.
-     * @param numPartitions
-     * @throws kafka.common.KafkaException
+     * @param numPartitions the num partitions
+     * @throws KafkaException the kafka exception
      */
     public void modifyTopicPartitioning(String topicName, int numPartitions) throws KafkaException {
         if (AdminUtils.topicExists(zkUtils, topicName)) {
@@ -240,6 +241,7 @@ public class KafkaUtils {
     /**
      * Send a message to a Kafka topic.
      *
+     * @param message   the message
      * @param topicName name of topic.
      */
     @Deprecated
@@ -254,8 +256,12 @@ public class KafkaUtils {
      * on the producer properties for key and value serializer types
      *
      * @param message        The message to be sent
+     * @param key            the key
      * @param topicName      name of topic
      * @param timeoutSeconds Number of seconds to wait for acknowledgement by Kafka
+     * @throws InterruptedException InterruptedException
+     * @throws ExecutionException   ExecutionException
+     * @throws TimeoutException     TimeoutException
      */
     public void sendAndConfirmMessage(String message, String key, String topicName, long timeoutSeconds) throws InterruptedException, ExecutionException, TimeoutException {
 
@@ -417,6 +423,8 @@ public class KafkaUtils {
      *
      * @param subject Name of the subject
      * @param schema  Schema object as string
+     * @return response object from the schema server
+     * @throws IOException IOException
      */
     public Response registerNewSchema(String subject, String schema) throws IOException {
         logger.debug("Registering new version of schema for subject " + subject);
@@ -443,6 +451,7 @@ public class KafkaUtils {
      * @param subject Subject name
      * @param version Version of the schema to fetch
      * @return Json encoded string of the schema
+     * @throws IOException IOException
      */
     public String getSchemaFromRegistry(String subject, String version) throws IOException {
         logger.debug("Fetching schema version " + version + " from subject " + subject);
@@ -491,6 +500,7 @@ public class KafkaUtils {
      * @param key    Name of the generic record
      * @param json   Json string with data
      * @param schema Schema to be used to serialize the object
+     * @throws IOException IOException
      */
     public void createGenericRecord(String key, String json, String schema) throws IOException {
 

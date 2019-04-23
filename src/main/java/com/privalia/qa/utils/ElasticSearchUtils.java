@@ -91,6 +91,8 @@ public class ElasticSearchUtils {
 
     /**
      * Connect to ES.
+     *
+     * @throws java.net.UnknownHostException the unknown host exception
      */
     public void connect() throws java.net.UnknownHostException {
         this.client = TransportClient.builder().settings(this.settings).build()
@@ -111,9 +113,9 @@ public class ElasticSearchUtils {
     /**
      * Create an ES Index.
      *
-     * @param indexName
-     * @return true if the index has been created and false if the index has not been created.
-     * @throws ElasticsearchException
+     * @param indexName                 the index name
+     * @return                          true if the index has been created and false if the index has not been created.
+     * @throws ElasticsearchException   the elasticsearch exception
      */
     public boolean createSingleIndex(String indexName) throws
             ElasticsearchException {
@@ -125,9 +127,9 @@ public class ElasticSearchUtils {
     /**
      * Drop an ES Index
      *
-     * @param indexName
-     * @return true if the index exists
-     * @throws ElasticsearchException
+     * @param indexName                 the index name
+     * @return                          true if the index exists
+     * @throws ElasticsearchException   the elasticsearch exception
      */
     public boolean dropSingleIndex(String indexName) throws
             ElasticsearchException {
@@ -155,7 +157,7 @@ public class ElasticSearchUtils {
     /**
      * Check if an index exists in ES
      *
-     * @param indexName
+     * @param indexName the index name
      * @return true if the index exists or false if the index does not exits.
      */
     public boolean indexExists(String indexName) {
@@ -165,8 +167,8 @@ public class ElasticSearchUtils {
     /**
      * Create a mapping over an index
      *
-     * @param indexName
-     * @param mappingName
+     * @param indexName     the index name
+     * @param mappingName   the mapping name
      * @param mappingSource the data that has to be inserted in the mapping.
      */
     public void createMapping(String indexName, String mappingName, ArrayList<XContentBuilder> mappingSource) {
@@ -193,9 +195,9 @@ public class ElasticSearchUtils {
     /**
      * Check if a mapping exists in an expecific index.
      *
-     * @param indexName
-     * @param mappingName
-     * @return true if the mapping exists and false in other case
+     * @param indexName     the index name
+     * @param mappingName   the mapping name
+     * @return              true if the mapping exists and false in other case
      */
     public boolean existsMapping(String indexName, String mappingName) {
         ClusterStateResponse resp = this.client.admin().cluster().prepareState().execute().actionGet();
@@ -214,13 +216,13 @@ public class ElasticSearchUtils {
     /**
      * Simulate a SELET * FROM index.mapping WHERE (One simple filter)
      *
-     * @param indexName
-     * @param mappingName
-     * @param columnName
-     * @param value
+     * @param indexName     The index name
+     * @param mappingName   The mapping name
+     * @param columnName    The column name
+     * @param value         The value
      * @param filterType  [equals, gt, gte, lt, lte]
      * @return ArrayList with all the rows(One element of the ArrayList is a JSON document)
-     * @throws Exception
+     * @throws Exception    Exception
      */
     public List<JSONObject> searchSimpleFilterElasticsearchQuery(String indexName, String mappingName, String
             columnName,
@@ -264,11 +266,11 @@ public class ElasticSearchUtils {
     /**
      * Indexes a document.
      *
-     * @param indexName
-     * @param mappingName
+     * @param indexName   the index name
+     * @param mappingName the mapping name
      * @param id          unique identifier of the document
-     * @param document
-     * @throws Exception
+     * @param document    the document
+     * @throws Exception  exception
      */
     public void indexDocument(String indexName, String mappingName, String id, XContentBuilder document)
             throws Exception {
@@ -278,9 +280,9 @@ public class ElasticSearchUtils {
     /**
      * Deletes a document by its id.
      *
-     * @param indexName
-     * @param mappingName
-     * @param id
+     * @param indexName   the index name
+     * @param mappingName the mapping name
+     * @param id          the id
      */
     public void deleteDocument(String indexName, String mappingName, String id) {
         client.prepareDelete(indexName, mappingName, id).get();

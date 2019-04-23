@@ -71,8 +71,8 @@ public class CassandraUtils {
     /**
      * Execute a query over Cassandra.
      *
-     * @param query
-     * @return ResultSet
+     * @param query the query
+     * @return ResultSet result set
      */
     public ResultSet executeQuery(String query) {
         return this.session.execute(query);
@@ -81,7 +81,7 @@ public class CassandraUtils {
     /**
      * Execute a list of queries over Cassandra.
      *
-     * @param queriesList
+     * @param queriesList the queries list
      */
     public void executeQueriesList(List<String> queriesList) {
 
@@ -103,7 +103,7 @@ public class CassandraUtils {
     /**
      * Disconnect from Cassandra host.
      *
-     * @throws DBException
+     * @throws DBException  DBException
      */
     public void disconnect() throws DBException {
         if (this.session == null) {
@@ -119,8 +119,8 @@ public class CassandraUtils {
     /**
      * Get the metadata of the Cassandra Cluster.
      *
-     * @return Metadata
-     * @throws DBException
+     * @return Metadata metadata
+     * @throws DBException the db exception
      */
     public Metadata getMetadata() throws DBException {
         if (!this.cluster.isClosed()) {
@@ -153,7 +153,7 @@ public class CassandraUtils {
     /**
      * Create a keyspace in Cassandra.
      *
-     * @param keyspace
+     * @param keyspace the keyspace
      */
     public void createKeyspace(String keyspace) {
         Map<String, String> replicationSimpleOneExtra = new HashMap<>();
@@ -170,8 +170,9 @@ public class CassandraUtils {
     /**
      * Create a table in Cassandra.
      *
-     * @param table
-     * @param colums
+     * @param table  the table name
+     * @param colums columns
+     * @param pk     the pk
      */
     public void createTableWithData(String table, Map<String, String> colums, ArrayList<String> pk) {
         String query = this.cassandraqueryUtils.createTable(table, colums, pk);
@@ -182,8 +183,8 @@ public class CassandraUtils {
     /**
      * Insert data in a keyspace.
      *
-     * @param table
-     * @param fields
+     * @param table  the table
+     * @param fields the fields
      */
     public void insertData(String table, Map<String, Object> fields) {
         String query = this.cassandraqueryUtils.insertData(table, fields);
@@ -194,9 +195,9 @@ public class CassandraUtils {
     /**
      * Checks if a keyspace exists in Cassandra.
      *
-     * @param keyspace
-     * @param showLog
-     * @return boolean
+     * @param keyspace the keyspace
+     * @param showLog  if log should be displayed
+     * @return boolean boolean
      */
     public boolean existsKeyspace(String keyspace, boolean showLog) {
         this.metadata = cluster.getMetadata();
@@ -229,7 +230,7 @@ public class CassandraUtils {
     /**
      * Drop a keyspace in Cassandra.
      *
-     * @param keyspace
+     * @param keyspace the keyspace
      */
     public void dropKeyspace(String keyspace) {
         executeQuery(this.cassandraqueryUtils
@@ -239,8 +240,8 @@ public class CassandraUtils {
     /**
      * Drop a keyspace in Cassandra.
      *
-     * @param ifExists
-     * @param keyspace
+     * @param ifExists to verify if exists
+     * @param keyspace the keyspace
      */
     public void dropKeyspace(boolean ifExists, String keyspace) {
         executeQuery(this.cassandraqueryUtils.dropKeyspaceQuery(ifExists,
@@ -250,7 +251,7 @@ public class CassandraUtils {
     /**
      * Use a keyspace in Cassandra.
      *
-     * @param keyspace
+     * @param keyspace the keyspace
      */
     public void useKeyspace(String keyspace) {
         executeQuery(this.cassandraqueryUtils.useQuery(keyspace));
@@ -259,10 +260,10 @@ public class CassandraUtils {
     /**
      * Checks if a keyspace contains an especific table.
      *
-     * @param keyspace
-     * @param table
-     * @param showLog
-     * @return boolean
+     * @param keyspace the keyspace
+     * @param table    the table
+     * @param showLog  if show log
+     * @return boolean boolean
      */
     public boolean existsTable(String keyspace, String table, boolean showLog) {
         this.metadata = this.cluster.getMetadata();
@@ -280,7 +281,7 @@ public class CassandraUtils {
     /**
      * Get tables of a keyspace.
      *
-     * @param keyspace
+     * @param keyspace the keyspace
      * @return {@code List<String>}
      */
     public List<String> getTables(String keyspace) {
@@ -298,7 +299,7 @@ public class CassandraUtils {
     /**
      * Drop a table of a keyspace.
      *
-     * @param table
+     * @param table the table name
      */
     public void dropTable(String table) {
         executeQuery(this.cassandraqueryUtils.dropTableQuery(false, table));
@@ -307,7 +308,7 @@ public class CassandraUtils {
     /**
      * Truncate a table of a keyspace.
      *
-     * @param table
+     * @param table the table name
      */
     public void truncateTable(String table) {
         executeQuery(this.cassandraqueryUtils.truncateTableQuery(false, table));

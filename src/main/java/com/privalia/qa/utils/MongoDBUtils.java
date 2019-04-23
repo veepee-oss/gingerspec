@@ -56,7 +56,7 @@ public class MongoDBUtils {
     /**
      * Connect to MongoDB Host.
      *
-     * @throws DBException
+     * @throws DBException DBException
      */
     public void connect() throws DBException {
         try {
@@ -78,7 +78,7 @@ public class MongoDBUtils {
     /**
      * Connect to DataBase of MongoDB(If it not exists, it will be created).
      *
-     * @param db
+     * @param db the db name
      */
     public void connectToMongoDBDataBase(String db) {
         dataBase = mongoClient.getDB(db);
@@ -87,8 +87,8 @@ public class MongoDBUtils {
     /**
      * Checks if a database exists in MongoDB.
      *
-     * @param dataBaseName
-     * @return boolean
+     * @param dataBaseName the data base name
+     * @return true if the db exists
      */
     public boolean exitsMongoDbDataBase(String dataBaseName) {
         List<String> dataBaseList = mongoClient.getDatabaseNames();
@@ -98,8 +98,8 @@ public class MongoDBUtils {
     /**
      * Checks if a collection exists in a MongoDB dataBase.
      *
-     * @param colName
-     * @return boolean
+     * @param colName the column name
+     * @return boolean boolean
      */
     public boolean exitsCollections(String colName) {
         return dataBase.collectionExists(colName);
@@ -117,8 +117,8 @@ public class MongoDBUtils {
     /**
      * Get a MongoDB collection.
      *
-     * @param collectionName
-     * @return DBCollection
+     * @param collectionName the collection name
+     * @return DBCollection mongo db collection
      */
     public DBCollection getMongoDBCollection(String collectionName) {
         return dataBase.getCollection(collectionName);
@@ -127,8 +127,8 @@ public class MongoDBUtils {
     /**
      * Create a MongoDB collection.
      *
-     * @param colectionName
-     * @param options
+     * @param colectionName the colection name
+     * @param options       the options (as datatable object)
      */
     public void createMongoDBCollection(String colectionName, DataTable options) {
         BasicDBObject aux = new BasicDBObject();
@@ -150,7 +150,7 @@ public class MongoDBUtils {
     /**
      * Create a MongoDB collection without options.
      *
-     * @param colectionName
+     * @param colectionName the colection name
      */
     public void createMongoDBCollection(String colectionName) {
         dataBase.createCollection(colectionName, null);
@@ -159,7 +159,7 @@ public class MongoDBUtils {
     /**
      * Drop a MongoDB DataBase.
      *
-     * @param dataBaseName
+     * @param dataBaseName the data base name
      */
     public void dropMongoDBDataBase(String dataBaseName) {
         mongoClient.dropDatabase(dataBaseName);
@@ -168,7 +168,7 @@ public class MongoDBUtils {
     /**
      * Drop a MongoDBCollection.
      *
-     * @param collectionName
+     * @param collectionName the collection name
      */
     public void dropMongoDBCollection(String collectionName) {
         getMongoDBCollection(collectionName).drop();
@@ -177,7 +177,7 @@ public class MongoDBUtils {
     /**
      * Drop all the data associated to a MongoDB Collection.
      *
-     * @param collectionName
+     * @param collectionName the collection name
      */
     public void dropAllDataMongoDBCollection(String collectionName) {
         DBCollection db = getMongoDBCollection(collectionName);
@@ -194,8 +194,8 @@ public class MongoDBUtils {
     /**
      * Insert data in a MongoDB Collection.
      *
-     * @param collection
-     * @param table
+     * @param collection the collection
+     * @param table      the table
      */
     public void insertIntoMongoDBCollection(String collection, DataTable table) {
         // Primero pasamos la fila del datatable a un hashmap de ColumnName-Type
@@ -217,8 +217,8 @@ public class MongoDBUtils {
     /**
      * Insert document in a MongoDB Collection.
      *
-     * @param collection
-     * @param document
+     * @param collection the collection
+     * @param document   the document
      */
     public void insertDocIntoMongoDBCollection(String collection, String document) {
 
@@ -230,8 +230,8 @@ public class MongoDBUtils {
     /**
      * Read data from a MongoDB collection.
      *
-     * @param collection
-     * @param table
+     * @param collection the collection
+     * @param table      the table
      * @return {@code List<DBObjects>}
      */
     public List<DBObject> readFromMongoDBCollection(String collection,

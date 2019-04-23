@@ -47,7 +47,7 @@ public final class BrowsersDataProvider {
     /**
      * Get the browsers available in a selenium grid.
      *
-     * @param context context
+     * @param context         context
      * @param testConstructor testConstructor
      * @return an iterator
      * @throws Exception exception
@@ -89,10 +89,10 @@ public final class BrowsersDataProvider {
     /**
      * Get the browsers available with "iOS" as platformName in a selenium grid.
      *
-     * @param context context
-     * @param testConstructor testConstructor
-     * @return an iterator
-     * @throws Exception
+     * @param context           context
+     * @param testConstructor   testConstructor
+     * @return                  an iterator
+     * @throws Exception        Exception
      */
     @DataProvider(parallel = true)
     public static Iterator<String[]> availableIOSBrowsers(ITestContext context, Constructor<?> testConstructor)
@@ -108,10 +108,10 @@ public final class BrowsersDataProvider {
     /**
      * Get the browsers available with "Android" or "iOS" as platformName in a selenium grid.
      *
-     * @param context context
+     * @param context         context
      * @param testConstructor testConstructor
      * @return an iterator
-     * @throws Exception
+     * @throws Exception the exception
      */
     @DataProvider(parallel = true)
     public static Iterator<String[]> availableMobileBrowsers(ITestContext context, Constructor<?> testConstructor)

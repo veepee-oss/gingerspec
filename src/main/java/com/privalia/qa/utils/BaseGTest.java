@@ -30,7 +30,7 @@ public abstract class BaseGTest {
     /**
      * Method executed before a suite.
      *
-     * @param context
+     * @param context the context
      */
     @BeforeSuite(alwaysRun = true)
     public void beforeGSuite(ITestContext context) {
@@ -39,7 +39,7 @@ public abstract class BaseGTest {
     /**
      * Method executed after a suite.
      *
-     * @param context
+     * @param context the context
      */
     @AfterSuite(alwaysRun = true)
     public void afterGSuite(ITestContext context) {
@@ -49,7 +49,7 @@ public abstract class BaseGTest {
     /**
      * Method executed before a test class.
      *
-     * @param context
+     * @param context the context
      */
     @BeforeClass(alwaysRun = true)
     public void beforeGClass(ITestContext context) {
@@ -59,7 +59,7 @@ public abstract class BaseGTest {
     /**
      * Method executed after a test method.
      *
-     * @param method
+     * @param method the method
      */
     @BeforeMethod(alwaysRun = true)
     public void beforeGMethod(Method method) {
@@ -68,7 +68,7 @@ public abstract class BaseGTest {
     /**
      * Method executed before method.
      *
-     * @param method
+     * @param method the method
      */
     @AfterMethod(alwaysRun = true)
     public void afterGMethod(Method method) {

@@ -57,8 +57,9 @@ public class FileParserUtils {
      *
      * @param XMLDefinitionFile File containing the rules for decoding
      * @param fileToParse       File to extract the values from
-     * @throws IOException
-     * @throws JAXBException
+     * @return a list of map objects with the result
+     * @throws IOException   the io exception
+     * @throws JAXBException the jaxb exception
      */
     public List<Map<String, String>> parseFile(Config XMLDefinitionFile, Reader fileToParse) throws IOException, JAXBException {
 
@@ -92,6 +93,7 @@ public class FileParserUtils {
      * @param records    Initial set of records to perform the operation
      * @param columnName Column name to sum
      * @return String representation of the sum
+     * @throws ParseException the parse exception
      */
     public String sumColumn(List<Map<String, String>> records, String columnName) throws ParseException {
 
@@ -176,7 +178,7 @@ public class FileParserUtils {
      *
      * @param records   Initial set of records in which to perform the operation
      * @param rowNumber Record number
-     * @return A single Map object {@link Map<String, String>} representing a record
+     * @return A single Map object representing a record
      */
     public Map<String, String> getRecordAtPosition(List<Map<String, String>> records, int rowNumber) {
 
@@ -190,7 +192,7 @@ public class FileParserUtils {
     /**
      * Validates the value of a given key in a record
      *
-     * @param record        record {@link Map<String, String>}
+     * @param record        record
      * @param key           Key to look for in the record
      * @param expectedValue Expected value for the key
      * @return True if the value is the expected, false otherwise

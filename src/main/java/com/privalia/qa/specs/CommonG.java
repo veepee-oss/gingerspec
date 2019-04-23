@@ -162,16 +162,16 @@ public class CommonG {
     }
 
     /**
-     * Returns the last selected record (Map<String, String>)
-     * @return
+     * Returns the last selected record
+     * @return  record in the set
      */
     public Map<String, String> getLastFileParseRecord() {
         return lastFileParseRecord;
     }
 
     /**
-     * Sets the record for the last operation (as (Map<String, String>))
-     * @param lastFileParseRecord
+     * Sets the record for the last operation
+     * @param lastFileParseRecord   record in the set
      */
     public void setLastFileParseRecord(Map<String, String> lastFileParseRecord) {
         this.lastFileParseRecord = lastFileParseRecord;
@@ -187,7 +187,7 @@ public class CommonG {
 
     /**
      * Sets the response of the execution of a remote method in a webservice as an XML String
-     * @param lastSoapResponse
+     * @param lastSoapResponse  SOAP response of last operation
      */
     public void setLastSoapResponse(String lastSoapResponse) {
         this.lastSoapResponse = lastSoapResponse;
@@ -196,7 +196,7 @@ public class CommonG {
     /**
      * Returns the records resulted from the last operation when
      * decoding/parsing files
-     * @return
+     * @return     records from last operation
      */
     public List<Map<String, String>> getLastFileParseResult() {
         return lastFileParseResult;
@@ -204,7 +204,7 @@ public class CommonG {
 
     /**
      * Stores the result of an operation when decoding/parsing files
-     * @param lastFileParseResult
+     * @param lastFileParseResult   records as result of last operation
      */
     public void setLastFileParseResult(List<Map<String, String>> lastFileParseResult) {
         this.lastFileParseResult = lastFileParseResult;
@@ -212,7 +212,7 @@ public class CommonG {
 
     /**
      * Set the values of the cookies used when performing rest requests
-     * @return
+     * @return  get the cookies returned from last operation
      */
     public Map<String, String> getRestCookies() {
         return restCookies;
@@ -220,7 +220,7 @@ public class CommonG {
 
     /**
      * Returns the values of the cookies used in the rest requests
-     * @param restCookies
+     * @param restCookies   Set REST cookies from last operation
      */
     public void setRestCookies(Map<String, String> restCookies) {
         this.restCookies = restCookies;
@@ -228,7 +228,7 @@ public class CommonG {
 
     /**
      * Get the previos Rest response (restassured)
-     * @return
+     * @return  Rest response
      */
     public io.restassured.response.Response getRestResponse() {
         return RestResponse;
@@ -236,7 +236,7 @@ public class CommonG {
 
     /**
      * Sets the Rest response (restassured)
-     * @param restResponse
+     * @param restResponse  Rest response
      */
     public void setRestResponse(io.restassured.response.Response restResponse) {
         RestResponse = restResponse;
@@ -244,7 +244,7 @@ public class CommonG {
 
     /**
      * Returns the Rest Request object (restassured)
-     * @return
+     * @return  Rest Request object (restassured)
      */
     public RequestSpecification getRestRequest() {
         return this.RestRequest;
@@ -252,7 +252,7 @@ public class CommonG {
 
     /***
      * Sets the Rest request object (restassured)
-     * @param restRequest
+     * @param restRequest   Rest Request object (restassured)
      */
     public void setRestRequest(RequestSpecification restRequest) {
         this.RestRequest = restRequest;
@@ -260,7 +260,7 @@ public class CommonG {
 
     /**
      * Get the SQL result from the last step
-     * @return
+     * @return  SQL result
      */
     public List<List<String>> getPreviousSqlResult() {
         return previousSqlResult;
@@ -268,7 +268,7 @@ public class CommonG {
 
     /**
      * Sets the result of the SQL sentence
-     * @param previousSqlResult
+     * @param previousSqlResult SQL result
      */
     public void setPreviousSqlResult(List<List<String>> previousSqlResult) {
         this.previousSqlResult = previousSqlResult;
@@ -285,6 +285,8 @@ public class CommonG {
 
     /**
      * Set the remote connection.
+     *
+     * @param remoteSSHConnection   remoteSSHConnection connection object
      */
     public void setRemoteSSHConnection(RemoteSSHConnection remoteSSHConnection) {
         this.remoteSSHConnection = remoteSSHConnection;
@@ -293,7 +295,7 @@ public class CommonG {
     /**
      * Get the common REST host.
      *
-     * @return String
+     * @return REST host
      */
     public String getRestHost() {
         return this.restHost;
@@ -879,6 +881,8 @@ public class CommonG {
 
     /**
      * Set the previous webElement
+     *
+     * @param previousWebElements   webElement
      */
     public void setPreviousWebElements(PreviousWebElements previousWebElements) {
         this.previousWebElements = previousWebElements;
@@ -895,6 +899,8 @@ public class CommonG {
 
     /**
      * Sets the parentWindow
+     *
+     * @param windowHandle  windowHandle as string
      */
     public void setParentWindow(String windowHandle) {
         this.parentWindow = windowHandle;
@@ -1072,7 +1078,7 @@ public class CommonG {
      *                      "mystring" -> | N/A | APPEND | new | -> "mystringnew"
      *                      }
      * @return String
-     * @throws Exception
+     * @throws Exception    Exception
      */
     public String modifyData(String data, String type, DataTable modifications) throws Exception {
         String modifiedData = data;
@@ -1098,6 +1104,7 @@ public class CommonG {
      * @param data        to be sent for PUT/POST requests
      * @param type        type of data to be sent (json|string)
      * @param codeBase64  XXX
+     * @return request object
      * @throws Exception exception
      */
     @Deprecated
@@ -1115,6 +1122,7 @@ public class CommonG {
      * @param endPoint    end point to sent the request to
      * @param data        to be sent for PUT/POST requests
      * @param type        type of data to be sent (json|string)
+     * @return rest request
      * @throws Exception exception
      */
     public Future<Response> generateRequest(String requestType, boolean secure, String user, String password, String endPoint, String data, String type) throws Exception {
@@ -1361,6 +1369,8 @@ public class CommonG {
      * @param endPoint    end point to sent the request to
      * @param data        to be sent for PUT/POST requests
      * @param type        type of data to be sent (json|string)
+     * @param codeBase64  codeBase64
+     * @return rest request
      * @throws Exception exception
      */
     @Deprecated
@@ -1372,7 +1382,7 @@ public class CommonG {
      * Generates a request to a REST endpoint
      * @param requestType   Request type (GET, POST, PUT, DELETE, PATCH)
      * @param endPoint      Final endpoint (i.e /user/1)
-     * @throws Exception
+     * @throws Exception    Exception
      */
     public void generateRestRequest(String requestType, String endPoint) throws Exception {
 
@@ -1786,7 +1796,8 @@ public class CommonG {
     /**
      * Runs a command locally
      *
-     * @param command command used to be run locally
+     * @param command       Command used to be run locally
+     * @throws Exception    Exception
      */
     public void runLocalCommand(String command) throws Exception {
 
@@ -1870,6 +1881,7 @@ public class CommonG {
      * @param jsonString string to be parsed
      * @param expr       jsonpath expression
      * @param position   position from a search result
+     * @return the resulting element as string
      */
     public String getJSONPathString(String jsonString, String expr, String position) {
 
@@ -1935,6 +1947,7 @@ public class CommonG {
      *
      * @param jsonString String of the json
      * @param expr       regex to be removed
+     * @return           new json
      */
 
     public String removeJSONPathElement(String jsonString, String expr) {
@@ -1952,6 +1965,7 @@ public class CommonG {
      * @param jsonString Original json object
      * @param key        Key to search
      * @param value      Value to replace key with
+     * @return           new json
      */
     public String replaceJSONPathElement(String jsonString, String key, String value) {
         return JsonPath.parse(jsonString).set(key, value).jsonString();
@@ -1962,9 +1976,10 @@ public class CommonG {
      * <p>
      * Object o could be a string or a list.
      *
-     * @param o         object to be evaluated
-     * @param condition condition to compare
-     * @param result    expected result
+     * @param o             object to be evaluated
+     * @param condition     condition to compare
+     * @param result        expected result
+     * @throws Exception    Exception
      */
     public void evaluateJSONElementOperation(Object o, String condition, String result) throws Exception {
 

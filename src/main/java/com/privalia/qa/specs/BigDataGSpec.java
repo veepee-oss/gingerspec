@@ -78,8 +78,10 @@ public class BigDataGSpec extends BaseGSpec {
     /**
      * Connect to cluster.
      *
-     * @param clusterType DB type (Cassandra|Mongo|Elasticsearch)
-     * @param url         url where is started Cassandra cluster
+     * @param clusterType               DB type (Cassandra|Mongo|Elasticsearch)
+     * @param url                       url where is started Cassandra cluster
+     * @throws DBException              DBException
+     * @throws UnknownHostException     UnknownHostException
      */
     @Given("^I connect to '(Cassandra|Mongo|Elasticsearch)' cluster at '(.+)'$")
     public void connect(String clusterType, String url) throws DBException, UnknownHostException {
@@ -311,9 +313,10 @@ public class BigDataGSpec extends BaseGSpec {
     /**
      * Insert document in a MongoDB table.
      *
-     * @param dataBase Mongo database
-     * @param collection Mongo collection
-     * @param document document used for schema
+     * @param dataBase      Mongo database
+     * @param collection    Mongo collection
+     * @param document      document used for schema
+     * @throws Exception    Exception
      */
     @Given("^I insert into MongoDB database '(.+?)' and collection '(.+?)' the document from schema '(.+?)'$")
     public void insertOnMongoTable(String dataBase, String collection, String document) throws Exception {
@@ -337,6 +340,7 @@ public class BigDataGSpec extends BaseGSpec {
     /**
      * Disconnect from zookeeper.
      *
+     * @throws InterruptedException InterruptedException
      */
     @Given("^I disconnect from Zookeeper$")
     public void disconnectFromZk() throws InterruptedException {
@@ -395,8 +399,10 @@ public class BigDataGSpec extends BaseGSpec {
      *
      * @param query         path to query
      * @param type          type of data in query (string or json)
+     * @param database      MongoDB database
      * @param collection    collection in database
      * @param modifications modifications to perform in query
+     * @throws Exception    Exception
      */
     @When("^I execute a query '(.+?)' of type '(json|string)' in mongo '(.+?)' database using collection '(.+?)' with:$")
     public void sendQueryOfType(String query, String type, String database, String collection, DataTable modifications) throws Exception {
@@ -417,11 +423,11 @@ public class BigDataGSpec extends BaseGSpec {
     /**
      * Execute query with filter over elasticsearch
      *
-     * @param indexName
-     * @param mappingName
-     * @param columnName
-     * @param filterType  it could be equals, gt, gte, lt and lte.
-     * @param value       value of the column to be filtered.
+     * @param indexName     index name
+     * @param mappingName   mapping name
+     * @param columnName    column Name
+     * @param filterType    it could be equals, gt, gte, lt and lte.
+     * @param value         value of the column to be filtered.
      */
     @When("^I execute an elasticsearch query over index '(.*?)' and mapping '(.*?)' and column '(.*?)' with value '(.*?)' to '(.*?)'$")
     public void elasticSearchQueryWithFilter(String indexName, String mappingName, String
@@ -450,6 +456,7 @@ public class BigDataGSpec extends BaseGSpec {
      * @param magic_column  magic column where index will be saved
      * @param keyspace      keyspace used
      * @param modifications data introduced for query fields defined on schema
+     * @throws Exception    Exception
      */
     @When("^I create a Cassandra index named '(.+?)' with schema '(.+?)' of type '(json|string)' in table '(.+?)' using magic_column '(.+?)' using keyspace '(.+?)' with:$")
     public void createCustomMapping(String index_name, String schema, String type, String table, String magic_column, String keyspace, DataTable modifications) throws Exception {
@@ -464,8 +471,8 @@ public class BigDataGSpec extends BaseGSpec {
     /**
      * Drop table
      *
-     * @param table
-     * @param keyspace
+     * @param table     Table name
+     * @param keyspace  Keyspace
      */
     @When("^I drop a Cassandra table named '(.+?)' using keyspace '(.+?)'$")
     public void dropTableWithData(String table, String keyspace) {
@@ -482,8 +489,8 @@ public class BigDataGSpec extends BaseGSpec {
     /**
      * Truncate table
      *
-     * @param table
-     * @param keyspace
+     * @param table         table name
+     * @param keyspace      keyspace
      */
     @When("^I truncate a Cassandra table named '(.+?)' using keyspace '(.+?)'$")
     public void truncateTable(String table, String keyspace) {
@@ -500,7 +507,8 @@ public class BigDataGSpec extends BaseGSpec {
     /**
      * Delete zPath, it should be empty
      *
-     * @param zNode path at zookeeper
+     * @param zNode         Path at zookeeper
+     * @throws Exception    Exception
      */
     @When("^I remove the zNode '(.+?)'$")
     public void removeZNode(String zNode) throws Exception {
@@ -510,10 +518,11 @@ public class BigDataGSpec extends BaseGSpec {
     /**
      * Create zPath and domcument
      *
-     * @param path      path at zookeeper
-     * @param foo       a dummy match group
-     * @param content   if it has content it should be defined
-     * @param ephemeral if it's created as ephemeral or not
+     * @param path          path at zookeeper
+     * @param foo           a dummy match group
+     * @param content       if it has content it should be defined
+     * @param ephemeral     if it's created as ephemeral or not
+     * @throws Exception    Exception
      */
     @When("^I create the zNode '(.+?)'( with content '(.+?)')? which (IS|IS NOT) ephemeral$")
     public void createZNode(String path, String foo, String content, boolean ephemeral) throws Exception {
@@ -527,7 +536,8 @@ public class BigDataGSpec extends BaseGSpec {
     /**
      * Create an elasticsearch index.
      *
-     * @param index
+     * @param index         index
+     * @param removeIndex   removeIndex
      */
     @When("^I create an elasticsearch index named '(.+?)'( removing existing index if exist)?$")
     public void createElasticsearchIndex(String index, String removeIndex) {
@@ -540,11 +550,11 @@ public class BigDataGSpec extends BaseGSpec {
     /**
      * Index a document within a mapping type.
      *
-     * @param indexName
-     * @param mappingName
-     * @param key
-     * @param value
-     * @throws Exception
+     * @param indexName         indexName
+     * @param mappingName       mappingName
+     * @param key               key
+     * @param value             value
+     * @throws Exception        Exception
      */
     @When("^I index a document in the index named '(.+?)' using the mapping named '(.+?)' with key '(.+?)' and value '(.+?)'$")
     public void indexElasticsearchDocument(String indexName, String mappingName, String key, String value) throws Exception {
@@ -557,7 +567,7 @@ public class BigDataGSpec extends BaseGSpec {
     /**
      * Checks if a keyspaces exists in Cassandra.
      *
-     * @param keyspace
+     * @param keyspace  keyspace
      */
     @Then("^a Cassandra keyspace '(.+?)' exists$")
     public void assertKeyspaceOnCassandraExists(String keyspace) {
@@ -567,8 +577,8 @@ public class BigDataGSpec extends BaseGSpec {
     /**
      * Checks if a cassandra keyspace contains a table.
      *
-     * @param keyspace
-     * @param tableName
+     * @param keyspace      keyspace
+     * @param tableName     tableName
      */
     @Then("^a Cassandra keyspace '(.+?)' contains a table '(.+?)'$")
     public void assertTableExistsOnCassandraKeyspace(String keyspace, String tableName) {
@@ -578,9 +588,9 @@ public class BigDataGSpec extends BaseGSpec {
     /**
      * Checks the number of rows in a cassandra table.
      *
-     * @param keyspace
-     * @param tableName
-     * @param numberRows
+     * @param keyspace      keyspace
+     * @param tableName     tableName
+     * @param numberRows    numberRows
      */
     @Then("^a Cassandra keyspace '(.+?)' contains a table '(.+?)' with '(.+?)' rows$")
     public void assertRowNumberOfTableOnCassandraKeyspace(String keyspace, String tableName, String numberRows) {
@@ -593,10 +603,10 @@ public class BigDataGSpec extends BaseGSpec {
     /**
      * Checks if a cassandra table contains the values of a DataTable.
      *
-     * @param keyspace
-     * @param tableName
-     * @param data
-     * @throws InterruptedException
+     * @param keyspace                  keyspace
+     * @param tableName                 tableName
+     * @param data                      data
+     * @throws InterruptedException     InterruptedException
      */
     @Then("^a Cassandra keyspace '(.+?)' contains a table '(.+?)' with values:$")
     public void assertValuesOfTable(String keyspace, String tableName, DataTable data) throws InterruptedException {
@@ -690,9 +700,9 @@ public class BigDataGSpec extends BaseGSpec {
     /**
      * Checks the values of a MongoDB table.
      *
-     * @param dataBase
-     * @param tableName
-     * @param data
+     * @param dataBase      dataBase
+     * @param tableName     tableName
+     * @param data          data
      */
     @Then("^a Mongo dataBase '(.+?)' contains a table '(.+?)' with values:")
     public void assertValuesOfTableMongo(String dataBase, String tableName, DataTable data) {
@@ -706,8 +716,8 @@ public class BigDataGSpec extends BaseGSpec {
     /**
      * Checks if a MongoDB database contains a table.
      *
-     * @param database
-     * @param tableName
+     * @param database      database
+     * @param tableName     tableName
      */
     @Then("^a Mongo dataBase '(.+?)' doesnt contains a table '(.+?)'$")
     public void aMongoDataBaseContainsaTable(String database, String tableName) {
@@ -719,8 +729,10 @@ public class BigDataGSpec extends BaseGSpec {
     /**
      * Read zPath
      *
-     * @param zNode    path at zookeeper
-     * @param document expected content of znode
+     * @param zNode         path at zookeeper
+     * @param document      expected content of znode
+     * @param foo           Required parameter for optional string
+     * @throws Exception    Exception
      */
     @Then("^the zNode '(.+?)' exists( and contains '(.+?)')?$")
     public void checkZnodeExists(String zNode, String foo, String document)  throws Exception {
@@ -732,6 +744,7 @@ public class BigDataGSpec extends BaseGSpec {
         }
     }
 
+
     @Then("^the zNode '(.+?)' does not exist")
     public void checkZnodeNotExist(String zNode) throws Exception {
         assert !commonspec.getZookeeperSecClient().exists(zNode) : "The zNode exists";
@@ -740,7 +753,7 @@ public class BigDataGSpec extends BaseGSpec {
     /**
      * Check that the ElasticSearch index exists.
      *
-     * @param indexName
+     * @param indexName indexName
      */
     @Then("^An elasticsearch index named '(.+?)' exists")
     public void elasticSearchIndexExist(String indexName) {
@@ -750,7 +763,7 @@ public class BigDataGSpec extends BaseGSpec {
     /**
      * Check that the ElasticSearch index does not exist.
      *
-     * @param indexName
+     * @param indexName     indexName
      */
     @Then("^An elasticsearch index named '(.+?)' does not exist")
     public void elasticSearchIndexDoesNotExist(String indexName) {
@@ -760,9 +773,11 @@ public class BigDataGSpec extends BaseGSpec {
     /**
      * Check that an elasticsearch index contains a specific document
      *
-     * @param indexName
-     * @param columnName
-     * @param columnValue
+     * @param indexName     indexName
+     * @param columnName    columnName
+     * @param columnValue   columnValue
+     * @param mappingName   mappingName
+     * @throws Exception    Exception
      */
     @Then("^The Elasticsearch index named '(.+?)' and mapping '(.+?)' contains a column named '(.+?)' with the value '(.+?)'$")
     public void elasticSearchIndexContainsDocument(String indexName, String mappingName, String columnName, String columnValue) throws Exception {

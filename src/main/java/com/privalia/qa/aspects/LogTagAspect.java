@@ -15,7 +15,7 @@ import java.util.List;
 
 /**
  * Adds the possibility of printing the comments from the feature files as info level messages when executing.
- * Using #log <message> in a feature file, will print the message in the CLI when executing the test
+ * Using #log {@literal <message>} in a feature file, will print the message in the CLI when executing the test
  * @author José Fernández
  */
 @Aspect

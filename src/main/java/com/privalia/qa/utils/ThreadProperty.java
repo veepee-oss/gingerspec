@@ -34,8 +34,8 @@ public final class ThreadProperty {
     /**
      * Set a string to share in other class.
      *
-     * @param key
-     * @param value
+     * @param key   the key
+     * @param value the value
      */
     public static void set(String key, String value) {
         PROPS.get().setProperty(key, value);
@@ -44,8 +44,8 @@ public final class ThreadProperty {
     /**
      * Get a property shared.
      *
-     * @param key
-     * @return String
+     * @param key the key
+     * @return String string
      */
     public static String get(String key) {
         return PROPS.get().getProperty(key);

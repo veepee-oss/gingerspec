@@ -37,6 +37,12 @@ public class RemoteSSHConnection {
 
     /**
      * Default constructor.
+     *
+     * @param user       the user
+     * @param password   the password
+     * @param remoteHost the remote host
+     * @param pemFile    the pem file
+     * @throws Exception the exception
      */
     public RemoteSSHConnection(String user, String password, String remoteHost, String pemFile) throws Exception {
         // Create session
@@ -90,8 +96,9 @@ public class RemoteSSHConnection {
     /**
      * Copy localPath to remotePath using the session created
      *
-     * @param localPath
-     * @param remotePath
+     * @param localPath  the local path
+     * @param remotePath the remote path
+     * @throws Exception Exception
      */
     public void copyTo(String localPath, String remotePath) throws Exception {
         FileInputStream fis = null;
@@ -184,7 +191,8 @@ public class RemoteSSHConnection {
     /**
      * Execute the command in the session created
      *
-     * @param command
+     * @param command the command to execute
+     * @throws Exception Exception
      */
     public void runCommand(String command) throws Exception {
         String result = "";
@@ -232,8 +240,9 @@ public class RemoteSSHConnection {
     /**
      * Copy remotePath to localPath using the session created
      *
-     * @param remotePath
-     * @param localPath
+     * @param remotePath the remote path
+     * @param localPath  the local path
+     * @throws Exception Exception
      */
     public void copyFrom(String remotePath, String localPath) throws Exception {
         FileOutputStream fos = null;
@@ -342,6 +351,8 @@ public class RemoteSSHConnection {
 
     /**
      * Close connection
+     *
+     * @throws Exception Exception
      */
     public void closeConnection() throws Exception {
         session.disconnect();
@@ -349,6 +360,10 @@ public class RemoteSSHConnection {
 
     /**
      * UTILS
+     *
+     * @param in the in
+     * @return the int
+     * @throws IOException the io exception
      */
     public int checkAck(InputStream in) throws IOException {
         int b = in.read();
