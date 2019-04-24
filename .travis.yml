@@ -11,6 +11,7 @@ cache:
 stages:
   - clean
   - test
+  ## require the branch name to be master
   - name: deploy
     if: branch = master
 
