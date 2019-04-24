@@ -14,7 +14,6 @@ stages:
   ## require the branch name to be master
   - name: deploy
     if: branch = master
-    if: type = push
 
 ## export GPG details
 before_install:
