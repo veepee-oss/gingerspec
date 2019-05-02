@@ -1016,7 +1016,7 @@ public class CommonGTest {
     }
 
 
-    @Test
+    @Test(enabled = false)
     public void testGETRequest() throws Exception {
         ThreadProperty.set("class", this.getClass().getCanonicalName());
         CommonG commong = new CommonG();
@@ -1029,7 +1029,7 @@ public class CommonGTest {
         assertThat(401).as("GET Request with exit code status 401").isEqualTo(response.get().getStatusCode());
     }
 
-    @Test
+    @Test(enabled = false)
     public void testPOSTRequest() throws Exception {
         ThreadProperty.set("class", this.getClass().getCanonicalName());
         CommonG commong = new CommonG();
@@ -1044,7 +1044,7 @@ public class CommonGTest {
         assertThat(401).as("GET Request with exit code status 401").isEqualTo(response.get().getStatusCode());
     }
 
-    @Test
+    @Test(enabled = false)
     public void testDELETERequest() throws Exception {
         ThreadProperty.set("class", this.getClass().getCanonicalName());
         CommonG commong = new CommonG();
@@ -1059,7 +1059,7 @@ public class CommonGTest {
         assertThat(401).as("GET Request with exit code status 401").isEqualTo(response.get().getStatusCode());
     }
 
-    @Test
+    @Test(enabled = false)
     public void testPUTRequest() throws Exception {
         ThreadProperty.set("class", this.getClass().getCanonicalName());
         CommonG commong = new CommonG();
