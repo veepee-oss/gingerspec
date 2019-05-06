@@ -50,26 +50,26 @@ services:
     ports:
       - "5432:5432"
   rest-server:
-    image: 'harbor.privalia-test.com/qa/privalia-rest-server:0.1.0'
+    image: 'privaliatech/privalia-rest-server:0.1.0'
     ports:
       - "3000:3000"
   demo-site:
-    image: 'harbor.privalia-test.com/qa/privalia-front-image:0.1.0'
+    image: 'privaliatech/privalia-front-image:0.1.0'
     ports:
       - "80:80"
   selenium-grid:
-    image: 'harbor.privalia-test.com/qa/privalia-selenium-hub:3.9.1'
+    image: 'privaliatech/privalia-selenium-hub:3.9.1'
     ports:
       - "4444:4444"
   selenium-chrome:
-    image: 'harbor.privalia-test.com/qa/privalia-selenium-chrome:64'
+    image: 'privaliatech/privalia-selenium-chrome:64'
     environment:
       ID: 'myBrowser'
       SELENIUM_GRID: 'selenium-grid:4444'
     ports:
       - "5900:5900"
   selenium-firefox:
-    image: 'harbor.privalia-test.com/qa/privalia-selenium-firefox:60'
+    image: 'privaliatech/privalia-selenium-firefox:60'
     environment:
       ID: 'myBrowser'
       SELENIUM_GRID: 'selenium-grid:4444'
