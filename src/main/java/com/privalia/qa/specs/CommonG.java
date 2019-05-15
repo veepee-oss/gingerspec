@@ -1,19 +1,3 @@
-/*
- * Copyright (C) 2014 Stratio (http://stratio.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.privalia.qa.specs;
 
 import com.datastax.driver.core.ColumnDefinitions;
@@ -27,14 +11,12 @@ import com.jayway.jsonpath.spi.mapper.GsonMappingProvider;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.AsyncHttpClient.BoundRequestBuilder;
 import com.ning.http.client.Realm;
-import com.ning.http.client.Realm.AuthScheme;
 import com.ning.http.client.Response;
 import com.ning.http.client.cookie.Cookie;
 import com.privalia.qa.conditions.Conditions;
 import com.privalia.qa.utils.*;
-import cucumber.api.DataTable;
+import io.cucumber.datatable.DataTable;
 import io.restassured.specification.RequestSpecification;
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.io.FileUtils;
@@ -57,7 +39,6 @@ import org.slf4j.LoggerFactory;
 import ru.yandex.qatools.ashot.AShot;
 import ru.yandex.qatools.ashot.Screenshot;
 import ru.yandex.qatools.ashot.shooting.ShootingStrategies;
-import ru.yandex.qatools.ashot.shooting.cutter.CutStrategy;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -67,12 +48,14 @@ import java.lang.reflect.InvocationTargetException;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.concurrent.Future;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.privalia.qa.assertions.Assertions.assertThat;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.testng.Assert.fail;
+import static com.privalia.qa.assertions.Assertions.assertThat;
+
 
 public class CommonG {
 
@@ -143,6 +126,43 @@ public class CommonG {
     private Map<String, String> lastFileParseRecord;
 
     private String lastSoapResponse;
+
+    public Alert getSeleniumAlert() {
+        return SeleniumAlert;
+    }
+
+    public void setSeleniumAlert(Alert seleniumAlert) {
+        SeleniumAlert = seleniumAlert;
+    }
+
+    public String getRestProtocol() {
+        return restProtocol;
+    }
+
+    /**
+     * Set the REST host.
+     *
+     * @param restProtocol api protocol "http or https"
+     */
+    public void setRestProtocol(String restProtocol) {
+        this.restProtocol = restProtocol;
+    }
+
+    public List<Cookie> getCookies() {
+        return cookies;
+    }
+
+    public void setCookies(List<Cookie> cookies) {
+        this.cookies = cookies;
+    }
+
+    public Set<org.openqa.selenium.Cookie> getSeleniumCookies() {
+        return seleniumCookies;
+    }
+
+    public void setSeleniumCookies(Set<org.openqa.selenium.Cookie> cookies) {
+        this.seleniumCookies = cookies;
+    }
 
     /**
      * Checks if a given string matches a regular expression or contains a string
@@ -559,7 +579,7 @@ public class CommonG {
      * @return                  List(WebElement)
      */
     public List<WebElement> locateElementWithPooling(int poolingInterval, int poolMaxTime, String method, String element,
-                                          Integer expectedCount, String type) {
+                                                     Integer expectedCount, String type) {
 
         Wait wait = new FluentWait(driver)
                 .withTimeout(poolMaxTime, SECONDS)
@@ -656,7 +676,7 @@ public class CommonG {
         this.getSeleniumAlert().accept();
     }
 
-     /**
+    /**
      * Capture a snapshot or an evidence in the driver
      *
      * @param driver driver used for testing
@@ -666,6 +686,7 @@ public class CommonG {
     public String captureEvidence(WebDriver driver, String type) {
         return captureEvidence(driver, type, "");
     }
+
 
     /**
      * Capture a snapshot or an evidence in the driver
@@ -990,7 +1011,6 @@ public class CommonG {
         return result;
     }
 
-
     /**
      * Returns the information modified
      *
@@ -1112,6 +1132,7 @@ public class CommonG {
         return generateRequest(requestType, secure, user, password, endPoint, data, type);
     }
 
+
     /**
      * Generates the request based on the type of request, the end point, the data and type passed
      *
@@ -1129,7 +1150,7 @@ public class CommonG {
 
         String protocol = this.getRestProtocol();
         Future<Response> response = null;
-        BoundRequestBuilder request;
+        AsyncHttpClient.BoundRequestBuilder request;
         Realm realm = null;
 
 
@@ -1153,7 +1174,7 @@ public class CommonG {
                     .setPrincipal(user)
                     .setPassword(password)
                     .setUsePreemptiveAuth(true)
-                    .setScheme(AuthScheme.BASIC)
+                    .setScheme(Realm.AuthScheme.BASIC)
                     .build();
         }
 
@@ -1360,7 +1381,6 @@ public class CommonG {
         return response;
     }
 
-
     /**
      * Generates the request based on the type of request, the end point, the data and type passed
      *
@@ -1417,7 +1437,6 @@ public class CommonG {
         }
 
     }
-
 
     /**
      * Saves the value in the attribute in class extending CommonG.
@@ -1487,14 +1506,6 @@ public class CommonG {
         this.resultsType = resultsType;
     }
 
-    public Set<org.openqa.selenium.Cookie> getSeleniumCookies() {
-        return seleniumCookies;
-    }
-
-    public void setSeleniumCookies(Set<org.openqa.selenium.Cookie> cookies) {
-        this.seleniumCookies = cookies;
-    }
-
     public Map<String, String> getHeaders() {
         return headers;
     }
@@ -1524,11 +1535,11 @@ public class CommonG {
             List<Map<String, Object>> resultsListExpected = new ArrayList<Map<String, Object>>();
             Map<String, Object> resultsCucumber;
 
-            for (int e = 1; e < expectedResults.getGherkinRows().size(); e++) {
+            for (int e = 1; e < expectedResults.height(); e++) {
                 resultsCucumber = new HashMap<String, Object>();
 
-                for (int i = 0; i < expectedResults.getGherkinRows().get(0).getCells().size(); i++) {
-                    resultsCucumber.put(expectedResults.getGherkinRows().get(0).getCells().get(i), expectedResults.getGherkinRows().get(e).getCells().get(i));
+                for (int i = 0; i < expectedResults.row(0).size(); i++) {
+                    resultsCucumber.put(expectedResults.row(0).get(i), expectedResults.row(e).get(i));
 
                 }
                 resultsListExpected.add(resultsCucumber);
@@ -1576,7 +1587,6 @@ public class CommonG {
         }
     }
 
-
     /**
      * Checks the different results of a previous query to Cassandra database
      *
@@ -1615,11 +1625,11 @@ public class CommonG {
             List<Map<String, Object>> resultsListExpected = new ArrayList<Map<String, Object>>();
             Map<String, Object> resultsCucumber;
 
-            for (int e = 1; e < expectedResults.getGherkinRows().size(); e++) {
+            for (int e = 1; e < expectedResults.height(); e++) {
                 resultsCucumber = new HashMap<String, Object>();
 
-                for (int i = 0; i < expectedResults.getGherkinRows().get(0).getCells().size(); i++) {
-                    resultsCucumber.put(expectedResults.getGherkinRows().get(0).getCells().get(i), expectedResults.getGherkinRows().get(e).getCells().get(i));
+                for (int i = 0; i < expectedResults.row(0).size(); i++) {
+                    resultsCucumber.put(expectedResults.row(0).get(i), expectedResults.row(e).get(i));
 
                 }
                 resultsListExpected.add(resultsCucumber);
@@ -1666,7 +1676,6 @@ public class CommonG {
         }
     }
 
-
     /**
      * Checks the different results of a previous query to Mongo database
      *
@@ -1688,11 +1697,11 @@ public class CommonG {
             List<Map<String, Object>> resultsListExpected = new ArrayList<Map<String, Object>>();
             Map<String, Object> resultsCucumber;
 
-            for (int e = 1; e < expectedResults.getGherkinRows().size(); e++) {
+            for (int e = 1; e < expectedResults.height(); e++) {
                 resultsCucumber = new HashMap<String, Object>();
 
-                for (int i = 0; i < expectedResults.getGherkinRows().get(0).getCells().size(); i++) {
-                    resultsCucumber.put(expectedResults.getGherkinRows().get(0).getCells().get(i), expectedResults.getGherkinRows().get(e).getCells().get(i));
+                for (int i = 0; i < expectedResults.row(0).size(); i++) {
+                    resultsCucumber.put(expectedResults.row(0).get(i), expectedResults.row(e).get(i));
 
                 }
                 resultsListExpected.add(resultsCucumber);
@@ -1770,7 +1779,7 @@ public class CommonG {
      */
     public void resultsMustBeElasticsearch(DataTable expectedResults) throws Exception {
         if (getElasticsearchResults() != null) {
-            List<List<String>> expectedResultList = expectedResults.raw();
+            List<List<String>> expectedResultList = expectedResults.asLists();
             //Check size
             assertThat(expectedResultList.size() - 1).overridingErrorMessage(
                     "Expected number of columns to be" + (expectedResultList.size() - 1)
@@ -1846,28 +1855,6 @@ public class CommonG {
         this.commandResult = commandResult;
     }
 
-    public String getRestProtocol() {
-        return restProtocol;
-    }
-
-    /**
-     * Set the REST host.
-     *
-     * @param restProtocol api protocol "http or https"
-     */
-    public void setRestProtocol(String restProtocol) {
-        this.restProtocol = restProtocol;
-    }
-
-    public List<Cookie> getCookies() {
-        return cookies;
-    }
-
-    public void setCookies(List<Cookie> cookies) {
-        this.cookies = cookies;
-    }
-
-
     /**
      * Parse jsonpath expression from a given string.
      * <p>
@@ -1940,7 +1927,6 @@ public class CommonG {
         }
         return value;
     }
-
 
     /**
      * Remove a subelement in a JsonPath
@@ -2080,14 +2066,6 @@ public class CommonG {
                 this.getLogger().debug("Command complete stdout:\n{}", this.getCommandResult());
             }
         }
-    }
-
-    public Alert getSeleniumAlert() {
-        return SeleniumAlert;
-    }
-
-    public void setSeleniumAlert(Alert seleniumAlert) {
-        SeleniumAlert = seleniumAlert;
     }
 
 }

@@ -15,16 +15,13 @@
  */
 package com.privalia.qa.ATests;
 
-import com.privalia.qa.cucumber.testng.CucumberRunner;
 import com.privalia.qa.utils.BaseGTest;
 import cucumber.api.CucumberOptions;
-import org.testng.annotations.Test;
 
-@CucumberOptions(format = "json:target/cucumber.json", features = {"src/test/resources/features/jsonReplacements.feature"},
-        glue = "classpath:com/privalia/qa/specs/*")
+@CucumberOptions(
+        features = {"src/test/resources/features/jsonReplacements.feature"},
+        glue = "com.privalia.qa.specs")
 public class JsonReplacementsIT extends BaseGTest {
-    @Test
-    public void simpleTest() throws Exception {
-        new CucumberRunner(this.getClass()).runCukes();
-    }
+
+
 }

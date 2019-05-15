@@ -16,12 +16,9 @@
 
 package com.privalia.qa.cucumber.converter;
 
-import cucumber.api.Transformer;
-
-public class NullableStringConverter extends Transformer<String> {
+public class NullableStringConverter {
     public static final int DEFAULT_RADIX = 16;
 
-    @Override
     public String transform(String input) {
 
         if ("//NONE//".equals(input)) {

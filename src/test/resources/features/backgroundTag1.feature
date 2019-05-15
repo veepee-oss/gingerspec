@@ -9,6 +9,6 @@ Feature: Background aspect tests
   @/BACKGROUND
     Given I run '[ "SHOULD_RUN" = "SHOULD_RUN" ]' locally
 
-
   Scenario: default scenario for background1
     Given I run '[ "SHOULD_RUN" = "SHOULD_RUN" ]' locally
+

@@ -20,8 +20,10 @@ import com.jayway.jsonpath.PathNotFoundException;
 import com.ning.http.client.cookie.Cookie;
 import com.privalia.qa.utils.RemoteSSHConnection;
 import com.privalia.qa.utils.ThreadProperty;
-import cucumber.api.DataTable;
+
+import cucumber.api.PendingException;
 import cucumber.api.java.en.Given;
+import io.cucumber.datatable.DataTable;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
@@ -108,9 +110,9 @@ public class GivenGSpec extends BaseGSpec {
     public void setHeaders(DataTable modifications) throws Throwable {
 
         LinkedHashMap jsonAsMap = new LinkedHashMap();
-        for (int i = 0; i < modifications.raw().size(); i++) {
-            String key = modifications.raw().get(i).get(0);
-            String value = modifications.raw().get(i).get(1);
+        for (int i = 0; i < modifications.height(); i++) {
+            String key = modifications.row(i).get(0);
+            String value = modifications.row(i).get(1);
             commonspec.getHeaders().put(key, value);
         }
 
@@ -351,14 +353,12 @@ public class GivenGSpec extends BaseGSpec {
      * Executes the command specified in local system
      *
      * @param command    command to be run locally
-     * @param foo        regex needed to match method
      * @param exitStatus command exit status
-     * @param bar        regex needed to match method
      * @param envVar     environment variable name
      * @throws Exception exception
      */
     @Given("^I run '(.+?)' locally( with exit status '(.+?)')?( and save the value in environment variable '(.+?)')?$")
-    public void executeLocalCommand(String command, String foo, Integer exitStatus, String bar, String envVar) throws Exception {
+    public void executeLocalCommand(String command, Integer exitStatus, String envVar) throws Exception {
         if (exitStatus == null) {
             exitStatus = 0;
         }

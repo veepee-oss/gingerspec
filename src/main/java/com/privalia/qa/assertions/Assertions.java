@@ -19,7 +19,8 @@ package com.privalia.qa.assertions;
 import com.mongodb.DBObject;
 import com.privalia.qa.specs.CommonG;
 import com.privalia.qa.utils.PreviousWebElements;
-import cucumber.api.DataTable;
+
+import io.cucumber.datatable.DataTable;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;

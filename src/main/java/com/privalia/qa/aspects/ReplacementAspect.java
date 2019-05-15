@@ -16,13 +16,16 @@
 
 package com.privalia.qa.aspects;
 
-import com.privalia.qa.cucumber.testng.CucumberReporter;
+
 import com.privalia.qa.exceptions.NonReplaceableException;
 import com.privalia.qa.specs.CommonG;
 import com.privalia.qa.utils.ThreadProperty;
-import gherkin.I18n;
-import gherkin.formatter.Reporter;
-import gherkin.formatter.model.*;
+import cucumber.runtime.StepDefinitionMatch;
+import gherkin.ast.*;
+import io.cucumber.cucumberexpressions.Group;
+import io.cucumber.stepexpression.DataTableArgument;
+import io.cucumber.stepexpression.DocStringArgument;
+import io.cucumber.stepexpression.ExpressionArgument;
 import org.apache.commons.configuration2.CombinedConfiguration;
 import org.apache.commons.configuration2.FileBasedConfiguration;
 import org.apache.commons.configuration2.PropertiesConfiguration;
@@ -31,7 +34,9 @@ import org.apache.commons.configuration2.builder.fluent.Parameters;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.configuration2.tree.OverrideCombiner;
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.annotation.*;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
+import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,23 +47,52 @@ import java.net.*;
 import java.util.Enumeration;
 import java.util.List;
 
+/**
+ * Aspect to replace variables used in the feature files
+ *
+ * @author Jose Fernandez
+ */
 @Aspect
 public class ReplacementAspect {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
 
-    private String lastEchoedStep = "";
+    private StepDefinitionMatch lastEchoedStep;
 
-
-    @Pointcut("(execution (gherkin.formatter.model.Scenario.new(..)) ||  execution (gherkin.formatter.model.ScenarioOutline.new(..))) && "
-            + "args (comments, tags, keyword, name, description, line, id) ")
-    protected void replacementScenarios(List<Comment> comments, List<Tag> tags, String keyword, String name, String description, Integer line, String id) {
+    @Pointcut("execution (gherkin.ast.Scenario.new(..)) && args(tags, location, keyword, name, description, steps)")
+    protected void replacementScenarios(List<Tag> tags, Location location, String keyword, String name, String description, List<Step> steps) {
     }
 
-    @After(value = "replacementScenarios(comments, tags, keyword, name, description, line, id)")
-    public void aroundScenarios(JoinPoint jp, List<Comment> comments, List<Tag> tags, String keyword, String name, String description, Integer line, String id) throws Throwable {
+    @Pointcut("execution (gherkin.ast.ScenarioOutline.new(..)) && args(tags, location, keyword, name, description, steps, examples)")
+    protected void replacementScenariosOutline(List<Tag> tags, Location location, String keyword, String name, String description, List<Step> steps, List<Examples> examples) {
+    }
 
-        BasicStatement scenario = (BasicStatement) jp.getThis();
+    @Before("replacementScenariosOutline(tags, location, keyword, name, description, steps, examples)")
+    public void aroundScenariosOutlineDefinition(JoinPoint jp, List<Tag> tags, Location location, String keyword, String name, String description, List<Step> steps, List<Examples> examples) throws Throwable {
+        this.aroundScenarios(jp, tags, location, keyword, name, description, steps, examples);
+    }
+
+    @Before("replacementScenarios(tags, location, keyword, name, description, steps)")
+    public void aroundScenariosDefinition(JoinPoint jp, List<Tag> tags, Location location, String keyword, String name, String description, List<Step> steps) throws Throwable {
+        this.aroundScenarios(jp, tags, location, keyword, name, description, steps, null);
+    }
+
+    /**
+     * replaces any variable placeholder in the scenario/Scenario Outline title.
+     *
+     * @param jp          the jp
+     * @param tags        the tags
+     * @param location    the location
+     * @param keyword     the keyword
+     * @param name        the name
+     * @param description the description
+     * @param steps       the steps
+     * @param examples    the examples
+     * @throws Throwable the throwable
+     */
+    public void aroundScenarios(JoinPoint jp, List<Tag> tags, Location location, String keyword, String name, String description, List<Step> steps, List<Examples> examples) throws Throwable {
+
+        ScenarioDefinition scenario = (ScenarioDefinition) jp.getThis();
         String scenarioName = scenario.getName();
         String newScenarioName = replacedElement(scenarioName, jp);
 
@@ -68,7 +102,8 @@ public class ReplacementAspect {
             do {
                 try {
                     field = current.getDeclaredField("name");
-                } catch (Exception e) { }
+                } catch (Exception e) {
+                }
             } while ((current = current.getSuperclass()) != null);
 
             field.setAccessible(true);
@@ -76,49 +111,99 @@ public class ReplacementAspect {
         }
     }
 
-    @Pointcut("execution (public void cucumber.runtime.Runtime.runStep(..)) && "
-            + "args (featurePath, step, reporter, i18n)")
-    protected void replacementStar(String featurePath, Step step, Reporter reporter, I18n i18n) {
+
+    @Pointcut("execution (* cucumber.runner.Match.getArguments(..)) && args()")
+    protected void replacementArguments() {
     }
 
-    @Before(value = "replacementStar(featurePath, step, reporter, i18n)")
-    public void aroundReplacementStar(JoinPoint jp, String featurePath, Step step, Reporter reporter, I18n i18n) throws Throwable {
-        DocString docString = step.getDocString();
-        List<DataTableRow> rows = step.getRows();
-        if (docString != null) {
-            String value = replacedElement(docString.getValue(), jp);
-            Field field = docString.getClass().getDeclaredField("value");
-            field.setAccessible(true);
-            field.set(docString, value);
+    /**
+     * When a step is about to be executed, the Match#getArguments method is called. this function retrieves the the arguments that
+     * are going to be used when executing the glue method.
+     * <p>
+     * This method captures this event and replaces the variables with their appropriate value using reflection
+     *
+     * @param jp the jp
+     * @throws NoSuchFieldException    the no such field exception
+     * @throws IllegalAccessException  the illegal access exception
+     * @throws FileNotFoundException   the file not found exception
+     * @throws NonReplaceableException the non replaceable exception
+     * @throws ConfigurationException  the configuration exception
+     * @throws URISyntaxException      the uri syntax exception
+     */
+    @Before(value = "replacementArguments()")
+    public void aroundReplacementArguments(JoinPoint jp) throws NoSuchFieldException, IllegalAccessException, FileNotFoundException, NonReplaceableException, ConfigurationException, URISyntaxException {
+
+        Object match = jp.getThis();
+
+        /*To avoid executing replacement on the same step several times*/
+        if (match.equals(lastEchoedStep)) {
+            return;
+        } else {
+            lastEchoedStep = (StepDefinitionMatch) match;
         }
-        if (rows != null) {
-            for (int r = 0; r < rows.size(); r++) {
-                List<String> cells = rows.get(r).getCells();
-                for (int c = 0; c < cells.size(); c++) {
-                    cells.set(c, replacedElement(cells.get(c), jp));
+
+        if (match.getClass().getName().matches("cucumber.runner.PickleStepDefinitionMatch")) {
+
+            Field argumentsField = match.getClass().getSuperclass().getDeclaredField("arguments");
+            argumentsField.setAccessible(true);
+            List<io.cucumber.stepexpression.Argument> arguments = (List<io.cucumber.stepexpression.Argument>) argumentsField.get(match);
+
+            for (io.cucumber.stepexpression.Argument argument : arguments) {
+
+                //if (argument.getValue() != null) {
+
+                //If is a normal expression argument
+                if (argument instanceof ExpressionArgument) {
+                    ExpressionArgument expressionArgument = (ExpressionArgument) argument;
+                    Field textField = expressionArgument.getClass().getDeclaredField("argument");
+                    textField.setAccessible(true);
+                    io.cucumber.cucumberexpressions.Argument textArgument = (io.cucumber.cucumberexpressions.Argument) textField.get(expressionArgument);
+                    String currentTextValue = textArgument.getGroup().getValue();
+
+                    /*In steps with optional params, the argument could be null*/
+                    if (currentTextValue != null) {
+                        String replacedValue = replacedElement(currentTextValue, jp);
+
+                        Group group = textArgument.getGroup();
+                        Field valueField = group.getClass().getDeclaredField("value");
+                        valueField.setAccessible(true);
+                        valueField.set(group, replacedValue);
+                    }
                 }
+
+                //If is a datatable argument
+                if (argument instanceof DataTableArgument) {
+                    DataTableArgument dataTabeArgument = (DataTableArgument) argument;
+                    Field listField = dataTabeArgument.getClass().getDeclaredField("argument");
+                    listField.setAccessible(true);
+                    List<List<String>> rows = (List<List<String>>) listField.get(dataTabeArgument);
+
+                    for (List<String> row : rows) {
+                        for (int i = 0; i <= row.size() - 1; i++) {
+                            row.set(i, replacedElement(row.get(i), jp));
+                        }
+                    }
+
+                    listField.set(dataTabeArgument, rows);
+                }
+
+                //If is a Docstring argument
+                if (argument instanceof DocStringArgument) {
+                    DocStringArgument docStringArgument = (DocStringArgument) argument;
+                    Field docstringField = docStringArgument.getClass().getDeclaredField("argument");
+                    docstringField.setAccessible(true);
+                    String docStringValue = (String) docstringField.get(docStringArgument);
+                    String replacedDocStringValue = replacedElement(docStringValue, jp);
+                    docstringField.set(docStringArgument, replacedDocStringValue);
+                }
+                //}
             }
+
+        } else {
+            logger.error("Incorrect step definition match in Feature. Could not apply replacements");
         }
-
-        String stepName = step.getName();
-        String newName = replacedElement(stepName, jp);
-        if (!stepName.equals(newName)) {
-            //field up to BasicStatement, from Step and ExampleStep
-            Field field = null;
-            Class current = step.getClass();
-            do {
-                try {
-                    field = current.getDeclaredField("name");
-                } catch (Exception e) { }
-            } while ((current = current.getSuperclass()) != null);
-
-            field.setAccessible(true);
-            field.set(step, newName);
-        }
-
-        lastEchoedStep = step.getName();
-        logger.info("  {}{}", step.getKeyword(), step.getName());
     }
+
 
     protected String replacedElement(String el, JoinPoint jp) throws NonReplaceableException, ConfigurationException, URISyntaxException, FileNotFoundException {
         if (el.contains("${")) {
@@ -210,6 +295,7 @@ public class ReplacementAspect {
         return newVal;
     }
 
+
     /**
      * Replaces every placeholded element, enclosed in @{} with the
      * corresponding attribute value in local Common class
@@ -226,7 +312,7 @@ public class ReplacementAspect {
      * target/test-classes). The file is read and its content is returned as a string
      *
      * @param element element to be replaced
-     * @param pjp JoinPoint
+     * @param pjp     JoinPoint
      * @return String
      * @throws NonReplaceableException exception
      */
@@ -241,7 +327,7 @@ public class ReplacementAspect {
                 property = placeholder.substring(2, placeholder.indexOf(".")).toLowerCase();
                 subproperty = placeholder.substring(placeholder.indexOf(".") + 1, placeholder.length() - 1);
             } else {
-                if (pjp.getThis() instanceof CucumberReporter.TestMethod) {
+                if (pjp.getThis() instanceof ScenarioDefinition) {
                     return newVal;
                 } else {
                     logger.error("{} -> {} placeholded element has not been replaced previously.", element, property);
@@ -286,17 +372,15 @@ public class ReplacementAspect {
         return newVal;
     }
 
-
     /**
      * Replaces every placeholded element, enclosed in !{} with the
      * corresponding attribute value in local Common class
      *
      * @param element element to be replaced
-     * @param pjp JoinPoint
-     * @return String
-     * @throws NonReplaceableException exception
+     * @param pjp     JoinPoint
+     * @return String string
      */
-    protected String replaceReflectionPlaceholders(String element, JoinPoint pjp) throws NonReplaceableException {
+    protected String replaceReflectionPlaceholders(String element, JoinPoint pjp) {
         String newVal = element;
         while (newVal.contains("!{")) {
             String placeholder = newVal.substring(newVal.indexOf("!{"),
@@ -305,7 +389,7 @@ public class ReplacementAspect {
             // we want to use value previously saved
             String prop = ThreadProperty.get(attribute);
 
-            if (prop == null && (pjp.getThis() instanceof CucumberReporter.TestMethod)) {
+            if (prop == null && (pjp.getThis() instanceof ScenarioDefinition)) {
                 return element;
             } else if (prop == null) {
                 logger.warn("{} -> {} local var has not been saved correctly previously.", element, attribute);
@@ -318,13 +402,12 @@ public class ReplacementAspect {
         return newVal;
     }
 
-
     /**
      * Replaces every placeholded element, enclosed in ${} with the
      * corresponding java property
      *
      * @param element element to be replaced
-     * @param jp JoinPoint
+     * @param jp      JoinPoint
      * @return String
      * @throws NonReplaceableException exception
      */
@@ -371,7 +454,7 @@ public class ReplacementAspect {
                 prop = System.getProperty(sysProp, defaultValue);
             }
 
-            if (prop == null && (jp.getThis() instanceof CucumberReporter.TestMethod)) {
+            if (prop == null && (jp.getThis() instanceof ScenarioDefinition)) {
                 return element;
             } else if (prop == null) {
                 logger.error("{} -> {} env var has not been defined.", element, sysProp);
@@ -388,5 +471,7 @@ public class ReplacementAspect {
 
         return newVal;
     }
+
+
 }
 

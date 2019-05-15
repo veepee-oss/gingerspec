@@ -16,7 +16,7 @@
 package com.privalia.qa.specs;
 
 import com.privalia.qa.utils.ThreadProperty;
-import cucumber.api.DataTable;
+import io.cucumber.datatable.DataTable;
 import org.testng.annotations.Test;
 
 import java.nio.file.Files;
@@ -32,7 +32,7 @@ public class ThenGTest {
         String envVar = "consulMesos";
         ThreadProperty.set("class", this.getClass().getCanonicalName());
         CommonG commong = new CommonG();
-        ThenGSpec theng = new ThenGSpec(commong);
+        RestSpec theng = new RestSpec(commong);
 
         String result = new String(Files.readAllBytes(
                 Paths.get(getClass().getClassLoader().getResource(baseData).getFile())));
@@ -57,7 +57,7 @@ public class ThenGTest {
         String envVar = "consulMesos";
         ThreadProperty.set("class", this.getClass().getCanonicalName());
         CommonG commong = new CommonG();
-        ThenGSpec theng = new ThenGSpec(commong);
+        RestSpec theng = new RestSpec(commong);
 
         String result = new String(Files.readAllBytes(
                 Paths.get(getClass().getClassLoader().getResource(baseData).getFile())));
@@ -82,7 +82,7 @@ public class ThenGTest {
         String envVar = "consulMesos";
         ThreadProperty.set("class", this.getClass().getCanonicalName());
         CommonG commong = new CommonG();
-        ThenGSpec theng = new ThenGSpec(commong);
+        RestSpec theng = new RestSpec(commong);
 
         String result = new String(Files.readAllBytes(
                 Paths.get(getClass().getClassLoader().getResource(baseData).getFile())));
@@ -106,7 +106,7 @@ public class ThenGTest {
         String envVar = "consulMesos";
         ThreadProperty.set("class", this.getClass().getCanonicalName());
         CommonG commong = new CommonG();
-        ThenGSpec theng = new ThenGSpec(commong);
+        RestSpec theng = new RestSpec(commong);
 
         String result = new String(Files.readAllBytes(
                 Paths.get(getClass().getClassLoader().getResource(baseData).getFile())));
@@ -130,7 +130,7 @@ public class ThenGTest {
         String envVar = "consulMesos";
         ThreadProperty.set("class", this.getClass().getCanonicalName());
         CommonG commong = new CommonG();
-        ThenGSpec theng = new ThenGSpec(commong);
+        RestSpec theng = new RestSpec(commong);
 
         String result = new String(Files.readAllBytes(
                 Paths.get(getClass().getClassLoader().getResource(baseData).getFile())));
@@ -154,7 +154,7 @@ public class ThenGTest {
         String envVar = "exampleEnvVar";
         ThreadProperty.set("class", this.getClass().getCanonicalName());
         CommonG commong = new CommonG();
-        ThenGSpec theng = new ThenGSpec(commong);
+        RestSpec theng = new RestSpec(commong);
 
         String result = new String(Files.readAllBytes(
                 Paths.get(getClass().getClassLoader().getResource(baseData).getFile())));
@@ -179,7 +179,7 @@ public class ThenGTest {
         String envVar = "exampleEnvVar";
         ThreadProperty.set("class", this.getClass().getCanonicalName());
         CommonG commong = new CommonG();
-        ThenGSpec theng = new ThenGSpec(commong);
+        RestSpec theng = new RestSpec(commong);
 
         String result = new String(Files.readAllBytes(
                 Paths.get(getClass().getClassLoader().getResource(baseData).getFile())));
@@ -203,7 +203,7 @@ public class ThenGTest {
         String envVar = "exampleEnvVar";
         ThreadProperty.set("class", this.getClass().getCanonicalName());
         CommonG commong = new CommonG();
-        ThenGSpec theng = new ThenGSpec(commong);
+        RestSpec theng = new RestSpec(commong);
 
         String result = new String(Files.readAllBytes(
                 Paths.get(getClass().getClassLoader().getResource(baseData).getFile())));
@@ -223,7 +223,7 @@ public class ThenGTest {
         String envVar = "exampleEnvVar";
         ThreadProperty.set("class", this.getClass().getCanonicalName());
         CommonG commong = new CommonG();
-        ThenGSpec theng = new ThenGSpec(commong);
+        RestSpec theng = new RestSpec(commong);
 
         String result = new String(Files.readAllBytes(
                 Paths.get(getClass().getClassLoader().getResource(baseData).getFile())));

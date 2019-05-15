@@ -16,12 +16,9 @@
 
 package com.privalia.qa.aspects;
 
-import cucumber.runtime.Runtime;
-import cucumber.runtime.model.CucumberScenario;
-import gherkin.formatter.Formatter;
-import gherkin.formatter.Reporter;
-import gherkin.formatter.model.Scenario;
-import gherkin.formatter.model.Tag;
+import cucumber.api.TestCase;
+import cucumber.runner.EventBus;
+import gherkin.pickles.PickleTag;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -29,10 +26,8 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -40,52 +35,48 @@ import java.util.stream.Collectors;
 import static com.privalia.qa.aspects.IgnoreTagAspect.ignoreReasons.NOREASON;
 import static com.privalia.qa.aspects.IgnoreTagAspect.ignoreReasons.NOTIGNORED;
 
+/**
+ * Aspect for managing the @ignore annotation on a feature/scenario
+ */
 @Aspect
 public class IgnoreTagAspect {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
 
-    @Pointcut("execution (* cucumber.runtime.model.CucumberScenario.run(..)) && "
-            + "args (formatter, reporter, runtime)")
-    protected void addIgnoreTagPointcutScenario(Formatter formatter, Reporter reporter, Runtime runtime) {
+
+    @Pointcut("execution (void cucumber.runner.TestCase.run(..)) && args(bus)")
+    protected void addIgnoreTagPointcutScenario(EventBus bus) {
     }
 
-    /**
-     * @param pjp ProceedingJoinPoint
-     * @param formatter formatter
-     * @param reporter reporter
-     * @param runtime runtime
-     * @throws Throwable exception
-     */
-    @Around(value = "addIgnoreTagPointcutScenario(formatter, reporter, runtime)")
-    public void aroundAddIgnoreTagPointcut(ProceedingJoinPoint pjp, Formatter formatter, Reporter reporter,
-                                           Runtime runtime) throws Throwable {
 
-        CucumberScenario scen = (CucumberScenario) pjp.getThis();
-        Scenario scenario = (Scenario) scen.getGherkinModel();
+    @Around(value = "addIgnoreTagPointcutScenario(bus)")
+    public void aroundAddIgnoreTagPointcut(ProceedingJoinPoint pjp, EventBus bus) throws Throwable {
 
-        Class<?> sc = scen.getClass();
-        Method tt = sc.getSuperclass().getDeclaredMethod("tagsAndInheritedTags");
-        tt.setAccessible(true);
-        Set<Tag> tags = (Set<Tag>) tt.invoke(scen);
+        TestCase testCase = (TestCase) pjp.getThis();
+        List<PickleTag> tags = testCase.getTags();
+
+        String scenarioName = testCase.getName();
 
         List<String> tagList = new ArrayList<>();
-        String scenarioName = scenario.getName();
-        tagList = tags.stream().map(Tag::getName).collect(Collectors.toList());
+        tagList = tags.stream().map(PickleTag::getName).collect(Collectors.toList());
+
 
         ignoreReasons exitReason = manageTags(tagList, scenarioName);
         if (exitReason.equals(NOREASON)) {
-            logger.error("Scenario '" + scenario.getName() + "' failed due to wrong use of the @ignore tag. ");
+            logger.error("Scenario '" + scenarioName + "' failed due to wrong use of the @ignore tag. ");
         }
 
         if ((!(exitReason.equals(NOTIGNORED))) && (!(exitReason.equals(NOREASON)))) {
+            /*
             runtime.buildBackendWorlds(reporter, tags, scenario);
             formatter.startOfScenarioLifeCycle(scenario);
             formatter.endOfScenarioLifeCycle(scenario);
             runtime.disposeBackendWorlds();
+            */
         } else {
             pjp.proceed();
         }
+
     }
 
     public ignoreReasons manageTags(List<String> tagList, String scenarioName) {

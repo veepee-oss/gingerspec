@@ -1,13 +1,10 @@
 package com.privalia.qa.specs;
 
-import com.privalia.qa.utils.ThreadProperty;
-import cucumber.api.DataTable;
-import cucumber.api.PendingException;
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
-import gherkin.formatter.model.DataTableRow;
+import io.cucumber.datatable.DataTable;
 import okhttp3.Response;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.zookeeper.KeeperException;
@@ -42,12 +39,11 @@ public class KafkaGSpec extends BaseGSpec {
      * Connect to Kafka.
      *
      * @param zkHost ZK host
-     * @param foo    required parameter by gherkin for matching the optional string
      * @param zkPath ZK port
      * @throws UnknownHostException exception
      */
     @Given("^I connect to kafka at '(.+?)'( using path '(.+?)')?$")
-    public void connectKafka(String zkHost, String foo, String zkPath) throws UnknownHostException {
+    public void connectKafka(String zkHost, String zkPath) throws UnknownHostException {
         String zkPort = zkHost.split(":")[1];
         zkHost = zkHost.split(":")[0];
         commonspec.getKafkaUtils().setZkHost(zkHost, zkPort, zkPath);
@@ -109,13 +105,12 @@ public class KafkaGSpec extends BaseGSpec {
      *
      * @param message    string that you send to topic
      * @param topic_name topic name
-     * @param foo        the foo
      * @param recordKey  the record key
      * @param ifExists   for handling optional text in Gherkin
      * @throws Exception Exception
      */
     @When("^I send a message '(.+?)' to the kafka topic named '(.+?)'( with key '(.+?)')?( if not exists)?$")
-    public void sendAMessage(String message, String topic_name, String foo, String recordKey, String ifExists) throws Exception {
+    public void sendAMessage(String message, String topic_name, String recordKey, String ifExists) throws Exception {
         if (ifExists != null) {
             Map<Object, Object> result = commonspec.getKafkaUtils().readTopicFromBeginning(topic_name);
             if (result.containsKey(recordKey)) {
@@ -135,7 +130,6 @@ public class KafkaGSpec extends BaseGSpec {
      *
      * @param message    Message to send (will be converted to the proper type specified by the value.serializer prop). String is default
      * @param topic_name Name of the topic where to send the message
-     * @param foo        Parameter required by Gherkin for optional text
      * @param recordKey  Key of the kafka record
      * @param table      Table containing alternative properties for the producer
      * @throws InterruptedException InterruptedException
@@ -143,12 +137,11 @@ public class KafkaGSpec extends BaseGSpec {
      * @throws TimeoutException     TimeoutException
      */
     @Given("I send a message '(.+?)' to the kafka topic named '(.+?)'( with key '(.+?)')? with:$")
-    public void sendAMessageWithDatatable(String message, String topic_name, String foo, String recordKey, DataTable table) throws InterruptedException, ExecutionException, TimeoutException {
+    public void sendAMessageWithDatatable(String message, String topic_name, String recordKey, DataTable table) throws InterruptedException, ExecutionException, TimeoutException {
 
-        /*Modify properties of producer*/
-        for (DataTableRow row : table.getGherkinRows()) {
-            String key = row.getCells().get(0);
-            String value = row.getCells().get(1);
+        for (List<String> row : table.asLists()) {
+            String key = row.get(0);
+            String value = row.get(1);
             commonspec.getKafkaUtils().modifyProducerProperties(key, value);
         }
 
@@ -256,10 +249,9 @@ public class KafkaGSpec extends BaseGSpec {
     @Then("^The kafka topic '(.+?)' has a message containing '(.+?)'( as key)? with:$")
     public void theKafkaTopicStringTopicHasAMessageContainingHelloWith(String topicName, String message, String isKey, DataTable dataTable) throws Throwable {
 
-        /*Modify properties of consumer*/
-        for (DataTableRow row : dataTable.getGherkinRows()) {
-            String key = row.getCells().get(0);
-            String value = row.getCells().get(1);
+        for (List<String> row : dataTable.asLists()) {
+            String key = row.get(0);
+            String value = row.get(1);
             commonspec.getKafkaUtils().modifyConsumerProperties(key, value);
         }
 
@@ -300,13 +292,12 @@ public class KafkaGSpec extends BaseGSpec {
      *
      * @param recordName Name of the Avro generic record
      * @param schemaFile File containing the schema of the message
-     * @param foo        parameter required by Gherkin to match optional text
      * @param seedFile   the seed file
      * @param table      Table containen the values for the fields on the schema. (Values will be converted according to field type)
      * @throws Throwable Throwable
      */
     @Then("^I create the avro record '(.+?)' from the schema in '(.+?)'( based on '(.+?)')? with:$")
-    public void iCreateTheAvroRecordRecord(String recordName, String schemaFile, String foo, String seedFile, DataTable table) throws Throwable {
+    public void iCreateTheAvroRecordRecord(String recordName, String schemaFile, String seedFile, DataTable table) throws Throwable {
 
         String schemaString = commonspec.retrieveData(schemaFile, "json");
         this.createRecord(recordName, schemaString, seedFile, table);
@@ -319,13 +310,12 @@ public class KafkaGSpec extends BaseGSpec {
      * @param recordName    Name of the record
      * @param versionNumber Verison number of the schema
      * @param subject       Subject name
-     * @param foo           parameter required by Gherkin to match optional text
      * @param seedFile      Seed file to use
      * @param table         Modifications datatable
      * @throws Throwable Throwable
      */
     @Then("^I create the avro record '(.+?)' using version '(.+?)' of subject '(.+?)' from registry( based on '(.+?)')? with:$")
-    public void iCreateTheAvroRecordRecordUsingVersionOfSubjectRecordFromRegistryWith(String recordName, String versionNumber, String subject, String foo, String seedFile, DataTable table) throws Throwable {
+    public void iCreateTheAvroRecordRecordUsingVersionOfSubjectRecordFromRegistryWith(String recordName, String versionNumber, String subject, String seedFile, DataTable table) throws Throwable {
 
         String schema = this.commonspec.getKafkaUtils().getSchemaFromRegistry(subject, versionNumber);
         this.createRecord(recordName, schema, seedFile, table);
@@ -343,6 +333,7 @@ public class KafkaGSpec extends BaseGSpec {
      */
     private void createRecord(String recordName, String schemaString, String seedFile, DataTable table) throws Exception {
 
+
         if (seedFile != null) {
             commonspec.getLogger().debug("Building Avro record from seed file");
 
@@ -359,8 +350,9 @@ public class KafkaGSpec extends BaseGSpec {
             commonspec.getLogger().debug("Building Avro record from datatable");
 
             Map<String, String> properties = new HashMap<>();
-            for (DataTableRow row : table.getGherkinRows()) {
-                properties.put(row.getCells().get(0), row.getCells().get(1));
+
+            for (List<String> row : table.asLists()) {
+                properties.put(row.get(0), row.get(1));
             }
 
             commonspec.getKafkaUtils().createGenericRecord(recordName, properties, schemaString);
@@ -373,18 +365,16 @@ public class KafkaGSpec extends BaseGSpec {
      *
      * @param genericRecord Name of the record to send
      * @param topicName     Topic where to send the record
-     * @param foo           parameter required by Gherkin to match optional text
      * @param recordKey     Record key
      * @param table         Table containing modifications for the producer properties
      * @throws Throwable Throwable
      */
     @When("^I send the avro record '(.+?)' to the kafka topic '(.+?)'( with key '(.+?)')? with:$")
-    public void iSendTheAvroRecordRecordToTheKafkaTopic(String genericRecord, String topicName, String foo, String recordKey, DataTable table) throws Throwable {
+    public void iSendTheAvroRecordRecordToTheKafkaTopic(String genericRecord, String topicName, String recordKey, DataTable table) throws Throwable {
 
-        /*Modify properties of producer*/
-        for (DataTableRow row : table.getGherkinRows()) {
-            String key = row.getCells().get(0);
-            String value = row.getCells().get(1);
+        for (List<String> row : table.asLists()) {
+            String key = row.get(0);
+            String value = row.get(1);
             commonspec.getKafkaUtils().modifyProducerProperties(key, value);
         }
 
@@ -408,10 +398,9 @@ public class KafkaGSpec extends BaseGSpec {
     @Then("^The kafka topic '(.+?)' has an avro message '(.+?)' with:$")
     public void theKafkaTopicAvroTopicHasAnAvroMessageRecordWith(String topicName, String avroRecord, DataTable dataTable) throws Throwable {
 
-        /*Modify properties of consumer*/
-        for (DataTableRow row : dataTable.getGherkinRows()) {
-            String key = row.getCells().get(0);
-            String value = row.getCells().get(1);
+        for (List<String> row : dataTable.asLists()) {
+            String key = row.get(0);
+            String value = row.get(1);
             commonspec.getKafkaUtils().modifyConsumerProperties(key, value);
         }
 
@@ -435,12 +424,13 @@ public class KafkaGSpec extends BaseGSpec {
     @Then("^I configure the kafka consumers with:$")
     public void iConfigureConsumerProperties(DataTable dataTable) {
 
-        for (DataTableRow row : dataTable.getGherkinRows()) {
-            String key = row.getCells().get(0);
-            String value = row.getCells().get(1);
+        for (List<String> row : dataTable.asLists()) {
+            String key = row.get(0);
+            String value = row.get(1);
             this.getCommonSpec().getLogger().debug("Setting kafka consumer property: " + key + " -> " + value);
             commonspec.getKafkaUtils().modifyConsumerProperties(key, value);
         }
+
     }
 
 
@@ -452,12 +442,13 @@ public class KafkaGSpec extends BaseGSpec {
     @Then("^I configure the kafka producer with:$")
     public void iConfigureProducerProperties(DataTable dataTable) {
 
-        for (DataTableRow row : dataTable.getGherkinRows()) {
-            String key = row.getCells().get(0);
-            String value = row.getCells().get(1);
+        for (List<String> row : dataTable.asLists()) {
+            String key = row.get(0);
+            String value = row.get(1);
             this.getCommonSpec().getLogger().debug("Setting kafka producer property: " + key + " -> " + value);
             commonspec.getKafkaUtils().modifyProducerProperties(key, value);
         }
+
     }
 
     /**
@@ -502,10 +493,10 @@ public class KafkaGSpec extends BaseGSpec {
 
                 String jsonString = avroMessage.toString();
 
-                for (DataTableRow row : datatable.getGherkinRows()) {
-                    String expression = row.getCells().get(0);
-                    String condition = row.getCells().get(1);
-                    String expectedResult = row.getCells().get(2);
+                for (List<String> row : datatable.asLists()) {
+                    String expression = row.get(0);
+                    String condition = row.get(1);
+                    String expectedResult = row.get(2);
 
                     String value = commonspec.getJSONPathString(jsonString, expression, null);
                     try {
@@ -514,6 +505,7 @@ public class KafkaGSpec extends BaseGSpec {
                         matches--;
                         break;
                     }
+
                 }
             }
         }

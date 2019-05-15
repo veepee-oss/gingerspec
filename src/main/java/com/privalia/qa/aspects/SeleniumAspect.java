@@ -22,7 +22,6 @@ import com.privalia.qa.specs.CommonG;
 import com.privalia.qa.specs.ThenGSpec;
 import com.privalia.qa.utils.PreviousWebElements;
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;

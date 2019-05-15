@@ -159,7 +159,7 @@ public class SqlUtils {
      * returns a List of List . This method will return in the first list the
      * columns name, and the remaining lists are the rows (if the query returned any). So, this method
      * will always return at least 1 List (size 1).
-     * This way of representing a ResultSet is very similar to the structure of a {@link cucumber.api.DataTable} in
+     * This way of representing a ResultSet is very similar to the structure of a DataTable in
      * cucumber, making the comparison easier
      *
      * @param query An SQL statement to be sent to the database, typically a static SQL SELECT statement

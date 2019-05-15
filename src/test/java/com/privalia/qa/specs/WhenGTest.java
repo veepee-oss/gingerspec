@@ -16,13 +16,13 @@
 package com.privalia.qa.specs;
 
 import com.privalia.qa.utils.ThreadProperty;
+import io.cucumber.datatable.DataTable;
 import org.testng.annotations.Test;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
-import cucumber.api.DataTable;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;

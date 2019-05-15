@@ -69,7 +69,7 @@ public class MongoToolsIT extends BaseGSpec {
         commonspec.getMongoDBClient().insertDocIntoMongoDBCollection(collection, doc);
     }
 
-    @Test(enabled = false, expectedExceptions = java.lang.IllegalArgumentException.class)
+    @Test(enabled = false, expectedExceptions = IllegalArgumentException.class)
     public void insertionAtMongo_nullFail() {
         doc = "";
         commonspec.getLogger().debug("Verifying document cant be null");

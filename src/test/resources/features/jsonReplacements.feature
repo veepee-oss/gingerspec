@@ -11,8 +11,8 @@ Feature: JSON replacements
   Scenario: Simplest read @{JSON.schemas/empty.json} on scenario name
     Given I run 'ls' locally
 
-#  Scenario: Simplest read ${WAIT} on scenario name 2
-#    Given I run 'ls' locally
+  Scenario: Simplest read ${WAIT} on scenario name 2
+    Given I run 'ls' locally
 
   Scenario Outline: With scenarios outlines
     Given I save '@{JSON.schemas/simple<id>.json}' in variable 'VAR'
@@ -41,17 +41,17 @@ Feature: JSON replacements
     Examples:
       | content  | file                       |
       | {"a":{}} | @{JSON.schemas/empty.json} |
-#
-#  Scenario Outline: With scenarios outlines and datatables2
-#    Given I run 'ls' locally
-#    Given I create file 'testSOATtag.json' based on 'schemas/simple1.json' as 'json' with:
-#      | $.a         | REPLACE | @{JSON.schemas/<file>.json}     | object   |
-#      | b           | ADD     | ${WAIT}                         | N/A      |
-#      | ${WAIT}     | ADD     | @{JSON.schemas/<file>.json}     | object   |
-#    Given I save '@{JSON.testSOATtag.json}' in variable 'VAR'
-#    Then I run '[ "!{VAR}" = "<content>" ]' locally
-#
-#    Examples:
-#      | content                 | file    |
-#      | {"a":{},"1":{},"b":"1"} | empty   |
-#      | {"a":{},"1":{},"b":"1"} | simple0 |
+
+  Scenario Outline: With scenarios outlines and datatables2
+    Given I run 'ls' locally
+    Given I create file 'testSOATtag.json' based on 'schemas/simple1.json' as 'json' with:
+      | $.a         | REPLACE | @{JSON.schemas/<file>.json}     | object   |
+      | b           | ADD     | ${WAIT}                         | N/A      |
+      | ${WAIT}     | ADD     | @{JSON.schemas/<file>.json}     | object   |
+    Given I save '@{JSON.testSOATtag.json}' in variable 'VAR'
+    Then I run '[ "!{VAR}" = "<content>" ]' locally
+
+    Examples:
+      | content                 | file    |
+      | {"a":{},"1":{},"b":"1"} | empty   |
+      | {"a":{},"1":{},"b":"1"} | simple0 |

@@ -16,15 +16,13 @@
 
 package com.privalia.qa.cucumber.converter;
 
-import cucumber.api.Transformer;
-
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class ArrayListConverter extends Transformer<List<String>> {
+public class ArrayListConverter {
 
-    @Override
+
     public List<String> transform(String input) {
 
         List<String> response = new ArrayList<String>();

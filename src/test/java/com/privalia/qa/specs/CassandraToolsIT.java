@@ -18,7 +18,7 @@ package com.privalia.qa.specs;
 import com.datastax.driver.core.*;
 import com.privalia.qa.exceptions.DBException;
 import com.privalia.qa.utils.ThreadProperty;
-import cucumber.api.DataTable;
+import io.cucumber.datatable.DataTable;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -93,7 +93,7 @@ public class CassandraToolsIT extends BaseGSpec {
         // to return in a hashmap,
         // dataTableColumns uses to simulate the behavior
         //of data reception as  "col1-varchar", "col2-int"
-        Map<String, String> dataTableColumns = extractColumnNamesAndTypes(this.dataTableComparison.raw().get(0));
+        Map<String, String> dataTableColumns = extractColumnNamesAndTypes(this.dataTableComparison.asLists().get(0));
         // check the table to have columns
         String query = "SELECT * FROM " + this.tableName + " LIMIT 1;";
         ResultSet res = commonspec.getCassandraClient().executeQuery(query);
@@ -115,7 +115,7 @@ public class CassandraToolsIT extends BaseGSpec {
         // to return in a hashmap,
         // dataTableColumns uses to simulate the behavior
         //of data reception as  "col1-varchar", "col2-int"
-        Map<String, String> dataTableColumns = extractColumnNamesAndTypes(this.dataTableComparison2.raw().get(0));
+        Map<String, String> dataTableColumns = extractColumnNamesAndTypes(this.dataTableComparison2.asLists().get(0));
         // check the table to have columns
         String query = "SELECT * FROM " + this.tableName + " LIMIT 1;";
         ResultSet res = commonspec.getCassandraClient().executeQuery(query);
@@ -133,14 +133,14 @@ public class CassandraToolsIT extends BaseGSpec {
         commonspec.getCassandraClient().useKeyspace(this.keySpace);
         // Obtain the types and column names of the datatable
         // to return in a hashmap,
-        Map<String, String> dataTableColumns = extractColumnNamesAndTypes(this.dataTableComparison.raw().get(0));
+        Map<String, String> dataTableColumns = extractColumnNamesAndTypes(this.dataTableComparison.asLists().get(0));
         // check if the table has columns
         String query = "SELECT * FROM " + this.tableName + " LIMIT 1;";
         ResultSet res = commonspec.getCassandraClient().executeQuery(query);
         equalsColumns(res.getColumnDefinitions(), dataTableColumns);
         //receiving the string from the select with the columns
         // that belong to the dataTable
-        List<String> selectQueries = giveQueriesList(this.dataTableComparison, tableName, columnNames(this.dataTableComparison.raw().get(0)));
+        List<String> selectQueries = giveQueriesList(this.dataTableComparison, tableName, columnNames(this.dataTableComparison.asLists().get(0)));
         //Check the data  of cassandra with different queries
         int index = 1;
         for (String execQuery : selectQueries) {
@@ -148,7 +148,7 @@ public class CassandraToolsIT extends BaseGSpec {
             List<Row> resAsList = res.all();
             assertThat(resAsList.size()).as("The query " + execQuery + " not return any result on Cassandra").isGreaterThan(0);
             assertThat(resAsList.get(0).toString()
-                    .substring(VALUE_SUBSTRING)).as("The resultSet is not as expected").isEqualTo(this.dataTableComparison.raw().get(index).toString());
+                    .substring(VALUE_SUBSTRING)).as("The resultSet is not as expected").isEqualTo(this.dataTableComparison.asLists().get(index).toString());
             index++;
         }
     }
@@ -193,9 +193,9 @@ public class CassandraToolsIT extends BaseGSpec {
 
     private List<String> giveQueriesList(DataTable data, String tableName, String colNames) {
         List<String> queryList = new ArrayList<String>();
-        for (int i = 1; i < data.raw().size(); i++) {
+        for (int i = 1; i < data.asLists().size(); i++) {
             String query = "SELECT " + colNames + " FROM " + tableName;
-            List<String> row = data.raw().get(i);
+            List<String> row = data.asLists().get(i);
             query += conditionWhere(row, colNames.split(",")) + ";";
             queryList.add(query);
         }
