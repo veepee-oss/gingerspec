@@ -43,6 +43,7 @@ public class IgnoreTagAspect {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
 
+
     @Pointcut("execution (void cucumber.runner.TestCase.run(..)) && args(bus)")
     protected void addIgnoreTagPointcutScenario(EventBus bus) {
     }

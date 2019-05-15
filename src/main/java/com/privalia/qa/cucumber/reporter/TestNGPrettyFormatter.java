@@ -42,12 +42,12 @@ import java.util.List;
  * This class implements a set of eventListeners for the tests suite. This methods are fired before/after
  * specific events during tests execution. Since the library uses testng and not junit to run the test
  * {@link ConcurrentEventListener} should be used instead of {@link EventListener}
- *
+ * <p>
  * This class is responsible for printing the steps/features/scenarios to console. This is a custom
  * implementation of the cucumber PrettyFormatter that allow more flexibility with colors and other
  * formatting options. Error messages generated from other classes are printed using the standard log4j.
- *
- * Unlike regular {@link cucumber.runtime.formatter.PrettyFormatter}, this formatter prints steps BEFORE
+ * <p>
+ * Unlike regular PrettyFormatter, this formatter prints steps BEFORE
  * they are executed, giving real-time feedback to the user about the test progress
  *
  * @author Jose Fernandez
@@ -136,6 +136,9 @@ public class TestNGPrettyFormatter implements ConcurrentEventListener, ColorAwar
         }
     };
 
+    /**
+     * Instantiates a new Test ng pretty formatter.
+     */
     @SuppressWarnings("WeakerAccess") // Used by PluginFactory
     public TestNGPrettyFormatter() {
         this.out = new NiceAppendable(new PrintStream(System.out));
@@ -144,7 +147,7 @@ public class TestNGPrettyFormatter implements ConcurrentEventListener, ColorAwar
 
     /**
      * Events are mapped to the appropriate handler method
-     * @param publisher
+     * @param publisher publisher
      */
     @Override
     public void setEventPublisher(EventPublisher publisher) {
@@ -342,6 +345,16 @@ public class TestNGPrettyFormatter implements ConcurrentEventListener, ColorAwar
 
     }
 
+    /**
+     * Format step text string.
+     *
+     * @param keyword    the keyword
+     * @param stepText   the step text
+     * @param textFormat the text format
+     * @param argFormat  the arg format
+     * @param arguments  the arguments
+     * @return the string
+     */
     String formatStepText(String keyword, String stepText, Format textFormat, Format argFormat, List<Argument> arguments) {
 
         int beginIndex = 0;

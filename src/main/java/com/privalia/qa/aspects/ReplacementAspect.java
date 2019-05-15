@@ -80,15 +80,15 @@ public class ReplacementAspect {
     /**
      * replaces any variable placeholder in the scenario/Scenario Outline title.
      *
-     * @param jp
-     * @param tags
-     * @param location
-     * @param keyword
-     * @param name
-     * @param description
-     * @param steps
-     * @param examples
-     * @throws Throwable
+     * @param jp          the jp
+     * @param tags        the tags
+     * @param location    the location
+     * @param keyword     the keyword
+     * @param name        the name
+     * @param description the description
+     * @param steps       the steps
+     * @param examples    the examples
+     * @throws Throwable the throwable
      */
     public void aroundScenarios(JoinPoint jp, List<Tag> tags, Location location, String keyword, String name, String description, List<Step> steps, List<Examples> examples) throws Throwable {
 
@@ -122,13 +122,13 @@ public class ReplacementAspect {
      * <p>
      * This method captures this event and replaces the variables with their appropriate value using reflection
      *
-     * @param jp
-     * @throws NoSuchFieldException
-     * @throws IllegalAccessException
-     * @throws FileNotFoundException
-     * @throws NonReplaceableException
-     * @throws ConfigurationException
-     * @throws URISyntaxException
+     * @param jp the jp
+     * @throws NoSuchFieldException    the no such field exception
+     * @throws IllegalAccessException  the illegal access exception
+     * @throws FileNotFoundException   the file not found exception
+     * @throws NonReplaceableException the non replaceable exception
+     * @throws ConfigurationException  the configuration exception
+     * @throws URISyntaxException      the uri syntax exception
      */
     @Before(value = "replacementArguments()")
     public void aroundReplacementArguments(JoinPoint jp) throws NoSuchFieldException, IllegalAccessException, FileNotFoundException, NonReplaceableException, ConfigurationException, URISyntaxException {
@@ -378,8 +378,7 @@ public class ReplacementAspect {
      *
      * @param element element to be replaced
      * @param pjp     JoinPoint
-     * @return String
-     * @throws NonReplaceableException exception
+     * @return String string
      */
     protected String replaceReflectionPlaceholders(String element, JoinPoint pjp) {
         String newVal = element;

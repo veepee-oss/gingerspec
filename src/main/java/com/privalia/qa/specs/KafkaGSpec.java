@@ -39,7 +39,6 @@ public class KafkaGSpec extends BaseGSpec {
      * Connect to Kafka.
      *
      * @param zkHost ZK host
-     * @param foo    required parameter by gherkin for matching the optional string
      * @param zkPath ZK port
      * @throws UnknownHostException exception
      */
@@ -106,7 +105,6 @@ public class KafkaGSpec extends BaseGSpec {
      *
      * @param message    string that you send to topic
      * @param topic_name topic name
-     * @param foo        the foo
      * @param recordKey  the record key
      * @param ifExists   for handling optional text in Gherkin
      * @throws Exception Exception
@@ -132,7 +130,6 @@ public class KafkaGSpec extends BaseGSpec {
      *
      * @param message    Message to send (will be converted to the proper type specified by the value.serializer prop). String is default
      * @param topic_name Name of the topic where to send the message
-     * @param foo        Parameter required by Gherkin for optional text
      * @param recordKey  Key of the kafka record
      * @param table      Table containing alternative properties for the producer
      * @throws InterruptedException InterruptedException
@@ -295,7 +292,6 @@ public class KafkaGSpec extends BaseGSpec {
      *
      * @param recordName Name of the Avro generic record
      * @param schemaFile File containing the schema of the message
-     * @param foo        parameter required by Gherkin to match optional text
      * @param seedFile   the seed file
      * @param table      Table containen the values for the fields on the schema. (Values will be converted according to field type)
      * @throws Throwable Throwable
@@ -314,7 +310,6 @@ public class KafkaGSpec extends BaseGSpec {
      * @param recordName    Name of the record
      * @param versionNumber Verison number of the schema
      * @param subject       Subject name
-     * @param foo           parameter required by Gherkin to match optional text
      * @param seedFile      Seed file to use
      * @param table         Modifications datatable
      * @throws Throwable Throwable
@@ -370,7 +365,6 @@ public class KafkaGSpec extends BaseGSpec {
      *
      * @param genericRecord Name of the record to send
      * @param topicName     Topic where to send the record
-     * @param foo           parameter required by Gherkin to match optional text
      * @param recordKey     Record key
      * @param table         Table containing modifications for the producer properties
      * @throws Throwable Throwable

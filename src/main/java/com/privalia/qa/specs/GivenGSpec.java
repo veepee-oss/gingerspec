@@ -353,9 +353,7 @@ public class GivenGSpec extends BaseGSpec {
      * Executes the command specified in local system
      *
      * @param command    command to be run locally
-     * @param foo        regex needed to match method
      * @param exitStatus command exit status
-     * @param bar        regex needed to match method
      * @param envVar     environment variable name
      * @throws Exception exception
      */

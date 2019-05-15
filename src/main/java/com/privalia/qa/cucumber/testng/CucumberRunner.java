@@ -44,6 +44,7 @@ public class CucumberRunner {
      * Bootstrap the cucumber runtime
      *
      * @param clazz Which has the cucumber.api.CucumberOptions and org.testng.annotations.Test annotations
+     * @throws NoSuchFieldException the no such field exception
      */
     public CucumberRunner(Class clazz) throws NoSuchFieldException {
 

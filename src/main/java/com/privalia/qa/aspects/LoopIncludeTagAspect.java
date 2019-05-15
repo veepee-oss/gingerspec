@@ -51,6 +51,9 @@ public class LoopIncludeTagAspect {
     }
 
     /**
+     * Around add loop tag pointcut scenario string.
+     *
+     * @param pjp      the pjp
      * @param resource resource containing feature
      * @return String parsed feature after aspect applied
      * @throws Throwable exception
