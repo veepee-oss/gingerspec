@@ -1,126 +1,145 @@
-/*
- * Copyright (C) 2014 Stratio (http://stratio.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.privalia.qa.cucumber.testng;
 
-import cucumber.api.CucumberOptions;
-import cucumber.runtime.ClassFinder;
-import cucumber.runtime.CucumberException;
-import cucumber.runtime.RuntimeOptions;
-import cucumber.runtime.RuntimeOptionsFactory;
+import cucumber.api.event.TestRunFinished;
+import cucumber.api.event.TestRunStarted;
+import cucumber.api.testng.*;
+import cucumber.runner.*;
+import cucumber.runtime.*;
+import cucumber.runtime.filter.Filters;
+import cucumber.runtime.formatter.PluginFactory;
+import cucumber.runtime.formatter.Plugins;
 import cucumber.runtime.io.MultiLoader;
 import cucumber.runtime.io.ResourceLoader;
 import cucumber.runtime.io.ResourceLoaderClassFinder;
-import org.reflections.Reflections;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import cucumber.runtime.model.CucumberFeature;
+import cucumber.runtime.model.FeatureLoader;
+import gherkin.events.PickleEvent;
 
 import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
-
+/**
+ * This is a custom implementation of {@link TestNGCucumberRunner} for running feature files
+ * using TestNG. This implementation automatically adds glue files, feature files and
+ * proper formatter options to all tests
+ *
+ * @author Jose Fernandez
+ */
 public class CucumberRunner {
 
-    private final cucumber.runtime.Runtime runtime;
+    private final EventBus bus;
 
-    private ClassLoader classLoader;
+    private final Filters filters;
 
-    private RuntimeOptions runtimeOptions;
+    private final FeaturePathFeatureSupplier featureSupplier;
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass()
-            .getCanonicalName());
+    private final ThreadLocalRunnerSupplier runnerSupplier;
+
+    private final RuntimeOptions runtimeOptions;
+
 
     /**
-     * Default constructor for cucumber Runner.
+     * Bootstrap the cucumber runtime
      *
-     * @param clazz class
-     * @param feature feature to execute
-     * @throws IOException exception
-     * @throws ClassNotFoundException exception
-     * @throws InstantiationException exception
-     * @throws IllegalAccessException exception
-     * @throws NoSuchMethodException exception
-     * @throws InvocationTargetException exception
+     * @param clazz Which has the cucumber.api.CucumberOptions and org.testng.annotations.Test annotations
      */
-    @SuppressWarnings("unused")
-    public CucumberRunner(Class<?> clazz, String... feature) throws IOException, ClassNotFoundException,
-            InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-        classLoader = clazz.getClassLoader();
+    public CucumberRunner(Class clazz) throws NoSuchFieldException {
+
+        ClassLoader classLoader = clazz.getClassLoader();
         ResourceLoader resourceLoader = new MultiLoader(classLoader);
 
-        RuntimeOptionsFactory runtimeOptionsFactory = new RuntimeOptionsFactory(clazz,
-                new Class[]{CucumberOptions.class});
+        RuntimeOptionsFactory runtimeOptionsFactory = new RuntimeOptionsFactory(clazz);
         runtimeOptions = runtimeOptionsFactory.create();
+
+        /* Automatically adds glue files of library if not present in CucumberOptions annotation */
+        if (!runtimeOptions.getGlue().contains("com.privalia.qa.specs")) {
+            List<String> uniqueGlue = new ArrayList<String>();
+            uniqueGlue.add("com.privalia.qa.specs");
+            runtimeOptions.getGlue().addAll(uniqueGlue);
+        }
+
+        /* Calculate route where to store reports */
         String testSuffix = System.getProperty("TESTSUFFIX");
         String targetExecutionsPath = "target/executions/";
         if (testSuffix != null) {
             targetExecutionsPath = targetExecutionsPath + testSuffix + "/";
         }
         boolean aux = new File(targetExecutionsPath).mkdirs();
-        CucumberReporter reporterTestNG;
 
-        if ((feature.length == 0)) {
-            reporterTestNG = new CucumberReporter(targetExecutionsPath, clazz.getCanonicalName(), "");
-        } else {
-            List<String> features = new ArrayList<String>();
-            String fPath = "src/test/resources/features/" + feature[0] + ".feature";
-            features.add(fPath);
-            runtimeOptions.getFeaturePaths().addAll(features);
-            reporterTestNG = new CucumberReporter(targetExecutionsPath, clazz.getCanonicalName(), feature[0]);
-        }
 
-        List<String> uniqueGlue = new ArrayList<String>();
-        uniqueGlue.add("classpath:com/privalia/qa/specs");
-        //runtimeOptions.getGlue().clear();
-        runtimeOptions.getGlue().addAll(uniqueGlue);
+        /* Include custom reporter*/
+        List<String> reporters = new ArrayList<String>();
+        reporters.add("com.privalia.qa.cucumber.reporter.TestNGPrettyFormatter");
 
-        runtimeOptions.addFormatter(reporterTestNG);
-        Set<Class<? extends ICucumberFormatter>> implementers = new Reflections("com.privalia.qa.utils")
-                .getSubTypesOf(ICucumberFormatter.class);
+        /* Include TestNG reporter (store TestNG reports under /target/executions/com.mypackage.myClass.xml) */
+        reporters.add("testng:" + targetExecutionsPath + clazz.getName() + ".xml");
 
-        for (Class<? extends ICucumberFormatter> implementerClazz : implementers) {
-            Constructor<?> ctor = implementerClazz.getConstructor();
-            ctor.setAccessible(true);
-            runtimeOptions.addFormatter((ICucumberFormatter) ctor.newInstance());
+        /* include abode reporters to the "Plugins" of cucumber options*/
+        Field pluginFormatterNamesField = runtimeOptions.getClass().getDeclaredField("pluginFormatterNames");
+        pluginFormatterNamesField.setAccessible(true);
+        try {
+            pluginFormatterNamesField.set(runtimeOptions, reporters);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
         }
 
         ClassFinder classFinder = new ResourceLoaderClassFinder(resourceLoader, classLoader);
-        runtime = new cucumber.runtime.Runtime(resourceLoader, classFinder, classLoader, runtimeOptions);
+        BackendModuleBackendSupplier backendSupplier = new BackendModuleBackendSupplier(resourceLoader, classFinder, runtimeOptions);
+        bus = new TimeServiceEventBus(TimeService.SYSTEM);
+        new Plugins(classLoader, new PluginFactory(), bus, runtimeOptions);
+        FeatureLoader featureLoader = new FeatureLoader(resourceLoader);
+        filters = new Filters(runtimeOptions);
+        this.runnerSupplier = new ThreadLocalRunnerSupplier(runtimeOptions, bus, backendSupplier);
+        featureSupplier = new FeaturePathFeatureSupplier(featureLoader, runtimeOptions);
+
+    }
+
+    public void runScenario(PickleEvent pickle) throws Throwable {
+        //Possibly invoked in a multi-threaded context
+        Runner runner = runnerSupplier.get();
+        TestCaseResultListener testCaseResultListener = new TestCaseResultListener(runner.getBus(), runtimeOptions.isStrict());
+        runner.runPickle(pickle);
+        testCaseResultListener.finishExecutionUnit();
+
+        if (!testCaseResultListener.isPassed()) {
+            throw testCaseResultListener.getError();
+        }
+    }
+
+    public void finish() {
+        bus.send(new TestRunFinished(bus.getTime()));
     }
 
     /**
-     * Run the testclases(Features).
-     *
-     * @throws IOException exception
-     * @throws NoSuchMethodException exception
-     * @throws InvocationTargetException exception
-     * @throws IllegalAccessException exception
+     * @return returns the cucumber scenarios as a two dimensional array of {@link PickleEventWrapper}
+     * scenarios combined with their {@link CucumberFeatureWrapper} feature.
      */
-    public void runCukes() throws IOException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-
-        runtime.run();
-
-        if (!runtime.getErrors().isEmpty()) {
-            logger.error ("Got {} exceptions", runtime.getErrors());
-            throw new CucumberException(runtime.getErrors().get(0));
+    public Object[][] provideScenarios() {
+        try {
+            List<Object[]> scenarios = new ArrayList<Object[]>();
+            List<CucumberFeature> features = getFeatures();
+            for (CucumberFeature feature : features) {
+                for (PickleEvent pickle : feature.getPickles()) {
+                    if (filters.matchesFilters(pickle)) {
+                        scenarios.add(new Object[]{new PickleEventWrapperImpl(pickle), new CucumberFeatureWrapperImpl(feature)});
+                    }
+                }
+            }
+            return scenarios.toArray(new Object[][]{});
+        } catch (CucumberException e) {
+            return new Object[][]{new Object[]{new CucumberExceptionWrapper(e), null}};
         }
+    }
+
+    List<CucumberFeature> getFeatures() {
+
+        List<CucumberFeature> features = featureSupplier.get();
+        bus.send(new TestRunStarted(bus.getTime()));
+        for (CucumberFeature feature : features) {
+            feature.sendTestSourceRead(bus);
+        }
+        return features;
     }
 }

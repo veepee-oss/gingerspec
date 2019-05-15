@@ -17,11 +17,12 @@
 package com.privalia.qa.specs;
 
 import com.privalia.qa.assertions.Assertions;
-import cucumber.api.DataTable;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
-import gherkin.formatter.model.DataTableRow;
+import io.cucumber.datatable.DataTable;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -110,10 +111,10 @@ public class SoapServiceGSpec extends BaseGSpec {
 
         String response = this.commonspec.getLastSoapResponse();
 
-        for (DataTableRow row : results.getGherkinRows()) {
-            String variable = row.getCells().get(0);
-            String condition = row.getCells().get(1);
-            String result = row.getCells().get(2);
+        for (List<String> row : results.asLists()) {
+            String variable = row.get(0);
+            String condition = row.get(1);
+            String result = row.get(2);
 
             switch (condition) {
 

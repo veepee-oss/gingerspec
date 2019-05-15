@@ -40,7 +40,7 @@ Feature: SQL Database Steps
     Then table 'weather1' doesn't exists
     Then table 'weather2' exists
     Then I execute query 'DROP TABLE weather2;'
-    
+
 
   Scenario: Verify if a table exists in a PostgreSQL Database
     Given I connect with JDBC to database 'postgres' type 'postgresql' on host '${POSTGRES_HOST}' and port '5432' with user 'postgres' and password 'postgres'
@@ -52,7 +52,7 @@ Feature: SQL Database Steps
     Then table 'weather1' doesn't exists
     Then table 'weather2' exists
     Then I execute query 'DROP TABLE weather2;'
-    
+
 
   Scenario: Executing SELECT statements on a MySQL database
     Given I connect with JDBC to database 'mysql' type 'mysql' on host '${MYSQL_HOST}' and port '3306' with user 'root' and password 'mysql'

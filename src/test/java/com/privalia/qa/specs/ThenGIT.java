@@ -15,24 +15,19 @@
  */
 package com.privalia.qa.specs;
 
-import com.privalia.qa.utils.BaseTest;
-import com.privalia.qa.cucumber.testng.CucumberRunner;
-import cucumber.api.CucumberOptions;
-import org.testng.annotations.Test;
-import org.testng.annotations.Factory;
 import com.privalia.qa.data.BrowsersDataProvider;
+import com.privalia.qa.utils.BaseTest;
+import cucumber.api.CucumberOptions;
+import org.testng.annotations.Factory;
 
-@CucumberOptions(format = "json:target/cucumber.json", features = {"src/test/resources/features/readWebElementTextToVariable.feature"},
-        glue = "classpath:com/privalia/qa/specs/*")
+@CucumberOptions(
+        features = {"src/test/resources/features/readWebElementTextToVariable.feature"},
+        glue = "com.privalia.qa.specs")
 public class ThenGIT extends BaseTest {
 
-    @Factory(enabled = false, dataProviderClass = BrowsersDataProvider.class, dataProvider = "availableUniqueBrowsers")
+    @Factory(dataProviderClass = BrowsersDataProvider.class, dataProvider = "availableUniqueBrowsers")
     public ThenGIT(String browser) {
         this.browser = browser;
     }
 
-    @Test
-    public void thenGTest() throws Exception {
-        new CucumberRunner(this.getClass()).runCukes();
-    }
 }

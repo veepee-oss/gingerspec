@@ -17,10 +17,10 @@
 package com.privalia.qa.specs;
 
 import com.privalia.qa.utils.ThreadProperty;
-import cucumber.api.DataTable;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
+import io.cucumber.datatable.DataTable;
 
 import java.io.*;
 import java.sql.SQLException;
@@ -48,7 +48,7 @@ public class SqlDatabaseGSpec extends BaseGSpec {
      * @param password      Database password
      */
     @Given("^I( securely)? connect with JDBC to database '(.+?)' type '(mysql|postgresql)' on host '(.+?)' and port '(.+?)' with user '(.+?)'( and password '(.+?)')?$")
-    public void connectDatabase(String isSecured, String database, String dataBaseType, String host, String port, String user, String foo, String password) {
+    public void connectDatabase(String isSecured, String database, String dataBaseType, String host, String port, String user, String password) {
         try {
             if (isSecured != null) {
                 commonspec.getLogger().debug("opening secure database");
@@ -146,7 +146,7 @@ public class SqlDatabaseGSpec extends BaseGSpec {
         List<List<String>> previousResult = this.commonspec.getPreviousSqlResult();
         assertThat(previousResult).as("The last SQL query returned a null result").isNotNull();
         assertThat(previousResult.size()).as("The last SQL query did not returned any rows").isNotEqualTo(0);
-        assertThat(dataTable.raw()).as("The returned and the expected results do not match.").isEqualTo(previousResult);
+        assertThat(dataTable.asLists()).as("The returned and the expected results do not match.").isEqualTo(previousResult);
 
     }
 

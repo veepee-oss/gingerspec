@@ -15,7 +15,8 @@
  */
 package com.privalia.qa.aspects;
 
-import gherkin.formatter.model.Tag;
+import gherkin.ast.Location;
+import gherkin.ast.Tag;
 import org.testng.annotations.Test;
 
 import java.util.ArrayList;
@@ -60,29 +61,29 @@ public class RunOnEnvTagAspectTest {
     public void testTagIterationRun() throws Exception {
         System.setProperty("HELLO","OK");
         List<Tag> tagList = new ArrayList<>();
-        tagList.add(new Tag("@runOnEnv(HELLO)", 1));
-        assertThat(false).isEqualTo(runontag.tagsIteration(tagList,1));
+        tagList.add(new Tag(new Location(1,1),"@runOnEnv(HELLO)"));
+        assertThat(false).isEqualTo(runontag.tagsIteration(tagList,new Location(1,1)));
     }
 
     @Test
     public void testTagIterationIgnoreRun() throws Exception {
         List<Tag> tagList = new ArrayList<>();
-        tagList.add(new Tag("@runOnEnv(BYE)", 1));
-        assertThat(true).isEqualTo(runontag.tagsIteration(tagList,1));
+        tagList.add(new Tag(new Location(1,1), "@runOnEnv(BYE)"));
+        assertThat(true).isEqualTo(runontag.tagsIteration(tagList,new Location(1,1)));
     }
 
     @Test
     public void testTagIterationSkip() throws Exception {
         List<Tag> tagList = new ArrayList<>();
-        tagList.add(new Tag("@skipOnEnv(HELLO_NO)", 1));
-        assertThat(false).isEqualTo(runontag.tagsIteration(tagList,1));
+        tagList.add(new Tag(new Location(1,1), "@skipOnEnv(HELLO_NO)"));
+        assertThat(false).isEqualTo(runontag.tagsIteration(tagList,new Location(1,1)));
     }
 
     @Test
     public void testTagIterationIgnoreSkip() throws Exception {
         System.setProperty("HELLO","OK");
         List<Tag> tagList = new ArrayList<>();
-        tagList.add(new Tag("@skipOnEnv(HELLO)", 1));
-        assertThat(true).isEqualTo(runontag.tagsIteration(tagList,1));
+        tagList.add(new Tag(new Location(1,1), "@skipOnEnv(HELLO)"));
+        assertThat(true).isEqualTo(runontag.tagsIteration(tagList,new Location(1,1)));
     }
 }

@@ -18,7 +18,7 @@ package com.privalia.qa.assertions;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
-import cucumber.api.DataTable;
+import io.cucumber.datatable.DataTable;
 import org.assertj.core.api.AbstractAssert;
 
 import java.sql.Timestamp;
@@ -47,10 +47,10 @@ public class DBObjectsAssert extends AbstractAssert<DBObjectsAssert, ArrayList<D
     protected boolean matchesSafely(ArrayList<DBObject> item, DataTable table) {
         List<String[]> colRel = coltoArrayList(table);
 
-        for (int i = 1; i < table.raw().size(); i++) {
+        for (int i = 1; i < table.height(); i++) {
             // Obtenemos la fila correspondiente
             BasicDBObject doc = new BasicDBObject();
-            List<String> row = table.raw().get(i);
+            List<String> row = table.row(i);
             for (int x = 0; x < row.size(); x++) {
                 String[] colNameType = colRel.get(x);
                 Object data = castSTringTo(colNameType[1], row.get(x));
@@ -90,7 +90,7 @@ public class DBObjectsAssert extends AbstractAssert<DBObjectsAssert, ArrayList<D
     private List<String[]> coltoArrayList(DataTable table) {
         List<String[]> res = new ArrayList<String[]>();
         // Primero se obiente la primera fila del datatable
-        List<String> firstRow = table.raw().get(0);
+        List<String> firstRow = table.row(0);
         for (int i = 0; i < firstRow.size(); i++) {
             String[] colTypeArray = firstRow.get(i).split("-");
             res.add(colTypeArray);

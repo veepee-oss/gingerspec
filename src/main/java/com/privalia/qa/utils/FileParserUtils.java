@@ -17,6 +17,7 @@
 package com.privalia.qa.utils;
 
 import com.privalia.qa.assertions.Assertions;
+import com.privalia.qa.utils.SqlUtils;
 import com.sonalake.utah.Parser;
 import com.sonalake.utah.config.Config;
 import org.slf4j.Logger;

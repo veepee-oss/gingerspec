@@ -15,18 +15,13 @@
  */
 package com.privalia.qa.specs;
 
-import com.privalia.qa.cucumber.testng.CucumberRunner;
 import com.privalia.qa.utils.BaseTest;
-
 import cucumber.api.CucumberOptions;
-import org.testng.annotations.Test;
 
-@CucumberOptions(format = "json:target/cucumber.json", features = {"src/test/resources/features/kafkaSteps.feature"},
-        glue = "classpath:com/privalia/qa/specs/*")
+@CucumberOptions(
+        features = {"src/test/resources/features/kafkaSteps.feature"},
+        glue = "com.privalia.qa.specs")
 public class KafkaStepsIT extends BaseTest {
 
-    @Test
-    public void kafkaStepsTest() throws Exception {
-        new CucumberRunner(this.getClass()).runCukes();
-    }
+
 }

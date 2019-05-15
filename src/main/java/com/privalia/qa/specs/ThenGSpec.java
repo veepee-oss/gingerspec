@@ -18,9 +18,9 @@ package com.privalia.qa.specs;
 
 import com.privalia.qa.utils.PreviousWebElements;
 import com.privalia.qa.utils.ThreadProperty;
-import cucumber.api.DataTable;
+
 import cucumber.api.java.en.Then;
-import gherkin.formatter.model.DataTableRow;
+import io.cucumber.datatable.DataTable;
 import org.assertj.core.api.Fail;
 import org.assertj.core.api.WritableAssertionInfo;
 import org.junit.Assert;
@@ -32,13 +32,10 @@ import java.util.regex.Pattern;
 
 import static com.jayway.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchema;
 import static com.privalia.qa.assertions.Assertions.assertThat;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
 
 
 /**
  * Generic Then Specs.
- *
  * @see <a href="ThenGSpec-annotations.html">Then Steps &amp; Matching Regex</a>
  */
 public class ThenGSpec extends BaseGSpec {
@@ -450,29 +447,7 @@ public class ThenGSpec extends BaseGSpec {
         commonspec.setSeleniumCookies(commonspec.getDriver().manage().getCookies());
     }
 
-    /**
-     * Check if expression defined by JSOPath (http://goessner.net/articles/JsonPath/index.html)
-     * match in JSON stored in a environment variable.
-     *
-     * @param envVar environment variable where JSON is stored
-     * @param table  data table in which each row stores one expression
-     * @throws Exception Exception
-     */
-    @Then("^'(.+?)' matches the following cases:.$")
-    public void matchWithExpresion(String envVar, DataTable table) throws Exception {
-        String jsonString = ThreadProperty.get(envVar);
-
-        for (DataTableRow row : table.getGherkinRows()) {
-            String expression = row.getCells().get(0);
-            String condition = row.getCells().get(1);
-            String result = row.getCells().get(2);
-
-            String value = commonspec.getJSONPathString(jsonString, expression, null);
-            commonspec.evaluateJSONElementOperation(value, condition, result);
-        }
-    }
-
-    /**
+    /*
      * Check value stored in environment variable "is|matches|is higher than|is lower than|contains|is different from" to value provided
      *
      * @param envVar        The env var to verify
@@ -480,7 +455,7 @@ public class ThenGSpec extends BaseGSpec {
      * @param value         The value to match against the condition
      * @throws Exception    Exception
      */
-    @Then("^'(?s)(.+?)' ((?!.*with).+?) '(.+?)'$")
+    @Then("^'(.+?)' ((is|matches|is higher than|is lower than|contains|is different from)) '(.+?)'$")
     public void checkValue(String envVar, String operation, String value) throws Exception {
         switch (operation.toLowerCase()) {
             case "is":

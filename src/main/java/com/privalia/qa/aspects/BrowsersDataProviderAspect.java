@@ -16,7 +16,6 @@
 
 package com.privalia.qa.aspects;
 
-import com.google.common.collect.Lists;
 import com.privalia.qa.specs.BaseGSpec;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -28,8 +27,13 @@ import org.testng.ITestContext;
 
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
-import java.util.List;
 
+/**
+ * This Aspect verifies if the maven variable FORCE_BROWSER exists when executing selenium related tests
+ * and forces the BrowsersDataProvider class to return only that browser
+ *
+ * @author Jose Fernandez
+ */
 @Aspect
 public class BrowsersDataProviderAspect extends BaseGSpec {
 
@@ -64,11 +68,8 @@ public class BrowsersDataProviderAspect extends BaseGSpec {
         }
 
         if (!"".equals(System.getProperty("FORCE_BROWSER", ""))) {
-            List<String[]> lData = Lists.newArrayList();
-            lData.add(new String[]{System.getProperty("FORCE_BROWSER")});
-            logger.debug("Forcing browser to {}",
-                    System.getProperty("FORCE_BROWSER"));
-            return lData.iterator();
+            logger.info("FORCE_BROWSER variable detected. Using browser: '{}'", System.getProperty("FORCE_BROWSER"));
+            return new Object[][] {{System.getProperty("FORCE_BROWSER")}};
         }
         return pjp.proceed();
     }
