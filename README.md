@@ -14,7 +14,7 @@
 ```
 
 [![Build Status](https://travis-ci.com/PrivaliaTech/gingerspec.svg)](https://travis-ci.org/rest-assured/rest-assured)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.privaliatech/gingerspec/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.rest-assured/rest-assured)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.privaliatech/gingerspec/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.privaliatech/gingerspec)
 
 
 Privalia Acceptance Test library. Testing runtime to rule over Privalia's acceptance tests
@@ -86,7 +86,7 @@ You must use the following dependency in your testng project to get access to al
 <dependency>
     <groupId>com.github.privaliatech</groupId>
     <artifactId>gingerspec</artifactId>
-    <version>1.0.0</version>
+    <version>2.0.0</version>
 </dependency>
 ``` 
 
