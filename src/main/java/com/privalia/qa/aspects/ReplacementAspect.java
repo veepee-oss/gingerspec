@@ -173,9 +173,11 @@ public class ReplacementAspect {
                         for (Group child: children) {
                             Field valueFieldChild = child.getClass().getDeclaredField("value");
                             String valuechild = child.getValue();
-                            String replacedValueChild = replacedElement(valuechild, jp);
-                            valueFieldChild.setAccessible(true);
-                            valueFieldChild.set(child, replacedValueChild);
+                            if (valuechild != null) {
+                                String replacedValueChild = replacedElement(valuechild, jp);
+                                valueFieldChild.setAccessible(true);
+                                valueFieldChild.set(child, replacedValueChild);
+                            }
                         }
 
                     }
