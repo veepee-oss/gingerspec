@@ -168,6 +168,16 @@ public class ReplacementAspect {
                         Field valueField = group.getClass().getDeclaredField("value");
                         valueField.setAccessible(true);
                         valueField.set(group, replacedValue);
+
+                        List<Group> children = group.getChildren();
+                        for (Group child: children) {
+                            Field valueFieldChild = child.getClass().getDeclaredField("value");
+                            String valuechild = child.getValue();
+                            String replacedValueChild = replacedElement(valuechild, jp);
+                            valueFieldChild.setAccessible(true);
+                            valueFieldChild.set(child, replacedValueChild);
+                        }
+
                     }
                 }
 
