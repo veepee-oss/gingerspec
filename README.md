@@ -90,7 +90,7 @@ You must use the following dependency in your testng project to get access to al
 </dependency>
 ``` 
 
-However, we strongly suggest you to make use of the special archetype for GingerSpec based projects: '**automation-archetype**'. Just run the following command in your terminal
+However, we strongly suggest you to make use of the special archetype for GingerSpec based projects: '**gingerspec-starter**'. Just run the following command in your terminal
 
 ``` 
 mvn -U archetype:generate -DarchetypeGroupId=com.github.privaliatech -DarchetypeArtifactId=gingerspec-starter
