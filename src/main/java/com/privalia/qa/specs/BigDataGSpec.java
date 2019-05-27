@@ -200,7 +200,6 @@ public class BigDataGSpec extends BaseGSpec {
      * Save clustername of elasticsearch in an environment varible for future use.
      *
      * @param host   elasticsearch connection
-     * @param port   elasticsearch port
      * @param envVar thread variable where to store the value
      * @throws IllegalAccessException exception
      * @throws IllegalArgumentException exception
