@@ -211,8 +211,16 @@ public class BigDataGSpec extends BaseGSpec {
      * @throws InvocationTargetException exception
      * @throws NoSuchMethodException exception
      */
-    @Given("^I obtain elasticsearch cluster name in '([^:]+?)(:.+?)?' and save it in variable '(.+?)'?$")
-    public void saveElasticCluster(String host, String port, String envVar) throws Exception {
+    @Given("^I obtain elasticsearch cluster name in '(.+?)' and save it in variable '(.+?)'?$")
+    public void saveElasticCluster(String host, String envVar) throws Exception {
+
+        String port = "9300";
+        String[] address = host.split(":");
+
+        if (address.length == 2) {
+            host = address[0];
+            port = address[1];
+        }
 
         GivenGSpec myGivenGSpec = new GivenGSpec(this.commonspec);
         myGivenGSpec.setupRestClient(null, host, port);
