@@ -159,17 +159,22 @@ public class GivenGSpec extends BaseGSpec {
     }
 
     /**
-     * Set app host and port {@code host, @code port}
+     * Set app host and port
      *
-     * @param host host where app is running
-     * @param port port where app is running
+     * @param host host where app is running (i.e "localhost" or "localhost:443")
      */
-    @Given("^My app is running in '([^:]+?)(:.+?)?'$")
-    public void setupApp(String host, String port) {
+    @Given("^My app is running in '(.+?)'$")
+    public void setupApp(String host) {
         assertThat(host).isNotEmpty();
 
-        if (port == null) {
-            port = ":80";
+        String port = ":80";
+
+        assertThat(host).as("Malformed url. No need to use http(s):// prefix").doesNotContain("http://").doesNotContain("https://");
+        String[] address = host.split(":");
+
+        if (address.length == 2) {
+            host = address[0];
+            port = ":" + address[1];
         }
 
         commonspec.setWebHost(host);
