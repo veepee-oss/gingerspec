@@ -16,7 +16,6 @@
 [![Build Status](https://travis-ci.com/PrivaliaTech/gingerspec.svg)](https://travis-ci.com/PrivaliaTech/gingerspec)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.privaliatech/gingerspec/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.privaliatech/gingerspec)
 
-
 Privalia Acceptance Test library. Testing runtime to rule over Privalia's acceptance tests
 
 ## Project Intro/Objective
