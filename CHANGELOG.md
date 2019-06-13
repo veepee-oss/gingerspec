@@ -1,7 +1,15 @@
 # Changelog
 
+## 2.0.0
 
-## 0.1.0 (upcoming)
+* Cucumber java was updated to the latest version
+
+* A lot of functionality was rewritten to work with the new Cucumber APIs
+
+* Console output is now controlled by new formatter plugging, allowing more colors and better looking console messages
+
+
+## 0.1.0
 
 * Config files for the projects
 

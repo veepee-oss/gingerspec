@@ -61,11 +61,11 @@ public class RestSpec extends BaseGSpec {
      * {@literal @}rest annotation at the beginning of your feature for a proper initialization.
      * @param isSecured     Indicates if https:// should be used (if false, defaults to http://)
      * @param restHost      Port where the API is running. Defaults to 80 if null
-     * @param restPort      Remote host. Defaults to 'localhost' if null
      */
-    @Given("^I( securely)? send requests to '([^:]+?)(:.+?)?'$")
-    public void setupApp(String isSecured, String restHost, String restPort) {
+    @Given("^I( securely)? send requests to '(.+?)'$")
+    public void setupApp(String isSecured, String restHost) {
         String restProtocol = "http://";
+        String restPort = null;
 
         if (isSecured != null) {
             restProtocol = "https://";
@@ -73,6 +73,14 @@ public class RestSpec extends BaseGSpec {
 
         if (restHost == null) {
             restHost = "localhost";
+        }
+
+        assertThat(restHost).as("Malformed url. No need to use http(s):// prefix").doesNotContain("http://").doesNotContain("https://");
+        String[] restAddress = restHost.split(":");
+
+        if (restAddress.length == 2) {
+            restHost = restAddress[0];
+            restPort = restAddress[1];
         }
 
         if (restPort == null) {
@@ -389,9 +397,9 @@ public class RestSpec extends BaseGSpec {
         commonspec.setRestRequest(given().header("Content-Type", "application/json").cookies(commonspec.getRestCookies()).spec(spec));
 
         if (commonspec.getRestProtocol().matches("https://")) {
-            this.setupApp("https://", commonspec.getRestHost(), commonspec.getRestPort());
+            this.setupApp("https://", commonspec.getRestHost() + ":" + commonspec.getRestPort());
         } else {
-            this.setupApp(null, commonspec.getRestHost(), commonspec.getRestPort());
+            this.setupApp(null, commonspec.getRestHost() + ":" + commonspec.getRestPort());
         }
 
     }
@@ -413,9 +421,9 @@ public class RestSpec extends BaseGSpec {
         commonspec.setRestRequest(given().header("Content-Type", "application/json").headers(commonspec.getHeaders()).spec(spec));
 
         if (commonspec.getRestProtocol().matches("https://")) {
-            this.setupApp("https://", commonspec.getRestHost(), commonspec.getRestPort());
+            this.setupApp("https://", commonspec.getRestHost() + ":" + commonspec.getRestPort());
         } else {
-            this.setupApp(null, commonspec.getRestHost(), commonspec.getRestPort());
+            this.setupApp(null, commonspec.getRestHost() + ":" + commonspec.getRestPort());
         }
 
     }
@@ -639,9 +647,9 @@ public class RestSpec extends BaseGSpec {
 
 
         if (commonspec.getRestProtocol().matches("https://")) {
-            this.setupApp("https://", commonspec.getRestHost(), commonspec.getRestPort());
+            this.setupApp("https://", commonspec.getRestHost() + ":" + commonspec.getRestPort());
         } else {
-            this.setupApp(null, commonspec.getRestHost(), commonspec.getRestPort());
+            this.setupApp(null, commonspec.getRestHost() + ":" + commonspec.getRestPort());
         }
     }
 

@@ -70,8 +70,11 @@ public class CucumberRunner {
         boolean aux = new File(targetExecutionsPath).mkdirs();
 
 
-        /* Include custom reporter*/
+        /* reporter*/
         List<String> reporters = new ArrayList<String>();
+        reporters.addAll(runtimeOptions.getPluginNames());
+
+        /*Include custom reporter*/
         reporters.add("com.privalia.qa.cucumber.reporter.TestNGPrettyFormatter");
 
         /* Include TestNG reporter (store TestNG reports under /target/executions/com.mypackage.myClass.xml) */

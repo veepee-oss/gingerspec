@@ -5,7 +5,7 @@
 
     <groupId>com.github.privaliatech</groupId>
     <artifactId>gingerspec</artifactId>
-    <version>2.0.0-SNAPSHOT</version>
+    <version>2.0.0</version>
 
     <name>Privalia GingerSpec framework</name>
     <description>Acceptance Test library. Testing runtime to rule over Privalia's acceptance tests.</description>

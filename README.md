@@ -13,9 +13,8 @@
                          \______/                               |__/ 
 ```
 
-[![Build Status](https://travis-ci.com/PrivaliaTech/gingerspec.svg)](https://travis-ci.org/rest-assured/rest-assured)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.privaliatech/gingerspec/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.rest-assured/rest-assured)
-
+[![Build Status](https://travis-ci.com/PrivaliaTech/gingerspec.svg)](https://travis-ci.com/PrivaliaTech/gingerspec)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.privaliatech/gingerspec/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.privaliatech/gingerspec)
 
 Privalia Acceptance Test library. Testing runtime to rule over Privalia's acceptance tests
 
@@ -23,6 +22,11 @@ Privalia Acceptance Test library. Testing runtime to rule over Privalia's accept
 The purpose of this project is to provide a generic BDT (behaviour driven testing) library with common BDD steps and extended gherkin language.
 
 GingerSpec provides common functionality that can be reused by different test projects, It encourage code reusability, as we test (in most of the cases) the same, it will help our QA Community to get our objectives much faster. It focus on the reuse of actions (also steps or keytabs) that implement low level functionality and that can be organized to create much more complex features 
+
+### Requirements
+* Oracle Java 8
+* Maven 3.5
+* Docker/docker-compose (for testing)
 
 
 ### Technologies
@@ -86,11 +90,11 @@ You must use the following dependency in your testng project to get access to al
 <dependency>
     <groupId>com.github.privaliatech</groupId>
     <artifactId>gingerspec</artifactId>
-    <version>1.0.0</version>
+    <version>2.0.0</version>
 </dependency>
 ``` 
 
-However, we strongly suggest you to make use of the special archetype for GingerSpec based projects: '**automation-archetype**'. Just run the following command in your terminal
+However, we strongly suggest to make use of the special archetype for GingerSpec based projects: [gingerspec-starter](https://github.com/PrivaliaTech/gingerspec-starter). Just run the following command in your terminal
 
 ``` 
 mvn -U archetype:generate -DarchetypeGroupId=com.github.privaliatech -DarchetypeArtifactId=gingerspec-starter
