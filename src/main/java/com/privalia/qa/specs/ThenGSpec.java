@@ -541,7 +541,6 @@ public class ThenGSpec extends BaseGSpec {
     /**
      * Takes the value of any the web element property passed by parameter and checks its value
      *
-     * @throws IllegalAccessException, NoSuchFieldException, ClassNotFoundException
      */
 
     @Then("^the element with '([^:]*?):(.+?)' has '(.+?)' in custom property '(.+?)'$")
@@ -551,8 +550,6 @@ public class ThenGSpec extends BaseGSpec {
         PreviousWebElements pwel = new PreviousWebElements(wel);
         commonspec.setPreviousWebElements(pwel);
         String textInAttribute = getTypeOfLastWebelement(customProperty);
-//        String textInAttribute = commonspec.getPreviousWebElements().getPreviousWebElements().get(0).getAttribute(customProperty);
-
         if (textInAttribute != null) {
             this.commonspec.getLogger().info("the element {} have text -> {} in property -> {}", element, textInAttribute, customProperty);
             assertTrue(textInAttribute.equalsIgnoreCase(textValue));
