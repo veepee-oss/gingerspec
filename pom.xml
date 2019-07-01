@@ -155,7 +155,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-source-plugin</artifactId>
-                        <version>2.4</version>
+                        <version>3.1.0</version>
                         <executions>
                             <execution>
                                 <id>attach-sources</id>
@@ -168,7 +168,10 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>2.10.3</version>
+                        <version>3.1.0</version>
+                        <configuration>
+                            <source>8</source>
+                        </configuration>
                         <executions>
                             <execution>
                                 <id>attach-javadocs</id>
@@ -201,7 +204,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.19.1</version>
+                <version>3.0.0-M3</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -211,11 +214,11 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <version>2.19.1</version>
+                <version>3.0.0-M3</version>
                 <configuration>
                     <argLine>
-                        -javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/1.8.8/aspectjweaver-1.8.8.jar
-                        -Xms512m -Xmx1536m
+                         -javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/1.8.8/aspectjweaver-1.8.8.jar
+                         -Xms512m -Xmx1536m
                     </argLine>
                     <reportsDirectory>${project.build.directory}/failsafe-reports</reportsDirectory>
                 </configuration>
@@ -310,7 +313,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>3.0.1</version>
+                <version>3.1.0</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
@@ -544,12 +547,12 @@
             <artifactId>curator-recipes</artifactId>
             <version>4.0.0</version>
         </dependency>
+
         <dependency>
-            <groupId>sun.jdk</groupId>
-            <artifactId>tools</artifactId>
-            <version>1.8.0</version>
-            <scope>system</scope>
-            <systemPath>${java.home}/../lib/tools.jar</systemPath>
+            <groupId>com.sun.xml.ws</groupId>
+            <artifactId>jaxws-ri</artifactId>
+            <version>2.3.2</version>
+            <type>pom</type>
         </dependency>
         <dependency>
             <groupId>mysql</groupId>
