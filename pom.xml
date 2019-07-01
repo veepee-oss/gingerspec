@@ -204,7 +204,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.19.1</version>
+                <version>3.0.0-M3</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -214,18 +214,11 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <version>2.19.1</version>
+                <version>3.0.0-M3</version>
                 <configuration>
                     <argLine>
                          -javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/1.8.8/aspectjweaver-1.8.8.jar
                          -Xms512m -Xmx1536m
-                         --add-modules java.se
-                         --add-exports java.base/jdk.internal.ref=ALL-UNNAMED
-                         --add-opens java.base/java.lang=ALL-UNNAMED
-                         --add-opens java.base/java.nio=ALL-UNNAMED
-                         --add-opens java.base/sun.nio.ch=ALL-UNNAMED
-                         --add-opens java.management/sun.management=ALL-UNNAMED
-                         --add-opens jdk.management/com.sun.management.internal=ALL-UNNAMED
                     </argLine>
                     <reportsDirectory>${project.build.directory}/failsafe-reports</reportsDirectory>
                 </configuration>
@@ -561,18 +554,6 @@
             <version>2.3.2</version>
             <type>pom</type>
         </dependency>
-
-        <!--<dependency>-->
-            <!--<groupId>com.sun.xml.bind</groupId>-->
-            <!--<artifactId>jaxb-impl</artifactId>-->
-            <!--<version>2.3.0.1</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>com.sun.xml.bind</groupId>-->
-            <!--<artifactId>jaxb-core</artifactId>-->
-            <!--<version>2.3.0.1</version>-->
-        <!--</dependency>-->
-
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
