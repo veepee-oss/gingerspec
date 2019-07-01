@@ -24,7 +24,7 @@ The purpose of this project is to provide a generic BDT (behaviour driven testin
 GingerSpec provides common functionality that can be reused by different test projects, It encourage code reusability, as we test (in most of the cases) the same, it will help our QA Community to get our objectives much faster. It focus on the reuse of actions (also steps or keytabs) that implement low level functionality and that can be organized to create much more complex features 
 
 ### Requirements
-* Oracle Java 8
+* Java 8+
 * Maven 3.5
 * Docker/docker-compose (for testing)
 
@@ -49,6 +49,21 @@ After modifying, to check changes in your local project do:
 `mvn clean install -Dmaven.test.skip=true` (tests skip temporarily)  
 
 If you want to execute all the integration tests in the library, please take a look at the docker-compose file for more information
+
+
+#### Testing with alternative SDK
+
+If you want to test your changes in a different sdk, you can use the official docker images of maven in the followinf way:
+
+First, create a docker volume where all dependencies will be stored (to avoid downloading all dependencies on every run)
+
+`docker volume create --name maven-repo` 
+
+Run your maven commands inside the container (use the -v option to map the previously created volume):
+
+`docker run -it --rm --name gingerspec -v maven-repo:/root/.m2 -v "$(pwd)":/usr/src/mymaven -w /usr/src/mymaven maven:3.6.1-jdk-11 mvn clean install -Dmaven.test.skip=true`
+
+This will execute the command using maven 3.6.1 and jdk-11. For the full list of supported tags check the official documentation [here](https://hub.docker.com/_/maven)
   
 #### Execution  
   
