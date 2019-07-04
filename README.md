@@ -53,7 +53,7 @@ If you want to execute all the integration tests in the library, please take a l
 
 #### Testing with alternative SDK
 
-If you want to test your changes in a different sdk, you can use the official docker images of maven in the followinf way:
+If you want to test your changes in a different sdk, you can use the official docker images of maven in the following way:
 
 First, create a docker volume where all dependencies will be stored (to avoid downloading all dependencies on every run)
 
@@ -90,6 +90,12 @@ _**print log at DEBUG level when running a test**_
 _**-DSELENIUM_GRID and -DFORCE_BROWSER for Selenium features**_
 
 ` mvn verify -Dit.test=com.privalia.myproject.mypackage.CucumberSeleniumIT -DSELENIUM_GRID=127.0.0.1:4444`
+
+_**-DSELENIUM_NODE and -DSELENIUM_NODE_TYPE for Selenium features**_
+
+Instead of using a selenium grid, you can directly conect to a standalone node by specifiying its address and the type of browser it supports
+
+` mvn verify -Dit.test=com.privalia.myproject.mypackage.CucumberSeleniumIT -DSELENIUM_NODE=127.0.0.1:4444 -DSELENIUM_NODE_TYPE=chrome`
 
 _**-Dmaven.failsafe.debug to debug with maven and IDE.**_
 

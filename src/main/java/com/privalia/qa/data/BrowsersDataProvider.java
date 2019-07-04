@@ -66,7 +66,7 @@ public final class BrowsersDataProvider {
     /**
      * Get unique browsers available in a selenium grid.
      *
-     * @param context context
+     * @param context         context
      * @param testConstructor testConstructor
      * @return an iterator
      * @throws Exception exception
@@ -89,10 +89,10 @@ public final class BrowsersDataProvider {
     /**
      * Get the browsers available with "iOS" as platformName in a selenium grid.
      *
-     * @param context           context
-     * @param testConstructor   testConstructor
-     * @return                  an iterator
-     * @throws Exception        Exception
+     * @param context         context
+     * @param testConstructor testConstructor
+     * @return an iterator
+     * @throws Exception Exception
      */
     @DataProvider(parallel = true)
     public static Object[] availableIOSBrowsers(ITestContext context, Constructor<?> testConstructor)
@@ -189,7 +189,43 @@ public final class BrowsersDataProvider {
                 }
             }
         } else {
-            LOGGER.warn("No Selenium Grid address specified!. Please use -DSELENIUM_GRID to supply a valid address");
+
+            String node = System.getProperty("SELENIUM_NODE");
+
+            if (node == null) {
+                LOGGER.warn("No Selenium Grid or Node address specified!. Searching for node in localhost:4444....");
+                node = "localhost:4444";
+            }
+
+            Document doc;
+            try {
+                doc = Jsoup.connect("http://" + node + "/wd/hub/static/resource/hub.html").timeout(DEFAULT_TIMEOUT).get();
+            } catch (IOException e) {
+                LOGGER.debug("Exception on connecting to Selenium node: {}", e.getMessage());
+                return response;
+            }
+
+            /**
+             * the process for connecting to a standalone node is the same as with the selenium grid, so SELENIUM_GRID is
+             * set to the value of the address of the node (the SELENIUM_GRID variable is later used in HoolGSpec class to
+             * create the connection)
+             */
+            System.setProperty("SELENIUM_GRID", node);
+
+
+            /**
+             * Is necessary to set the browser type the node supports, since this informacion is later used in the
+             * HoolGSpec class to create the correct capabilities object
+             */
+            String nodeType = System.getProperty("SELENIUM_NODE_TYPE");
+
+            if (nodeType == null) {
+                LOGGER.warn("No Selenium Node browser type specified!. Using 'chrome' as default....");
+                response.add("chrome_1.0");
+            } else {
+                response.add(nodeType + "_1.0");
+            }
+
         }
         // Sort response
         Collections.sort(response);
