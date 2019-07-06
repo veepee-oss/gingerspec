@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.0.1
+
+* Updated dependencies so now the library can work with jdk > 1.8
+
+* Selenium tests can now be executed in selenium standalone nodes (no grid necessary). Check README for more information
+
 ## 2.0.0
 
 * Cucumber java was updated to the latest version
