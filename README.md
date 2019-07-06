@@ -25,7 +25,7 @@ GingerSpec provides common functionality that can be reused by different test pr
 
 ### Requirements
 * Java 8+
-* Maven 3.5
+* Maven 3+
 * Docker/docker-compose (for testing)
 
 
