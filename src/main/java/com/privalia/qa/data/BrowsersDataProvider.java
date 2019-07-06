@@ -144,7 +144,7 @@ public final class BrowsersDataProvider {
             try {
                 doc = Jsoup.connect(grid).timeout(DEFAULT_TIMEOUT).get();
             } catch (IOException e) {
-                LOGGER.debug("Exception on connecting to Selenium grid: {}", e.getMessage());
+                LOGGER.error("Exception on connecting to Selenium grid: {}", e.getMessage());
                 return response;
             }
 
@@ -201,7 +201,7 @@ public final class BrowsersDataProvider {
             try {
                 doc = Jsoup.connect("http://" + node + "/wd/hub/static/resource/hub.html").timeout(DEFAULT_TIMEOUT).get();
             } catch (IOException e) {
-                LOGGER.debug("Exception on connecting to Selenium node: {}", e.getMessage());
+                LOGGER.error("Exception on connecting to Selenium node: {}", e.getMessage());
                 return response;
             }
 
