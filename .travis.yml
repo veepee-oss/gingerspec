@@ -43,6 +43,7 @@ deploy:
       condition: ${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH} =~ ^release\/.*$
   - provider: pages
     skip_cleanup: true
+    local_dir: target/apidocs
     github_token: JROTzhHYWhSKMq1qBxbxROoyVwD90s09yOMBz6Dr+okXKgmOeOflPmSvzWSMVrhgjgwfXvmAIlN6RaVPImC3mRqefAMzPFoyCmOH1KWN4GPlrPXP0/DYm2E1bQE0JXvTPyf3+kZwt7Hr0j0FUgnDVsnQyIkjqiEEYq/TK4EjCsCF+KNAnjevk88XigD/0Ea6tyxslEB6Yg9gl21uAznbQwqbRcARqrpogFUQmc2+aQWMHc7/W4wCFE2i80HZGor0Op4y9CI1kOkbnmWAuz2Yj8tASeW8MENYuFsFWsqy8KyReQLAC83icGgQ5nHhj9rq6wjz/pT038T0hKMzm5iSyXRQjb/vjBKYMVECp621hDT/Ih7cjdcqF+Es44HvpK7nbaJntlt5o2ts+/XDw9hYyIfjPu4+aoVUlz08U6sYSqPkYVxXYXIyvRWfkKSLZVpWXSd2hssCyTwXf6V7c5wekkPgAltHz4FmO808aqpsW8fgj7sUd0pq+j5Bk4M05XmHPM0baQME0x/rTyBDbdnuglbxYzYNfyvmMbVzBsoiePh4aL95sYMcu5FI7iDKhgHMoUu3wgLjtwmU3j4NTTonj9f+m4AWU8DJBm4lJRMa1WESAAk4+pwM/cQcuEmLmUBekBvcg4lOYiUX+f6vF2tOa0DxNOYb7J8L5hGoTceC8To=
     keep_history: true
     on:
