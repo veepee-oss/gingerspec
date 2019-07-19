@@ -44,7 +44,7 @@ deploy:
   - provider: pages
     skip_cleanup: true
     local_dir: target/apidocs
-    github_token: d7bfd78ee0f1ad12fdee5edce6a4de6141a3035f
+    github_token: 2fc2bd77c196a8dc2297f5bdae1d18625b69cfc3
     keep_history: true
     on:
       branch: feature/github-pages
