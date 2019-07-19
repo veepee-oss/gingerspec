@@ -41,6 +41,15 @@ deploy:
       tags: false
       all_branches: true
       condition: ${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH} =~ ^release\/.*$
+  - provider: pages
+    skip_cleanup: true
+    local_dir: target/apidocs
+    github_token: $GITHUB_TOKEN
+    keep_history: true
+    on:
+      tags: false
+      all_branches: true
+      condition: ${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH} =~ ^release\/.*$
 cache:
     directories:
         - ~/.m2/repository
