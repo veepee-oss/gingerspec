@@ -21,7 +21,11 @@ Privalia Acceptance Test library. Testing runtime to rule over Privalia's accept
 ## Project Intro/Objective
 The purpose of this project is to provide a generic BDT (behaviour driven testing) library with common BDD steps and extended gherkin language.
 
-GingerSpec provides common functionality that can be reused by different test projects, It encourage code reusability, as we test (in most of the cases) the same, it will help our QA Community to get our objectives much faster. It focus on the reuse of actions (also steps or keytabs) that implement low level functionality and that can be organized to create much more complex features 
+GingerSpec provides common functionality that can be reused by different test projects, It encourage code reusability, as we test (in most of the cases) the same, it will help our QA Community to get our objectives much faster. It focus on the reuse of actions (also steps or keytabs) that implement low level functionality and that can be organized to create much more complex features
+
+## Documentation
+* [Project wiki](https://github.com/PrivaliaTech/gingerspec/wiki)
+* [Javadoc](https://privaliatech.github.io/gingerspec/)  
 
 ### Requirements
 * Java 8+
@@ -196,9 +200,3 @@ And many many more!
 |Name     |  Slack Handle   | 
 |---------|-----------------|
 |[Jose Fernandez Duque](https://github.com/josefd8)| @josefd8        |
-
-
-<br>
-
-## Contact
-* You can find a more in depth docs/manuals [here](https://confluence.vptech.eu/pages/viewpage.action?spaceKey=QAP&title=Automation+with+Java+BDD+Framework+Ecosystem).  
