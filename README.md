@@ -68,6 +68,8 @@ Run your maven commands inside the container (use the -v option to map the previ
 `docker run -it --rm --name gingerspec -v maven-repo:/root/.m2 -v "$(pwd)":/usr/src/mymaven -w /usr/src/mymaven maven:3.6.1-jdk-11 mvn clean install -Dmaven.test.skip=true`
 
 This will execute the command using maven 3.6.1 and jdk-11. For the full list of supported tags check the official documentation [here](https://hub.docker.com/_/maven)
+
+You can also use the option `--network host` when testing the library using the included docker-compose 
   
 #### Execution  
   
