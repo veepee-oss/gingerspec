@@ -1,18 +1,30 @@
+sudo: required
+
 language: java
 
+## library is tested under java 8, 11 and 12
 jdk:
   - openjdk8
   - openjdk11
   - openjdk12
 
+services:
+  - docker
 
-## export GPG details
+
 before_install:
+    ## export GPG details
     - echo $GPG_SECRET_KEYS | base64 --decode | $GPG_EXECUTABLE --import
     - echo $GPG_OWNERTRUST | base64 --decode | $GPG_EXECUTABLE --import-ownertrust
+    ## travis runs its own mysql and postgresql services in the background. These are stopped so they dont conflict with the ones of the docker-compose
+    - sudo /etc/init.d/mysql stop
+    - sudo /etc/init.d/postgresql stop
+    ## start all services that are necessary for running the library tests using the local docker-compose file
+    - docker-compose up -d
+
 
 install:
-    mvn --settings cd/mvnsettings.xml install -Dmaven.test.skip=true
+    mvn --settings cd/mvnsettings.xml install -DVERSION=1.0 -DSLEEPTEST=3 -DAGENT_LIST=1,2 -DVARNAME=foo -DWAIT=1 -DPOSTGRES_HOST=localhost -DMYSQL_HOST=localhost -DREST_SERVER_HOST=localhost -DDEMO_SITE_HOST=demo-site -DSELENIUM_GRID=localhost:4444 -DZOOKEEPER_HOST=localhost -DSCHEMA_REGISTRY_HOST=localhost
 
 
 ## Get the project version
@@ -21,8 +33,8 @@ before_deploy:
     - export project_version=$(mvn help:evaluate -N -Dexpression=project.version|grep -v '\[')
 
 
-### Create release in GitHub only on builds from branches starting with release/
 deploy:
+  ### Create release in GitHub only on builds from branches starting with release/
   - provider: releases
     api_key:
       secure: JROTzhHYWhSKMq1qBxbxROoyVwD90s09yOMBz6Dr+okXKgmOeOflPmSvzWSMVrhgjgwfXvmAIlN6RaVPImC3mRqefAMzPFoyCmOH1KWN4GPlrPXP0/DYm2E1bQE0JXvTPyf3+kZwt7Hr0j0FUgnDVsnQyIkjqiEEYq/TK4EjCsCF+KNAnjevk88XigD/0Ea6tyxslEB6Yg9gl21uAznbQwqbRcARqrpogFUQmc2+aQWMHc7/W4wCFE2i80HZGor0Op4y9CI1kOkbnmWAuz2Yj8tASeW8MENYuFsFWsqy8KyReQLAC83icGgQ5nHhj9rq6wjz/pT038T0hKMzm5iSyXRQjb/vjBKYMVECp621hDT/Ih7cjdcqF+Es44HvpK7nbaJntlt5o2ts+/XDw9hYyIfjPu4+aoVUlz08U6sYSqPkYVxXYXIyvRWfkKSLZVpWXSd2hssCyTwXf6V7c5wekkPgAltHz4FmO808aqpsW8fgj7sUd0pq+j5Bk4M05XmHPM0baQME0x/rTyBDbdnuglbxYzYNfyvmMbVzBsoiePh4aL95sYMcu5FI7iDKhgHMoUu3wgLjtwmU3j4NTTonj9f+m4AWU8DJBm4lJRMa1WESAAk4+pwM/cQcuEmLmUBekBvcg4lOYiUX+f6vF2tOa0DxNOYb7J8L5hGoTceC8To=
@@ -35,12 +47,14 @@ deploy:
       condition: ${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH} =~ ^release\/.*$
     name: $project_version
     overwrite: true
+  ### Deploy the generated artifact to maven central only on builds from branches starting with release/
   - provider: script
     script: mvn clean deploy --settings cd/mvnsettings.xml -P sign,build-extras -Dmaven.test.skip=true
     on:
       tags: false
       all_branches: true
       condition: ${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH} =~ ^release\/.*$
+  ### Publish the resulting javadoc to github pages only on builds from branches starting with release/
   - provider: pages
     skip_cleanup: true
     local_dir: target/apidocs
