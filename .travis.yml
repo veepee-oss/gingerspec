@@ -36,6 +36,7 @@ before_deploy:
 deploy:
   ### Create release in GitHub only on builds from branches starting with release/
   - provider: releases
+    jdk: openjdk12
     api_key:
       secure: JROTzhHYWhSKMq1qBxbxROoyVwD90s09yOMBz6Dr+okXKgmOeOflPmSvzWSMVrhgjgwfXvmAIlN6RaVPImC3mRqefAMzPFoyCmOH1KWN4GPlrPXP0/DYm2E1bQE0JXvTPyf3+kZwt7Hr0j0FUgnDVsnQyIkjqiEEYq/TK4EjCsCF+KNAnjevk88XigD/0Ea6tyxslEB6Yg9gl21uAznbQwqbRcARqrpogFUQmc2+aQWMHc7/W4wCFE2i80HZGor0Op4y9CI1kOkbnmWAuz2Yj8tASeW8MENYuFsFWsqy8KyReQLAC83icGgQ5nHhj9rq6wjz/pT038T0hKMzm5iSyXRQjb/vjBKYMVECp621hDT/Ih7cjdcqF+Es44HvpK7nbaJntlt5o2ts+/XDw9hYyIfjPu4+aoVUlz08U6sYSqPkYVxXYXIyvRWfkKSLZVpWXSd2hssCyTwXf6V7c5wekkPgAltHz4FmO808aqpsW8fgj7sUd0pq+j5Bk4M05XmHPM0baQME0x/rTyBDbdnuglbxYzYNfyvmMbVzBsoiePh4aL95sYMcu5FI7iDKhgHMoUu3wgLjtwmU3j4NTTonj9f+m4AWU8DJBm4lJRMa1WESAAk4+pwM/cQcuEmLmUBekBvcg4lOYiUX+f6vF2tOa0DxNOYb7J8L5hGoTceC8To=
     file:
@@ -49,6 +50,7 @@ deploy:
     overwrite: true
   ### Deploy the generated artifact to maven central only on builds from branches starting with release/
   - provider: script
+    jdk: openjdk12
     script: mvn clean deploy --settings cd/mvnsettings.xml -P sign,build-extras -Dmaven.test.skip=true
     on:
       tags: false
@@ -56,6 +58,7 @@ deploy:
       condition: ${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH} =~ ^release\/.*$
   ### Publish the resulting javadoc to github pages only on builds from branches starting with release/
   - provider: pages
+    jdk: openjdk12
     skip_cleanup: true
     local_dir: target/apidocs
     github_token: $GITHUB_TOKEN
