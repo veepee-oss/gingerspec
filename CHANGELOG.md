@@ -1,5 +1,17 @@
 # Changelog
 
+## 2.0.2
+
+* Updated jackson-databind dependency to resolve security warning in github
+
+* Added configuration to automatically publish javadoc on github pages on every release
+
+* Added documentation section in README file to access javadoc and wiki
+
+* Fixed bug when taking a screenshot on selenium tests
+
+* All integration tests are now executed on the travis pipeline
+
 ## 2.0.1
 
 * Updated dependencies so now the library can work with jdk > 1.8
