@@ -48,15 +48,11 @@ jobs:
 
   - stage: deploy
     name: "This is a test"
-    if: ${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH} =~ ^features\/.*$
+    if: branch =~ ^features\/.*$
     deploy:
       provider: script
       jdk: openjdk12
       script: echo 'THE DEPLOY PHASE IS BEING EXECUTED!'
-      on:
-        tags: false
-        all_branches: true
-        condition: ${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH} =~ ^features\/.*$
 
 
 ## Get the project version
