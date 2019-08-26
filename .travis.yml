@@ -55,7 +55,7 @@ jobs:
         on:
           tags: false
           all_branches: true
-          condition: ${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH} =~ ^feature\/.*$
+          condition: ${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH} =~ ^features\/.*$
 
 
 ## Get the project version
