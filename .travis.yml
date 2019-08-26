@@ -3,28 +3,43 @@ sudo: required
 language: java
 
 ## library is tested under java 8, 11 and 12
-jdk:
-  - openjdk8
-  - openjdk11
-  - openjdk12
+#jdk:
+#  - openjdk8
+#  - openjdk11
+#  - openjdk12
 
-services:
-  - docker
+#services:
+#  - docker
 
 
 before_install:
     ## export GPG details
-    - echo $GPG_SECRET_KEYS | base64 --decode | $GPG_EXECUTABLE --import
-    - echo $GPG_OWNERTRUST | base64 --decode | $GPG_EXECUTABLE --import-ownertrust
+#    - echo $GPG_SECRET_KEYS | base64 --decode | $GPG_EXECUTABLE --import
+#    - echo $GPG_OWNERTRUST | base64 --decode | $GPG_EXECUTABLE --import-ownertrust
     ## travis runs its own mysql and postgresql services in the background. These are stopped so they dont conflict with the ones of the docker-compose
-    - sudo /etc/init.d/mysql stop
-    - sudo /etc/init.d/postgresql stop
+#    - sudo /etc/init.d/mysql stop
+#    - sudo /etc/init.d/postgresql stop
     ## start all services that are necessary for running the library tests using the local docker-compose file
-    - docker-compose up -d
+#    - docker-compose up -d
+     - echo 'THE BEFORE INSTALL IS BEING EXECUTED!'
 
 
-install:
-    mvn --settings cd/mvnsettings.xml install -DVERSION=1.0 -DSLEEPTEST=3 -DAGENT_LIST=1,2 -DVARNAME=foo -DWAIT=1 -DPOSTGRES_HOST=localhost -DMYSQL_HOST=localhost -DREST_SERVER_HOST=localhost -DDEMO_SITE_HOST=demo-site -DSELENIUM_GRID=localhost:4444 -DZOOKEEPER_HOST=localhost -DSCHEMA_REGISTRY_HOST=localhost
+#install:
+#    mvn clean install -Dmaven.test.skip=true
+#    mvn --settings cd/mvnsettings.xml install -DVERSION=1.0 -DSLEEPTEST=3 -DAGENT_LIST=1,2 -DVARNAME=foo -DWAIT=1 -DPOSTGRES_HOST=localhost -DMYSQL_HOST=localhost -DREST_SERVER_HOST=localhost -DDEMO_SITE_HOST=demo-site -DSELENIUM_GRID=localhost:4444 -DZOOKEEPER_HOST=localhost -DSCHEMA_REGISTRY_HOST=localhost
+#
+
+jobs:
+  include:
+  - stage: install
+    jdk: openjdk8
+    script: mvn clean install -Dmaven.test.skip=true
+  - jdk: openjdk11
+    script: mvn clean install -Dmaven.test.skip=true
+  - jdk: openjdk12
+    script: mvn clean install -Dmaven.test.skip=true
+
+
 
 
 ## Get the project version
