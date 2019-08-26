@@ -48,7 +48,7 @@ jobs:
 
   - stage: deploy
     name: "This is a test"
-    if: branch =~ ^features\/.*$
+    if: branch =~ ^feature\/.*$
     deploy:
       provider: script
       jdk: openjdk12
