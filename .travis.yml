@@ -1,16 +1,20 @@
 sudo: required
 
-language: java
+env:
+  - COMMAND="mvn --settings cd/mvnsettings.xml install -DVERSION=1.0 -DSLEEPTEST=3 -DAGENT_LIST=1,2 -DVARNAME=foo -DWAIT=1 -DPOSTGRES_HOST=localhost -DMYSQL_HOST=localhost -DREST_SERVER_HOST=localhost -DDEMO_SITE_HOST=demo-site -DSELENIUM_GRID=localhost:4444 -DZOOKEEPER_HOST=localhost -DSCHEMA_REGISTRY_HOST=localhost"
 
-## library is tested under java 8, 11 and 12
-jdk:
-  - openjdk8
-  - openjdk11
-  - openjdk12
+language: java
 
 services:
   - docker
 
+stages:
+  - install
+  - deploy
+
+cache:
+  directories:
+    - ~/.m2/repository
 
 before_install:
     ## export GPG details
@@ -22,51 +26,70 @@ before_install:
     ## start all services that are necessary for running the library tests using the local docker-compose file
     - docker-compose up -d
 
-
-install:
-    mvn --settings cd/mvnsettings.xml install -DVERSION=1.0 -DSLEEPTEST=3 -DAGENT_LIST=1,2 -DVARNAME=foo -DWAIT=1 -DPOSTGRES_HOST=localhost -DMYSQL_HOST=localhost -DREST_SERVER_HOST=localhost -DDEMO_SITE_HOST=demo-site -DSELENIUM_GRID=localhost:4444 -DZOOKEEPER_HOST=localhost -DSCHEMA_REGISTRY_HOST=localhost
-
-
 ## Get the project version
 before_deploy:
     - mvn help:evaluate -N -Dexpression=project.version|grep -v '\['
     - export project_version=$(mvn help:evaluate -N -Dexpression=project.version|grep -v '\[')
 
+jobs:
+  include:
 
-deploy:
-  ### Create release in GitHub only on builds from branches starting with release/
-  - provider: releases
-    jdk: openjdk12
-    api_key:
-      secure: JROTzhHYWhSKMq1qBxbxROoyVwD90s09yOMBz6Dr+okXKgmOeOflPmSvzWSMVrhgjgwfXvmAIlN6RaVPImC3mRqefAMzPFoyCmOH1KWN4GPlrPXP0/DYm2E1bQE0JXvTPyf3+kZwt7Hr0j0FUgnDVsnQyIkjqiEEYq/TK4EjCsCF+KNAnjevk88XigD/0Ea6tyxslEB6Yg9gl21uAznbQwqbRcARqrpogFUQmc2+aQWMHc7/W4wCFE2i80HZGor0Op4y9CI1kOkbnmWAuz2Yj8tASeW8MENYuFsFWsqy8KyReQLAC83icGgQ5nHhj9rq6wjz/pT038T0hKMzm5iSyXRQjb/vjBKYMVECp621hDT/Ih7cjdcqF+Es44HvpK7nbaJntlt5o2ts+/XDw9hYyIfjPu4+aoVUlz08U6sYSqPkYVxXYXIyvRWfkKSLZVpWXSd2hssCyTwXf6V7c5wekkPgAltHz4FmO808aqpsW8fgj7sUd0pq+j5Bk4M05XmHPM0baQME0x/rTyBDbdnuglbxYzYNfyvmMbVzBsoiePh4aL95sYMcu5FI7iDKhgHMoUu3wgLjtwmU3j4NTTonj9f+m4AWU8DJBm4lJRMa1WESAAk4+pwM/cQcuEmLmUBekBvcg4lOYiUX+f6vF2tOa0DxNOYb7J8L5hGoTceC8To=
-    file:
-      - gingerspec/target/gingerspec-$project_version.jar
-    on:
-      repo: PrivaliaTech/gingerspec
-      tags: false
-      all_branches: true
-      condition: ${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH} =~ ^release\/.*$
-    name: $project_version
-    overwrite: true
-  ### Deploy the generated artifact to maven central only on builds from branches starting with release/
-  - provider: script
-    jdk: openjdk12
-    script: mvn clean deploy --settings cd/mvnsettings.xml -P sign,build-extras -Dmaven.test.skip=true
-    on:
-      tags: false
-      all_branches: true
-      condition: ${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH} =~ ^release\/.*$
-  ### Publish the resulting javadoc to github pages only on builds from branches starting with release/
-  - provider: pages
-    jdk: openjdk12
-    skip_cleanup: true
-    local_dir: target/apidocs
-    github_token: $GITHUB_TOKEN
-    keep_history: true
-    on:
-      tags: false
-      all_branches: true
-      condition: ${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH} =~ ^release\/.*$
-cache:
-    directories:
-        - ~/.m2/repository
+  - stage: install
+    jdk: openjdk8
+    name: "Testing with openjdk8"
+    script: ${COMMAND}
+
+  - jdk: openjdk11
+    name: "Testing with openjdk11"
+    script: ${COMMAND}
+
+  - jdk: openjdk12
+    name: "Testing with openjdk12"
+    script: ${COMMAND}
+
+  - stage: deploy
+    name: "Create release in GitHub"
+    if: branch =~ ^release\/.*$
+    deploy:
+      provider: releases
+      jdk: openjdk12
+      api_key:
+        secure: JROTzhHYWhSKMq1qBxbxROoyVwD90s09yOMBz6Dr+okXKgmOeOflPmSvzWSMVrhgjgwfXvmAIlN6RaVPImC3mRqefAMzPFoyCmOH1KWN4GPlrPXP0/DYm2E1bQE0JXvTPyf3+kZwt7Hr0j0FUgnDVsnQyIkjqiEEYq/TK4EjCsCF+KNAnjevk88XigD/0Ea6tyxslEB6Yg9gl21uAznbQwqbRcARqrpogFUQmc2+aQWMHc7/W4wCFE2i80HZGor0Op4y9CI1kOkbnmWAuz2Yj8tASeW8MENYuFsFWsqy8KyReQLAC83icGgQ5nHhj9rq6wjz/pT038T0hKMzm5iSyXRQjb/vjBKYMVECp621hDT/Ih7cjdcqF+Es44HvpK7nbaJntlt5o2ts+/XDw9hYyIfjPu4+aoVUlz08U6sYSqPkYVxXYXIyvRWfkKSLZVpWXSd2hssCyTwXf6V7c5wekkPgAltHz4FmO808aqpsW8fgj7sUd0pq+j5Bk4M05XmHPM0baQME0x/rTyBDbdnuglbxYzYNfyvmMbVzBsoiePh4aL95sYMcu5FI7iDKhgHMoUu3wgLjtwmU3j4NTTonj9f+m4AWU8DJBm4lJRMa1WESAAk4+pwM/cQcuEmLmUBekBvcg4lOYiUX+f6vF2tOa0DxNOYb7J8L5hGoTceC8To=
+      file:
+        - gingerspec/target/gingerspec-$project_version.jar
+      on:
+        repo: PrivaliaTech/gingerspec
+        tags: false
+        all_branches: true
+        condition: ${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH} =~ ^release\/.*$
+      name: $project_version
+      overwrite: true
+
+    name: "Deploy the generated artifact to maven central"
+    if: branch =~ ^release\/.*$
+    deploy:
+      provider: script
+      jdk: openjdk12
+      script: mvn clean deploy --settings cd/mvnsettings.xml -P sign,build-extras -Dmaven.test.skip=true
+      on:
+        tags: false
+        all_branches: true
+        condition: ${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH} =~ ^release\/.*$
+
+    name: "Publish the resulting javadoc to github pages"
+    if: branch =~ ^release\/.*$
+    deploy:
+      provider: pages
+      jdk: openjdk12
+      skip_cleanup: true
+      local_dir: target/apidocs
+      github_token: $GITHUB_TOKEN
+      keep_history: true
+      on:
+        tags: false
+        all_branches: true
+        condition: ${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH} =~ ^release\/.*$
+
+
+
+
