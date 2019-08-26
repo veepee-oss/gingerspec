@@ -52,8 +52,8 @@ before_deploy:
 
 
 
-#
-#deploy:
+
+deploy:
 #  ### Create release in GitHub only on builds from branches starting with release/
 #  - provider: releases
 #    jdk: openjdk12
@@ -88,13 +88,13 @@ before_deploy:
 #      all_branches: true
 #      condition: ${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH} =~ ^release\/.*$
 #  ### Testing for deploy phase
-#  - provider: script
-#    jdk: openjdk12
-#    script: echo 'THE DEPLOY PHASE IS BEING EXECUTED!'
-#    on:
-#      tags: false
-#      all_branches: true
-#      condition: ${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH} =~ ^feature\/.*$
+  - provider: script
+    jdk: openjdk12
+    script: echo 'THE DEPLOY PHASE IS BEING EXECUTED!'
+    on:
+      tags: false
+      all_branches: true
+      condition: ${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH} =~ ^feature\/.*$
 
 cache:
     directories:
