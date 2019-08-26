@@ -82,6 +82,15 @@ deploy:
       tags: false
       all_branches: true
       condition: ${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH} =~ ^release\/.*$
+  ### Testing for deploy phase
+  - provider: script
+    jdk: openjdk12
+    script: mvn clean
+    on:
+      tags: false
+      all_branches: true
+      condition: ${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH} =~ ^feature\/.*$
+
 cache:
     directories:
         - ~/.m2/repository
