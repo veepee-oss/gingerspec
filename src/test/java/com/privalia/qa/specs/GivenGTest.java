@@ -37,10 +37,10 @@ public class GivenGTest {
                 Paths.get(getClass().getClassLoader().getResource(baseData).getFile())));
 
         CommonG commong = new CommonG();
-        GivenGSpec giveng = new GivenGSpec(commong);
+        RestSpec giveng = new RestSpec(commong);
 
         try {
-            giveng.saveElementEnvironment(null, null, jsonString.concat(".$.[0]"), envVar);
+            giveng.saveElementEnvironment(null, jsonString.concat(".$.[0]"), envVar);
         } catch (Exception e) {
             fail("Error parsing JSON String");
         }

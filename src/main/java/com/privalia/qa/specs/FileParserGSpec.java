@@ -21,7 +21,6 @@ import com.sonalake.utah.config.ConfigLoader;
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
-import gherkin.ast.TableRow;
 import io.cucumber.datatable.DataTable;
 
 import javax.xml.bind.JAXBException;
@@ -34,6 +33,12 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * Steps definitions for handling and parsing text files.
+ * This class makes use of Utah-parser, a Java library for parsing semi-structured text files
+ * @see <a href="https://github.com/sonalake/utah-parser">https://github.com/sonalake/utah-parser</a>
+ * @author Jose Fernandez
+ */
 public class FileParserGSpec extends BaseGSpec {
 
     public FileParserGSpec(CommonG spec) {

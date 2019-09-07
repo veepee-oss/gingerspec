@@ -25,14 +25,14 @@ import org.testng.annotations.Test;
 
 
 public class MongoToolsIT extends BaseGSpec {
-    GivenGSpec commonspecG;
+    BigDataGSpec commonspecG;
     String doc;
     String db = "mongoITDB";
     String collection = "testCollection";
     public MongoToolsIT() {
         ThreadProperty.set("class", this.getClass().getCanonicalName());
         this.commonspec = new CommonG();
-        commonspecG = new GivenGSpec(this.commonspec);
+        commonspecG = new BigDataGSpec(this.commonspec);
     }
 
     @BeforeClass(enabled = false)

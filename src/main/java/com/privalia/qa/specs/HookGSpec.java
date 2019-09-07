@@ -48,6 +48,13 @@ import java.util.concurrent.TimeUnit;
 import static io.restassured.RestAssured.given;
 import static org.testng.Assert.fail;
 
+/**
+ * This class contains functions that are executed before and after each test.
+ * For this, it makes use of cucumber hooks
+ *
+ * @see <a href="https://cucumber.io/docs/cucumber/api/#hooks">https://cucumber.io/docs/cucumber/api/#hooks</a>
+ * @author Jose Fernandez
+ */
 public class HookGSpec extends BaseGSpec {
 
     public static final int ORDER_10 = 10;
@@ -69,8 +76,9 @@ public class HookGSpec extends BaseGSpec {
         this.commonspec = spec;
     }
 
+
     /**
-     * Clean the exception list.
+     * Clean the exception list before each scenario.
      */
     @Before(order = 0)
     public void globalSetup() {
@@ -84,7 +92,8 @@ public class HookGSpec extends BaseGSpec {
 
 
     /**
-     * Connect to selenium.
+     * If the feature has the @web or @mobile annotation, creates a new selenium driver
+     * before each scenario
      *
      * @throws MalformedURLException    MalformedURLException
      */
@@ -165,7 +174,7 @@ public class HookGSpec extends BaseGSpec {
 
 
     /**
-     * Close selenium web driver.
+     * If the feature has the @web or @mobile annotation, closes selenium web driver after each scenario is completed.
      */
     @After(order = ORDER_20, value = {"@mobile or @web"})
     public void seleniumTeardown() {
@@ -183,6 +192,10 @@ public class HookGSpec extends BaseGSpec {
     public void teardown() {
     }
 
+    /**
+     * If the feature has the @rest annotation, creates a new REST client before each scenario
+     * @throws Exception    Exception
+     */
     @Before(order = 10, value = "@rest")
     public void restClientSetup() throws Exception {
         commonspec.getLogger().debug("Starting a REST client");
@@ -194,6 +207,10 @@ public class HookGSpec extends BaseGSpec {
 
     }
 
+    /**
+     * If the feature has the @rest annotation, closes the REST client after each scenario is completed
+     * @throws IOException  IOException
+     */
     @After(order = 10, value = "@rest")
     public void restClientTeardown() throws IOException {
         commonspec.getLogger().debug("Shutting down REST client");
@@ -201,6 +218,10 @@ public class HookGSpec extends BaseGSpec {
 
     }
 
+    /**
+     * Disconnect any remaining open SSH connection after each scenario is completed
+     * @throws Exception    Exception
+     */
     @After(order = 10)
     public void remoteSSHConnectionTeardown() throws Exception {
         if (commonspec.getRemoteSSHConnection() != null) {
@@ -209,6 +230,10 @@ public class HookGSpec extends BaseGSpec {
         }
     }
 
+    /**
+     * If the feature has the @sql annotation, closes any open connection to a database after each scenario is completed
+     * @throws Exception    Exception
+     */
     @After(value = "@sql")
     public void sqlConnectionClose() throws Exception {
         if ((commonspec.getSqlClient() != null) && (commonspec.getSqlClient().connectionStatus())) {

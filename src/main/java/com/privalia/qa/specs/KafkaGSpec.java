@@ -19,7 +19,7 @@ import java.util.concurrent.TimeoutException;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Class for all Kafka-related cucumber steps
+ * Steps definitions for working with Apache Kafka
  *
  * @author José Fernández
  */

@@ -242,7 +242,7 @@ public class ThenGTest {
     public void testCheckValueInvalidComparison() throws Exception {
         ThreadProperty.set("class", this.getClass().getCanonicalName());
         CommonG commong = new CommonG();
-        ThenGSpec theng = new ThenGSpec(commong);
+        UtilsGSpec theng = new UtilsGSpec(commong);
 
         String envVar = "EVAR";
 
@@ -254,7 +254,7 @@ public class ThenGTest {
     public void testCheckValueInvalidNumber() throws Exception {
         ThreadProperty.set("class", this.getClass().getCanonicalName());
         CommonG commong = new CommonG();
-        ThenGSpec theng = new ThenGSpec(commong);
+        UtilsGSpec theng = new UtilsGSpec(commong);
 
         String envVar = "EVAR";
 
