@@ -22,14 +22,17 @@ import cucumber.api.Scenario;
 import cucumber.api.event.*;
 import cucumber.api.formatter.ColorAware;
 import cucumber.api.formatter.NiceAppendable;
+import cucumber.runtime.DefinitionArgument;
 import cucumber.runtime.formatter.Format;
 import cucumber.runtime.formatter.Formats;
 import cucumber.util.FixJava;
 import cucumber.util.Mapper;
 import gherkin.ast.*;
 import gherkin.pickles.PickleTag;
+import io.cucumber.cucumberexpressions.Group;
 import io.cucumber.stepexpression.DataTableArgument;
 import io.cucumber.stepexpression.DocStringArgument;
+import io.cucumber.stepexpression.ExpressionArgument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -296,6 +299,27 @@ public class TestNGPrettyFormatter implements ConcurrentEventListener, ColorAwar
         String locationPadding = createPaddingToLocation(STEP_INDENT, keyword + stepText);
         String formattedStepText = formatStepText(keyword, stepText, formats.get(result.getStatus().lowerCaseName()), formats.get(result.getStatus().lowerCaseName() + "_arg"), testStep.getDefinitionArgument());
         out.println(STEP_INDENT + formattedStepText + locationPadding + getLocationText(testStep.getCodeLocation()));
+
+        for (Argument argument: testStep.getDefinitionArgument()) {
+            try {
+                Field groupField = argument.getClass().getDeclaredField("group");
+                groupField.setAccessible(true);
+                Group group = (Group) groupField.get(argument);
+
+                if (group.getChildren().size() > 0) {
+                    out.println(group.getChildren().get(0).getValue());
+                } else {
+                    out.println(group.getValue());
+                }
+
+
+            } catch (NoSuchFieldException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+
         printStepExtraArguments(formats.get("tag"), testStep);
     }
 
