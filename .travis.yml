@@ -30,6 +30,7 @@ before_install:
 before_deploy:
     - mvn help:evaluate -N -Dexpression=project.version|grep -v '\['
     - export project_version=$(mvn help:evaluate -N -Dexpression=project.version|grep -v '\[')
+    - mvn clean install -Dmaven.test.skip=true
 
 jobs:
   include:
@@ -65,6 +66,7 @@ jobs:
       name: $project_version
       overwrite: true
 
+  - stage: deploy
     name: "Deploy the generated artifact to maven central"
     if: branch =~ ^release\/.*$
     deploy:
@@ -76,6 +78,7 @@ jobs:
         all_branches: true
         condition: ${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH} =~ ^release\/.*$
 
+  - stage: deploy
     name: "Publish the resulting javadoc to github pages"
     if: branch =~ ^release\/.*$
     deploy:
