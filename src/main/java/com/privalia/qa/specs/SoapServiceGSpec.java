@@ -26,6 +26,11 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * Steps definitions for working with SOAP web services
+ *
+ * @author Jose Fernandez
+ */
 public class SoapServiceGSpec extends BaseGSpec {
 
     public SoapServiceGSpec(CommonG spec) {

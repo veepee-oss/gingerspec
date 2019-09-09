@@ -43,8 +43,9 @@ import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchema;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Class that contains all steps related to RESTFull API testing. This class rewrites some of the already existing steps from using com.ning.async-http-client to
- * the new io.rest-assured.rest-assured
+ * Steps definitions for testing REST services
+ *
+ * @see <a href="https://github.com/rest-assured/rest-assured">https://github.com/rest-assured/rest-assured</a>
  * @author Jose Fernandez
  */
 public class RestSpec extends BaseGSpec {

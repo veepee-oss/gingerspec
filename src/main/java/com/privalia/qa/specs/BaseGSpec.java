@@ -16,6 +16,9 @@
 
 package com.privalia.qa.specs;
 
+/**
+ * Base class for all classes that contain steps definitions
+ */
 public class BaseGSpec {
 
     protected CommonG commonspec;

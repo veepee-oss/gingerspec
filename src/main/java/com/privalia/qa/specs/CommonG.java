@@ -56,7 +56,9 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.testng.Assert.fail;
 import static com.privalia.qa.assertions.Assertions.assertThat;
 
-
+/**
+ * Class with common functions used by all the step definition classes
+ */
 public class CommonG {
 
     private static final long DEFAULT_CURRENT_TIME = 1000L;
@@ -2066,6 +2068,25 @@ public class CommonG {
                 this.getLogger().debug("Command complete stdout:\n{}", this.getCommandResult());
             }
         }
+    }
+
+
+    /**
+     * Add sso token list.
+     *
+     * @param ssoCookies the sso cookies
+     * @param tokenList  the token list
+     * @return the list
+     */
+    public List<Cookie> addSsoToken(HashMap<String, String> ssoCookies, String[] tokenList) {
+        List<Cookie> cookiesAttributes = new ArrayList<>();
+
+        for (String tokenKey : tokenList) {
+            cookiesAttributes.add(new Cookie(tokenKey, ssoCookies.get(tokenKey),
+                    false, null,
+                    null, 999999, false, false));
+        }
+        return cookiesAttributes;
     }
 
 }

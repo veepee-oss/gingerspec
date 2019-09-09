@@ -46,7 +46,7 @@ public class WhenGTest {
                 Paths.get(getClass().getClassLoader().getResource(ascendingFile).getFile())));
 
         CommonG commong = new CommonG();
-        WhenGSpec wheng = new WhenGSpec(commong);
+        UtilsGSpec wheng = new UtilsGSpec(commong);
 
         ThreadProperty.set(envVar, jsonString);
 
@@ -75,7 +75,7 @@ public class WhenGTest {
                 Paths.get(getClass().getClassLoader().getResource(descendingFile).getFile())));
 
         CommonG commong = new CommonG();
-        WhenGSpec wheng = new WhenGSpec(commong);
+        UtilsGSpec wheng = new UtilsGSpec(commong);
 
         ThreadProperty.set(envVar, jsonString);
 
@@ -101,7 +101,7 @@ public class WhenGTest {
         DataTable modifications = DataTable.create(rawData);
 
         CommonG commong = new CommonG();
-        WhenGSpec wheng = new WhenGSpec(commong);
+        UtilsGSpec wheng = new UtilsGSpec(commong);
 
         wheng.readFileToVariable(baseData, type, envVar, modifications);
 
@@ -122,7 +122,7 @@ public class WhenGTest {
         DataTable modifications = DataTable.create(rawData);
 
         CommonG commong = new CommonG();
-        WhenGSpec wheng = new WhenGSpec(commong);
+        UtilsGSpec wheng = new UtilsGSpec(commong);
 
         wheng.readFileToVariable(baseData, type, envVar, modifications);
 

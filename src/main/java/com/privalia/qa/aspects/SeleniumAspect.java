@@ -19,7 +19,7 @@ package com.privalia.qa.aspects;
 import com.privalia.qa.assertions.SeleniumAssert;
 import com.privalia.qa.specs.BaseGSpec;
 import com.privalia.qa.specs.CommonG;
-import com.privalia.qa.specs.ThenGSpec;
+import com.privalia.qa.specs.SeleniumGSpec;
 import com.privalia.qa.utils.PreviousWebElements;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -120,8 +120,8 @@ public class SeleniumAspect extends BaseGSpec {
                 logger.info("Trying to capture screenshots...");
                 String suffix = "assert";
                 CommonG common = null;
-                if ((pjp.getThis() instanceof ThenGSpec) && (((ThenGSpec) pjp.getThis()).getCommonSpec() != null)) {
-                    common = ((ThenGSpec) pjp.getThis()).getCommonSpec();
+                if ((pjp.getThis() instanceof SeleniumGSpec) && (((SeleniumGSpec) pjp.getThis()).getCommonSpec() != null)) {
+                    common = ((SeleniumGSpec) pjp.getThis()).getCommonSpec();
                 } else if ((pjp.getTarget() instanceof SeleniumAssert) && ((SeleniumAssert) pjp.getTarget()).getCommonspec() != null) {
                     common = ((CommonG) ((SeleniumAssert) pjp.getTarget()).getCommonspec());
                 } else {

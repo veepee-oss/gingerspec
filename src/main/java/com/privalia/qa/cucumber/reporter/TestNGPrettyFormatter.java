@@ -22,14 +22,17 @@ import cucumber.api.Scenario;
 import cucumber.api.event.*;
 import cucumber.api.formatter.ColorAware;
 import cucumber.api.formatter.NiceAppendable;
+import cucumber.runtime.DefinitionArgument;
 import cucumber.runtime.formatter.Format;
 import cucumber.runtime.formatter.Formats;
 import cucumber.util.FixJava;
 import cucumber.util.Mapper;
 import gherkin.ast.*;
 import gherkin.pickles.PickleTag;
+import io.cucumber.cucumberexpressions.Group;
 import io.cucumber.stepexpression.DataTableArgument;
 import io.cucumber.stepexpression.DocStringArgument;
+import io.cucumber.stepexpression.ExpressionArgument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

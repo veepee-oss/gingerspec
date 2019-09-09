@@ -30,8 +30,7 @@ import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
 
 /**
- * Generic BigData Specs.
- * @see <a href="BigDataGSpec-annotations.html">BigData Steps &amp; Matching Regex</a>
+ * Steps definition for big data functionality
  */
 public class BigDataGSpec extends BaseGSpec {
 
@@ -221,8 +220,8 @@ public class BigDataGSpec extends BaseGSpec {
             port = address[1];
         }
 
-        GivenGSpec myGivenGSpec = new GivenGSpec(this.commonspec);
-        myGivenGSpec.setupRestClient(null, host, port);
+        RestSpec restSpec = new RestSpec(this.commonspec);
+        restSpec.setupApp(null, host + ":" + port);
 
         Future<Response> response;
 
