@@ -299,27 +299,6 @@ public class TestNGPrettyFormatter implements ConcurrentEventListener, ColorAwar
         String locationPadding = createPaddingToLocation(STEP_INDENT, keyword + stepText);
         String formattedStepText = formatStepText(keyword, stepText, formats.get(result.getStatus().lowerCaseName()), formats.get(result.getStatus().lowerCaseName() + "_arg"), testStep.getDefinitionArgument());
         out.println(STEP_INDENT + formattedStepText + locationPadding + getLocationText(testStep.getCodeLocation()));
-
-        for (Argument argument: testStep.getDefinitionArgument()) {
-            try {
-                Field groupField = argument.getClass().getDeclaredField("group");
-                groupField.setAccessible(true);
-                Group group = (Group) groupField.get(argument);
-
-                if (group.getChildren().size() > 0) {
-                    out.println(group.getChildren().get(0).getValue());
-                } else {
-                    out.println(group.getValue());
-                }
-
-
-            } catch (NoSuchFieldException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        }
-
         printStepExtraArguments(formats.get("tag"), testStep);
     }
 
