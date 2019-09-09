@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.0.3
+
+* GivenGSpec, WhenGSpec, ThenGSpec classes were removed and steps definitions were organized in a more logical way (This change may have some breaking changes to clients that still rely on the aforementioned classes)
+
+* Step definition location is now hidden by default when running tests. The variable -DSHOW_STACK_INFO can be used to reveal it, together with information about the value of each parameter passed to the underlying test definition function
+
 ## 2.0.2
 
 * Updated jackson-databind dependency to resolve security warning in github
