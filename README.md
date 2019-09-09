@@ -107,6 +107,10 @@ _**-Dmaven.failsafe.debug to debug with maven and IDE.**_
 
 ` mvn verify -DSECS=AGENT_LIST=1,2 -Dit.test=com.privalia.qa.ATests.LoopTagAspectIT -Dmaven.failsafe.debug`
 
+_**-DSHOW_STACK_INFO to get information about the underlying step definition function being called and its arguments.**_
+
+` mvn verify -DSECS=AGENT_LIST=1,2 -Dit.test=com.privalia.qa.ATests.LoopTagAspectIT -DSHOW_STACK_INFO`
+
 <br>
 
 ## Using the library
