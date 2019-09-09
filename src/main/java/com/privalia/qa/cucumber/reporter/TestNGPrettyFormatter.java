@@ -28,11 +28,7 @@ import cucumber.util.FixJava;
 import cucumber.util.Mapper;
 import gherkin.ast.*;
 import gherkin.pickles.PickleTag;
-<<<<<<< Updated upstream
-=======
 import io.cucumber.cucumberexpressions.Group;
-import io.cucumber.stepexpression.ArgumentMatcher;
->>>>>>> Stashed changes
 import io.cucumber.stepexpression.DataTableArgument;
 import io.cucumber.stepexpression.DocStringArgument;
 import io.cucumber.stepexpression.ExpressionArgument;
