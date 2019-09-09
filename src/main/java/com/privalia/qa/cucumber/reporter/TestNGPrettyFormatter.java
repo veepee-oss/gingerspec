@@ -28,13 +28,20 @@ import cucumber.util.FixJava;
 import cucumber.util.Mapper;
 import gherkin.ast.*;
 import gherkin.pickles.PickleTag;
+<<<<<<< Updated upstream
+=======
+import io.cucumber.cucumberexpressions.Group;
+import io.cucumber.stepexpression.ArgumentMatcher;
+>>>>>>> Stashed changes
 import io.cucumber.stepexpression.DataTableArgument;
 import io.cucumber.stepexpression.DocStringArgument;
+import io.cucumber.stepexpression.ExpressionArgument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.PrintStream;
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -63,6 +70,8 @@ public class TestNGPrettyFormatter implements ConcurrentEventListener, ColorAwar
     private static final String EXAMPLES_INDENT = "    ";
 
     private static final String TABLES_INDENT = "     ";
+
+    private static final String LOCATION_INDENT = "         ";
 
     private final TestSourcesModel testSources = new TestSourcesModel();
 
@@ -295,8 +304,13 @@ public class TestNGPrettyFormatter implements ConcurrentEventListener, ColorAwar
         String stepText = testStep.getStepText();
         String locationPadding = createPaddingToLocation(STEP_INDENT, keyword + stepText);
         String formattedStepText = formatStepText(keyword, stepText, formats.get(result.getStatus().lowerCaseName()), formats.get(result.getStatus().lowerCaseName() + "_arg"), testStep.getDefinitionArgument());
-        out.println(STEP_INDENT + formattedStepText + locationPadding + getLocationText(testStep.getCodeLocation()));
+        out.println(STEP_INDENT + formattedStepText);
         printStepExtraArguments(formats.get("tag"), testStep);
+
+        if (System.getProperty("SHOW_STACK_INFO") != null) {
+            printStepStackInformation(testStep);
+        }
+
     }
 
     /**
@@ -313,14 +327,8 @@ public class TestNGPrettyFormatter implements ConcurrentEventListener, ColorAwar
         if (testStep.getStepArgument().size() > 0) {
 
             try {
-                Field definitionMatchField = testStep.getClass().getDeclaredField("definitionMatch");
-                definitionMatchField.setAccessible(true);
-                Object pickleStepDefinitionMatch = definitionMatchField.get(testStep);
-                Field argumentsField = pickleStepDefinitionMatch.getClass().getSuperclass().getDeclaredField("arguments");
-                argumentsField.setAccessible(true);
-                List<io.cucumber.stepexpression.Argument> arguments = (List<io.cucumber.stepexpression.Argument>) argumentsField.get(pickleStepDefinitionMatch);
 
-                for (io.cucumber.stepexpression.Argument argument: arguments) {
+                for (io.cucumber.stepexpression.Argument argument: this.getArguments(testStep)) {
 
                     if (argument instanceof DocStringArgument) {
                         out.println(TABLES_INDENT +  format.text("\"\"\""));
@@ -343,6 +351,23 @@ public class TestNGPrettyFormatter implements ConcurrentEventListener, ColorAwar
 
         }
 
+    }
+
+    /**
+     * Returns the list of arguments for the given step
+     * @param testStep                  PickleStepTestStep instance
+     * @return                          list of Arguments
+     * @throws NoSuchFieldException     NoSuchFieldException
+     * @throws IllegalAccessException   IllegalAccessException
+     */
+    private List<io.cucumber.stepexpression.Argument> getArguments(PickleStepTestStep testStep) throws NoSuchFieldException, IllegalAccessException {
+        Field definitionMatchField = testStep.getClass().getDeclaredField("definitionMatch");
+        definitionMatchField.setAccessible(true);
+        Object pickleStepDefinitionMatch = definitionMatchField.get(testStep);
+        Field argumentsField = pickleStepDefinitionMatch.getClass().getSuperclass().getDeclaredField("arguments");
+        argumentsField.setAccessible(true);
+        List<io.cucumber.stepexpression.Argument> arguments = (List<io.cucumber.stepexpression.Argument>) argumentsField.get(pickleStepDefinitionMatch);
+        return arguments;
     }
 
     /**
@@ -383,6 +408,52 @@ public class TestNGPrettyFormatter implements ConcurrentEventListener, ColorAwar
             result.append(textFormat.text(text));
         }
         return result.toString();
+    }
+
+    /**
+     * Shows information about the underlying test step definition function, its location and the arguments used
+     * @param testStep  PickleStepTestStep instance
+     */
+    private void printStepStackInformation(PickleStepTestStep testStep) {
+
+        out.println(LOCATION_INDENT +  getLocationText(testStep.getCodeLocation()));
+
+        int argumentIndex = 0;
+
+        try {
+
+            for (io.cucumber.stepexpression.Argument argument: this.getArguments(testStep)) {
+
+                if (argument instanceof ExpressionArgument) {
+
+                    Group group = (Group) ((ExpressionArgument) argument).getGroup();
+
+                    if (group.getChildren().size() > 0) {
+                        out.println(LOCATION_INDENT +  getLocationText("Argument " + String.valueOf(argumentIndex) + ": " + group.getChildren().get(0).getValue()));
+                    } else {
+                        out.println(LOCATION_INDENT +  getLocationText("Argument " + String.valueOf(argumentIndex) + ": " + group.getValue()));
+                    }
+                }
+
+                if (argument instanceof DocStringArgument) {
+                    out.println(LOCATION_INDENT +  getLocationText("Argument " + String.valueOf(argumentIndex) + ": " + argument.getValue().toString()));
+                }
+
+                if (argument instanceof DataTableArgument) {
+                    Field argumentField = argument.getClass().getDeclaredField("argument");
+                    argumentField.setAccessible(true);
+                    List<List<String>> finalList = (List<List<String>>) argumentField.get(argument);
+
+                    out.println(LOCATION_INDENT +  getLocationText("Argument " + String.valueOf(argumentIndex) + ": " + Arrays.toString(finalList.toArray())));
+                }
+
+                argumentIndex += 1;
+            }
+
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
     }
 
     private String getScenarioDefinitionText(ScenarioDefinition definition) {
