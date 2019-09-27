@@ -1,5 +1,9 @@
 @web
-Feature: Selenium run test
+Feature: Selenium steps
+
+  This feature provides examples on how to use some of the most common steps for selenium. All feature files that include
+  steps for testing web pages using selenium (such as this one) must include the "@web" annotation at the beginning of the file.
+  This is necessary, since it signals the library that it should bootstrap selenium and other important components.
 
   Scenario: Finding a text anyware on the page
     Given My app is running in '${DEMO_SITE_HOST}'

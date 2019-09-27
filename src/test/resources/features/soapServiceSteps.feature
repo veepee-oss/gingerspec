@@ -3,7 +3,7 @@ Feature: communicating with a remote webservice
   This feature provides a basic example on how to execute remote methods of a webservice.
   Because this steps provide a way to interact with any webservice, besides the address
   of the WSDL, it is also necessary to know the format of the request and response messages
-  that are interchanged during the comunication (XML based messages).
+  that are interchanged during the communication (XML based messages).
 
   The library is also capable of replacing values in the requets body before sending and to
   evaluate specific values in the response body

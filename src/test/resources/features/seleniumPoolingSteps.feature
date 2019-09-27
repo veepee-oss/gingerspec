@@ -2,7 +2,6 @@
 Feature: Selenium wait with pooling
 
   Scenario: Verify that in Demo->Tbas there are 3 tabs, and in registration 3 radio buttons and 3 checkboxes
-
     Given My app is running in '${DEMO_SITE_HOST}'
     And I browse to '/index.html@p=82.html'
     Then I check every '1' seconds for at least '10' seconds until '3' elements exists with 'xpath://*[contains(@class, 'ui-tabs-anchor')]' and is 'clickable'
@@ -12,10 +11,8 @@ Feature: Selenium wait with pooling
     Then I check every '1' seconds for at least '10' seconds until '3' elements exists with 'name:checkbox_5[]' and is 'clickable'
     And I wait '1' seconds
 
-    @ignore @toocomplex
-  Scenario: Verify that a warning alert appears when clicking on the excel icon without campaigns listed and that the alert can be
-    dismissed or accepted
-
+  @ignore @toocomplex
+  Scenario: Verify that a warning alert appears when clicking on the excel icon without campaigns listed and that the alert can be dismissed or accepted
     Given My app is running in 'dummy-test.com:80'
     And I browse to '/login'
     When '1' elements exists with 'xpath://*[@id="aclusr_username"]'
