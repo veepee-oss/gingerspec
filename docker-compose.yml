@@ -3,7 +3,7 @@
 #
 # In order to use it, go to the root folder of the project and execute
 #
-# $ cd bdt-lib/
+# $ cd gingerspec/
 # $ docker-compose up -d
 #
 # All services will be available via localhost, and all will have port binding to a local port in the

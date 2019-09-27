@@ -4,6 +4,7 @@ import com.privalia.qa.cucumber.converter.ArrayListConverter;
 import com.privalia.qa.cucumber.converter.NullableStringConverter;
 import com.privalia.qa.utils.PreviousWebElements;
 import com.privalia.qa.utils.ThreadProperty;
+import cucumber.api.PendingException;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
@@ -94,7 +95,7 @@ public class SeleniumGSpec extends BaseGSpec {
 
 
     /**
-     * Checks that a web elements exists in the page and is of the type specified. This method is similar to {@link SeleniumGSpec#assertSeleniumNElementExists(Integer, String, String)}
+     * Checks that a web elements exists in the page and is of the type specified. This method is similar to {@link SeleniumGSpec#assertSeleniumNElementExists(String, Integer, String, String)}
      * but implements a pooling mechanism with a maximum pooling time instead of a static wait
      * @param poolingInterval   Time between consecutive condition evaluations
      * @param poolMaxTime       Maximum time to wait for the condition to be true
@@ -265,8 +266,9 @@ public class SeleniumGSpec extends BaseGSpec {
     /**
      * Checks if {@code expectedCount} webelements are found, with a location {@code method}.
      *
-     * @param expectedCount             the expected count
-     * @param method                    the method
+     * @param atLeast                   asserts that the amount of elements if greater or equal to expectedCount. If null, asserts the amount of element is equal to expectedCount
+     * @param expectedCount             the expected count of elements to find
+     * @param method                    method to locate the elements (id, class, css, xpath, etc)
      * @param element                   the element
      * @throws ClassNotFoundException   the class not found exception
      * @throws NoSuchFieldException     the no such field exception
@@ -274,9 +276,18 @@ public class SeleniumGSpec extends BaseGSpec {
      * @throws IllegalArgumentException the illegal argument exception
      * @throws IllegalAccessException   the illegal access exception
      */
-    @Then("^'(\\d+?)' elements? exists? with '([^:]*?):(.+?)'$")
-    public void assertSeleniumNElementExists(Integer expectedCount, String method, String element) throws ClassNotFoundException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
-        List<WebElement> wel = commonspec.locateElement(method, element, expectedCount);
+    @Then("^(at least )?'(\\d+?)' elements? exists? with '([^:]*?):(.+?)'$")
+    public void assertSeleniumNElementExists(String atLeast, Integer expectedCount, String method, String element) throws ClassNotFoundException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+
+        List<WebElement> wel;
+
+        if (atLeast != null) {
+            wel = commonspec.locateElement(method, element, -1);
+            assertThat(wel.size()).as("Element count doesnt match").isGreaterThanOrEqualTo(expectedCount);
+        } else {
+            wel = commonspec.locateElement(method, element, expectedCount);
+        }
+
         PreviousWebElements pwel = new PreviousWebElements(wel);
         commonspec.setPreviousWebElements(pwel);
     }
@@ -666,5 +677,21 @@ public class SeleniumGSpec extends BaseGSpec {
             }
         }
 
+    }
+
+    /**
+     * Saves the given property of the specified webelement (referenced by its index) in the specified variable.
+     *
+     * @param propertyName      Name of the property
+     * @param index             Index of the webelement in the list
+     * @param variable          Variable where to save the result
+     * @throws Throwable        Throwable
+     */
+    @Then("^I save the value of the property '(.+?)' of the element in index '(.+?)' in variable '(.+?)'$")
+    public void iSaveTheValueOfThePropertyHrefOfTheElementInIndexInVariableVAR(String propertyName, int index, String variable) throws Throwable {
+        List<WebElement> wel = commonspec.getPreviousWebElements().getPreviousWebElements();
+        String value = wel.get(index).getAttribute(propertyName);
+        assertThat(value).as("The web element dont have the property '" + propertyName + "'").isNotNull();
+        ThreadProperty.set(variable, value);
     }
 }
