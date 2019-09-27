@@ -1,5 +1,4 @@
 @rest
-
 Feature: Test print comments via CLI
 
   Scenario: Testing comments via CLI

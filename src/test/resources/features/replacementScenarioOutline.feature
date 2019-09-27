@@ -7,6 +7,6 @@ Feature: Scenario outline replacements
     And I wait '#{wait.time}' seconds
 
     Examples:
-    | other |
-    | 1 |
-    | 2 |
+      | other |
+      | 1     |
+      | 2     |

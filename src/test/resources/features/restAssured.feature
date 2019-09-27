@@ -1,13 +1,12 @@
 @rest
 Feature: Rest Assured Feature
 
-  This feature was created to test the migration from the old com.ning.async-http-client to
-  the new io.rest-assured.rest-assured. The feature files and the steps will remain the same
-  and the user will still use the same syntax when creating scenarios, what changes is the
-  backend implementation.
+  This feature provides examples on how to use the steps for testing REST APIs. All feature files that make use of
+  the steps for testing REST APIs (such as this one) must include the "@rest" annotation at the beginning of the file.
+  This is necessary, since it signals the library that it should bootstrap some necessary components for testing REST APIs
 
 
-  Scenario: Some simple request
+  Scenario: How to perform a simple request, verify the HTTP code returned, and check the body and its schema
     Given I send requests to '${REST_SERVER_HOST}:3000'
     When I send a 'GET' request to '/posts'
     Then the service response status must be '200' and its response must contain the text 'body'
@@ -38,7 +37,7 @@ Feature: Rest Assured Feature
       | $.userId | not equal | 2              |
 
 
-  Scenario: URL parameters are added to the request
+  Scenario: URL parameters are added to the request (i.e /posts?userId=3)
     Given I send requests to '${REST_SERVER_HOST}:3000'
     Given I set url parameters:
       | userId | 3 |
@@ -58,7 +57,7 @@ Feature: Rest Assured Feature
 
 
   @ignore @toocomplex
-  Scenario: Setting headers using a datatable
+  Scenario: Setting headers using a datatable and verifying the returned headers
     Given I send requests to 'dummy-test.com:80'
     Given I set headers:
       | x-user  | vente_privee_es                                                  |
