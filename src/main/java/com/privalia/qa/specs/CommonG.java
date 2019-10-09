@@ -67,7 +67,7 @@ public class CommonG {
 
     private final Logger logger = LoggerFactory.getLogger(ThreadProperty.get("class"));
 
-    private RemoteWebDriver driver = null;
+    private WebDriver driver = null;
 
     private String browserName = null;
 
@@ -490,7 +490,7 @@ public class CommonG {
      *
      * @return RemoteWebDriver
      */
-    public RemoteWebDriver getDriver() {
+    public WebDriver getDriver() {
         return driver;
     }
 
@@ -499,7 +499,7 @@ public class CommonG {
      *
      * @param driver driver to be used for testing
      */
-    public void setDriver(RemoteWebDriver driver) {
+    public void setDriver(WebDriver driver) {
         this.driver = driver;
     }
 
