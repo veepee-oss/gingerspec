@@ -21,11 +21,15 @@ import com.ning.http.client.AsyncHttpClientConfig;
 import com.privalia.qa.utils.ThreadProperty;
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
+import io.github.bonigarcia.wdm.WebDriverManager;
 import io.restassured.http.ContentType;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.MutableCapabilities;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.remote.CommandInfo;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -67,6 +71,8 @@ public class HookGSpec extends BaseGSpec {
 
     public static final int SCRIPT_TIMEOUT = 30;
 
+    protected WebDriver driver;
+
     /**
      * Default constructor.
      *
@@ -99,10 +105,13 @@ public class HookGSpec extends BaseGSpec {
      */
     @Before(order = ORDER_10, value = {"@mobile or @web"})
     public void seleniumSetup() throws MalformedURLException {
+
         String grid = System.getProperty("SELENIUM_GRID");
+
         if (grid == null) {
             fail("Selenium grid not available");
         }
+
         String b = ThreadProperty.get("browser");
 
         if ("".equals(b)) {
@@ -114,7 +123,6 @@ public class HookGSpec extends BaseGSpec {
         commonspec.setBrowserName(browser);
         commonspec.getLogger().debug("Setting up selenium for {}", browser);
 
-        //DesiredCapabilities capabilities = null;
         MutableCapabilities capabilities = null;
 
 
@@ -123,16 +131,34 @@ public class HookGSpec extends BaseGSpec {
                 ChromeOptions chromeOptions = new ChromeOptions();
                 chromeOptions.addArguments("--no-sandbox");
                 chromeOptions.addArguments("--ignore-certificate-errors");
-                //capabilities = DesiredCapabilities.chrome();
                 capabilities = new ChromeOptions();
                 capabilities.setCapability(ChromeOptions.CAPABILITY, chromeOptions);
+
+                if (grid.matches("local")) {
+                    System.setProperty("webdriver.chrome.silentOutput", "true"); //removes logging messages
+                    WebDriverManager.chromedriver().setup();
+                    driver = new ChromeDriver(chromeOptions);
+                }
+
                 break;
             case "firefox":
-                //capabilities = DesiredCapabilities.firefox();
                 capabilities = new FirefoxOptions();
+
+                if (grid.matches("local")) {
+                    System.setProperty(FirefoxDriver.SystemProperty.DRIVER_USE_MARIONETTE, "true"); //removes logging messages
+                    System.setProperty(FirefoxDriver.SystemProperty.BROWSER_LOGFILE, "/dev/null");  //removes logging messages
+                    WebDriverManager.firefoxdriver().setup();
+                    driver = new FirefoxDriver(capabilities);
+                }
+
                 break;
             case "phantomjs":
                 capabilities = DesiredCapabilities.phantomjs();
+
+                if (grid.matches("local")) {
+                    //TODO add support for local phantonjs driver
+                }
+
                 break;
             case "iphone":
             case "safari":
@@ -153,13 +179,20 @@ public class HookGSpec extends BaseGSpec {
                 throw new WebDriverException("Unknown browser: " + browser);
         }
 
-        //capabilities.setVersion(version);
+        if (grid.matches("local")) {
 
-        grid = "http://" + grid + "/wd/hub";
-        HttpClient.Factory factory = new ApacheHttpClient.Factory(new HttpClientFactory(60000, 60000));
-        HttpCommandExecutor executor = new HttpCommandExecutor(new HashMap<String, CommandInfo>(), new URL(grid), factory);
-        executor.setLocalLogs(null);
-        commonspec.setDriver(new RemoteWebDriver(executor, capabilities));
+            commonspec.setDriver(driver);
+
+        } else {
+
+            grid = "http://" + grid + "/wd/hub";
+            HttpClient.Factory factory = new ApacheHttpClient.Factory(new HttpClientFactory(60000, 60000));
+            HttpCommandExecutor executor = new HttpCommandExecutor(new HashMap<String, CommandInfo>(), new URL(grid), factory);
+            executor.setLocalLogs(null);
+            commonspec.setDriver(new RemoteWebDriver(executor, capabilities));
+
+        }
+
         commonspec.getDriver().manage().timeouts().pageLoadTimeout(PAGE_LOAD_TIMEOUT, TimeUnit.SECONDS);
         commonspec.getDriver().manage().timeouts().implicitlyWait(IMPLICITLY_WAIT, TimeUnit.SECONDS);
         commonspec.getDriver().manage().timeouts().setScriptTimeout(SCRIPT_TIMEOUT, TimeUnit.SECONDS);

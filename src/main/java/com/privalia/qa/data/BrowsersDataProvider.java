@@ -137,6 +137,7 @@ public final class BrowsersDataProvider {
         LOGGER.debug("Trying to get a list of Selenium-available browsers");
 
         String grid = System.getProperty("SELENIUM_GRID");
+        String node = System.getProperty("SELENIUM_NODE");
 
         if (grid != null) {
             grid = "http://" + grid + "/grid/console";
@@ -188,15 +189,11 @@ public final class BrowsersDataProvider {
                     }
                 }
             }
-        } else {
+        } else if (node != null) {
 
-            String node = System.getProperty("SELENIUM_NODE");
-
-            if (node == null) {
-                LOGGER.warn("No Selenium Grid or Node address specified!. Searching for node in localhost:4444....");
-                node = "localhost:4444";
-            }
-
+            /**
+             * Verify that the selenium standalone server actually exists and is online by trying a connection
+             */
             Document doc;
             try {
                 doc = Jsoup.connect("http://" + node + "/wd/hub/static/resource/hub.html").timeout(DEFAULT_TIMEOUT).get();
@@ -207,15 +204,15 @@ public final class BrowsersDataProvider {
 
             /**
              * the process for connecting to a standalone node is the same as with the selenium grid, so SELENIUM_GRID is
-             * set to the value of the address of the node (the SELENIUM_GRID variable is later used in HoolGSpec class to
+             * set to the value of the address of the node (the SELENIUM_GRID variable is later used in {@link com.privalia.qa.specs.HookGSpec} class to
              * create the connection)
              */
             System.setProperty("SELENIUM_GRID", node);
 
 
             /**
-             * Is necessary to set the browser type the node supports, since this informacion is later used in the
-             * HoolGSpec class to create the correct capabilities object
+             * Is necessary to set the browser type the node supports, since this information is later used in the
+             * {@link com.privalia.qa.specs.HookGSpec} class to create the correct capabilities object
              */
             String nodeType = System.getProperty("SELENIUM_NODE_TYPE");
 
@@ -226,7 +223,27 @@ public final class BrowsersDataProvider {
                 response.add(nodeType + "_1.0");
             }
 
+
+        } else {
+
+            /**
+             * If neither SELENIUM_GRID nor SELENIUM_NODE variables are found, the system will automatically try to use a
+             * local driver. For this, SELENIUM_GRID is set to "local" and if no browser found, chrome is used as default.
+             * Check {@link com.privalia.qa.specs.HookGSpec} for more info
+             */
+
+            LOGGER.warn("No Selenium Grid or Node address specified!. Trying to use local webdriver....");
+            System.setProperty("SELENIUM_GRID", "local");
+            String browser = System.getProperty("browser");
+            if (browser == null) {
+                LOGGER.warn("No browser specified, using chrome as default");
+                response.add("chrome_1.0");
+            } else {
+                response.add(browser + "1.0");
+            }
+
         }
+
         // Sort response
         Collections.sort(response);
         return response;

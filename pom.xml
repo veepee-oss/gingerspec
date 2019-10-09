@@ -111,7 +111,7 @@
         <org.jacoco.core.version>0.7.5.201505241946</org.jacoco.core.version>
         <aspectjweaver.version>1.8.8</aspectjweaver.version>
         <cassandra-driver-core.version>3.2.0</cassandra-driver-core.version>
-        <guava.version>21.0</guava.version>
+        <guava.version>23.0</guava.version>
         <lz4.version>1.2.0</lz4.version>
         <httpclient.version>4.5.1</httpclient.version>
         <mongo-java-driver.version>2.12.3</mongo-java-driver.version>
@@ -618,6 +618,11 @@
             <groupId>net.bytebuddy</groupId>
             <artifactId>byte-buddy</artifactId>
             <version>1.9.16</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.bonigarcia</groupId>
+            <artifactId>webdrivermanager</artifactId>
+            <version>3.6.1</version>
         </dependency>
     </dependencies>
 </project>

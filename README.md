@@ -103,6 +103,12 @@ Instead of using a selenium grid, you can directly conect to a standalone node b
 
 ` mvn verify -Dit.test=com.privalia.myproject.mypackage.CucumberSeleniumIT -DSELENIUM_NODE=127.0.0.1:4444 -DSELENIUM_NODE_TYPE=chrome`
 
+_**Run Selenium features using local browser**_
+
+If neither selenium grid nor a standalone selenium node server is specified, gingerspec will automatically download the correct driver to run the test
+
+` mvn verify -Dit.test=com.privalia.myproject.mypackage.CucumberSeleniumIT` (you can use -Dbrowser=<browser> to specify the browser type. Currently supports chrome/firefox )
+
 _**-Dmaven.failsafe.debug to debug with maven and IDE.**_
 
 ` mvn verify -DSECS=AGENT_LIST=1,2 -Dit.test=com.privalia.qa.ATests.LoopTagAspectIT -Dmaven.failsafe.debug`
