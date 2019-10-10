@@ -239,7 +239,7 @@ public final class BrowsersDataProvider {
                 LOGGER.warn("No browser specified, using chrome as default");
                 response.add("chrome_1.0");
             } else {
-                response.add(browser + "1.0");
+                response.add(browser + "_1.0");
             }
 
         }
