@@ -31,6 +31,7 @@ before_deploy:
     - mvn help:evaluate -N -Dexpression=project.version|grep -v '\['
     - export project_version=$(mvn help:evaluate -N -Dexpression=project.version|grep -v '\[')
     - mvn clean install -Dmaven.test.skip=true
+    - export GPG_TTY=$(tty)
 
 jobs:
   include:
