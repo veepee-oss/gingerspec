@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.0.4
+
+* Improved documentation on some of the feature files
+
+* Added new functionality to some of the selenium steps
+
+* Added support for using the local browser when running selenium tests. If neither SELENIUM_GRID nor SELENIUM_NODE variables are found, gingerspec will try to download the appropiate driver for the selected browser and operating system (chrome is selected by default if no -Dbrowser variable found)
+
 ## 2.0.3
 
 * GivenGSpec, WhenGSpec, ThenGSpec classes were removed and steps definitions were organized in a more logical way (This change may have some breaking changes to clients that still rely on the aforementioned classes)
