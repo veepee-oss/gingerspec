@@ -8,10 +8,7 @@ import cucumber.api.PendingException;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
-import org.openqa.selenium.Alert;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.Select;
 
@@ -693,5 +690,34 @@ public class SeleniumGSpec extends BaseGSpec {
         String value = wel.get(index).getAttribute(propertyName);
         assertThat(value).as("The web element dont have the property '" + propertyName + "'").isNotNull();
         ThreadProperty.set(variable, value);
+    }
+
+
+    /**
+     * Executes a JavaScript function in the current driver. This could be useful for getting specific information on the
+     * web page or forcing specific actions, like clicking on an element that is being blocked by a popup
+     *
+     * @param script            Script to execute (i.e alert("This is an alert message"))
+     * @param index             If used, the index of the previously found web element on which to execute the function
+     * @param enVar             if used, variable where to store the result of the execution of the script
+     * @throws Throwable        Throwable
+     */
+    @Then("^I execute '(.+?)' as javascript( on the element on index '(.+?)')?( and save the result in the environment variable '(.+?)')?$")
+    public void iExecuteTheScriptScriptOnTheElmentOnIndex(String script, String index, String enVar) throws Throwable {
+
+        JavascriptExecutor executor = (JavascriptExecutor) this.commonspec.getDriver();
+        Object output;
+
+        if (index != null) {
+            List<WebElement> wel = commonspec.getPreviousWebElements().getPreviousWebElements();
+            output = executor.executeScript(script, wel.get(Integer.parseInt(index)));
+        } else {
+            output = executor.executeScript(script);
+        }
+
+        if (enVar != null) {
+            assertThat(output).as("The script did not return any value!").isNotNull();
+            ThreadProperty.set(enVar, output.toString());
+        }
     }
 }

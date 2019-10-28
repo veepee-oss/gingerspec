@@ -140,3 +140,26 @@ Feature: Selenium steps
     And I wait '1' seconds
     And '3' elements exists with 'css:input[name='radio_4[]']'
     Then the element in index '1' has 'radio_4[]' in property 'name'
+
+
+  Scenario: Creating an alert using Javascript
+    Given My app is running in '${DEMO_SITE_HOST}'
+    When I browse to '/'
+    And I wait '1' seconds
+    And I execute 'alert("This is an alert!")' as javascript
+    And I wait '3' seconds
+    And I check every '1' seconds for at least '5' seconds until an alert appears
+    And I accept the alert
+
+  Scenario: Executing a javascript to click on an element and to get info of the page
+    Given My app is running in '${DEMO_SITE_HOST}'
+    When I browse to '/'
+    And I wait '1' seconds
+    And '1' elements exists with 'xpath://*[@id="menu-item-158"]/a'
+    And I execute 'arguments[0].click();' as javascript on the element on index '0'
+    And I wait '3' seconds
+    And I execute 'return document.URL;' as javascript and save the result in the environment variable 'PAGE'
+    And '!{PAGE}' contains 'index.html'
+
+
+
