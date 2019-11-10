@@ -16,7 +16,6 @@
 
 package com.privalia.qa.data;
 
-import com.google.common.collect.Lists;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -131,7 +130,7 @@ public final class BrowsersDataProvider {
      * @param filter browser selected for test execution
      * @return browsers list
      */
-    private static List<String> gridBrowsers(Map<String, String> filter) {
+    private static List<String> gridBrowsers(Map<String, String> filter) throws IOException {
 
         ArrayList<String> response = new ArrayList<String>();
         LOGGER.debug("Trying to get a list of Selenium-available browsers");
@@ -167,10 +166,10 @@ public final class BrowsersDataProvider {
                                 filterCheck = filterCheck & mFilter.find();
                             }
                             if (filterCheck) {
-                                Pattern pat = Pattern.compile("browserName=(.*?),.*?(version=(.*?)[,|}])");
+                                Pattern pat = Pattern.compile("browserName=(.*?),.*?(version|platformVersion)=(.*?),.*?platform=(.*?)[,|}]");
                                 Matcher m = pat.matcher(browserDetails.attr("title"));
                                 while (m.find()) {
-                                    response.add(m.group(1) + "_" + m.group(3));
+                                    response.add(m.group(1) + "_" + m.group(3) + "_" + m.group(4));
                                 }
                             }
                         } else {
