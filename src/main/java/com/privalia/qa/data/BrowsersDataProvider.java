@@ -169,7 +169,9 @@ public final class BrowsersDataProvider {
                                 String[] nodedetails =  browserDetails.attr("title").replace("{", "").replace("}", "").split(",");
                                 Map<String, String> nodeDetailsMap = new HashMap<String, String>();
                                 for (String detail: nodedetails) {
-                                    nodeDetailsMap.put(detail.split("=")[0].trim(), detail.split("=")[1].trim());
+                                    try {
+                                        nodeDetailsMap.put(detail.split("=")[0].trim(), detail.split("=")[1].trim());
+                                    } catch (Exception e) { }
                                 }
 
                                 response.add((nodeDetailsMap.get("browserName") == null ? "mobile" : nodeDetailsMap.get("browserName")) + "_" +
