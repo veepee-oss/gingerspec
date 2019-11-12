@@ -21,10 +21,9 @@ import com.ning.http.client.AsyncHttpClientConfig;
 import com.privalia.qa.utils.ThreadProperty;
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
-import io.appium.java_client.AppiumCommandInfo;
+import io.appium.java_client.MobileElement;
 import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.ios.IOSDriver;
-import io.appium.java_client.remote.AppiumCommandExecutor;
+import io.appium.java_client.remote.MobileBrowserType;
 import io.appium.java_client.remote.MobileCapabilityType;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import io.restassured.http.ContentType;
@@ -43,17 +42,15 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.http.HttpClient;
 import org.openqa.selenium.remote.internal.ApacheHttpClient;
 import org.openqa.selenium.remote.internal.HttpClientFactory;
-import org.openqa.selenium.safari.SafariDriver;
-
-import java.util.logging.Level;
-import java.util.logging.LogManager;
-import java.util.logging.Logger;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
 import static io.restassured.RestAssured.given;
 import static org.testng.Assert.fail;
@@ -168,6 +165,7 @@ public class HookGSpec extends BaseGSpec {
                     capabilities.setCapability("automationName", "UiAutomator2");
                     capabilities.setCapability("deviceName", "Android Emulator");
                     capabilities.setCapability("browserName", "Chrome");
+                    capabilities.setCapability(MobileCapabilityType.BROWSER_NAME, MobileBrowserType.CHROME);
                     commonspec.setDriver(new RemoteWebDriver(new URL(grid), capabilities));
 
                 } else if (platform.toLowerCase().matches("ios")) {
@@ -198,6 +196,34 @@ public class HookGSpec extends BaseGSpec {
                 commonspec.setDriver(new RemoteWebDriver(executor, capabilities));
                 this.configureWebDriver(capabilities);
                 break;
+
+            case "mobile":
+
+                if (platform.toLowerCase().matches("android")) {
+                    capabilities = new DesiredCapabilities();
+                    capabilities.setCapability("platformName", "Android");
+                    capabilities.setCapability("automationName", "UiAutomator2");
+                    capabilities.setCapability("deviceName", "Android Emulator");
+                    capabilities.setCapability("appPackage", "com.android.calculator2");
+                    capabilities.setCapability("appActivity", "com.android.calculator2.Calculator");
+                    //commonspec.setDriver(new AndroidDriver(new URL(grid), capabilities));
+
+                    AndroidDriver appDriver = new AndroidDriver(new URL(grid), capabilities);
+
+                    MobileElement el1 = (MobileElement) appDriver.findElementById("com.android.calculator2:id/digit_2");
+                    el1.click();
+
+                    try {
+                        Thread.sleep(5000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+
+                }
+
+                break;
+
 
             default:
                 commonspec.getLogger().error("Unknown browser: " + browser);

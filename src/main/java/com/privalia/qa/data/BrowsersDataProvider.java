@@ -166,11 +166,15 @@ public final class BrowsersDataProvider {
                                 filterCheck = filterCheck & mFilter.find();
                             }
                             if (filterCheck) {
-                                Pattern pat = Pattern.compile("browserName=(.*?),.*?(version|platformVersion)=(.*?),.*?platform=(.*?)[,|}]");
-                                Matcher m = pat.matcher(browserDetails.attr("title"));
-                                while (m.find()) {
-                                    response.add(m.group(1) + "_" + m.group(3) + "_" + m.group(4));
+                                String[] nodedetails =  browserDetails.attr("title").replace("{", "").replace("}", "").split(",");
+                                Map<String, String> nodeDetailsMap = new HashMap<String, String>();
+                                for (String detail: nodedetails) {
+                                    nodeDetailsMap.put(detail.split("=")[0].trim(), detail.split("=")[1].trim());
                                 }
+
+                                response.add((nodeDetailsMap.get("browserName") == null ? "mobile" : nodeDetailsMap.get("browserName")) + "_" +
+                                        (nodeDetailsMap.get("version") == null ? nodeDetailsMap.get("platformVersion") : nodeDetailsMap.get("version")) + "_" +
+                                        (nodeDetailsMap.get("platform") == null ? nodeDetailsMap.get("platformName") : nodeDetailsMap.get("platform")));
                             }
                         } else {
                             String version = busyBrowserList.get(iBusy).parent().text();
