@@ -115,7 +115,7 @@
         <lz4.version>1.2.0</lz4.version>
         <httpclient.version>4.5.1</httpclient.version>
         <mongo-java-driver.version>2.12.3</mongo-java-driver.version>
-        <selenium-java.version>3.9.1</selenium-java.version>
+        <selenium-java.version>3.141.59</selenium-java.version>
         <jsoup.version>1.7.3</jsoup.version>
         <json.version>20140107</json.version>
 

@@ -40,8 +40,8 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.HttpCommandExecutor;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.http.HttpClient;
-import org.openqa.selenium.remote.internal.ApacheHttpClient;
-import org.openqa.selenium.remote.internal.HttpClientFactory;
+//import org.openqa.selenium.remote.internal.ApacheHttpClient;
+//import org.openqa.selenium.remote.internal.HttpClientFactory;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -149,9 +149,9 @@ public class HookGSpec extends BaseGSpec {
         MutableCapabilities capabilities = null;
 
         grid = "http://" + grid + "/wd/hub";
-        HttpClient.Factory factory = new ApacheHttpClient.Factory(new HttpClientFactory(60000, 60000));
-        HttpCommandExecutor executor = new HttpCommandExecutor(new HashMap<String, CommandInfo>(), new URL(grid), factory);
-        executor.setLocalLogs(null);
+//        HttpClient.Factory factory = new ApacheHttpClient.Factory(new HttpClientFactory(60000, 60000));
+//        HttpCommandExecutor executor = new HttpCommandExecutor(new HashMap<String, CommandInfo>(), new URL(grid), factory);
+//        executor.setLocalLogs(null);
 
         switch (browser.toLowerCase()) {
             case "chrome":
@@ -179,7 +179,7 @@ public class HookGSpec extends BaseGSpec {
                     chromeOptions.addArguments("--ignore-certificate-errors");
                     capabilities = new ChromeOptions();
                     capabilities.setCapability(ChromeOptions.CAPABILITY, chromeOptions);
-                    commonspec.setDriver(new RemoteWebDriver(executor, capabilities));
+                    commonspec.setDriver(new RemoteWebDriver(new URL(grid), capabilities));
                     this.configureWebDriver(capabilities);
                 }
 
@@ -187,13 +187,13 @@ public class HookGSpec extends BaseGSpec {
 
             case "firefox":
                 capabilities = new FirefoxOptions();
-                commonspec.setDriver(new RemoteWebDriver(executor, capabilities));
+                commonspec.setDriver(new RemoteWebDriver(new URL(grid), capabilities));
                 this.configureWebDriver(capabilities);
                 break;
 
             case "phantomjs":
                 capabilities = DesiredCapabilities.phantomjs();
-                commonspec.setDriver(new RemoteWebDriver(executor, capabilities));
+                commonspec.setDriver(new RemoteWebDriver(new URL(grid), capabilities));
                 this.configureWebDriver(capabilities);
                 break;
 
