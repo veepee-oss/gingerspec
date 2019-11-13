@@ -21,6 +21,7 @@ import com.ning.http.client.AsyncHttpClientConfig;
 import com.privalia.qa.utils.ThreadProperty;
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
+import io.appium.java_client.MobileDriver;
 import io.appium.java_client.MobileElement;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.remote.MobileBrowserType;
@@ -35,18 +36,12 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
-import org.openqa.selenium.remote.CommandInfo;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.remote.HttpCommandExecutor;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import org.openqa.selenium.remote.http.HttpClient;
-//import org.openqa.selenium.remote.internal.ApacheHttpClient;
-//import org.openqa.selenium.remote.internal.HttpClientFactory;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
@@ -208,7 +203,7 @@ public class HookGSpec extends BaseGSpec {
                     capabilities.setCapability("appActivity", "com.android.calculator2.Calculator");
                     //commonspec.setDriver(new AndroidDriver(new URL(grid), capabilities));
 
-                    AndroidDriver appDriver = new AndroidDriver(new URL(grid), capabilities);
+                    MobileDriver appDriver = new AndroidDriver(new URL(grid), capabilities);
 
                     MobileElement el1 = (MobileElement) appDriver.findElementById("com.android.calculator2:id/digit_2");
                     el1.click();

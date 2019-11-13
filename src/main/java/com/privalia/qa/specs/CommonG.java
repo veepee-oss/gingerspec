@@ -16,6 +16,7 @@ import com.ning.http.client.Response;
 import com.ning.http.client.cookie.Cookie;
 import com.privalia.qa.conditions.Conditions;
 import com.privalia.qa.utils.*;
+import io.appium.java_client.MobileDriver;
 import io.cucumber.datatable.DataTable;
 import io.restassured.specification.RequestSpecification;
 import org.apache.commons.collections.IteratorUtils;
@@ -68,6 +69,8 @@ public class CommonG {
     private final Logger logger = LoggerFactory.getLogger(ThreadProperty.get("class"));
 
     private WebDriver driver = null;
+
+    private MobileDriver mobileDriver = null;
 
     private String browserName = null;
 
@@ -502,6 +505,18 @@ public class CommonG {
     public void setDriver(WebDriver driver) {
         this.driver = driver;
     }
+
+    /**
+     * Get the mobile driver
+     * @return
+     */
+    public MobileDriver getMobileDriver() { return mobileDriver; }
+
+    /**
+     * Set the mobile driver
+     * @param mobileDriver
+     */
+    public void setMobileDriver(MobileDriver mobileDriver) { this.mobileDriver = mobileDriver; }
 
     /**
      * Get the browser name.

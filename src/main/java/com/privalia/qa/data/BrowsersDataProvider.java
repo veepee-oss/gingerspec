@@ -179,6 +179,7 @@ public final class BrowsersDataProvider {
                                         (nodeDetailsMap.get("platform") == null ? nodeDetailsMap.get("platformName") : nodeDetailsMap.get("platform")));
                             }
                         } else {
+                            //TODO not sure under what circunstances this path is taken
                             String version = busyBrowserList.get(iBusy).parent().text();
                             String browser = busyBrowserList.get(iBusy).text();
                             version = version.substring(2);
@@ -188,7 +189,7 @@ public final class BrowsersDataProvider {
                                 browser = browserSrc.substring(browserSrc.lastIndexOf('/') + 1, browserSrc.length()
                                         - DEFAULT_LESS_LENGTH);
                             }
-                            response.add(browser + "_" + version);
+                            response.add(browser + "_" + version + "_local");
                             iBusy++;
                         }
                     }
@@ -223,9 +224,9 @@ public final class BrowsersDataProvider {
 
             if (nodeType == null) {
                 LOGGER.warn("No Selenium Node browser type specified!. Using 'chrome' as default....");
-                response.add("chrome_1.0");
+                response.add("chrome_1.0_local");
             } else {
-                response.add(nodeType + "_1.0");
+                response.add(nodeType + "_1.0_local");
             }
 
 
@@ -242,9 +243,9 @@ public final class BrowsersDataProvider {
             String browser = System.getProperty("browser");
             if (browser == null) {
                 LOGGER.warn("No browser specified, using chrome as default");
-                response.add("chrome_1.0");
+                response.add("chrome_1.0_local");
             } else {
-                response.add(browser + "_1.0");
+                response.add(browser + "_1.0_local");
             }
 
         }
