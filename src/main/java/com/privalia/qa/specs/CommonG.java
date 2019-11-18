@@ -17,6 +17,7 @@ import com.ning.http.client.cookie.Cookie;
 import com.privalia.qa.conditions.Conditions;
 import com.privalia.qa.utils.*;
 import io.appium.java_client.MobileDriver;
+import io.appium.java_client.MobileElement;
 import io.cucumber.datatable.DataTable;
 import io.restassured.specification.RequestSpecification;
 import org.apache.commons.collections.IteratorUtils;
@@ -75,6 +76,8 @@ public class CommonG {
     private String browserName = null;
 
     private PreviousWebElements previousWebElements = null;
+
+    private PreviousMobileElements previousMobileElements = null;
 
     private String parentWindow = "";
 
@@ -188,7 +191,8 @@ public class CommonG {
 
     /**
      * Returns the last selected record
-     * @return  record in the set
+     *
+     * @return record in the set
      */
     public Map<String, String> getLastFileParseRecord() {
         return lastFileParseRecord;
@@ -196,7 +200,8 @@ public class CommonG {
 
     /**
      * Sets the record for the last operation
-     * @param lastFileParseRecord   record in the set
+     *
+     * @param lastFileParseRecord record in the set
      */
     public void setLastFileParseRecord(Map<String, String> lastFileParseRecord) {
         this.lastFileParseRecord = lastFileParseRecord;
@@ -204,6 +209,7 @@ public class CommonG {
 
     /**
      * Returns the las response from a remote method execution in the webservice as an XML String
+     *
      * @return XML String
      */
     public String getLastSoapResponse() {
@@ -212,7 +218,8 @@ public class CommonG {
 
     /**
      * Sets the response of the execution of a remote method in a webservice as an XML String
-     * @param lastSoapResponse  SOAP response of last operation
+     *
+     * @param lastSoapResponse SOAP response of last operation
      */
     public void setLastSoapResponse(String lastSoapResponse) {
         this.lastSoapResponse = lastSoapResponse;
@@ -221,7 +228,8 @@ public class CommonG {
     /**
      * Returns the records resulted from the last operation when
      * decoding/parsing files
-     * @return     records from last operation
+     *
+     * @return records from last operation
      */
     public List<Map<String, String>> getLastFileParseResult() {
         return lastFileParseResult;
@@ -229,7 +237,8 @@ public class CommonG {
 
     /**
      * Stores the result of an operation when decoding/parsing files
-     * @param lastFileParseResult   records as result of last operation
+     *
+     * @param lastFileParseResult records as result of last operation
      */
     public void setLastFileParseResult(List<Map<String, String>> lastFileParseResult) {
         this.lastFileParseResult = lastFileParseResult;
@@ -237,7 +246,8 @@ public class CommonG {
 
     /**
      * Set the values of the cookies used when performing rest requests
-     * @return  get the cookies returned from last operation
+     *
+     * @return get the cookies returned from last operation
      */
     public Map<String, String> getRestCookies() {
         return restCookies;
@@ -245,7 +255,8 @@ public class CommonG {
 
     /**
      * Returns the values of the cookies used in the rest requests
-     * @param restCookies   Set REST cookies from last operation
+     *
+     * @param restCookies Set REST cookies from last operation
      */
     public void setRestCookies(Map<String, String> restCookies) {
         this.restCookies = restCookies;
@@ -253,7 +264,8 @@ public class CommonG {
 
     /**
      * Get the previos Rest response (restassured)
-     * @return  Rest response
+     *
+     * @return Rest response
      */
     public io.restassured.response.Response getRestResponse() {
         return RestResponse;
@@ -261,7 +273,8 @@ public class CommonG {
 
     /**
      * Sets the Rest response (restassured)
-     * @param restResponse  Rest response
+     *
+     * @param restResponse Rest response
      */
     public void setRestResponse(io.restassured.response.Response restResponse) {
         RestResponse = restResponse;
@@ -269,7 +282,8 @@ public class CommonG {
 
     /**
      * Returns the Rest Request object (restassured)
-     * @return  Rest Request object (restassured)
+     *
+     * @return Rest Request object (restassured)
      */
     public RequestSpecification getRestRequest() {
         return this.RestRequest;
@@ -285,7 +299,8 @@ public class CommonG {
 
     /**
      * Get the SQL result from the last step
-     * @return  SQL result
+     *
+     * @return SQL result
      */
     public List<List<String>> getPreviousSqlResult() {
         return previousSqlResult;
@@ -293,6 +308,7 @@ public class CommonG {
 
     /**
      * Sets the result of the SQL sentence
+     *
      * @param previousSqlResult SQL result
      */
     public void setPreviousSqlResult(List<List<String>> previousSqlResult) {
@@ -311,7 +327,7 @@ public class CommonG {
     /**
      * Set the remote connection.
      *
-     * @param remoteSSHConnection   remoteSSHConnection connection object
+     * @param remoteSSHConnection remoteSSHConnection connection object
      */
     public void setRemoteSSHConnection(RemoteSSHConnection remoteSSHConnection) {
         this.remoteSSHConnection = remoteSSHConnection;
@@ -475,7 +491,7 @@ public class CommonG {
      *
      * @return FileParserUtils
      */
-    public  FileParserUtils getFileParserUtil() {
+    public FileParserUtils getFileParserUtil() {
         return FileParserUtil.INSTANCE.getFileParserUtils();
     }
 
@@ -508,15 +524,21 @@ public class CommonG {
 
     /**
      * Get the mobile driver
-     * @return
+     *
+     * @return  mobileDriver
      */
-    public MobileDriver getMobileDriver() { return mobileDriver; }
+    public MobileDriver getMobileDriver() {
+        return mobileDriver;
+    }
 
     /**
      * Set the mobile driver
-     * @param mobileDriver
+     *
+     * @param mobileDriver The mobileDriver
      */
-    public void setMobileDriver(MobileDriver mobileDriver) { this.mobileDriver = mobileDriver; }
+    public void setMobileDriver(MobileDriver mobileDriver) {
+        this.mobileDriver = mobileDriver;
+    }
 
     /**
      * Get the browser name.
@@ -540,15 +562,15 @@ public class CommonG {
      * Looks for webelements inside a selenium context. This search will be made
      * by id, name and xpath expression matching an {@code locator} value
      *
-     * @param method class of element to be searched
-     * @param element webElement searched in selenium context
+     * @param method        class of element to be searched
+     * @param element       webElement searched in selenium context
      * @param expectedCount integer. Expected number of elements.
      * @return List(WebElement)
-     * @throws IllegalAccessException exception
+     * @throws IllegalAccessException   exception
      * @throws IllegalArgumentException exception
-     * @throws SecurityException exception
-     * @throws NoSuchFieldException exception
-     * @throws ClassNotFoundException exception
+     * @throws SecurityException        exception
+     * @throws NoSuchFieldException     exception
+     * @throws ClassNotFoundException   exception
      */
     public List<WebElement> locateElement(String method, String element,
                                           Integer expectedCount) throws ClassNotFoundException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
@@ -587,13 +609,13 @@ public class CommonG {
      * maximum time (poolMaxTime) in which the condition is checked in intervals (poolingInterval).
      * The method also verify if the required elements are of the type specified.
      *
-     * @param poolingInterval   Time between consecutive condition evaluations
-     * @param poolMaxTime       Maximum time to wait for the condition to be true
-     * @param method            class of element to be searched
-     * @param element           webElement searched in selenium context
-     * @param expectedCount     integer. Expected number of elements.
-     * @param type              The expected style of the element: visible, clickable, present, hidden
-     * @return                  List(WebElement)
+     * @param poolingInterval Time between consecutive condition evaluations
+     * @param poolMaxTime     Maximum time to wait for the condition to be true
+     * @param method          class of element to be searched
+     * @param element         webElement searched in selenium context
+     * @param expectedCount   integer. Expected number of elements.
+     * @param type            The expected style of the element: visible, clickable, present, hidden
+     * @return List(WebElement)
      */
     public List<WebElement> locateElementWithPooling(int poolingInterval, int poolMaxTime, String method, String element,
                                                      Integer expectedCount, String type) {
@@ -635,9 +657,10 @@ public class CommonG {
 
     /**
      * Locates an element within a document given a method and an element reference
-     * @param method    class of element to be searched (id, name, class, xpath, css)
-     * @param element   webElement searched in selenium context
-     * @return          a By which locates elements by the method specified
+     *
+     * @param method  class of element to be searched (id, name, class, xpath, css)
+     * @param element webElement searched in selenium context
+     * @return a By which locates elements by the method specified
      */
     private By getByType(String method, String element) {
         if ("id".equals(method)) {
@@ -659,9 +682,10 @@ public class CommonG {
     /**
      * Similar to {@link CommonG#locateElementWithPooling(int, int, String, String, Integer, String)}, looks for an alert message
      * inside a selenium context. The method waits a maximum time (poolMaxTime) in which the condition is checked in intervals (poolingInterval).
-     * @param poolingInterval   Time between consecutive condition evaluations
-     * @param poolMaxTime       Maximum time to wait for the condition to be true
-     * @return                  A selenium Alert object
+     *
+     * @param poolingInterval Time between consecutive condition evaluations
+     * @param poolMaxTime     Maximum time to wait for the condition to be true
+     * @return A selenium Alert object
      */
     public Alert waitAlertWithPooling(int poolingInterval, int poolMaxTime) {
         Wait wait = new FluentWait(driver)
@@ -697,7 +721,7 @@ public class CommonG {
      * Capture a snapshot or an evidence in the driver
      *
      * @param driver driver used for testing
-     * @param type type
+     * @param type   type
      * @return String
      */
     public String captureEvidence(WebDriver driver, String type) {
@@ -709,7 +733,7 @@ public class CommonG {
      * Capture a snapshot or an evidence in the driver
      *
      * @param driver driver used for testing
-     * @param type type
+     * @param type   type
      * @param suffix suffix
      * @return String
      */
@@ -792,7 +816,7 @@ public class CommonG {
                 Screenshot screenshot = new AShot().shootingStrategy(ShootingStrategies.viewportPasting(500)).takeScreenshot(driver);
                 try {
                     file = new File("target/temp");
-                    ImageIO.write(screenshot.getImage(), "PNG",  file);
+                    ImageIO.write(screenshot.getImage(), "PNG", file);
                 } catch (IOException e) {
                     logger.error("Exception on taking screenshot", e);
                 }
@@ -920,10 +944,28 @@ public class CommonG {
     /**
      * Set the previous webElement
      *
-     * @param previousWebElements   webElement
+     * @param previousWebElements webElement
      */
     public void setPreviousWebElements(PreviousWebElements previousWebElements) {
         this.previousWebElements = previousWebElements;
+    }
+
+    /**
+     * Returns the previous MobileElement
+     *
+     * @return List(MobileElement)
+     */
+    public PreviousMobileElements getPreviousMobileElements() {
+        return previousMobileElements;
+    }
+
+    /**
+     * Set the previous MobileElement
+     *
+     * @param previousMobileElements MobileElement
+     */
+    public void setPreviousMobileElements(PreviousMobileElements previousMobileElements) {
+        this.previousMobileElements = previousMobileElements;
     }
 
     /**
@@ -938,7 +980,7 @@ public class CommonG {
     /**
      * Sets the parentWindow
      *
-     * @param windowHandle  windowHandle as string
+     * @param windowHandle windowHandle as string
      */
     public void setParentWindow(String windowHandle) {
         this.parentWindow = windowHandle;
@@ -1115,7 +1157,7 @@ public class CommonG {
      *                      "mystring" -> | N/A | APPEND | new | -> "mystringnew"
      *                      }
      * @return String
-     * @throws Exception    Exception
+     * @throws Exception Exception
      */
     public String modifyData(String data, String type, DataTable modifications) throws Exception {
         String modifiedData = data;
@@ -1417,9 +1459,10 @@ public class CommonG {
 
     /**
      * Generates a request to a REST endpoint
-     * @param requestType   Request type (GET, POST, PUT, DELETE, PATCH)
-     * @param endPoint      Final endpoint (i.e /user/1)
-     * @throws Exception    Exception
+     *
+     * @param requestType Request type (GET, POST, PUT, DELETE, PATCH)
+     * @param endPoint    Final endpoint (i.e /user/1)
+     * @throws Exception Exception
      */
     public void generateRestRequest(String requestType, String endPoint) throws Exception {
 
@@ -1460,13 +1503,13 @@ public class CommonG {
      *
      * @param element attribute in class where to store the value
      * @param value   value to be stored
-     * @throws NoSuchFieldException exception
-     * @throws SecurityException exception
-     * @throws IllegalArgumentException exception
-     * @throws IllegalAccessException exception
-     * @throws InstantiationException exception
-     * @throws ClassNotFoundException exception
-     * @throws NoSuchMethodException exception
+     * @throws NoSuchFieldException      exception
+     * @throws SecurityException         exception
+     * @throws IllegalArgumentException  exception
+     * @throws IllegalAccessException    exception
+     * @throws InstantiationException    exception
+     * @throws ClassNotFoundException    exception
+     * @throws NoSuchMethodException     exception
      * @throws InvocationTargetException exception
      */
 
@@ -1822,8 +1865,8 @@ public class CommonG {
     /**
      * Runs a command locally
      *
-     * @param command       Command used to be run locally
-     * @throws Exception    Exception
+     * @param command Command used to be run locally
+     * @throws Exception Exception
      */
     public void runLocalCommand(String command) throws Exception {
 
@@ -1950,7 +1993,7 @@ public class CommonG {
      *
      * @param jsonString String of the json
      * @param expr       regex to be removed
-     * @return           new json
+     * @return new json
      */
 
     public String removeJSONPathElement(String jsonString, String expr) {
@@ -1968,7 +2011,7 @@ public class CommonG {
      * @param jsonString Original json object
      * @param key        Key to search
      * @param value      Value to replace key with
-     * @return           new json
+     * @return new json
      */
     public String replaceJSONPathElement(String jsonString, String key, String value) {
         return JsonPath.parse(jsonString).set(key, value).jsonString();
@@ -1979,10 +2022,10 @@ public class CommonG {
      * <p>
      * Object o could be a string or a list.
      *
-     * @param o             object to be evaluated
-     * @param condition     condition to compare
-     * @param result        expected result
-     * @throws Exception    Exception
+     * @param o         object to be evaluated
+     * @param condition condition to compare
+     * @param result    expected result
+     * @throws Exception Exception
      */
     public void evaluateJSONElementOperation(Object o, String condition, String result) throws Exception {
 
@@ -2104,4 +2147,58 @@ public class CommonG {
         return cookiesAttributes;
     }
 
+
+    /**
+     * Looks for mobile elements inside a Appium context. This search will be made
+     * by id, name, class
+     *
+     * This method is similar to {@link CommonG#locateElement(String, String, Integer)} but instead
+     * of locating webelements inside a selenium driver, locates mobile elements in a mobile application
+     *
+     * @param method                    class of element to be searched
+     * @param element                   mobileElement searched in Appium driver context
+     * @param expectedCount             integer. Expected number of elements.
+     * @return List(WebElement)
+     * @throws IllegalAccessException   exception
+     * @throws IllegalArgumentException exception
+     * @throws SecurityException        exception
+     * @throws NoSuchFieldException     exception
+     * @throws ClassNotFoundException   exception
+     */
+    public List<MobileElement> locateMobileElement(String method, String element,
+                                                   Integer expectedCount) throws ClassNotFoundException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+
+        List<MobileElement> wel = null;
+
+        if ("id".equals(method)) {
+            logger.debug("Locating {} by id", element);
+            wel = this.getMobileDriver().findElementsById(element);
+        } else if ("name".equals(method)) {
+            logger.debug("Locating {} by name", element);
+            wel = this.getMobileDriver().findElementsByName(element);
+        } else if ("class".equals(method)) {
+            logger.debug("Locating {} by class", element);
+            wel = this.getMobileDriver().findElementsByClassName(element);
+        } else if ("xpath".equals(method)) {
+            logger.debug("Locating {} by xpath", element);
+            wel = this.getMobileDriver().findElementsByXPath(element);
+        } else if ("css".equals(method)) {
+            wel = this.getMobileDriver().findElementsByCssSelector(element);
+        } else if ("linkText".equals(method)) {
+            wel = this.getMobileDriver().findElementsByLinkText(element);
+        } else if ("partialLinkText".equals(method)) {
+            wel = this.getMobileDriver().findElementsByPartialLinkText(element);
+        } else if ("tagName".equals(method)) {
+            wel = this.getMobileDriver().findElementsByTagName(element);
+        } else {
+            fail("Unknown search method: " + method);
+        }
+
+        if (expectedCount != -1) {
+            PreviousMobileElements pwel = new PreviousMobileElements(wel);
+            assertThat(pwel.getPreviousMobileElements().size()).as("Element count doesnt match").isEqualTo(expectedCount);
+        }
+
+        return wel;
+    }
 }
