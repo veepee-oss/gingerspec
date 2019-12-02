@@ -71,13 +71,9 @@ public class CommonG {
 
     private WebDriver driver = null;
 
-    private MobileDriver mobileDriver = null;
-
     private String browserName = null;
 
     private PreviousWebElements previousWebElements = null;
-
-    private PreviousMobileElements previousMobileElements = null;
 
     private String parentWindow = "";
 
@@ -523,24 +519,6 @@ public class CommonG {
     }
 
     /**
-     * Get the mobile driver
-     *
-     * @return  mobileDriver
-     */
-    public MobileDriver getMobileDriver() {
-        return mobileDriver;
-    }
-
-    /**
-     * Set the mobile driver
-     *
-     * @param mobileDriver The mobileDriver
-     */
-    public void setMobileDriver(MobileDriver mobileDriver) {
-        this.mobileDriver = mobileDriver;
-    }
-
-    /**
      * Get the browser name.
      *
      * @return String
@@ -577,23 +555,54 @@ public class CommonG {
 
         List<WebElement> wel = null;
 
-        if ("id".equals(method)) {
-            logger.debug("Locating {} by id", element);
-            wel = this.getDriver().findElements(By.id(element));
-        } else if ("name".equals(method)) {
-            logger.debug("Locating {} by name", element);
-            wel = this.getDriver().findElements(By.name(element));
-        } else if ("class".equals(method)) {
-            logger.debug("Locating {} by class", element);
-            wel = this.getDriver().findElements(By.className(element));
-        } else if ("xpath".equals(method)) {
-            logger.debug("Locating {} by xpath", element);
-            wel = this.getDriver().findElements(By.xpath(element));
-        } else if ("css".equals(method)) {
-            wel = this.getDriver().findElements(By.cssSelector(element));
+        if (this.getDriver() instanceof MobileDriver) {
+
+            if ("id".equals(method)) {
+                logger.debug("Locating {} by id", element);
+                wel = ((MobileDriver) this.getDriver()).findElementsById(element);
+            } else if ("name".equals(method)) {
+                logger.debug("Locating {} by name", element);
+                wel = ((MobileDriver) this.getDriver()).findElementsByName(element);
+            } else if ("class".equals(method)) {
+                logger.debug("Locating {} by class", element);
+                wel = ((MobileDriver) this.getDriver()).findElementsByClassName(element);
+            } else if ("xpath".equals(method)) {
+                logger.debug("Locating {} by xpath", element);
+                wel = ((MobileDriver) this.getDriver()).findElementsByXPath(element);
+            } else if ("css".equals(method)) {
+                wel = ((MobileDriver) this.getDriver()).findElementsByCssSelector(element);
+            } else if ("linkText".equals(method)) {
+                wel = ((MobileDriver) this.getDriver()).findElementsByLinkText(element);
+            } else if ("partialLinkText".equals(method)) {
+                wel = ((MobileDriver) this.getDriver()).findElementsByPartialLinkText(element);
+            } else if ("tagName".equals(method)) {
+                wel = ((MobileDriver) this.getDriver()).findElementsByTagName(element);
+            } else {
+                fail("Unknown search method: " + method);
+            }
+
         } else {
-            fail("Unknown search method: " + method);
+
+            if ("id".equals(method)) {
+                logger.debug("Locating {} by id", element);
+                wel = this.getDriver().findElements(By.id(element));
+            } else if ("name".equals(method)) {
+                logger.debug("Locating {} by name", element);
+                wel = this.getDriver().findElements(By.name(element));
+            } else if ("class".equals(method)) {
+                logger.debug("Locating {} by class", element);
+                wel = this.getDriver().findElements(By.className(element));
+            } else if ("xpath".equals(method)) {
+                logger.debug("Locating {} by xpath", element);
+                wel = this.getDriver().findElements(By.xpath(element));
+            } else if ("css".equals(method)) {
+                wel = this.getDriver().findElements(By.cssSelector(element));
+            } else {
+                fail("Unknown search method: " + method);
+            }
+
         }
+
 
         if (expectedCount != -1) {
             PreviousWebElements pwel = new PreviousWebElements(wel);
@@ -948,24 +957,6 @@ public class CommonG {
      */
     public void setPreviousWebElements(PreviousWebElements previousWebElements) {
         this.previousWebElements = previousWebElements;
-    }
-
-    /**
-     * Returns the previous MobileElement
-     *
-     * @return List(MobileElement)
-     */
-    public PreviousMobileElements getPreviousMobileElements() {
-        return previousMobileElements;
-    }
-
-    /**
-     * Set the previous MobileElement
-     *
-     * @param previousMobileElements MobileElement
-     */
-    public void setPreviousMobileElements(PreviousMobileElements previousMobileElements) {
-        this.previousMobileElements = previousMobileElements;
     }
 
     /**
@@ -2147,58 +2138,4 @@ public class CommonG {
         return cookiesAttributes;
     }
 
-
-    /**
-     * Looks for mobile elements inside a Appium context. This search will be made
-     * by id, name, class
-     *
-     * This method is similar to {@link CommonG#locateElement(String, String, Integer)} but instead
-     * of locating webelements inside a selenium driver, locates mobile elements in a mobile application
-     *
-     * @param method                    class of element to be searched
-     * @param element                   mobileElement searched in Appium driver context
-     * @param expectedCount             integer. Expected number of elements.
-     * @return List(WebElement)
-     * @throws IllegalAccessException   exception
-     * @throws IllegalArgumentException exception
-     * @throws SecurityException        exception
-     * @throws NoSuchFieldException     exception
-     * @throws ClassNotFoundException   exception
-     */
-    public List<MobileElement> locateMobileElement(String method, String element,
-                                                   Integer expectedCount) throws ClassNotFoundException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
-
-        List<MobileElement> wel = null;
-
-        if ("id".equals(method)) {
-            logger.debug("Locating {} by id", element);
-            wel = this.getMobileDriver().findElementsById(element);
-        } else if ("name".equals(method)) {
-            logger.debug("Locating {} by name", element);
-            wel = this.getMobileDriver().findElementsByName(element);
-        } else if ("class".equals(method)) {
-            logger.debug("Locating {} by class", element);
-            wel = this.getMobileDriver().findElementsByClassName(element);
-        } else if ("xpath".equals(method)) {
-            logger.debug("Locating {} by xpath", element);
-            wel = this.getMobileDriver().findElementsByXPath(element);
-        } else if ("css".equals(method)) {
-            wel = this.getMobileDriver().findElementsByCssSelector(element);
-        } else if ("linkText".equals(method)) {
-            wel = this.getMobileDriver().findElementsByLinkText(element);
-        } else if ("partialLinkText".equals(method)) {
-            wel = this.getMobileDriver().findElementsByPartialLinkText(element);
-        } else if ("tagName".equals(method)) {
-            wel = this.getMobileDriver().findElementsByTagName(element);
-        } else {
-            fail("Unknown search method: " + method);
-        }
-
-        if (expectedCount != -1) {
-            PreviousMobileElements pwel = new PreviousMobileElements(wel);
-            assertThat(pwel.getPreviousMobileElements().size()).as("Element count doesnt match").isEqualTo(expectedCount);
-        }
-
-        return wel;
-    }
 }

@@ -4,7 +4,6 @@ import com.privalia.qa.cucumber.converter.ArrayListConverter;
 import com.privalia.qa.cucumber.converter.NullableStringConverter;
 import com.privalia.qa.utils.PreviousWebElements;
 import com.privalia.qa.utils.ThreadProperty;
-import cucumber.api.PendingException;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;

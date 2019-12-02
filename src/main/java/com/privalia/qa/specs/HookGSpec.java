@@ -16,14 +16,14 @@
 
 package com.privalia.qa.specs;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
 import com.privalia.qa.utils.ThreadProperty;
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
-import io.appium.java_client.MobileDriver;
-import io.appium.java_client.MobileElement;
 import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.ios.IOSDriver;
 import io.appium.java_client.remote.MobileBrowserType;
 import io.appium.java_client.remote.MobileCapabilityType;
 import io.github.bonigarcia.wdm.WebDriverManager;
@@ -42,6 +42,7 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
@@ -98,30 +99,29 @@ public class HookGSpec extends BaseGSpec {
      * @throws MalformedURLException MalformedURLException
      */
     @Before(order = 10, value = "@web")
-    public void seleniumSetup() throws MalformedURLException {
+    public void seleniumSetup() throws IOException {
 
         String grid = System.getProperty("SELENIUM_GRID");
+        String b = ThreadProperty.get("browser");
+        ObjectMapper mapper = new ObjectMapper();
 
         if (grid == null) {
             fail("Selenium grid not available");
         }
 
-        String b = ThreadProperty.get("browser");
-
         if ("".equals(b)) {
             fail("Non available browsers");
         }
 
-        String browser = b.split("_")[0];
-        String version = b.split("_")[1];
-        String platform = b.split("_")[2];
-        commonspec.setBrowserName(browser);
-        commonspec.getLogger().debug("Setting up selenium for {}", browser);
+        Map<String, String> capabilitiesMap = mapper.readValue(b, Map.class);
+
+        commonspec.setBrowserName(capabilitiesMap.get("browserName"));
+        commonspec.getLogger().debug("Setting up selenium for {}", capabilitiesMap.get("browserName"));
 
         if (grid.matches("local")) {
-            this.useLocalDriver(browser);
+            this.useLocalDriver(capabilitiesMap.get("browserName"));
         } else {
-            this.useRemoteGrid(grid, browser, version, platform);
+            this.useRemoteGrid(grid, capabilitiesMap.get("browserName"), capabilitiesMap.get("version"), capabilitiesMap.get("platform"));
         }
 
     }
@@ -133,56 +133,59 @@ public class HookGSpec extends BaseGSpec {
      * @throws MalformedURLException MalformedURLException
      */
     @Before(order = 20, value = "@mobile")
-    public void AppiumSetup() throws MalformedURLException {
+    public void AppiumSetup() throws IOException {
 
+        ObjectMapper mapper = new ObjectMapper();
         String grid = System.getProperty("SELENIUM_GRID");
+        String b = ThreadProperty.get("browser");
 
         if (grid == null) {
             fail("Selenium grid not available");
         }
 
-        String b = ThreadProperty.get("browser");
-
         if ("".equals(b)) {
-            fail("Non available browsers");
+            fail("No available nodes connected");
         }
 
-        String browser = b.split("_")[0];
-        String version = b.split("_")[1];
-        String platform = b.split("_")[2];
-        commonspec.setBrowserName(browser);
-        commonspec.getLogger().debug("Setting up selenium for {}", browser);
+        Map<String, String> capabilitiesMap = mapper.readValue(b, Map.class);
+
+        commonspec.setBrowserName(capabilitiesMap.get("automationName"));
+        commonspec.getLogger().debug("Setting up selenium for {}", capabilitiesMap.get("automationName"));
 
         grid = "http://" + grid + "/wd/hub";
         MutableCapabilities capabilities = null;
         capabilities = new DesiredCapabilities();
 
-        String app = System.getProperty("APP");
+
+        String app = capabilitiesMap.get("app");
+
+        if (System.getProperty("APP") != null) {
+            app = System.getProperty("APP");
+        }
+
         if (app == null) {
-            fail("No app specified (The absolute local path or remote http URL of an .apk or .ipa file)");
+            fail("No app specified (The absolute local path or remote http URL of an .apk or .ipa file). You can specify this in the node capabilities or using -DAPP=/path/to/file");
         }
 
         //General capabilities
         capabilities.setCapability("app", app);
+        capabilities.setCapability("platformName", capabilitiesMap.get("platformName"));
+        capabilities.setCapability("automationName", capabilitiesMap.get("automationName"));
+        capabilities.setCapability("deviceName", capabilitiesMap.get("deviceName"));
 
-        //Platform specific capabilities
-        switch (platform.toLowerCase()) {
+        switch (capabilitiesMap.get("platformName").toLowerCase()) {
 
             case "android":
-                capabilities.setCapability("platformName", "Android");
-                capabilities.setCapability("automationName", "UiAutomator2");
-                capabilities.setCapability("deviceName", "Android Emulator");
-                commonspec.setMobileDriver(new AndroidDriver(new URL(grid), capabilities));
+                commonspec.setDriver(new AndroidDriver(new URL(grid), capabilities));
                 break;
 
             case "ios":
-                //TODO add support for IOS native apps
+                commonspec.setDriver(new IOSDriver(new URL(grid), capabilities));
                 break;
 
             default:
-                commonspec.getLogger().error("Unknown platform: " + platform);
-                throw new WebDriverException("Unknown platform: " + platform);
-
+                commonspec.getLogger().error("Unknown platform: " + capabilitiesMap.get("platformName"));
+                throw new WebDriverException("Unknown platform: " + capabilitiesMap.get("platformName"));
         }
 
     }
@@ -310,23 +313,12 @@ public class HookGSpec extends BaseGSpec {
     /**
      * If the feature has the @web or @mobile annotation, closes selenium web driver after each scenario is completed.
      */
-    @After(order = 20, value = "@web")
+    @After(order = 20, value = {"@web or @mobile"})
     public void seleniumTeardown() {
         if (commonspec.getDriver() != null) {
             commonspec.getLogger().debug("Shutdown Selenium client");
             //commonspec.getDriver().close(); //causes the driver instance when using firefox
             commonspec.getDriver().quit();
-        }
-    }
-
-    /**
-     * If the feature has the @web or @mobile annotation, closes selenium web driver after each scenario is completed.
-     */
-    @After(order = 30, value = "@mobile")
-    public void AppiumTeardown() {
-        if (commonspec.getMobileDriver() != null) {
-            commonspec.getLogger().debug("Shutdown Appium client");
-            commonspec.getMobileDriver().quit();
         }
     }
 
