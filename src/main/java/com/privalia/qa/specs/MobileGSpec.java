@@ -1,10 +1,7 @@
 package com.privalia.qa.specs;
 
-import cucumber.api.PendingException;
 import cucumber.api.java.en.Given;
 import io.appium.java_client.MobileDriver;
-import io.appium.java_client.TouchAction;
-import org.openqa.selenium.DeviceRotation;
 import org.openqa.selenium.ScreenOrientation;
 
 import static org.testng.Assert.fail;

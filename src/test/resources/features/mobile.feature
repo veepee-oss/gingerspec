@@ -8,12 +8,11 @@ Feature: Running tests in mobile devices
     Notice that the @mobile annotation at the begining of the feature is NECESSARY to bootstrap the Appium driver
 
     Mobile devices should be connected to a Selenium Grid using Appium, so you must use -DSELENIUM_GRID parameter
-    when running this feature, besides the -DAPP parameter, with the absolute address of the .apk (Android) or the
-    .ipa (iOS) file to test
+    when running this feature
 
-    mvn verify -Dit.test=com.privalia.qa.specs.MobileGIT
-          -DSELENIUM_GRID=localhost:4444
-          -DAPP=/Users/jose.fernandez/privalia/gingerspec/src/test/resources/calculator.apk
+    mvn verify -Dit.test=com.privalia.qa.specs.MobileGIT -DSELENIUM_GRID=localhost:4444
+
+    Check the following documentation for more information
 
 
   Scenario: Openning an closing the app

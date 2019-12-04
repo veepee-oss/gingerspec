@@ -38,6 +38,7 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.safari.SafariOptions;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -121,7 +122,7 @@ public class HookGSpec extends BaseGSpec {
         if (grid.matches("local")) {
             this.useLocalDriver(capabilitiesMap.get("browserName"));
         } else {
-            this.useRemoteGrid(grid, capabilitiesMap.get("browserName"), capabilitiesMap.get("version"), capabilitiesMap.get("platform"));
+            this.useRemoteGrid(grid, capabilitiesMap);
         }
 
     }
@@ -156,6 +157,15 @@ public class HookGSpec extends BaseGSpec {
         MutableCapabilities capabilities = null;
         capabilities = new DesiredCapabilities();
 
+        //This capabilities are removed since they can cause problems when testing mobile apps
+        capabilitiesMap.remove("platform");
+        capabilitiesMap.remove("maxInstances");
+        capabilitiesMap.remove("seleniumProtocol");
+
+        //Assign all found capabilities found returned by the selenium node
+        for (Map.Entry<String, String> entry : capabilitiesMap.entrySet()) {
+            capabilities.setCapability(entry.getKey(), entry.getValue());
+        }
 
         String app = capabilitiesMap.get("app");
 
@@ -167,11 +177,7 @@ public class HookGSpec extends BaseGSpec {
             fail("No app specified (The absolute local path or remote http URL of an .apk or .ipa file). You can specify this in the node capabilities or using -DAPP=/path/to/file");
         }
 
-        //General capabilities
         capabilities.setCapability("app", app);
-        capabilities.setCapability("platformName", capabilitiesMap.get("platformName"));
-        capabilities.setCapability("automationName", capabilitiesMap.get("automationName"));
-        capabilities.setCapability("deviceName", capabilitiesMap.get("deviceName"));
 
         switch (capabilitiesMap.get("platformName").toLowerCase()) {
 
@@ -192,37 +198,30 @@ public class HookGSpec extends BaseGSpec {
 
     /**
      * Connects to a remote selenium grid to execute the tests
-     *
      * @param grid                      Address of the remote selenium grid
-     * @param browser                   Browser type to use
-     * @param version                   Browser version (it can also be the platform version if mobile)
-     * @param platform                  Platform (LINUX, ANDROID, etc)
+     * @param capabilitiesMap           Capabilities of the node
      * @throws MalformedURLException    MalformedURLException
      */
-    private void useRemoteGrid(String grid, String browser, String version, String platform) throws MalformedURLException {
+    private void useRemoteGrid(String grid, Map<String, String> capabilitiesMap) throws MalformedURLException {
 
         MutableCapabilities capabilities = null;
 
         grid = "http://" + grid + "/wd/hub";
 
-        switch (browser.toLowerCase()) {
+        capabilitiesMap.putIfAbsent("platform", "desktop");
+
+        switch (capabilitiesMap.get("browserName").toLowerCase()) {
             case "chrome":
 
-                commonspec.getLogger().debug("Setting up selenium for chrome in {}", platform);
+                commonspec.getLogger().debug("Setting up selenium for chrome in {}", capabilitiesMap.get("platform"));
 
-                if (platform.toLowerCase().matches("android")) {
+                if ("android".matches(capabilitiesMap.get("platform").toLowerCase())) {
                     //Testing in chrome for android
                     capabilities = DesiredCapabilities.android();
-                    capabilities.setCapability("platformName", "Android");
-                    capabilities.setCapability("automationName", "UiAutomator2");
-                    capabilities.setCapability("deviceName", "Android Emulator");
-                    capabilities.setCapability("browserName", "Chrome");
-                    capabilities.setCapability(MobileCapabilityType.BROWSER_NAME, MobileBrowserType.CHROME);
-                    commonspec.setDriver(new RemoteWebDriver(new URL(grid), capabilities));
 
-                } else if (platform.toLowerCase().matches("ios")) {
-                    //Testing in chrome for ios
-                    //TODO
+                } else if ("ios".matches(capabilitiesMap.get("platform").toLowerCase())) {
+                    //Testing in chrome for iphone
+                    capabilities = DesiredCapabilities.iphone();
 
                 } else {
                     //Testing in desktop version of chrome
@@ -231,29 +230,48 @@ public class HookGSpec extends BaseGSpec {
                     chromeOptions.addArguments("--ignore-certificate-errors");
                     capabilities = new ChromeOptions();
                     capabilities.setCapability(ChromeOptions.CAPABILITY, chromeOptions);
-                    commonspec.setDriver(new RemoteWebDriver(new URL(grid), capabilities));
-                    this.configureWebDriver(capabilities);
                 }
 
                 break;
 
             case "firefox":
                 capabilities = new FirefoxOptions();
-                commonspec.setDriver(new RemoteWebDriver(new URL(grid), capabilities));
-                this.configureWebDriver(capabilities);
                 break;
 
             case "phantomjs":
                 capabilities = DesiredCapabilities.phantomjs();
-                commonspec.setDriver(new RemoteWebDriver(new URL(grid), capabilities));
-                this.configureWebDriver(capabilities);
+                break;
+
+            case "safari":
+
+                commonspec.getLogger().debug("Setting up selenium for chrome in {}", capabilitiesMap.get("platform"));
+
+                if ("ios".matches(capabilitiesMap.get("platform").toLowerCase())) {
+                    //Testing in safari for iphone
+                    capabilities = DesiredCapabilities.iphone();
+
+                } else {
+                    //Testing in Safari desktop browser
+                    capabilities = DesiredCapabilities.safari();
+                }
+
                 break;
 
 
             default:
-                commonspec.getLogger().error("Unknown browser: " + browser);
-                throw new WebDriverException("Unknown browser: " + browser);
+                commonspec.getLogger().error("Unknown browser: " + capabilitiesMap.get("browserName"));
+                throw new WebDriverException("Unknown browser: " + capabilitiesMap.get("browserName"));
         }
+
+
+        //Assign all found capabilities found returned by the selenium node
+        for (Map.Entry<String, String> entry : capabilitiesMap.entrySet()) {
+            capabilities.setCapability(entry.getKey(), entry.getValue());
+        }
+
+        commonspec.setDriver(new RemoteWebDriver(new URL(grid), capabilities));
+        this.configureWebDriver(capabilities, capabilitiesMap.get("platform"));
+
 
     }
 
@@ -292,11 +310,11 @@ public class HookGSpec extends BaseGSpec {
         }
 
         commonspec.setDriver(driver);
-        this.configureWebDriver(capabilities);
+        this.configureWebDriver(capabilities, "desktop");
 
     }
 
-    private void configureWebDriver(MutableCapabilities capabilities) {
+    private void configureWebDriver(MutableCapabilities capabilities, String platform) {
 
         commonspec.getDriver().manage().timeouts().pageLoadTimeout(PAGE_LOAD_TIMEOUT, TimeUnit.SECONDS);
         commonspec.getDriver().manage().timeouts().implicitlyWait(IMPLICITLY_WAIT, TimeUnit.SECONDS);
@@ -306,7 +324,12 @@ public class HookGSpec extends BaseGSpec {
         if (capabilities.getCapability("deviceName") == null) {
             commonspec.getDriver().manage().window().setSize(new Dimension(1440, 900));
         }
-        commonspec.getDriver().manage().window().maximize();
+
+        //Doing a window.maximize in mobile could cause the browser to fail
+        if ((!(platform.toLowerCase().matches("android") || platform.toLowerCase().matches("ios")))) {
+            commonspec.getDriver().manage().window().maximize();
+        }
+
     }
 
 

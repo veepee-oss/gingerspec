@@ -192,9 +192,6 @@ public final class BrowsersDataProvider {
 
                                 response.add(objectMapper.writeValueAsString(nodeDetailsMap));
 
-//                                response.add((nodeDetailsMap.get("browserName") == null ? "mobile" : nodeDetailsMap.get("browserName")) + "_" +
-//                                        (nodeDetailsMap.get("version") == null ? nodeDetailsMap.get("platformVersion") : nodeDetailsMap.get("version")) + "_" +
-//                                        (nodeDetailsMap.get("platform") == null ? nodeDetailsMap.get("platformName") : nodeDetailsMap.get("platform")));
                             }
                         } else {
                             //TODO not sure under what circunstances this path is taken
@@ -212,7 +209,6 @@ public final class BrowsersDataProvider {
                             nodeDetailsMap.put("version", version);
                             nodeDetailsMap.put("platform", "local");
                             response.add(objectMapper.writeValueAsString(nodeDetailsMap));
-                            //response.add(browser + "_" + version + "_local");
                             iBusy++;
                         }
                     }
@@ -249,14 +245,10 @@ public final class BrowsersDataProvider {
             if (nodeType == null) {
                 LOGGER.warn("No Selenium Node browser type specified!. Using 'chrome' as default....");
                 nodeDetailsMap.put("browserName", "chrome");
-                //response.add("chrome_1.0_local");
             } else {
                 nodeDetailsMap.put("browserName", nodeType);
-                //response.add(nodeType + "_1.0_local");
             }
 
-            nodeDetailsMap.put("version", "1.0");
-            nodeDetailsMap.put("platform", "local");
             response.add(objectMapper.writeValueAsString(nodeDetailsMap));
 
 
@@ -276,10 +268,8 @@ public final class BrowsersDataProvider {
             if (browser == null) {
                 LOGGER.warn("No browser specified, using chrome as default");
                 nodeDetailsMap.put("browserName", "chrome");
-                //response.add("chrome_1.0_local");
             } else {
                 nodeDetailsMap.put("browserName", browser);
-                //response.add(browser + "_1.0_local");
             }
 
             nodeDetailsMap.put("version", "1.0");

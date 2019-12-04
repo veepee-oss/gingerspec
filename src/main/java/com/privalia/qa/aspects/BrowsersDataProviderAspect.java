@@ -54,6 +54,14 @@ public class BrowsersDataProviderAspect extends BaseGSpec {
      * If a System property with FORCE_BROWSER exists then Methods in
      * BrowsersDataProvider will return its value.
      *
+     * The expected format of the FORCE_BROWSER variable is:
+     *  browserName_version
+     *
+     * browserName: browserName capability of the connected node
+     * version: version capability of the connected node
+     *
+     * Example: firefox_60.0
+     *
      * @param pjp             ProceedingJoinPoint
      * @param context         the context
      * @param testConstructor the test constructor
@@ -78,9 +86,7 @@ public class BrowsersDataProviderAspect extends BaseGSpec {
             Map<String, String> nodeDetailsMap = new HashMap<String, String>();
             nodeDetailsMap.put("browserName", System.getProperty("FORCE_BROWSER").split("_")[0]);
             nodeDetailsMap.put("version", System.getProperty("FORCE_BROWSER").split("_")[1]);
-            return new Object[][] {{ objectMapper.writeValueAsString(nodeDetailsMap) }};
-
-            //return new Object[][] {{System.getProperty("FORCE_BROWSER")}};
+            return new Object[][] {{objectMapper.writeValueAsString(nodeDetailsMap)}};
         }
         return pjp.proceed();
     }
