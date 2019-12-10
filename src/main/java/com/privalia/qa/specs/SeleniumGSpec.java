@@ -264,8 +264,8 @@ public class SeleniumGSpec extends BaseGSpec {
      *
      * @param atLeast                   asserts that the amount of elements if greater or equal to expectedCount. If null, asserts the amount of element is equal to expectedCount
      * @param expectedCount             the expected count of elements to find
-     * @param method                    method to locate the elements (id, class, css, xpath, etc)
-     * @param element                   the element
+     * @param method                    method to locate the elements (id, name, class, css, xpath for regular html elements, and additionally, linkText, partialLinkText and tagName for mobile elements)
+     * @param element                   the relative reference to the element
      * @throws ClassNotFoundException   the class not found exception
      * @throws NoSuchFieldException     the no such field exception
      * @throws SecurityException        the security exception

@@ -24,8 +24,6 @@ import cucumber.api.java.After;
 import cucumber.api.java.Before;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
-import io.appium.java_client.remote.MobileBrowserType;
-import io.appium.java_client.remote.MobileCapabilityType;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import io.restassured.http.ContentType;
 import org.openqa.selenium.Dimension;
@@ -38,7 +36,6 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import org.openqa.selenium.safari.SafariOptions;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -164,7 +161,7 @@ public class HookGSpec extends BaseGSpec {
 
         //Assign all found capabilities found returned by the selenium node
         for (Map.Entry<String, String> entry : capabilitiesMap.entrySet()) {
-            capabilities.setCapability(entry.getKey(), entry.getValue());
+            capabilities.setCapability(entry.getKey(), (Object) entry.getValue());
         }
 
         String app = capabilitiesMap.get("app");
@@ -198,9 +195,10 @@ public class HookGSpec extends BaseGSpec {
 
     /**
      * Connects to a remote selenium grid to execute the tests
-     * @param grid                      Address of the remote selenium grid
-     * @param capabilitiesMap           Capabilities of the node
-     * @throws MalformedURLException    MalformedURLException
+     *
+     * @param grid            Address of the remote selenium grid
+     * @param capabilitiesMap Capabilities of the node
+     * @throws MalformedURLException MalformedURLException
      */
     private void useRemoteGrid(String grid, Map<String, String> capabilitiesMap) throws MalformedURLException {
 

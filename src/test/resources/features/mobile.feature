@@ -5,7 +5,7 @@ Feature: Running tests in mobile devices
     This feature provides an overview of the available steps for testing native mobile apps (android & ios)
     The mobile device must be connected to a selenium grid node
 
-    Notice that the @mobile annotation at the begining of the feature is NECESSARY to bootstrap the Appium driver
+    Notice that the @mobile annotation at the beginning of the feature is NECESSARY to bootstrap the Appium driver
 
     Mobile devices should be connected to a Selenium Grid using Appium, so you must use -DSELENIUM_GRID parameter
     when running this feature
@@ -15,7 +15,7 @@ Feature: Running tests in mobile devices
     Check the following documentation for more information
 
 
-  Scenario: Openning an closing the app
+  Scenario: Opening an closing the app
     Given I open the application
     And I wait '5' seconds
     Given I close the application
