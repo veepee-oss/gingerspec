@@ -1,39 +1,24 @@
+@ignore @toocomplex
 @mobile
-
 Feature: Running tests in mobile devices
 
-    This feature provides an overview of the available steps for testing native mobile apps (android & ios)
-    The mobile device must be connected to a selenium grid node
-
+    This feature provides an overview of the available steps for testing native mobile apps (android & ios).
     Notice that the @mobile annotation at the beginning of the feature is NECESSARY to bootstrap the Appium driver
 
-    Mobile devices should be connected to a Selenium Grid using Appium, so you must use -DSELENIUM_GRID parameter
-    when running this feature
-
+    You can connect your mobile device as a node in a selenium grid using Appium, and run this feature like this
+    (assuming grid is running in localhost:4444):
     mvn verify -Dit.test=com.privalia.qa.specs.MobileGIT -DSELENIUM_GRID=localhost:4444
 
-    Check the following documentation for more information
+    Or you can directly start an Appium server (no grid required) and run this feature like this (assuming Appium
+    server is running in localhost:4723)
+    mvn verify -Dit.test=com.privalia.qa.specs.MobileGIT -DSELENIUM_NODE=localhost:4723
 
+    Check the following documentation for more information
 
   Scenario: Opening an closing the app
     Given I open the application
     And I wait '5' seconds
     Given I close the application
-
-  @ignore @toocomplex
-  Scenario: Interacting with elements
-    And at least '1' elements exists with 'id:com.google.android.calculator:id/digit_2'
-    And I click on the element on index '0'
-    And at least '1' elements exists with 'id:com.google.android.calculator:id/op_add'
-    And I click on the element on index '0'
-    And at least '1' elements exists with 'id:com.google.android.calculator:id/digit_2'
-    And I click on the element on index '0'
-    And at least '1' elements exists with 'id:com.google.android.calculator:id/eq'
-    And I click on the element on index '0'
-    And I wait '3' seconds
-    And at least '1' elements exists with 'id:com.google.android.calculator:id/result_final'
-    Then the element on index '0' has '4' as text
-
 
   Scenario: Changing orientation
     Given I rotate the device to 'landscape' mode

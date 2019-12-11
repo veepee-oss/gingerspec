@@ -138,7 +138,7 @@ public final class BrowsersDataProvider {
      * capabilities found
      *
      * @param filter browser selected for test execution
-     * @return browsers list
+     * @return list of capabilities of the active sessions
      */
     private static List<String> gridBrowsers(Map<String, String> filter) throws IOException {
 
@@ -216,6 +216,7 @@ public final class BrowsersDataProvider {
             /**
              * Verify that the node actually exists and is online by trying a connection
              */
+            LOGGER.debug("Trying to connect to {}", "http://" + node + "/wd/hub/sessions");
             URL url = new URL("http://" + node + "/wd/hub/sessions");
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
 
@@ -223,6 +224,8 @@ public final class BrowsersDataProvider {
                 LOGGER.error("Exception on connecting to node, response code {}: {}", con.getResponseCode(), con.getResponseMessage());
                 return response;
             }
+
+            LOGGER.debug("Response code {} with message ", con.getResponseCode(), con.getResponseMessage());
 
             //Read the json response to get the capabilities of the active sessions
             InputStream in = new BufferedInputStream(con.getInputStream());
@@ -250,7 +253,7 @@ public final class BrowsersDataProvider {
                 Map<String, String> nodeDetailsMap = new HashMap<String, String>();
 
                 if (nodeType == null) {
-                    LOGGER.warn("No Selenium Node browser type specified!. Using 'chrome' as default (Override this by using -DSELENIUM_NODE_TYPE=browserName)");
+                    LOGGER.warn("No Selenium Node browser type specified!. Using 'chrome' as default (Override this by using -DSELENIUM_NODE_TYPE=(chrome|firefox))");
                     nodeDetailsMap.put("browserName", "chrome");
                 } else {
                     nodeDetailsMap.put("browserName", nodeType);

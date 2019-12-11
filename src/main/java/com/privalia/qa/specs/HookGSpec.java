@@ -206,18 +206,22 @@ public class HookGSpec extends BaseGSpec {
 
         grid = "http://" + grid + "/wd/hub";
 
-        capabilitiesMap.putIfAbsent("platform", "desktop");
+        //If capabilities do not contain info on the platform, we assume desktop
+        String platformName = capabilitiesMap.get("platformName");
+        if (platformName == null) {
+            platformName = "desktop";
+        }
 
         switch (capabilitiesMap.get("browserName").toLowerCase()) {
             case "chrome":
 
-                commonspec.getLogger().debug("Setting up selenium for chrome in {}", capabilitiesMap.get("platform"));
+                commonspec.getLogger().debug("Setting up selenium for chrome in {}", platformName);
 
-                if ("android".matches(capabilitiesMap.get("platform").toLowerCase())) {
+                if ("android".matches(platformName.toLowerCase())) {
                     //Testing in chrome for android
                     capabilities = DesiredCapabilities.android();
 
-                } else if ("ios".matches(capabilitiesMap.get("platform").toLowerCase())) {
+                } else if ("ios".matches(platformName.toLowerCase())) {
                     //Testing in chrome for iphone
                     capabilities = DesiredCapabilities.iphone();
 
@@ -242,9 +246,9 @@ public class HookGSpec extends BaseGSpec {
 
             case "safari":
 
-                commonspec.getLogger().debug("Setting up selenium for chrome in {}", capabilitiesMap.get("platform"));
+                commonspec.getLogger().debug("Setting up selenium for chrome in {}", platformName);
 
-                if ("ios".matches(capabilitiesMap.get("platform").toLowerCase())) {
+                if ("ios".matches(platformName.toLowerCase())) {
                     //Testing in safari for iphone
                     capabilities = DesiredCapabilities.iphone();
 
@@ -264,11 +268,11 @@ public class HookGSpec extends BaseGSpec {
 
         //Assign all found capabilities found returned by the selenium node
         for (Map.Entry<String, String> entry : capabilitiesMap.entrySet()) {
-            capabilities.setCapability(entry.getKey(), entry.getValue());
+            capabilities.setCapability(entry.getKey(), (Object) entry.getValue());
         }
 
         commonspec.setDriver(new RemoteWebDriver(new URL(grid), capabilities));
-        this.configureWebDriver(capabilities, capabilitiesMap.get("platform"));
+        this.configureWebDriver(capabilities, platformName);
 
 
     }
@@ -312,7 +316,7 @@ public class HookGSpec extends BaseGSpec {
 
     }
 
-    private void configureWebDriver(MutableCapabilities capabilities, String platform) {
+    private void configureWebDriver(MutableCapabilities capabilities, String platformName) {
 
         commonspec.getDriver().manage().timeouts().pageLoadTimeout(PAGE_LOAD_TIMEOUT, TimeUnit.SECONDS);
         commonspec.getDriver().manage().timeouts().implicitlyWait(IMPLICITLY_WAIT, TimeUnit.SECONDS);
@@ -324,7 +328,7 @@ public class HookGSpec extends BaseGSpec {
         }
 
         //Doing a window.maximize in mobile could cause the browser to fail
-        if ((!(platform.toLowerCase().matches("android") || platform.toLowerCase().matches("ios")))) {
+        if ((!(platformName.toLowerCase().matches("android") || platformName.toLowerCase().matches("ios")))) {
             commonspec.getDriver().manage().window().maximize();
         }
 
