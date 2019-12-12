@@ -36,7 +36,8 @@ GingerSpec provides common functionality that can be reused by different test pr
 ### Technologies
 * Cucumber for test definition   
 * TestNG for execution    
-* Selenium     
+* Selenium
+* Appium     
 * AssertJ
 * SQL (PostgreSQL & MySQL)
 * rest-assured
@@ -127,7 +128,7 @@ You must use the following dependency in your testng project to get access to al
 <dependency>
     <groupId>com.github.privaliatech</groupId>
     <artifactId>gingerspec</artifactId>
-    <version>2.0.0</version>
+    <version>2.1.0</version>
 </dependency>
 ``` 
 

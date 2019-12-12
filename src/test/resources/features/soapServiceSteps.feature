@@ -1,3 +1,4 @@
+@ignore @toocomplex
 Feature: communicating with a remote webservice
 
   This feature provides a basic example on how to execute remote methods of a webservice.

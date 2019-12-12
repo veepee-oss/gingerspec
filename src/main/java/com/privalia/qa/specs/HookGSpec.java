@@ -16,11 +16,14 @@
 
 package com.privalia.qa.specs;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
 import com.privalia.qa.utils.ThreadProperty;
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
+import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.ios.IOSDriver;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import io.restassured.http.ContentType;
 import org.openqa.selenium.Dimension;
@@ -31,23 +34,17 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
-import org.openqa.selenium.remote.CommandInfo;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.remote.HttpCommandExecutor;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import org.openqa.selenium.remote.http.HttpClient;
-import org.openqa.selenium.remote.internal.ApacheHttpClient;
-import org.openqa.selenium.remote.internal.HttpClientFactory;
-
-import java.util.logging.Level;
-import java.util.logging.LogManager;
-import java.util.logging.Logger;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
 import static io.restassured.RestAssured.given;
 import static org.testng.Assert.fail;
@@ -56,14 +53,10 @@ import static org.testng.Assert.fail;
  * This class contains functions that are executed before and after each test.
  * For this, it makes use of cucumber hooks
  *
- * @see <a href="https://cucumber.io/docs/cucumber/api/#hooks">https://cucumber.io/docs/cucumber/api/#hooks</a>
  * @author Jose Fernandez
+ * @see <a href="https://cucumber.io/docs/cucumber/api/#hooks">https://cucumber.io/docs/cucumber/api/#hooks</a>
  */
 public class HookGSpec extends BaseGSpec {
-
-    public static final int ORDER_10 = 10;
-
-    public static final int ORDER_20 = 20;
 
     public static final int PAGE_LOAD_TIMEOUT = 120;
 
@@ -76,7 +69,7 @@ public class HookGSpec extends BaseGSpec {
     /**
      * Default constructor.
      *
-     * @param spec  commonG object
+     * @param spec commonG object
      */
     public HookGSpec(CommonG spec) {
         this.commonspec = spec;
@@ -98,33 +91,200 @@ public class HookGSpec extends BaseGSpec {
 
 
     /**
-     * If the feature has the @web or @mobile annotation, creates a new selenium driver
+     * If the feature has the @web annotation, creates a new selenium web driver
      * before each scenario
      *
-     * @throws MalformedURLException    MalformedURLException
+     * @throws MalformedURLException MalformedURLException
      */
-    @Before(order = ORDER_10, value = {"@mobile or @web"})
-    public void seleniumSetup() throws MalformedURLException {
+    @Before(order = 10, value = "@web")
+    public void seleniumSetup() throws IOException {
 
         String grid = System.getProperty("SELENIUM_GRID");
+        String b = ThreadProperty.get("browser");
+        ObjectMapper mapper = new ObjectMapper();
 
         if (grid == null) {
             fail("Selenium grid not available");
         }
 
-        String b = ThreadProperty.get("browser");
-
         if ("".equals(b)) {
             fail("Non available browsers");
         }
 
-        String browser = b.split("_")[0];
-        String version = b.split("_")[1];
-        commonspec.setBrowserName(browser);
-        commonspec.getLogger().debug("Setting up selenium for {}", browser);
+        Map<String, String> capabilitiesMap = mapper.readValue(b, Map.class);
+
+        commonspec.setBrowserName(capabilitiesMap.get("browserName"));
+        commonspec.getLogger().debug("Setting up selenium for {}", capabilitiesMap.get("browserName"));
+
+        if (grid.matches("local")) {
+            this.useLocalDriver(capabilitiesMap.get("browserName"));
+        } else {
+            this.useRemoteGrid(grid, capabilitiesMap);
+        }
+
+    }
+
+    /**
+     * If the feature has the @mobile annotation, creates a new Appium driver
+     * before each scenario
+     *
+     * @throws MalformedURLException MalformedURLException
+     */
+    @Before(order = 20, value = "@mobile")
+    public void AppiumSetup() throws IOException {
+
+        ObjectMapper mapper = new ObjectMapper();
+        String grid = System.getProperty("SELENIUM_GRID");
+        String b = ThreadProperty.get("browser");
+
+        if (grid == null) {
+            fail("Selenium grid not available");
+        }
+
+        if ("".equals(b)) {
+            fail("No available nodes connected");
+        }
+
+        Map<String, String> capabilitiesMap = mapper.readValue(b, Map.class);
+
+        commonspec.setBrowserName(capabilitiesMap.get("automationName"));
+        commonspec.getLogger().debug("Setting up selenium for {}", capabilitiesMap.get("automationName"));
+
+        grid = "http://" + grid + "/wd/hub";
+        MutableCapabilities capabilities = null;
+        capabilities = new DesiredCapabilities();
+
+        //This capabilities are removed since they can cause problems when testing mobile apps
+        capabilitiesMap.remove("platform");
+        capabilitiesMap.remove("maxInstances");
+        capabilitiesMap.remove("seleniumProtocol");
+
+        //Assign all found capabilities found returned by the selenium node
+        for (Map.Entry<String, String> entry : capabilitiesMap.entrySet()) {
+            capabilities.setCapability(entry.getKey(), (Object) entry.getValue());
+        }
+
+        String app = capabilitiesMap.get("app");
+
+        if (System.getProperty("APP") != null) {
+            app = System.getProperty("APP");
+        }
+
+        if (app == null) {
+            fail("No app specified (The absolute local path or remote http URL of an .apk or .ipa file). You can specify this in the node capabilities or using -DAPP=/path/to/file");
+        }
+
+        capabilities.setCapability("app", app);
+
+        switch (capabilitiesMap.get("platformName").toLowerCase()) {
+
+            case "android":
+                commonspec.setDriver(new AndroidDriver(new URL(grid), capabilities));
+                break;
+
+            case "ios":
+                commonspec.setDriver(new IOSDriver(new URL(grid), capabilities));
+                break;
+
+            default:
+                commonspec.getLogger().error("Unknown platform: " + capabilitiesMap.get("platformName"));
+                throw new WebDriverException("Unknown platform: " + capabilitiesMap.get("platformName"));
+        }
+
+    }
+
+    /**
+     * Connects to a remote selenium grid to execute the tests
+     *
+     * @param grid            Address of the remote selenium grid
+     * @param capabilitiesMap Capabilities of the node
+     * @throws MalformedURLException MalformedURLException
+     */
+    private void useRemoteGrid(String grid, Map<String, String> capabilitiesMap) throws MalformedURLException {
 
         MutableCapabilities capabilities = null;
 
+        grid = "http://" + grid + "/wd/hub";
+
+        //If capabilities do not contain info on the platform, we assume desktop
+        String platformName = capabilitiesMap.get("platformName");
+        if (platformName == null) {
+            platformName = "desktop";
+        }
+
+        switch (capabilitiesMap.get("browserName").toLowerCase()) {
+            case "chrome":
+
+                commonspec.getLogger().debug("Setting up selenium for chrome in {}", platformName);
+
+                if ("android".matches(platformName.toLowerCase())) {
+                    //Testing in chrome for android
+                    capabilities = DesiredCapabilities.android();
+
+                } else if ("ios".matches(platformName.toLowerCase())) {
+                    //Testing in chrome for iphone
+                    capabilities = DesiredCapabilities.iphone();
+
+                } else {
+                    //Testing in desktop version of chrome
+                    ChromeOptions chromeOptions = new ChromeOptions();
+                    chromeOptions.addArguments("--no-sandbox");
+                    chromeOptions.addArguments("--ignore-certificate-errors");
+                    capabilities = new ChromeOptions();
+                    capabilities.setCapability(ChromeOptions.CAPABILITY, chromeOptions);
+                }
+
+                break;
+
+            case "firefox":
+                capabilities = new FirefoxOptions();
+                break;
+
+            case "phantomjs":
+                capabilities = DesiredCapabilities.phantomjs();
+                break;
+
+            case "safari":
+
+                commonspec.getLogger().debug("Setting up selenium for chrome in {}", platformName);
+
+                if ("ios".matches(platformName.toLowerCase())) {
+                    //Testing in safari for iphone
+                    capabilities = DesiredCapabilities.iphone();
+
+                } else {
+                    //Testing in Safari desktop browser
+                    capabilities = DesiredCapabilities.safari();
+                }
+
+                break;
+
+
+            default:
+                commonspec.getLogger().error("Unknown browser: " + capabilitiesMap.get("browserName"));
+                throw new WebDriverException("Unknown browser: " + capabilitiesMap.get("browserName"));
+        }
+
+
+        //Assign all found capabilities found returned by the selenium node
+        for (Map.Entry<String, String> entry : capabilitiesMap.entrySet()) {
+            capabilities.setCapability(entry.getKey(), (Object) entry.getValue());
+        }
+
+        commonspec.setDriver(new RemoteWebDriver(new URL(grid), capabilities));
+        this.configureWebDriver(capabilities, platformName);
+
+
+    }
+
+    /**
+     * Makes use of WebDriverManager to automatically download the appropriate local driver
+     *
+     * @param browser Browser type to use (chrome/firefox)
+     */
+    private void useLocalDriver(String browser) {
+
+        MutableCapabilities capabilities = null;
 
         switch (browser.toLowerCase()) {
             case "chrome":
@@ -133,65 +293,30 @@ public class HookGSpec extends BaseGSpec {
                 chromeOptions.addArguments("--ignore-certificate-errors");
                 capabilities = new ChromeOptions();
                 capabilities.setCapability(ChromeOptions.CAPABILITY, chromeOptions);
-
-                if (grid.matches("local")) {
-                    System.setProperty("webdriver.chrome.silentOutput", "true"); //removes logging messages
-                    WebDriverManager.chromedriver().setup();
-                    driver = new ChromeDriver(chromeOptions);
-                }
-
+                System.setProperty("webdriver.chrome.silentOutput", "true"); //removes logging messages
+                WebDriverManager.chromedriver().setup();
+                driver = new ChromeDriver(chromeOptions);
                 break;
+
             case "firefox":
                 capabilities = new FirefoxOptions();
-
-                if (grid.matches("local")) {
-                    System.setProperty(FirefoxDriver.SystemProperty.DRIVER_USE_MARIONETTE, "true"); //removes logging messages
-                    System.setProperty(FirefoxDriver.SystemProperty.BROWSER_LOGFILE, "/dev/null");  //removes logging messages
-                    WebDriverManager.firefoxdriver().setup();
-                    driver = new FirefoxDriver(capabilities);
-                }
-
+                System.setProperty(FirefoxDriver.SystemProperty.DRIVER_USE_MARIONETTE, "true"); //removes logging messages
+                System.setProperty(FirefoxDriver.SystemProperty.BROWSER_LOGFILE, "/dev/null");  //removes logging messages
+                WebDriverManager.firefoxdriver().setup();
+                driver = new FirefoxDriver(capabilities);
                 break;
-            case "phantomjs":
-                capabilities = DesiredCapabilities.phantomjs();
 
-                if (grid.matches("local")) {
-                    //TODO add support for local phantonjs driver
-                }
-
-                break;
-            case "iphone":
-            case "safari":
-                capabilities = DesiredCapabilities.iphone();
-                capabilities.setCapability("platformName", "iOS");
-                capabilities.setCapability("platformVersion", "8.1");
-                capabilities.setCapability("deviceName", "iPhone Simulator");
-                break;
-            case "android":
-                capabilities = DesiredCapabilities.android();
-                capabilities.setCapability("platformName", "Android");
-                capabilities.setCapability("platformVersion", "6.0");
-                capabilities.setCapability("deviceName", "Android Emulator");
-                capabilities.setCapability("app", "Browser");
-                break;
             default:
                 commonspec.getLogger().error("Unknown browser: " + browser);
                 throw new WebDriverException("Unknown browser: " + browser);
         }
 
-        if (grid.matches("local")) {
+        commonspec.setDriver(driver);
+        this.configureWebDriver(capabilities, "desktop");
 
-            commonspec.setDriver(driver);
+    }
 
-        } else {
-
-            grid = "http://" + grid + "/wd/hub";
-            HttpClient.Factory factory = new ApacheHttpClient.Factory(new HttpClientFactory(60000, 60000));
-            HttpCommandExecutor executor = new HttpCommandExecutor(new HashMap<String, CommandInfo>(), new URL(grid), factory);
-            executor.setLocalLogs(null);
-            commonspec.setDriver(new RemoteWebDriver(executor, capabilities));
-
-        }
+    private void configureWebDriver(MutableCapabilities capabilities, String platformName) {
 
         commonspec.getDriver().manage().timeouts().pageLoadTimeout(PAGE_LOAD_TIMEOUT, TimeUnit.SECONDS);
         commonspec.getDriver().manage().timeouts().implicitlyWait(IMPLICITLY_WAIT, TimeUnit.SECONDS);
@@ -201,7 +326,11 @@ public class HookGSpec extends BaseGSpec {
         if (capabilities.getCapability("deviceName") == null) {
             commonspec.getDriver().manage().window().setSize(new Dimension(1440, 900));
         }
-        commonspec.getDriver().manage().window().maximize();
+
+        //Doing a window.maximize in mobile could cause the browser to fail
+        if ((!(platformName.toLowerCase().matches("android") || platformName.toLowerCase().matches("ios")))) {
+            commonspec.getDriver().manage().window().maximize();
+        }
 
     }
 
@@ -209,7 +338,7 @@ public class HookGSpec extends BaseGSpec {
     /**
      * If the feature has the @web or @mobile annotation, closes selenium web driver after each scenario is completed.
      */
-    @After(order = ORDER_20, value = {"@mobile or @web"})
+    @After(order = 20, value = {"@web or @mobile"})
     public void seleniumTeardown() {
         if (commonspec.getDriver() != null) {
             commonspec.getLogger().debug("Shutdown Selenium client");
@@ -227,7 +356,8 @@ public class HookGSpec extends BaseGSpec {
 
     /**
      * If the feature has the @rest annotation, creates a new REST client before each scenario
-     * @throws Exception    Exception
+     *
+     * @throws Exception Exception
      */
     @Before(order = 10, value = "@rest")
     public void restClientSetup() throws Exception {
@@ -242,7 +372,8 @@ public class HookGSpec extends BaseGSpec {
 
     /**
      * If the feature has the @rest annotation, closes the REST client after each scenario is completed
-     * @throws IOException  IOException
+     *
+     * @throws IOException IOException
      */
     @After(order = 10, value = "@rest")
     public void restClientTeardown() throws IOException {
@@ -253,7 +384,8 @@ public class HookGSpec extends BaseGSpec {
 
     /**
      * Disconnect any remaining open SSH connection after each scenario is completed
-     * @throws Exception    Exception
+     *
+     * @throws Exception Exception
      */
     @After(order = 10)
     public void remoteSSHConnectionTeardown() throws Exception {
@@ -265,7 +397,8 @@ public class HookGSpec extends BaseGSpec {
 
     /**
      * If the feature has the @sql annotation, closes any open connection to a database after each scenario is completed
-     * @throws Exception    Exception
+     *
+     * @throws Exception Exception
      */
     @After(value = "@sql")
     public void sqlConnectionClose() throws Exception {
