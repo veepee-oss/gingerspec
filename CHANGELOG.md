@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.1.0-RC1
+
+* A new step for executing Javascript functions (using JavaScriptExecutor) was included in the Selenium step definitions
+
+* Bump jackson-databind from 2.9.9.2 to 2.9.10.1
+
+* Gingerspec now supports Appium for testing mobile web/native apps. Many sections needed to be rewritten for this functionality.
+
 ## 2.0.4
 
 * Improved documentation on some of the feature files

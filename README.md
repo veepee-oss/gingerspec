@@ -40,10 +40,10 @@ GingerSpec provides common functionality that can be reused by different test pr
 * Appium     
 * AssertJ
 * SQL (PostgreSQL & MySQL)
-* rest-assured
+* rest-assured (Rest API testing)
 * SSH support
 * Files manipulation
-* WebServices
+* WebServices (SOAP)
 * Kafka & ZooKeeper
 
 
@@ -94,7 +94,7 @@ _**print log at DEBUG level when running a test**_
 
 ` mvn verify -DSECS=AGENT_LIST=1,2 -Dit.test=com.privalia.qa.ATests.LoopTagAspectIT -DlogLevel=DEBUG`
 
-_**-DSELENIUM_GRID and -DFORCE_BROWSER for Selenium features**_
+_**-DSELENIUM_GRID and -DFORCE_BROWSER for Selenium (@web) and mobile (@mobile) features**_
 
 ` mvn verify -Dit.test=com.privalia.myproject.mypackage.CucumberSeleniumIT -DSELENIUM_GRID=127.0.0.1:4444`
 
@@ -128,7 +128,7 @@ You must use the following dependency in your testng project to get access to al
 <dependency>
     <groupId>com.github.privaliatech</groupId>
     <artifactId>gingerspec</artifactId>
-    <version>2.1.0</version>
+    <version>2.1.0-RC1</version>
 </dependency>
 ``` 
 

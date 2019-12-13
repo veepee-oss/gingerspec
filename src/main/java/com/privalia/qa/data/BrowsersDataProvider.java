@@ -36,7 +36,10 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
+/**
+ * Handles the connection to a Selenium Grid/Standalone Nodes to all classes
+ * with the {@link org.testng.annotations.Factory} annotation in the constructor
+ */
 public final class BrowsersDataProvider {
 
     public static final int DEFAULT_TIMEOUT = 20000;

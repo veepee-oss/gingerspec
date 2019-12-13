@@ -164,6 +164,12 @@ public class HookGSpec extends BaseGSpec {
             capabilities.setCapability(entry.getKey(), (Object) entry.getValue());
         }
 
+        /**
+         * When testing mobile apps, the "app" capability is necessary to indicate the app under test
+         * This variable can also be provided using the maven variable -DAPP=/full/path/to/file.
+         * If both, an app capability and -DAPP variable are provided, the -DAPP will take precedence
+         */
+
         String app = capabilitiesMap.get("app");
 
         if (System.getProperty("APP") != null) {
@@ -171,7 +177,7 @@ public class HookGSpec extends BaseGSpec {
         }
 
         if (app == null) {
-            fail("No app specified (The absolute local path or remote http URL of an .apk or .ipa file). You can specify this in the node capabilities or using -DAPP=/path/to/file");
+            fail("No app specified (The absolute local path or remote http URL of an .apk or .ipa file). You can specify this in the node capabilities or using -DAPP=/full/path/to/file");
         }
 
         capabilities.setCapability("app", app);
@@ -307,8 +313,8 @@ public class HookGSpec extends BaseGSpec {
                 break;
 
             default:
-                commonspec.getLogger().error("Unknown browser: " + browser);
-                throw new WebDriverException("Unknown browser: " + browser);
+                commonspec.getLogger().error("Unknown browser: " + browser + ". For using local browser, only chrome/firefox are supported");
+                throw new WebDriverException("Unknown browser: " + browser + ". For using local browser, only chrome/firefox are supported");
         }
 
         commonspec.setDriver(driver);
@@ -327,7 +333,7 @@ public class HookGSpec extends BaseGSpec {
             commonspec.getDriver().manage().window().setSize(new Dimension(1440, 900));
         }
 
-        //Doing a window.maximize in mobile could cause the browser to fail
+        //Doing a window.maximize in mobile browser could cause the test to fail
         if ((!(platformName.toLowerCase().matches("android") || platformName.toLowerCase().matches("ios")))) {
             commonspec.getDriver().manage().window().maximize();
         }
