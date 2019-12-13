@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.1.0-RC1
+
+* A new step for executing Javascript functions (using JavaScriptExecutor) was included in the Selenium step definitions
+
+* 
+
 ## 2.0.4
 
 * Improved documentation on some of the feature files

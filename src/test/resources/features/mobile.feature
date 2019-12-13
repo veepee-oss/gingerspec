@@ -13,8 +13,6 @@ Feature: Running tests in mobile devices
     server is running in localhost:4723)
     mvn verify -Dit.test=com.privalia.qa.specs.MobileGIT -DSELENIUM_NODE=localhost:4723
 
-    Check the following documentation for more information
-
   Scenario: Opening an closing the app
     Given I open the application
     And I wait '5' seconds
