@@ -15,6 +15,7 @@
 
 [![Build Status](https://travis-ci.com/PrivaliaTech/gingerspec.svg)](https://travis-ci.com/PrivaliaTech/gingerspec)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.privaliatech/gingerspec/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.privaliatech/gingerspec)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 Privalia Acceptance Test library. Testing runtime to rule over Privalia's acceptance tests
 
