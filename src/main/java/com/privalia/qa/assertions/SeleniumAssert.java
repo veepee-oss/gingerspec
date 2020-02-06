@@ -296,9 +296,9 @@ public class SeleniumAssert extends AbstractAssert<SeleniumAssert, Object> {
      */
     public SeleniumAssert hasAtLeast(Integer size) {
         if (actual instanceof List) {
-            Integers.instance().assertGreaterThan(info, ((List<WebElement>) actual).size(), size);
+            Integers.instance().assertGreaterThanOrEqualTo(info, ((List<WebElement>) actual).size(), size);
         } else if (actual instanceof PreviousWebElements) {
-            Integers.instance().assertGreaterThan(info, ((PreviousWebElements) actual).getPreviousWebElements().size(), size);
+            Integers.instance().assertGreaterThanOrEqualTo(info, ((PreviousWebElements) actual).getPreviousWebElements().size(), size);
         }
         return this;
     }
