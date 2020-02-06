@@ -810,8 +810,8 @@ public class CommonG {
             outputFile = outputFile + ".png";
             File file = null;
             driver.switchTo().defaultContent();
-            ((Locatable) driver.findElement(By.tagName("body")))
-                    .getCoordinates().inViewPort();
+//            ((Locatable) driver.findElement(By.tagName("body")))
+////                    .getCoordinates().inViewPort();
 
             if (currentBrowser.startsWith("android")
                     || currentBrowser.startsWith("droidemu")) {

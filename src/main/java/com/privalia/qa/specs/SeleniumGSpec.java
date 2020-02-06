@@ -279,7 +279,8 @@ public class SeleniumGSpec extends BaseGSpec {
 
         if (atLeast != null) {
             wel = commonspec.locateElement(method, element, -1);
-            assertThat(wel.size()).as("Element count doesnt match").isGreaterThanOrEqualTo(expectedCount);
+            assertThat(this.commonspec, wel).as("Element count doesnt match").hasAtLeast(expectedCount);
+
         } else {
             wel = commonspec.locateElement(method, element, expectedCount);
         }
