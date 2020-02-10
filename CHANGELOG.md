@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1.0-RC2
+
+* Changed the hasAtLeast method from assertGreaterThan to assertGreaterThanOrEqual. Under certain conditions, no screen capture was taken when an exception occurred 
+
 ## 2.1.0-RC1
 
 * A new step for executing Javascript functions (using JavaScriptExecutor) was included in the Selenium step definitions
