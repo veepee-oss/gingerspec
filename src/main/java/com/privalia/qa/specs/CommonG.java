@@ -2053,7 +2053,7 @@ public class CommonG {
                     }
                     break;
                 default:
-                    Assertions.fail("Not implemented condition");
+                    Assertions.fail("Not valid operation '" + condition + "'. Valid operations: 'equal', 'not equal', 'contains', 'does not contain', 'length', 'exists', 'does not exists' and 'size'");
                     break;
             }
         } else if (o instanceof List) {
