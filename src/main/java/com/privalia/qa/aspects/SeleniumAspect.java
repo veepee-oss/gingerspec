@@ -21,6 +21,7 @@ import com.privalia.qa.specs.BaseGSpec;
 import com.privalia.qa.specs.CommonG;
 import com.privalia.qa.specs.SeleniumGSpec;
 import com.privalia.qa.utils.PreviousWebElements;
+import io.appium.java_client.MobileDriver;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -129,9 +130,15 @@ public class SeleniumAspect extends BaseGSpec {
                     common.setDriver((RemoteWebDriver) driver);
                     suffix = "exception";
                 }
-                common.captureEvidence(driver, "framehtmlSource", suffix);
-                common.captureEvidence(driver, "htmlSource", suffix);
-                common.captureEvidence(driver, "screenCapture", suffix);
+
+                if (driver instanceof MobileDriver) {
+                    common.captureEvidence(driver, "mobileScreenCapture", suffix);
+                    common.captureEvidence(driver, "mobilePageSource", suffix);
+                } else {
+                    common.captureEvidence(driver, "framehtmlSource", suffix);
+                    common.captureEvidence(driver, "htmlSource", suffix);
+                    common.captureEvidence(driver, "screenCapture", suffix);
+                }
                 logger.info("Screenshots are available at target/executions");
             } else {
                 logger.info("Got no Selenium driver to capture a screen");

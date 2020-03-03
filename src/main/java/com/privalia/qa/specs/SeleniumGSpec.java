@@ -279,8 +279,8 @@ public class SeleniumGSpec extends BaseGSpec {
 
         if (atLeast != null) {
             wel = commonspec.locateElement(method, element, -1);
-            assertThat(this.commonspec, wel).as("Element count doesnt match").hasAtLeast(expectedCount);
-
+            PreviousWebElements pwel = new PreviousWebElements(wel);
+            assertThat(this.commonspec, pwel).as("Element count doesnt match").hasAtLeast(expectedCount);
         } else {
             wel = commonspec.locateElement(method, element, expectedCount);
         }

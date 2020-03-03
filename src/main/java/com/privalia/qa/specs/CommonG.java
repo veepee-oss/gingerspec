@@ -836,6 +836,44 @@ public class CommonG {
             } catch (IOException e) {
                 logger.error("Exception on copying browser screen capture", e);
             }
+
+        } else if ("mobileScreenCapture".equals(type)) {
+
+            outputFile = dir + clazz + "/"
+                    + ThreadProperty.get("feature") + "." + ThreadProperty.get("scenario") + "/"  +
+                    currentData + ts.toString() + suffix;
+
+            outputFile = outputFile.replaceAll(" ", "_") + ".png";
+
+            try {
+                File file = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+                FileUtils.copyFile(file, new File(outputFile));
+            } catch (Exception e) {
+                logger.error("Exception when taking screenshot", e);
+            }
+
+        } else if ("mobilePageSource".equals(type)) {
+
+            outputFile = dir + clazz + "/"
+                    + ThreadProperty.get("feature") + "." + ThreadProperty.get("scenario") + "/"  +
+                    currentData + ts.toString() + suffix;
+
+            outputFile = outputFile.replaceAll(" ", "_") + ".xml";
+
+            String source = driver.getPageSource();
+
+            File fout = new File(outputFile);
+            boolean dirs = fout.getParentFile().mkdirs();
+
+            try (FileOutputStream fos = new FileOutputStream(fout, true)) {
+                Writer out = new OutputStreamWriter(fos, "UTF8");
+                PrintWriter writer = new PrintWriter(out, false);
+                writer.append(source);
+                writer.close();
+                out.close();
+            } catch (IOException e) {
+                logger.error("Exception on evidence capture", e);
+            }
         }
 
         return outputFile;
