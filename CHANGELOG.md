@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.1.0-RC3
+
+*  Fixed bug that was causing that during assertion errors, no screen capture was taken when driver was instance of mobiledriver (appium)
+
+* Added a more descriptive error message to evaluateJSONElementOperation method
+
 ## 2.1.0-RC2
 
 * Changed the hasAtLeast method from assertGreaterThan to assertGreaterThanOrEqual. Under certain conditions, no screen capture was taken when an exception occurred 
