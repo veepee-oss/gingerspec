@@ -606,7 +606,7 @@ public class CommonG {
 
         if (expectedCount != -1) {
             PreviousWebElements pwel = new PreviousWebElements(wel);
-            assertThat(this, pwel).as("Element count doesnt match").hasSize(expectedCount);
+            assertThat(this, pwel).as("Couldn't find the expected amount of elements (%s) with the given %s", expectedCount, method).hasSize(expectedCount);
         }
 
         return wel;
@@ -660,7 +660,7 @@ public class CommonG {
 
             return wel;
         } catch (Exception e) {
-            this.getLogger().error("An exception ocurred: " + e.getMessage());
+            this.getLogger().error("An exception occurred: " + e.getMessage());
             this.getExceptions().add(e);
             throw e;
         }
