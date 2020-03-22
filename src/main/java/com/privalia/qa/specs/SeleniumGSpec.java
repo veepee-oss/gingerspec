@@ -36,7 +36,10 @@ public class SeleniumGSpec extends BaseGSpec {
 
 
     /**
-     * Set app host and port
+     * Set app host and port.
+     *
+     * This is an initialization step. This is used as the first step in Selenium features to configure
+     * the url the selenium driver will load
      *
      * @param host host where app is running (i.e "localhost" or "localhost:443")
      */
@@ -63,6 +66,8 @@ public class SeleniumGSpec extends BaseGSpec {
     /**
      * Browse to {@code url} using the current browser.
      *
+     * The {@code url} is relative to the basepath configured with {@link SeleniumGSpec#setupApp(String)} method
+     *
      * @param isSecured     If the connection should be secured
      * @param path          path of running app
      * @throws Exception    exception
@@ -72,11 +77,11 @@ public class SeleniumGSpec extends BaseGSpec {
         assertThat(path).isNotEmpty();
 
         if (commonspec.getWebHost() == null) {
-            throw new Exception("Web host has not been set");
+            throw new Exception("Web host has not been set. You may need to use the 'My app is running in...' step first");
         }
 
         if (commonspec.getWebPort() == null) {
-            throw new Exception("Web port has not been set");
+            throw new Exception("Web port has not been set. You may need to use the 'My app is running in...' step first");
         }
         String protocol = "http://";
         if (isSecured != null) {
@@ -91,7 +96,7 @@ public class SeleniumGSpec extends BaseGSpec {
 
 
     /**
-     * Checks that a web elements exists in the page and is of the type specified. This method is similar to {@link SeleniumGSpec#assertSeleniumNElementExists(String, Integer, String, String)}
+     * Checks that a web elements exists in the page and is of the type specified. This method is similar to {@link SeleniumGSpec#assertSeleniumNElementExists(String, Integer, String, String)} <br>
      * but implements a pooling mechanism with a maximum pooling time instead of a static wait
      *
      * @param poolingInterval Time between consecutive condition evaluations
@@ -114,10 +119,9 @@ public class SeleniumGSpec extends BaseGSpec {
      *
      * @param poolingInterval Time between consecutive condition evaluations
      * @param poolMaxTime     Maximum time to wait for the condition to be true
-     * @throws Throwable      Throwable
      */
     @Then("^I check every '(\\d+)' seconds for at least '(\\d+)' seconds until an alert appears$")
-    public void waitAlertWithPooling(int poolingInterval, int poolMaxTime) throws Throwable {
+    public void waitAlertWithPooling(int poolingInterval, int poolMaxTime) {
         Alert alert = commonspec.waitAlertWithPooling(poolingInterval, poolMaxTime);
         commonspec.setSeleniumAlert(alert);
     }
@@ -125,20 +129,18 @@ public class SeleniumGSpec extends BaseGSpec {
     /**
      * Accepts an alert message previously found
      *
-     * @throws Throwable Throwable
      */
     @Then("^I dismiss the alert$")
-    public void iAcceptTheAlert() throws Throwable {
+    public void iAcceptTheAlert() {
         commonspec.dismissSeleniumAlert();
     }
 
     /**
      * Dismiss an alert message previously found
      *
-     * @throws Throwable Throwable
      */
     @Then("^I accept the alert$")
-    public void iDismissTheAlert() throws Throwable {
+    public void iDismissTheAlert() {
         commonspec.acceptSeleniumAlert();
     }
 
@@ -147,19 +149,23 @@ public class SeleniumGSpec extends BaseGSpec {
      * is suitable for file selectors/file pickers (an input type=file), where the user must specify a
      * file in the local computer as an input in a form
      *
+     * This step requires a previous operation for finding elements to have been executed, such as: <br>
+     * {@link SeleniumGSpec#assertSeleniumNElementExists(String, Integer, String, String)} <br>
+     * {@link SeleniumGSpec#assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)} <br>
+     * {@link SeleniumGSpec#waitWebElementWithPooling(int, int, int, String, String, String)}
+     *
      * @param fileName      Name of the file relative to schemas folder (schemas/myFile.txt)
      * @param index         Index of the web element (file input)
-     * @throws Throwable    Throwable
      */
     @Then("^I assign the file in '(.+?)' to the element on index '(\\d+)'$")
-    public void iSetTheFileInSchemasEmptyJsonToTheElementOnIndex(String fileName, int index) throws Throwable {
+    public void iSetTheFileInSchemasEmptyJsonToTheElementOnIndex(String fileName, int index) {
 
         //Get file absolute path
         String filePath = getClass().getClassLoader().getResource(fileName).getPath();
 
         //Assign the file absolute path to the file picker element previously set
         File f = new File(filePath);
-        assertThat(this.getCommonSpec(), f.exists()).as("The file located in " + filePath + " does not exists or is not accesible").isEqualTo(true);
+        assertThat(this.getCommonSpec(), f.exists()).as("The file located in " + filePath + " does not exists or is not accessible").isEqualTo(true);
         commonspec.getPreviousWebElements().getPreviousWebElements().get(index).sendKeys(filePath);
     }
 
@@ -175,6 +181,11 @@ public class SeleniumGSpec extends BaseGSpec {
 
     /**
      * Switches to a frame/ iframe.
+     *
+     * This step requires a previous operation for finding elements to have been executed, such as: <br>
+     * {@link SeleniumGSpec#assertSeleniumNElementExists(String, Integer, String, String)} <br>
+     * {@link SeleniumGSpec#assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)} <br>
+     * {@link SeleniumGSpec#waitWebElementWithPooling(int, int, int, String, String, String)}
      *
      * @param index the index
      */
@@ -233,14 +244,19 @@ public class SeleniumGSpec extends BaseGSpec {
      */
     @Given("^a new window is opened$")
     public void seleniumGetwindows() {
-        Set<String> wel = commonspec.getDriver().getWindowHandles();
 
-        assertThat(wel).as("Element count doesnt match").hasSize(2);
+        Set<String> wel = commonspec.getDriver().getWindowHandles();
+        assertThat(wel).as("No new windows opened. Driver only returned %s window handles", wel.size()).hasSize(2);
     }
 
 
     /**
      * Verifies that a webelement previously found has {@code text} as text
+     *
+     * This step requires a previous operation for finding elements to have been executed, such as: <br>
+     * {@link SeleniumGSpec#assertSeleniumNElementExists(String, Integer, String, String)} <br>
+     * {@link SeleniumGSpec#assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)} <br>
+     * {@link SeleniumGSpec#waitWebElementWithPooling(int, int, int, String, String, String)}
      *
      * @param index the index of the webelement
      * @param text  the text to verify
@@ -296,9 +312,13 @@ public class SeleniumGSpec extends BaseGSpec {
 
 
     /**
-     * Checks if {@code expectedCount} webelements are found, whithin a {@code timeout} and with a location
+     * Checks if {@code expectedCount} webelements are found, within a {@code timeout} and with a location
      * {@code method}. Each negative lookup is followed by a wait of {@code wait} seconds. Selenium times are not
      * accounted for the mentioned timeout.
+     *
+     * This method is similar to {@link SeleniumGSpec#waitWebElementWithPooling(int, int, int, String, String, String)}
+     * but uses static wait instead of {@link org.openqa.selenium.support.ui.FluentWait} and does not assert the expected
+     * condition of the elements (if elements are visible|hidden|present|clickable)
      *
      * @param timeout                   the max time to wait for the condition to be true
      * @param wait                      interval between verification
@@ -326,7 +346,7 @@ public class SeleniumGSpec extends BaseGSpec {
         }
 
         PreviousWebElements pwel = new PreviousWebElements(wel);
-        assertThat(this.commonspec, pwel).as("Element count doesnt match").hasSize(expectedCount);
+        assertThat(this.commonspec, pwel).as("Could not find the expected amount of element(s) (%s), with the given %s. Checked for %s secs, %s secs interval,", expectedCount, method, timeout, wait).hasSize(expectedCount);
         commonspec.setPreviousWebElements(pwel);
 
     }
@@ -334,6 +354,11 @@ public class SeleniumGSpec extends BaseGSpec {
 
     /**
      * Verifies that a webelement previously found {@code isDisplayed}
+     *
+     * This step requires a previous operation for finding elements to have been executed, such as: <br>
+     * {@link SeleniumGSpec#assertSeleniumNElementExists(String, Integer, String, String)} <br>
+     * {@link SeleniumGSpec#assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)} <br>
+     * {@link SeleniumGSpec#waitWebElementWithPooling(int, int, int, String, String, String)}
      *
      * @param index  the index of the element
      * @param option the option (is selected or not)
@@ -356,6 +381,11 @@ public class SeleniumGSpec extends BaseGSpec {
     /**
      * Verifies that a webelement previously found {@code isEnabled}
      *
+     * This step requires a previous operation for finding elements to have been executed, such as: <br>
+     * {@link SeleniumGSpec#assertSeleniumNElementExists(String, Integer, String, String)} <br>
+     * {@link SeleniumGSpec#assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)} <br>
+     * {@link SeleniumGSpec#waitWebElementWithPooling(int, int, int, String, String, String)}
+     *
      * @param index  the index of the web element in the list
      * @param option the option (is enabled or not)
      */
@@ -376,6 +406,11 @@ public class SeleniumGSpec extends BaseGSpec {
 
     /**
      * Verifies that a webelement previously found {@code isSelected}
+     *
+     * This step requires a previous operation for finding elements to have been executed, such as: <br>
+     * {@link SeleniumGSpec#assertSeleniumNElementExists(String, Integer, String, String)} <br>
+     * {@link SeleniumGSpec#assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)} <br>
+     * {@link SeleniumGSpec#waitWebElementWithPooling(int, int, int, String, String, String)}
      *
      * @param index  the index of the web element in the list
      * @param option the option (if it is enabled or not)
@@ -398,6 +433,11 @@ public class SeleniumGSpec extends BaseGSpec {
     /**
      * Verifies that a webelement previously found has {@code attribute} with {@code value} (as a regexp)
      *
+     * This step requires a previous operation for finding elements to have been executed, such as: <br>
+     * {@link SeleniumGSpec#assertSeleniumNElementExists(String, Integer, String, String)} <br>
+     * {@link SeleniumGSpec#assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)} <br>
+     * {@link SeleniumGSpec#waitWebElementWithPooling(int, int, int, String, String, String)}
+     *
      * @param index     the index of the web element
      * @param attribute the attribute to verify
      * @param value     the value of the attribute
@@ -415,10 +455,9 @@ public class SeleniumGSpec extends BaseGSpec {
     /**
      * Takes an snapshot of the current page
      *
-     * @throws Exception Exception
      */
     @Then("^I take a snapshot$")
-    public void seleniumSnapshot() throws Exception {
+    public void seleniumSnapshot() {
         commonspec.captureEvidence(commonspec.getDriver(), "screenCapture");
     }
 
@@ -450,16 +489,20 @@ public class SeleniumGSpec extends BaseGSpec {
     /**
      * Save cookie in context for future references
      *
-     * @throws Exception Exception
      */
     @Then("^I save selenium cookies in context$")
-    public void saveSeleniumCookies() throws Exception {
+    public void saveSeleniumCookies() {
         commonspec.setSeleniumCookies(commonspec.getDriver().manage().getCookies());
     }
 
 
     /**
      * Takes the content of a webElement and stores it in the thread environment variable passed as parameter
+     *
+     * This step requires a previous operation for finding elements to have been executed, such as: <br>
+     * {@link SeleniumGSpec#assertSeleniumNElementExists(String, Integer, String, String)} <br>
+     * {@link SeleniumGSpec#assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)} <br>
+     * {@link SeleniumGSpec#waitWebElementWithPooling(int, int, int, String, String, String)}
      *
      * @param index  position of the element in the array of webElements found
      * @param envVar name of the thread environment variable where to store the text
@@ -476,15 +519,17 @@ public class SeleniumGSpec extends BaseGSpec {
     /**
      * Verifies if the value of a property of the webelement referenced by index matches the given value
      *
+     * This step requires a previous operation for finding elements to have been executed, such as: <br>
+     * {@link SeleniumGSpec#assertSeleniumNElementExists(String, Integer, String, String)} <br>
+     * {@link SeleniumGSpec#assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)} <br>
+     * {@link SeleniumGSpec#waitWebElementWithPooling(int, int, int, String, String, String)}
+     *
      * @param index                     Position of the element in the array of webElements
      * @param textValue                 Value expected in the property
      * @param customProperty            Property of webElement to verify
-     * @throws IllegalAccessException   IllegalAccessException
-     * @throws NoSuchFieldException     NoSuchFieldException
-     * @throws ClassNotFoundException   ClassNotFoundException
      */
     @Then("^the element in index '(.+?)' has '(.+?)' in property '(.+?)'$")
-    public void theElementOnIndexHasTextInCustomPropertyName(int index, String textValue, String customProperty) throws IllegalAccessException, NoSuchFieldException, ClassNotFoundException {
+    public void theElementOnIndexHasTextInCustomPropertyName(int index, String textValue, String customProperty) {
 
         List<WebElement> wel = commonspec.getPreviousWebElements().getPreviousWebElements();
         assertThat(wel.size()).as("The last step did not find elements").isNotZero();
@@ -524,11 +569,15 @@ public class SeleniumGSpec extends BaseGSpec {
     /**
      * Click on an numbered {@code url} previously found element.
      *
+     * This step requires a previous operation for finding elements to have been executed, such as: <br>
+     * {@link SeleniumGSpec#assertSeleniumNElementExists(String, Integer, String, String)} <br>
+     * {@link SeleniumGSpec#assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)} <br>
+     * {@link SeleniumGSpec#waitWebElementWithPooling(int, int, int, String, String, String)}
+     *
      * @param index                 Index of the webelement in the list
-     * @throws InterruptedException InterruptedException
      */
     @When("^I click on the element on index '(\\d+?)'$")
-    public void seleniumClick(Integer index) throws InterruptedException {
+    public void seleniumClick(Integer index) {
 
         assertThat(this.commonspec, commonspec.getPreviousWebElements()).as("Could not get webelement with index %s. Less elements were found. Allowed index: 0 to %s", index, commonspec.getPreviousWebElements().getPreviousWebElements().size() - 1)
                 .hasAtLeast(index + 1);
@@ -538,6 +587,11 @@ public class SeleniumGSpec extends BaseGSpec {
 
     /**
      * Clear the text on a numbered {@code index} previously found element.
+     *
+     * This step requires a previous operation for finding elements to have been executed, such as: <br>
+     * {@link SeleniumGSpec#assertSeleniumNElementExists(String, Integer, String, String)} <br>
+     * {@link SeleniumGSpec#assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)} <br>
+     * {@link SeleniumGSpec#waitWebElementWithPooling(int, int, int, String, String, String)}
      *
      * @param index index of the web element
      */
@@ -554,6 +608,11 @@ public class SeleniumGSpec extends BaseGSpec {
 
     /**
      * Type a {@code text} on an numbered {@code index} previously found element.
+     *
+     * This step requires a previous operation for finding elements to have been executed, such as: <br>
+     * {@link SeleniumGSpec#assertSeleniumNElementExists(String, Integer, String, String)} <br>
+     * {@link SeleniumGSpec#assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)} <br>
+     * {@link SeleniumGSpec#waitWebElementWithPooling(int, int, int, String, String, String)}
      *
      * @param input Text to write on the element
      * @param index Index of the webelement in the list
@@ -587,7 +646,12 @@ public class SeleniumGSpec extends BaseGSpec {
      * ARROW_UP, RIGHT, ARROW_RIGHT, DOWN, ARROW_DOWN, INSERT, DELETE, SEMICOLON, EQUALS, NUMPAD0, NUMPAD1, NUMPAD2,
      * NUMPAD3, NUMPAD4, NUMPAD5, NUMPAD6, NUMPAD7, NUMPAD8, NUMPAD9, MULTIPLY, ADD, SEPARATOR, SUBTRACT, DECIMAL,
      * DIVIDE, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, META, COMMAND, ZENKAKU_HANKAKU) , a plus sign (+), a
-     * comma (,) or spaces ( )
+     * comma (,) or spaces ( ) <br>
+     *
+     * This step requires a previous operation for finding elements to have been executed, such as: <br>
+     * {@link SeleniumGSpec#assertSeleniumNElementExists(String, Integer, String, String)} <br>
+     * {@link SeleniumGSpec#assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)} <br>
+     * {@link SeleniumGSpec#waitWebElementWithPooling(int, int, int, String, String, String)}
      *
      * @param text  key stroke to send
      * @param index index of the web element in the list
@@ -630,6 +694,11 @@ public class SeleniumGSpec extends BaseGSpec {
     /**
      * Choose an @{code option} from a select webelement found previously
      *
+     * This step requires a previous operation for finding elements to have been executed, such as: <br>
+     * {@link SeleniumGSpec#assertSeleniumNElementExists(String, Integer, String, String)} <br>
+     * {@link SeleniumGSpec#assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)} <br>
+     * {@link SeleniumGSpec#waitWebElementWithPooling(int, int, int, String, String, String)}
+     *
      * @param option option in the select element
      * @param index  index of the web element in the list
      */
@@ -644,6 +713,11 @@ public class SeleniumGSpec extends BaseGSpec {
 
     /**
      * Choose no option from a select webelement found previously
+     *
+     * This step requires a previous operation for finding elements to have been executed, such as: <br>
+     * {@link SeleniumGSpec#assertSeleniumNElementExists(String, Integer, String, String)} <br>
+     * {@link SeleniumGSpec#assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)} <br>
+     * {@link SeleniumGSpec#waitWebElementWithPooling(int, int, int, String, String, String)}
      *
      * @param index index of the web element in the list
      */
@@ -677,16 +751,20 @@ public class SeleniumGSpec extends BaseGSpec {
     /**
      * Saves the given property of the specified webelement (referenced by its index) in the specified variable.
      *
+     * This step requires a previous operation for finding elements to have been executed, such as: <br>
+     * {@link SeleniumGSpec#assertSeleniumNElementExists(String, Integer, String, String)} <br>
+     * {@link SeleniumGSpec#assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)} <br>
+     * {@link SeleniumGSpec#waitWebElementWithPooling(int, int, int, String, String, String)}
+     *
      * @param propertyName  Name of the property
      * @param index         Index of the webelement in the list
      * @param variable      Variable where to save the result
-     * @throws Throwable    Throwable
      */
     @Then("^I save the value of the property '(.+?)' of the element in index '(.+?)' in variable '(.+?)'$")
-    public void iSaveTheValueOfThePropertyHrefOfTheElementInIndexInVariableVAR(String propertyName, int index, String variable) throws Throwable {
+    public void iSaveTheValueOfThePropertyHrefOfTheElementInIndexInVariableVAR(String propertyName, int index, String variable) {
         List<WebElement> wel = commonspec.getPreviousWebElements().getPreviousWebElements();
         String value = wel.get(index).getAttribute(propertyName);
-        assertThat(value).as("The web element dont have the property '" + propertyName + "'").isNotNull();
+        assertThat(value).as("The web element doesn't have the property '" + propertyName + "'").isNotNull();
         ThreadProperty.set(variable, value);
     }
 
@@ -695,13 +773,17 @@ public class SeleniumGSpec extends BaseGSpec {
      * Executes a JavaScript function in the current driver. This could be useful for getting specific information on the
      * web page or forcing specific actions, like clicking on an element that is being blocked by a popup
      *
+     * This step requires a previous operation for finding elements to have been executed, such as: <br>
+     * {@link SeleniumGSpec#assertSeleniumNElementExists(String, Integer, String, String)} <br>
+     * {@link SeleniumGSpec#assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)} <br>
+     * {@link SeleniumGSpec#waitWebElementWithPooling(int, int, int, String, String, String)}
+     *
      * @param script        Script to execute (i.e alert("This is an alert message"))
      * @param index         If used, the index of the previously found web element on which to execute the function
      * @param enVar         if used, variable where to store the result of the execution of the script
-     * @throws Throwable    Throwable
      */
     @Then("^I execute '(.+?)' as javascript( on the element on index '(.+?)')?( and save the result in the environment variable '(.+?)')?$")
-    public void iExecuteTheScriptScriptOnTheElmentOnIndex(String script, String index, String enVar) throws Throwable {
+    public void iExecuteTheScriptScriptOnTheElmentOnIndex(String script, String index, String enVar) {
 
         JavascriptExecutor executor = (JavascriptExecutor) this.commonspec.getDriver();
         Object output;
