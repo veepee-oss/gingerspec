@@ -606,7 +606,7 @@ public class CommonG {
 
         if (expectedCount != -1) {
             PreviousWebElements pwel = new PreviousWebElements(wel);
-            assertThat(this, pwel).as("Element count doesnt match").hasSize(expectedCount);
+            assertThat(this, pwel).as("Couldn't find the expected amount of elements (%s) with the given %s", expectedCount, method).hasSize(expectedCount);
         }
 
         return wel;
@@ -629,7 +629,7 @@ public class CommonG {
     public List<WebElement> locateElementWithPooling(int poolingInterval, int poolMaxTime, String method, String element,
                                                      Integer expectedCount, String type) {
 
-        Wait wait = new FluentWait(driver)
+        FluentWait fluentWait = new FluentWait(driver)
                 .withTimeout(poolMaxTime, SECONDS)
                 .pollingEvery(poolingInterval, SECONDS)
                 .ignoring(NoSuchElementException.class)
@@ -641,23 +641,26 @@ public class CommonG {
         logger.debug("Waiting for {} elements by xpath to be {}", expectedCount, type);
 
         try {
-            List<WebElement> wel = (List<WebElement>) wait.until(new ElementCountByMethod(method, element, expectedCount));
 
+            fluentWait.withMessage("Could not find the expected amount of element(s) (" + expectedCount + "), with the given " + method);
+            List<WebElement> wel = (List<WebElement>) fluentWait.until(new ElementCountByMethod(method, element, expectedCount));
+
+            fluentWait.withMessage("The " + expectedCount + " element(s) found with the given " + method + " did not fulfil the expected condition '" + type + "'");
             if ("visible".matches(type)) {
-                wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(getByType(method, element)));
+                fluentWait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(getByType(method, element)));
             } else if ("clickable".matches(type)) {
-                wait.until(ExpectedConditions.elementToBeClickable(getByType(method, element)));
+                fluentWait.until(ExpectedConditions.elementToBeClickable(getByType(method, element)));
             } else if ("present".matches(type)) {
-                wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(getByType(method, element)));
+                fluentWait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(getByType(method, element)));
             } else if ("hidden".matches(type)) {
-                wait.until(ExpectedConditions.invisibilityOfElementLocated(getByType(method, element)));
+                fluentWait.until(ExpectedConditions.invisibilityOfElementLocated(getByType(method, element)));
             } else {
                 fail("Unknown type: " + type);
             }
 
             return wel;
         } catch (Exception e) {
-            this.getLogger().error("An exception ocurred: " + e.getMessage());
+            this.getLogger().error("An exception occurred: " + e.getMessage());
             this.getExceptions().add(e);
             throw e;
         }
