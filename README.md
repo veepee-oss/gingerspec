@@ -50,74 +50,11 @@ GingerSpec provides common functionality that can be reused by different test pr
 
 ## Getting Started
 
-After modifying, to check changes in your local project do:  
+Check the following articles to get more information about how to use GingerSpec:
 
-`mvn clean install -Dmaven.test.skip=true` (tests skip temporarily)  
-
-If you want to execute all the integration tests in the library, please take a look at the docker-compose file for more information
-
-
-#### Testing with alternative SDK
-
-If you want to test your changes in a different sdk, you can use the official docker images of maven in the following way:
-
-First, create a docker volume where all dependencies will be stored (to avoid downloading all dependencies on every run)
-
-`docker volume create --name maven-repo` 
-
-Run your maven commands inside the container (use the -v option to map the previously created volume):
-
-`docker run -it --rm --name gingerspec -v maven-repo:/root/.m2 -v "$(pwd)":/usr/src/mymaven -w /usr/src/mymaven maven:3.6.1-jdk-11 mvn clean install -Dmaven.test.skip=true`
-
-This will execute the command using maven 3.6.1 and jdk-11. For the full list of supported tags check the official documentation [here](https://hub.docker.com/_/maven)
-
-You can also use the option `--network host` when testing the library using the included docker-compose 
-  
-#### Execution  
-  
-Individual tests are supposed to be executed as follows:  
-  
-` 
-mvn verify [-D\<ENV_VAR>=\<VALUE>] [-Dit.test=\<TEST_TO_EXECUTE>|-Dgroups=\<GROUP_TO_EXECUTE>] 
-`  
-  
-Examples:  
-  
-_**single class execution**_  
-  
-` mvn verify -DSECS=AGENT_LIST=1,2 -Dit.test=com.privalia.qa.ATests.LoopTagAspectIT `  
-  
-_**group execution**_  
-  
-` mvn verify -DSECS=5 -Dgroups=hol `  
-
-_**print log at DEBUG level when running a test**_
-
-` mvn verify -DSECS=AGENT_LIST=1,2 -Dit.test=com.privalia.qa.ATests.LoopTagAspectIT -DlogLevel=DEBUG`
-
-_**-DSELENIUM_GRID and -DFORCE_BROWSER for Selenium (@web) and mobile (@mobile) features**_
-
-` mvn verify -Dit.test=com.privalia.myproject.mypackage.CucumberSeleniumIT -DSELENIUM_GRID=127.0.0.1:4444`
-
-_**-DSELENIUM_NODE and -DSELENIUM_NODE_TYPE for Selenium features**_
-
-Instead of using a selenium grid, you can directly conect to a standalone node by specifiying its address and the type of browser it supports
-
-` mvn verify -Dit.test=com.privalia.myproject.mypackage.CucumberSeleniumIT -DSELENIUM_NODE=127.0.0.1:4444 -DSELENIUM_NODE_TYPE=chrome`
-
-_**Run Selenium features using local browser**_
-
-If neither selenium grid nor a standalone selenium node server is specified, gingerspec will automatically download the correct driver to run the test
-
-` mvn verify -Dit.test=com.privalia.myproject.mypackage.CucumberSeleniumIT` (you can use -Dbrowser=<browser> to specify the browser type. Currently supports chrome/firefox )
-
-_**-Dmaven.failsafe.debug to debug with maven and IDE.**_
-
-` mvn verify -DSECS=AGENT_LIST=1,2 -Dit.test=com.privalia.qa.ATests.LoopTagAspectIT -Dmaven.failsafe.debug`
-
-_**-DSHOW_STACK_INFO to get information about the underlying step definition function being called and its arguments.**_
-
-` mvn verify -DSECS=AGENT_LIST=1,2 -Dit.test=com.privalia.qa.ATests.LoopTagAspectIT -DSHOW_STACK_INFO`
+* [Compiling the library](https://github.com/PrivaliaTech/gingerspec/wiki/Getting-started#compiling-the-library)
+* [Testing with alternative SDK](https://github.com/PrivaliaTech/gingerspec/wiki/Getting-started#testing-with-alternative-sdk)  
+* [Tests execution](https://github.com/PrivaliaTech/gingerspec/wiki/Getting-started#tests-execution)
 
 <br>
 
@@ -129,11 +66,11 @@ You must use the following dependency in your testng project to get access to al
 <dependency>
     <groupId>com.github.privaliatech</groupId>
     <artifactId>gingerspec</artifactId>
-    <version>2.1.0-RC1</version>
+    <version>2.1.0-RC3</version>
 </dependency>
 ``` 
 
-However, we strongly suggest to make use of the special archetype for GingerSpec based projects: [gingerspec-starter](https://github.com/PrivaliaTech/gingerspec-starter). Just run the following command in your terminal
+However, we **strongly** suggest to make use of the special archetype for GingerSpec based projects: [gingerspec-starter](https://github.com/PrivaliaTech/gingerspec-starter). Just run the following command in your terminal
 
 ``` 
 mvn -U archetype:generate -DarchetypeGroupId=com.github.privaliatech -DarchetypeArtifactId=gingerspec-starter
@@ -147,19 +84,19 @@ This will create a ready-to-use project based on a template with best practices 
   
 As part of GingerSpec implementation, there are a couple of AspectJ aspects which may be useful for your scenarios:  
   
-- **RunOnTagAspect**:  Allow the conditional execution of scenarios based on a given environment variable
+- [RunOnTagAspect](https://github.com/PrivaliaTech/gingerspec/wiki/Gherkin-extended-language#runonenv-tag):  Allow the conditional execution of scenarios based on a given environment variable
   
-- **IgnoreTagAspect**: An AspectJ aspect that allows to skip an scenario or a whole feature. To do so, a tag must be used before the scenario or the feature keyword. Additionally an ignored reason can be set.  
+- [IgnoreTagAspect](https://github.com/PrivaliaTech/gingerspec/wiki/Gherkin-extended-language#ignore-tags): An AspectJ aspect that allows to skip an scenario or a whole feature. To do so, a tag must be used before the scenario or the feature keyword. Additionally an ignored reason can be set.  
   
-- **IncludeTagAspect**: An AspectJ aspect that includes an scenario before the tagged one. It manages parameters as well. Scenario name of the included feature can not contain spaces. Parameters should be wrapped in []  
+- [IncludeTagAspect](https://github.com/PrivaliaTech/gingerspec/wiki/Gherkin-extended-language#include-tag): An AspectJ aspect that includes an scenario before the tagged one. It manages parameters as well. Scenario name of the included feature can not contain spaces. Parameters should be wrapped in []  
 
-- **LoopTagAspect**: An AspectJ aspect that allows looping over scenarios. Using this tag before an scenario will convert this scenario into an scenario outline
+- [LoopTagAspect](https://github.com/PrivaliaTech/gingerspec/wiki/Gherkin-extended-language#loop-tag): An AspectJ aspect that allows looping over scenarios. Using this tag before an scenario will convert this scenario into an scenario outline
   
-- **BackgroundTagAspect**: An AspectJ aspect included in loopTagAspect that allows conditional backgrounds, or conditional executions of group of steps based in a environmental variable.
+- [BackgroundTagAspect](https://github.com/PrivaliaTech/gingerspec/wiki/Gherkin-extended-language#background-extension): An AspectJ aspect included in loopTagAspect that allows conditional backgrounds, or conditional executions of group of steps based in a environmental variable.
 
-- **ReplacementAspect**: Allows the use of variables in the Feature file. Variables are enclosed in #{}, ${}, @{} and !{} symbols and could be global (feature level) or local (scenario level)
+- [ReplacementAspect](https://github.com/PrivaliaTech/gingerspec/wiki/Gherkin-extended-language#environment-variables): Allows the use of variables in the Feature file. Variables are enclosed in #{}, ${}, @{} and !{} symbols and could be global (feature level) or local (scenario level)
   
-- **LogTagAspect**: Allows comments in the feature file to be printed in console when tests are executed.
+- [LogTagAspect](https://github.com/PrivaliaTech/gingerspec/wiki/Gherkin-extended-language#log-aspect): Allows comments in the feature file to be printed in console when tests are executed.
   
   <br>
   
