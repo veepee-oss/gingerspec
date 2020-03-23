@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.1.0
+
+* Improved assertion error messages for selenium features. Messages are now more descriptive and the errors easier to spot.
+
+* Improved javadoc for SeleniumGSpec class.
+
+* Cleanup of README file for better readability. Removed information that is now located in the project wiki.
+
 ## 2.1.0-RC3
 
 *  Fixed bug that was causing that during assertion errors, no screen capture was taken when driver was instance of mobiledriver (appium)
