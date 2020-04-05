@@ -19,6 +19,7 @@ package com.privalia.qa.specs;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
+import com.privalia.qa.data.BrowsersDataProvider;
 import com.privalia.qa.utils.ThreadProperty;
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
@@ -36,6 +37,8 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.safari.SafariOptions;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -63,6 +66,9 @@ public class HookGSpec extends BaseGSpec {
     public static final int IMPLICITLY_WAIT = 10;
 
     public static final int SCRIPT_TIMEOUT = 30;
+
+    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(HookGSpec.class);
+
 
     protected WebDriver driver;
 
@@ -210,6 +216,8 @@ public class HookGSpec extends BaseGSpec {
 
         MutableCapabilities capabilities = null;
 
+        String[] arguments = System.getProperty("SELENIUM_ARGUMENTS", "--ignore-certificate-errors;--no-sandbox").split(";");
+
         grid = "http://" + grid + "/wd/hub";
 
         //If capabilities do not contain info on the platform, we assume desktop
@@ -234,8 +242,11 @@ public class HookGSpec extends BaseGSpec {
                 } else {
                     //Testing in desktop version of chrome
                     ChromeOptions chromeOptions = new ChromeOptions();
-                    chromeOptions.addArguments("--no-sandbox");
-                    chromeOptions.addArguments("--ignore-certificate-errors");
+
+                    commonspec.getLogger().debug("Configuring chrome desktop with arguments {} ", String.join(";", arguments));
+                    for (String argument: arguments) {
+                        chromeOptions.addArguments(argument);
+                    }
                     capabilities = new ChromeOptions();
                     capabilities.setCapability(ChromeOptions.CAPABILITY, chromeOptions);
                 }
@@ -243,7 +254,14 @@ public class HookGSpec extends BaseGSpec {
                 break;
 
             case "firefox":
+                FirefoxOptions firefoxOptions = new FirefoxOptions();
+
+                commonspec.getLogger().debug("Configuring firefox desktop with arguments {} ", String.join(";", arguments));
+                for (String argument: arguments) {
+                    firefoxOptions.addArguments(argument);
+                }
                 capabilities = new FirefoxOptions();
+                capabilities.setCapability(FirefoxOptions.FIREFOX_OPTIONS, firefoxOptions);
                 break;
 
             case "phantomjs":
@@ -260,7 +278,7 @@ public class HookGSpec extends BaseGSpec {
 
                 } else {
                     //Testing in Safari desktop browser
-                    capabilities = DesiredCapabilities.safari();
+                    capabilities = new SafariOptions();
                 }
 
                 break;
@@ -291,12 +309,16 @@ public class HookGSpec extends BaseGSpec {
     private void useLocalDriver(String browser) {
 
         MutableCapabilities capabilities = null;
+        String[] arguments = System.getProperty("SELENIUM_ARGUMENTS", "--ignore-certificate-errors;--no-sandbox").split(";");
 
         switch (browser.toLowerCase()) {
             case "chrome":
                 ChromeOptions chromeOptions = new ChromeOptions();
-                chromeOptions.addArguments("--no-sandbox");
-                chromeOptions.addArguments("--ignore-certificate-errors");
+
+                commonspec.getLogger().debug("Configuring chrome desktop with arguments {} ", String.join(";", arguments));
+                for (String argument: arguments) {
+                    chromeOptions.addArguments(argument);
+                }
                 capabilities = new ChromeOptions();
                 capabilities.setCapability(ChromeOptions.CAPABILITY, chromeOptions);
                 System.setProperty("webdriver.chrome.silentOutput", "true"); //removes logging messages
@@ -305,6 +327,12 @@ public class HookGSpec extends BaseGSpec {
                 break;
 
             case "firefox":
+                FirefoxOptions firefoxOptions = new FirefoxOptions();
+
+                commonspec.getLogger().debug("Configuring firefox desktop with arguments {} ", String.join(";", arguments));
+                for (String argument: arguments) {
+                    firefoxOptions.addArguments(argument);
+                }
                 capabilities = new FirefoxOptions();
                 System.setProperty(FirefoxDriver.SystemProperty.DRIVER_USE_MARIONETTE, "true"); //removes logging messages
                 System.setProperty(FirefoxDriver.SystemProperty.BROWSER_LOGFILE, "/dev/null");  //removes logging messages
