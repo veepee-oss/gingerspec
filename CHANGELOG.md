@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.1.1
+
+* Updated dependencies for rest-assured and jacksonxml. This fixed an error when when doing schema validation for json responses
+
+* Updated dependency for webdrivermanager and fixed a small bug when passing arguments to selenium driver in local mode for firefox
+
+* Added the possibility of passing arguments directly to ChromeOptions/FirefoxOptions using the maven variable -DSELENIUM_ARGUMENTS=argument1;argument2;.....;argumentn (i.e -DSELENIUM_ARGUMENTS=--headless)
+
 ## 2.1.0
 
 * Improved assertion error messages for selenium features. Messages are now more descriptive and the errors easier to spot.
