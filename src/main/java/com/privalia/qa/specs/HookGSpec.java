@@ -334,6 +334,7 @@ public class HookGSpec extends BaseGSpec {
                     firefoxOptions.addArguments(argument);
                 }
                 capabilities = new FirefoxOptions();
+                capabilities.setCapability(FirefoxOptions.FIREFOX_OPTIONS, firefoxOptions);
                 System.setProperty(FirefoxDriver.SystemProperty.DRIVER_USE_MARIONETTE, "true"); //removes logging messages
                 System.setProperty(FirefoxDriver.SystemProperty.BROWSER_LOGFILE, "/dev/null");  //removes logging messages
                 WebDriverManager.firefoxdriver().setup();
