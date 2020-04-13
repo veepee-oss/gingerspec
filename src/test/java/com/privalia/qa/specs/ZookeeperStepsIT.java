@@ -15,10 +15,8 @@
  */
 package com.privalia.qa.specs;
 
-import com.privalia.qa.cucumber.testng.CucumberRunner;
 import com.privalia.qa.utils.BaseTest;
 import cucumber.api.CucumberOptions;
-import org.testng.annotations.Test;
 
 @CucumberOptions(
         features = {"src/test/resources/features/zookeeperSteps.feature"},
