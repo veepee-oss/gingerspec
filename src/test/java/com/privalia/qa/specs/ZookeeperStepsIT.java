@@ -15,13 +15,13 @@
  */
 package com.privalia.qa.specs;
 
-import com.privalia.qa.utils.BaseTest;
+import com.privalia.qa.utils.BaseGTest;
 import cucumber.api.CucumberOptions;
 
 @CucumberOptions(
         features = {"src/test/resources/features/zookeeperSteps.feature"},
         glue = "com.privalia.qa.specs")
-public class ZookeeperStepsIT extends BaseTest {
+public class ZookeeperStepsIT extends BaseGTest {
 
 
 }

@@ -2,7 +2,8 @@ package com.privalia.qa.cucumber.testng;
 
 import cucumber.api.CucumberOptions;
 import cucumber.api.SnippetType;
-import java.lang.annotation.Annotation;
+
+import java.lang.annotation.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -77,7 +78,7 @@ public class CucumberOptionsImpl implements CucumberOptions {
      */
     @Override
     public String[] plugin() {
-        List<String> glue  = new ArrayList<String>(Arrays.asList(cucumberOptionsAnnotation.plugin()));
+        List<String> plugin  = new ArrayList<String>(Arrays.asList(cucumberOptionsAnnotation.plugin()));
 
         /* Calculate route where to store reports */
         String testSuffix = System.getProperty("TESTSUFFIX");
@@ -87,12 +88,12 @@ public class CucumberOptionsImpl implements CucumberOptions {
         }
 
         /* Include TestNG reporter (store TestNG reports under /target/executions/com.mypackage.myClass.xml) */
-        glue.add("testng:" + targetExecutionsPath + this.className + ".xml");
+        plugin.add("testng:" + targetExecutionsPath + this.className + ".xml");
 
         /*Include custom reporter*/
-        glue.add("com.privalia.qa.cucumber.reporter.TestNGPrettyFormatter");
+        plugin.add("com.privalia.qa.cucumber.reporter.TestNGPrettyFormatter");
 
-        return (String[]) glue.toArray(cucumberOptionsAnnotation.plugin());
+        return (String[]) plugin.toArray(cucumberOptionsAnnotation.plugin());
 
     }
 

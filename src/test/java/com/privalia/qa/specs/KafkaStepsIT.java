@@ -15,13 +15,13 @@
  */
 package com.privalia.qa.specs;
 
-import com.privalia.qa.utils.BaseTest;
+import com.privalia.qa.utils.BaseGTest;
 import cucumber.api.CucumberOptions;
 
 @CucumberOptions(
         features = {"src/test/resources/features/kafkaSteps.feature"},
         glue = "com.privalia.qa.specs")
-public class KafkaStepsIT extends BaseTest {
+public class KafkaStepsIT extends BaseGTest {
 
 
 }
