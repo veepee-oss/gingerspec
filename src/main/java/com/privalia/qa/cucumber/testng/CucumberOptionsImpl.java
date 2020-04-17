@@ -6,6 +6,7 @@ import cucumber.api.SnippetType;
 import java.lang.annotation.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 /**
@@ -53,12 +54,9 @@ public class CucumberOptionsImpl implements CucumberOptions {
      */
     @Override
     public String[] glue() {
-        List<String> glue  = new ArrayList<String>(Arrays.asList(cucumberOptionsAnnotation.glue()));
-        if (!glue.contains("com.privalia.qa.specs")) {
-            glue.add("com.privalia.qa.specs");
-            return (String[]) glue.toArray(cucumberOptionsAnnotation.glue());
-        }
-        return cucumberOptionsAnnotation.glue();
+        LinkedHashSet<String> glue = new LinkedHashSet<>(Arrays.asList(cucumberOptionsAnnotation.plugin()));
+        glue.add("com.privalia.qa.specs");
+        return glue.toArray(new String[]{});
     }
 
     @Override
@@ -78,7 +76,7 @@ public class CucumberOptionsImpl implements CucumberOptions {
      */
     @Override
     public String[] plugin() {
-        List<String> plugin  = new ArrayList<String>(Arrays.asList(cucumberOptionsAnnotation.plugin()));
+        LinkedHashSet<String> plugin = new LinkedHashSet<>(Arrays.asList(cucumberOptionsAnnotation.plugin()));
 
         /* Calculate route where to store reports */
         String testSuffix = System.getProperty("TESTSUFFIX");
@@ -93,7 +91,7 @@ public class CucumberOptionsImpl implements CucumberOptions {
         /*Include custom reporter*/
         plugin.add("com.privalia.qa.cucumber.reporter.TestNGPrettyFormatter");
 
-        return (String[]) plugin.toArray(cucumberOptionsAnnotation.plugin());
+        return plugin.toArray(new String[]{});
 
     }
 

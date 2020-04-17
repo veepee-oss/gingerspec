@@ -19,6 +19,7 @@ package com.privalia.qa.utils;
 import com.privalia.qa.cucumber.testng.CucumberOptionsImpl;
 import cucumber.api.CucumberOptions;
 import cucumber.api.testng.AbstractTestNGCucumberTests;
+import cucumber.api.testng.TestNGCucumberRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.ITestContext;
@@ -45,20 +46,46 @@ abstract public class BaseGTest extends AbstractTestNGCucumberTests {
 
     protected String browser = "";
 
+
+    @BeforeSuite(alwaysRun = true)
+    public void beforeGSuite(ITestContext context) {
+    }
+
+    /**
+     * Method executed after a suite.
+     *
+     * @param context the context
+     */
+    @AfterSuite(alwaysRun = true)
+    public void afterGSuite(ITestContext context) {
+        logger.info("Done executing this test-run.");
+    }
+
+    /**
+     * Overrides the parent method {@link AbstractTestNGCucumberTests#setUpClass()} and executes custom
+     * code before the {@link TestNGCucumberRunner} object is created
+     *
+     * @throws Exception    Exception
+     */
+    @Override
+    @BeforeClass(alwaysRun = true)
+    public void setUpClass() throws Exception {
+        this.modifyCucumberOptions();
+        super.setUpClass();
+    }
+
     /**
      * Method executed before a suite.
      *
      * Before the test is executed, the library modifies the {@link CucumberOptions} annotation
      * in the runner class  to include some special configuration for GingerSpec.
      *
-     * @param context                       context
      * @throws NoSuchMethodException        NoSuchMethodException
      * @throws InvocationTargetException    InvocationTargetException
      * @throws IllegalAccessException       IllegalAccessException
      * @throws NoSuchFieldException         NoSuchFieldException
      */
-    @BeforeSuite(alwaysRun = true)
-    public void beforeGSuite(ITestContext context) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, NoSuchFieldException {
+    private void modifyCucumberOptions() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, NoSuchFieldException {
 
         CucumberOptionsImpl newAnnotation = new CucumberOptionsImpl(this.getClass());
 
@@ -72,16 +99,7 @@ abstract public class BaseGTest extends AbstractTestNGCucumberTests {
         annotations.setAccessible(true);
         Map<Class<? extends Annotation>, Annotation> map = (Map<Class<? extends Annotation>, Annotation>) annotations.get(annotationData);
         map.put(CucumberOptions.class, newAnnotation);
-    }
 
-    /**
-     * Method executed after a suite.
-     *
-     * @param context the context
-     */
-    @AfterSuite(alwaysRun = true)
-    public void afterGSuite(ITestContext context) {
-        logger.info("Done executing this test-run.");
     }
 
     /**
