@@ -54,7 +54,7 @@ public class CucumberOptionsImpl implements CucumberOptions {
      */
     @Override
     public String[] glue() {
-        LinkedHashSet<String> glue = new LinkedHashSet<>(Arrays.asList(cucumberOptionsAnnotation.plugin()));
+        LinkedHashSet<String> glue = new LinkedHashSet<>(Arrays.asList(cucumberOptionsAnnotation.glue()));
         glue.add("com.privalia.qa.specs");
         return glue.toArray(new String[]{});
     }
