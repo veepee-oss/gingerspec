@@ -453,7 +453,6 @@
                 <configuration>
                     <argLine>
                          -javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/1.8.8/aspectjweaver-1.8.8.jar
-                         -Xms512m -Xmx1536m
                     </argLine>
                     <reportsDirectory>${project.build.directory}/failsafe-reports</reportsDirectory>
                 </configuration>
