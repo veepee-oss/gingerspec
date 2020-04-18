@@ -6,6 +6,7 @@ Feature: Background aspect tests 2
     Given I run '[ "SHOULD_RUN" = "FAIL_RUN" ]' locally
     Given I run '[ "SHOULD_RUN" = "FAIL_RUN" ]' locally
     Given I run '[ "SHOULD_RUN" = "FAIL_RUN" ]' locally
+    Given I run 'exit 1' locally
   @/background
     Given I run '[ "SHOULD_RUN" = "SHOULD_RUN" ]' locally
 

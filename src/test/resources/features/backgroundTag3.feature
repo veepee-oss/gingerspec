@@ -4,6 +4,7 @@ Feature: Backgorund aspect tests 3
   @background(WAIT_NO)
     Given I run '[ "SHOULD_RUN" = "FAIL_RUN" ]' locally
     Given I run '[ "SHOULD_RUN" = "FAIL_RUN" ]' locally
+    Given I run 'exit 1' locally
   @/background
 
 

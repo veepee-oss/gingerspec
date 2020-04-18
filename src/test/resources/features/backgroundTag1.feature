@@ -6,6 +6,7 @@ Feature: Background aspect tests
   @/BACKGROUND
   @BACKGROUND(WAIT_NO)
     Given I run '[ "SHOULD_RUN" = "FAIL_RUN" ]' locally
+    Given I run 'exit 1' locally
   @/BACKGROUND
     Given I run '[ "SHOULD_RUN" = "SHOULD_RUN" ]' locally
 
