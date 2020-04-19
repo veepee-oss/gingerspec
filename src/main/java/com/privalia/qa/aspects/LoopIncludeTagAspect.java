@@ -25,13 +25,11 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -61,10 +59,16 @@ public class LoopIncludeTagAspect {
     @Around(value = "featureBuilderRead(resource)")
     public String aroundAddLoopTagPointcutScenario(ProceedingJoinPoint pjp, Resource resource) throws Throwable {
 
-        List<String> lines = Files.readAllLines(Paths.get(resource.getPath()), StandardCharsets.UTF_8);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(resource.getInputStream()));
+        List<String> lines = new ArrayList<>();
+
+        while (reader.ready()) {
+            lines.add(reader.readLine());
+        }
+
         String listParams;
         String paramReplace;
-        String path = resource.getPath();
+        String path = resource.getPath().getSchemeSpecificPart();
         int endIndex = path.lastIndexOf("/") + 1;
         path = path.substring(0, endIndex);
 

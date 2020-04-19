@@ -16,72 +16,37 @@
 
 package com.privalia.qa.utils;
 
-import com.privalia.qa.cucumber.testng.CucumberRunner;
+import com.privalia.qa.cucumber.testng.CucumberOptionsImpl;
+import cucumber.api.CucumberOptions;
 import cucumber.api.testng.AbstractTestNGCucumberTests;
-import cucumber.api.testng.CucumberFeatureWrapper;
-import cucumber.api.testng.PickleEventWrapper;
 import cucumber.api.testng.TestNGCucumberRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.ITestContext;
 import org.testng.annotations.*;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Map;
 
 /**
- * This is a custom implementation of {@link AbstractTestNGCucumberTests} that makes use of the custom {@link CucumberRunner}
- * class. Test classes must extend this class in order to be executed with TestNG and use the library steps
+ * This is a custom implementation of {@link AbstractTestNGCucumberTests} for adding special configuration
+ * of GingerSpec to the {@link CucumberOptions} annotation of the class
+ *
+ * Test classes must extend this class in order to be executed with TestNG and use the Gingerspec steps
+ * and other functionality
  *
  * @author Jose Fernandez
  */
-abstract public class BaseGTest {
+abstract public class BaseGTest extends AbstractTestNGCucumberTests {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
 
     protected String browser = "";
 
-    /**
-     * Use custom implementation of {@link TestNGCucumberRunner}
-     */
-    private CucumberRunner cucumberRunner;
 
-    @BeforeClass(alwaysRun = true)
-    public void setUpClass() throws Exception {
-        cucumberRunner = new CucumberRunner(this.getClass());
-    }
-
-    @Test(groups = "cucumber", description = "Runs Cucumber Scenarios", dataProvider = "scenarios")
-    public void runScenario(PickleEventWrapper pickleWrapper, CucumberFeatureWrapper featureWrapper) throws Throwable {
-        // the 'featureWrapper' parameter solely exists to display the feature file in a test report
-        cucumberRunner.runScenario(pickleWrapper.getPickleEvent());
-    }
-
-    /**
-     * Returns two dimensional array of PickleEventWrapper scenarios with their associated CucumberFeatureWrapper feature.
-     *
-     * @return a two dimensional array of scenarios features.
-     */
-    @DataProvider
-    public Object[][] scenarios() {
-        if (cucumberRunner == null) {
-            return new Object[0][0];
-        }
-        return cucumberRunner.provideScenarios();
-    }
-
-    @AfterClass(alwaysRun = true)
-    public void tearDownClass() throws Exception {
-        if (cucumberRunner == null) {
-            return;
-        }
-        cucumberRunner.finish();
-    }
-
-    /**
-     * Method executed before a suite.
-     *
-     * @param context the context
-     */
     @BeforeSuite(alwaysRun = true)
     public void beforeGSuite(ITestContext context) {
     }
@@ -94,6 +59,47 @@ abstract public class BaseGTest {
     @AfterSuite(alwaysRun = true)
     public void afterGSuite(ITestContext context) {
         logger.info("Done executing this test-run.");
+    }
+
+    /**
+     * Overrides the parent method {@link AbstractTestNGCucumberTests#setUpClass()} and executes custom
+     * code before the {@link TestNGCucumberRunner} object is created
+     *
+     * @throws Exception    Exception
+     */
+    @Override
+    @BeforeClass(alwaysRun = true)
+    public void setUpClass() throws Exception {
+        this.modifyCucumberOptions();
+        super.setUpClass();
+    }
+
+    /**
+     * Method executed before a suite.
+     *
+     * Before the test is executed, the library modifies the {@link CucumberOptions} annotation
+     * in the runner class  to include some special configuration for GingerSpec.
+     *
+     * @throws NoSuchMethodException        NoSuchMethodException
+     * @throws InvocationTargetException    InvocationTargetException
+     * @throws IllegalAccessException       IllegalAccessException
+     * @throws NoSuchFieldException         NoSuchFieldException
+     */
+    private void modifyCucumberOptions() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, NoSuchFieldException {
+
+        CucumberOptionsImpl newAnnotation = new CucumberOptionsImpl(this.getClass());
+
+        Method method = Class.class.getDeclaredMethod("annotationData", null);
+        method.setAccessible(true);
+        //Since AnnotationData is a private class we cannot create a direct reference to it. We will have to
+        //manage with just Object
+        Object annotationData = method.invoke(this.getClass());
+        //We now look for the map called "annotations" within AnnotationData object.
+        Field annotations = annotationData.getClass().getDeclaredField("annotations");
+        annotations.setAccessible(true);
+        Map<Class<? extends Annotation>, Annotation> map = (Map<Class<? extends Annotation>, Annotation>) annotations.get(annotationData);
+        map.put(CucumberOptions.class, newAnnotation);
+
     }
 
     /**

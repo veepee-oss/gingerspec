@@ -92,7 +92,7 @@
     </distributionManagement>
 
     <properties>
-        <cucumber-java.version>4.2.2</cucumber-java.version>
+        <cucumber-java.version>4.4.0</cucumber-java.version>
         <testng.version>6.14.3</testng.version>
         <assertj-core.version>3.3.0</assertj-core.version>
         <slf4j-api.version>1.7.7</slf4j-api.version>
@@ -453,7 +453,6 @@
                 <configuration>
                     <argLine>
                          -javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/1.8.8/aspectjweaver-1.8.8.jar
-                         -Xms512m -Xmx1536m
                     </argLine>
                     <reportsDirectory>${project.build.directory}/failsafe-reports</reportsDirectory>
                 </configuration>
