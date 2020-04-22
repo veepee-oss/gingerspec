@@ -1,5 +1,17 @@
 # Changelog
 
+## 2.1.2-RC1
+
+* Changed the way Gingerspec modifies the current cucumber options of a runner class. This change is located in BaseGTest class and it modifies the CucumberOptions annotation of the class before the TestNGCucumberRunner object is created. This new implementation is much cleaner and more decoupled from cucumber.
+
+* Removed useless BaseTest class
+
+* Removed CLI command in the POM that allocated more RAM memory on runtime
+
+* Added a step for better testing @ignore, @skip and @background annotations. The step must fail if executed, making easy to spot a problem in the annotations
+
+* Small bump in cucumber version
+
 ## 2.1.1
 
 * Updated dependencies for rest-assured and jacksonxml. This fixed an error when when doing schema validation for json responses
