@@ -825,11 +825,11 @@ public class CommonG {
                 file = chromeFullScreenCapture(driver);
             } else {
 
-                Screenshot screenshot = new AShot().shootingStrategy(ShootingStrategies.viewportPasting(500)).takeScreenshot(driver);
                 try {
+                    Screenshot screenshot = new AShot().shootingStrategy(ShootingStrategies.viewportPasting(500)).takeScreenshot(driver);
                     file = new File("target/temp");
                     ImageIO.write(screenshot.getImage(), "PNG", file);
-                } catch (IOException e) {
+                } catch (Exception e) {
                     logger.error("Exception on taking screenshot", e);
                 }
             }
