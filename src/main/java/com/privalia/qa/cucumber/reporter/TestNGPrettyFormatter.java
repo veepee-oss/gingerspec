@@ -18,11 +18,9 @@ package com.privalia.qa.cucumber.reporter;
 
 import com.privalia.qa.utils.ThreadProperty;
 import cucumber.api.*;
-import cucumber.api.Scenario;
 import cucumber.api.event.*;
 import cucumber.api.formatter.ColorAware;
 import cucumber.api.formatter.NiceAppendable;
-import cucumber.runtime.DefinitionArgument;
 import cucumber.runtime.formatter.Format;
 import cucumber.runtime.formatter.Formats;
 import cucumber.util.FixJava;
@@ -219,11 +217,14 @@ public class TestNGPrettyFormatter implements ConcurrentEventListener, ColorAwar
         }
     }
 
+    /**
+     * Prints the reason of failure
+     * @param event TestStepFinished event
+     */
     private void handleTestStepFinished(TestStepFinished event) {
-//        if (event.testStep instanceof PickleStepTestStep) {
-//            printStep((PickleStepTestStep) event.testStep, event.result);
-//        }
-//        printError(event.result);
+        if (event.result.is(Result.Type.FAILED)) {
+            out.println(STEP_INDENT + formats.get("failed").text(event.result.getError().getMessage()));
+        }
     }
 
     private void handleWrite(WriteEvent event) {
@@ -426,14 +427,14 @@ public class TestNGPrettyFormatter implements ConcurrentEventListener, ColorAwar
                     Group group = (Group) ((ExpressionArgument) argument).getGroup();
 
                     if (group.getChildren().size() > 0) {
-                        out.println(LOCATION_INDENT +  getLocationText("Argument " + String.valueOf(argumentIndex) + ": " + group.getChildren().get(0).getValue()));
+                        out.println(LOCATION_INDENT +  getLocationText("Argument " + argumentIndex + ": " + group.getChildren().get(0).getValue()));
                     } else {
-                        out.println(LOCATION_INDENT +  getLocationText("Argument " + String.valueOf(argumentIndex) + ": " + group.getValue()));
+                        out.println(LOCATION_INDENT +  getLocationText("Argument " + argumentIndex + ": " + group.getValue()));
                     }
                 }
 
                 if (argument instanceof DocStringArgument) {
-                    out.println(LOCATION_INDENT +  getLocationText("Argument " + String.valueOf(argumentIndex) + ": " + argument.getValue().toString()));
+                    out.println(LOCATION_INDENT +  getLocationText("Argument " + argumentIndex + ": " + argument.getValue().toString()));
                 }
 
                 if (argument instanceof DataTableArgument) {
@@ -441,7 +442,7 @@ public class TestNGPrettyFormatter implements ConcurrentEventListener, ColorAwar
                     argumentField.setAccessible(true);
                     List<List<String>> finalList = (List<List<String>>) argumentField.get(argument);
 
-                    out.println(LOCATION_INDENT +  getLocationText("Argument " + String.valueOf(argumentIndex) + ": " + Arrays.toString(finalList.toArray())));
+                    out.println(LOCATION_INDENT +  getLocationText("Argument " + argumentIndex + ": " + Arrays.toString(finalList.toArray())));
                 }
 
                 argumentIndex += 1;
@@ -530,8 +531,7 @@ public class TestNGPrettyFormatter implements ConcurrentEventListener, ColorAwar
         if (astNode != null) {
             Background background = TestSourcesModel.getBackgroundForTestCase(astNode);
             String backgroundText = getScenarioDefinitionText(background);
-            boolean useBackgroundSteps = true;
-            calculateLocationIndentation(SCENARIO_INDENT + backgroundText, testCase.getTestSteps(), useBackgroundSteps);
+            calculateLocationIndentation(SCENARIO_INDENT + backgroundText, testCase.getTestSteps(), true);
             String locationPadding = createPaddingToLocation(SCENARIO_INDENT, backgroundText);
             out.println();
             out.println(SCENARIO_INDENT + backgroundText + locationPadding + getLocationText(currentFeatureFile, background.getLocation().getLine()));
@@ -557,8 +557,7 @@ public class TestNGPrettyFormatter implements ConcurrentEventListener, ColorAwar
     }
 
     private void calculateLocationIndentation(String definitionText, List<TestStep> testSteps) {
-        boolean useBackgroundSteps = false;
-        calculateLocationIndentation(definitionText, testSteps, useBackgroundSteps);
+        calculateLocationIndentation(definitionText, testSteps, false);
     }
 
     private void calculateLocationIndentation(String definitionText, List<TestStep> testSteps, boolean useBackgroundSteps) {
