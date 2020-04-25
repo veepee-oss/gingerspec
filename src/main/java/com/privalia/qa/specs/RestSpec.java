@@ -388,10 +388,10 @@ public class RestSpec extends BaseGSpec {
     @Then("^I clear headers from previous request$")
     public void clearHeaders() throws Throwable {
 
-        /**
-         * Since there is no easy way to remove all headers from the request,
-         * a new request object is created with the same configuration
-         * */
+        /*
+          Since there is no easy way to remove all headers from the request,
+          a new request object is created with the same configuration
+          */
 
         commonspec.getHeaders().clear();
         RequestSpecification spec = new RequestSpecBuilder().setContentType(ContentType.JSON).build();
@@ -413,10 +413,10 @@ public class RestSpec extends BaseGSpec {
     @Then("^I clear cookies from previous request$")
     public void clearCookies() throws Throwable {
 
-        /**
-         * Since there is no easy way to remove all cookies from the request,
-         * a new request object is created with the same configuration
-         * */
+        /*
+          Since there is no easy way to remove all cookies from the request,
+          a new request object is created with the same configuration
+          */
         commonspec.getRestCookies().clear();
         RequestSpecification spec = new RequestSpecBuilder().setContentType(ContentType.JSON).build();
         commonspec.setRestRequest(given().header("Content-Type", "application/json").headers(commonspec.getHeaders()).spec(spec));
@@ -638,10 +638,10 @@ public class RestSpec extends BaseGSpec {
      */
     @Then("^I clear the url parameters from previous request$")
     public void iClearTheUrlParametersFromPreviousRequest() throws Throwable {
-        /**
-         * Since there is no easy way to remove all url parameters from the request,
-         * a new request object is created with the same configuration
-         * */
+        /*
+          Since there is no easy way to remove all url parameters from the request,
+          a new request object is created with the same configuration
+          */
         RequestSpecification spec = new RequestSpecBuilder().setContentType(ContentType.JSON).build();
         commonspec.setRestRequest(given().header("Content-Type", "application/json").headers(commonspec.getHeaders()).spec(spec));
         commonspec.setRestRequest(given().cookies(commonspec.getRestCookies()).spec(spec));
