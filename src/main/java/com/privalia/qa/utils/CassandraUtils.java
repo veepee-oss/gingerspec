@@ -25,6 +25,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -351,7 +352,7 @@ public class CassandraUtils {
         LOGGER.debug(url.toString());
         LOGGER.info("Loading script from: " + url);
         try (BufferedReader br = new BufferedReader(new InputStreamReader(
-                url.openStream(), "UTF8"))) {
+                url.openStream(), StandardCharsets.UTF_8))) {
             String line;
             while ((line = br.readLine()) != null) {
                 if (line.length() > 0 && !line.startsWith("#")) {

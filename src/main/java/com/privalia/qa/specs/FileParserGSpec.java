@@ -26,6 +26,7 @@ import io.cucumber.datatable.DataTable;
 import javax.xml.bind.JAXBException;
 import java.io.*;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -62,7 +63,7 @@ public class FileParserGSpec extends BaseGSpec {
         InputStream stream = getClass().getClassLoader().getResourceAsStream(fileToParse);
         Config config = new ConfigLoader().loadConfig(getClass().getClassLoader().getResource(XMLDefinitionFile).toURI().toURL());
 
-        Reader in = new BufferedReader(new InputStreamReader(stream, "UTF-8"));
+        Reader in = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
         List<Map<String, String>> records = this.commonspec.getFileParserUtil().parseFile(config, in);
         this.commonspec.setLastFileParseResult(records);
 

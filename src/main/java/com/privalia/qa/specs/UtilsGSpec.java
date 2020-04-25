@@ -27,6 +27,7 @@ import org.hjson.JsonArray;
 import org.hjson.JsonValue;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -255,11 +256,11 @@ public class UtilsGSpec extends BaseGSpec {
         String modifiedData = commonspec.modifyData(retrievedData, type, modifications).toString();
 
         // Create file (temporary) and set path to be accessible within test
-        File tempDirectory = new File(String.valueOf(System.getProperty("user.dir") + "/target/test-classes/"));
+        File tempDirectory = new File(System.getProperty("user.dir") + "/target/test-classes/");
         String absolutePathFile = tempDirectory.getAbsolutePath() + "/" + fileName;
         commonspec.getLogger().debug("Creating file {} in 'target/test-classes'", absolutePathFile);
         // Note that this Writer will delete the file if it exists
-        Writer out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(absolutePathFile), "UTF-8"));
+        Writer out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(absolutePathFile), StandardCharsets.UTF_8));
         try {
             out.write(modifiedData);
         } catch (Exception e) {

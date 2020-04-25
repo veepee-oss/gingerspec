@@ -22,7 +22,7 @@ import com.datastax.driver.core.DataType;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.privalia.qa.assertions.DBObjectsAssert;
-import org.apache.zookeeper.KeeperException;
+
 import java.util.regex.Pattern;
 
 import static com.privalia.qa.assertions.Assertions.assertThat;

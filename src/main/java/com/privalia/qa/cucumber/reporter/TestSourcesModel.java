@@ -51,10 +51,10 @@ public class TestSourcesModel {
             return calculateId(astNode.parent) + ";" + convertToId(((ScenarioDefinition) node).getName());
         }
         if (node instanceof ExamplesRowWrapperNode) {
-            return calculateId(astNode.parent) + ";" + Integer.toString(((ExamplesRowWrapperNode) node).bodyRowIndex + 2);
+            return calculateId(astNode.parent) + ";" + (((ExamplesRowWrapperNode) node).bodyRowIndex + 2);
         }
         if (node instanceof TableRow) {
-            return calculateId(astNode.parent) + ";" + Integer.toString(1);
+            return calculateId(astNode.parent) + ";" + 1;
         }
         if (node instanceof Examples) {
             return calculateId(astNode.parent) + ";" + convertToId(((Examples) node).getName());

@@ -4,10 +4,8 @@ import cucumber.api.CucumberOptions;
 import cucumber.api.SnippetType;
 
 import java.lang.annotation.*;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
-import java.util.List;
 
 /**
  * This is a custom implementation of {@link CucumberOptions} annotation. This implementation
