@@ -429,8 +429,6 @@ public class HookGSpec extends BaseGSpec {
 
     /**
      * If the feature has the @rest annotation, creates a new REST client before each scenario
-     *
-     * @throws Exception Exception
      */
     @Before(order = 10, value = "@rest")
     public void restClientSetup() {
@@ -445,8 +443,6 @@ public class HookGSpec extends BaseGSpec {
 
     /**
      * If the feature has the @rest annotation, closes the REST client after each scenario is completed
-     *
-     * @throws IOException IOException
      */
     @After(order = 10, value = "@rest")
     public void restClientTeardown() {
@@ -457,9 +453,7 @@ public class HookGSpec extends BaseGSpec {
 
     /**
      * Disconnect any remaining open SSH connection after each scenario is completed
-     *
-     * @throws Exception Exception
-     */
+     * */
     @After(order = 10)
     public void remoteSSHConnectionTeardown() {
         if (commonspec.getRemoteSSHConnection() != null) {
