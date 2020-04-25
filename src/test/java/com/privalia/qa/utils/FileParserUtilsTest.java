@@ -9,6 +9,7 @@ import org.testng.annotations.Test;
 import javax.xml.bind.JAXBException;
 import java.io.*;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
@@ -94,7 +95,7 @@ public class FileParserUtilsTest {
 
         InputStream stream = getClass().getClassLoader().getResourceAsStream("files/f10_ip_bgp_summary_example.txt");
         Config config = new ConfigLoader().loadConfig(getClass().getClassLoader().getResource("files/f10_ip_bgp_summary_template.xml").toURI().toURL());
-        Reader in = new BufferedReader(new InputStreamReader(stream, "UTF-8"));
+        Reader in = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
         this.records = this.fileParserUtils.parseFile(config, in);
     }
 
