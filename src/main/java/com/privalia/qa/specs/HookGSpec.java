@@ -19,10 +19,11 @@ package com.privalia.qa.specs;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
-import com.privalia.qa.data.BrowsersDataProvider;
 import com.privalia.qa.utils.ThreadProperty;
+import cucumber.api.Scenario;
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
+import io.appium.java_client.MobileDriver;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
 import io.github.bonigarcia.wdm.WebDriverManager;
@@ -39,7 +40,12 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.safari.SafariOptions;
 import org.slf4j.LoggerFactory;
+import ru.yandex.qatools.ashot.AShot;
+import ru.yandex.qatools.ashot.Screenshot;
+import ru.yandex.qatools.ashot.shooting.ShootingStrategies;
 
+import javax.imageio.ImageIO;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -51,6 +57,7 @@ import java.util.logging.Logger;
 
 import static io.restassured.RestAssured.given;
 import static org.testng.Assert.fail;
+
 
 /**
  * This class contains functions that are executed before and after each test.
@@ -170,10 +177,10 @@ public class HookGSpec extends BaseGSpec {
             capabilities.setCapability(entry.getKey(), (Object) entry.getValue());
         }
 
-        /**
-         * When testing mobile apps, the "app" capability is necessary to indicate the app under test
-         * This variable can also be provided using the maven variable -DAPP=/full/path/to/file.
-         * If both, an app capability and -DAPP variable are provided, the -DAPP will take precedence
+        /*
+          When testing mobile apps, the "app" capability is necessary to indicate the app under test
+          This variable can also be provided using the maven variable -DAPP=/full/path/to/file.
+          If both, an app capability and -DAPP variable are provided, the -DAPP will take precedence
          */
 
         String app = capabilitiesMap.get("app");
@@ -369,15 +376,46 @@ public class HookGSpec extends BaseGSpec {
 
     }
 
-
     /**
      * If the feature has the @web or @mobile annotation, closes selenium web driver after each scenario is completed.
+     * @param scenario      Instance of the scenario just executed
+     * @throws IOException  The IOException
      */
     @After(order = 20, value = {"@web or @mobile"})
-    public void seleniumTeardown() {
+    public void seleniumTeardown(Scenario scenario) throws IOException {
         if (commonspec.getDriver() != null) {
-            commonspec.getLogger().debug("Shutdown Selenium client");
-            //commonspec.getDriver().close(); //causes the driver instance when using firefox
+
+            if (scenario.isFailed()) {
+                //Include screenshot in the report
+                commonspec.getLogger().debug("Scenario failed. Adding screenshot to report");
+                Screenshot screenshot = new AShot().shootingStrategy(ShootingStrategies.viewportPasting(500)).takeScreenshot(driver);
+
+                //transform the screenshot to byte[] to embed it in the report
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                ImageIO.write(screenshot.getImage(), "png", baos);
+                baos.flush();
+                byte[] imageInByte = baos.toByteArray();
+                baos.close();
+
+                //Also include the page source in the report
+                String source = ((RemoteWebDriver) driver).getPageSource();
+                scenario.embed(imageInByte, "image/png");
+                scenario.embed(source.getBytes(), "text");
+
+                //Take screenshot and save it in the target/execution folder
+                commonspec.getLogger().debug("Adding screenshot target/execution folder");
+                if (this.commonspec.getDriver() instanceof MobileDriver) {
+                    this.commonspec.captureEvidence(driver, "mobileScreenCapture", "exception");
+                    this.commonspec.captureEvidence(driver, "mobilePageSource", "exception");
+                } else {
+                    this.commonspec.captureEvidence(driver, "framehtmlSource", "exception");
+                    this.commonspec.captureEvidence(driver, "htmlSource", "exception");
+                    this.commonspec.captureEvidence(driver, "screenCapture", "exception");
+                }
+            }
+
+            //Close the selenium driver
+            commonspec.getLogger().debug("Shutting down Selenium client");
             commonspec.getDriver().quit();
         }
     }
@@ -395,7 +433,7 @@ public class HookGSpec extends BaseGSpec {
      * @throws Exception Exception
      */
     @Before(order = 10, value = "@rest")
-    public void restClientSetup() throws Exception {
+    public void restClientSetup() {
         commonspec.getLogger().debug("Starting a REST client");
 
         commonspec.setClient(new AsyncHttpClient(new AsyncHttpClientConfig.Builder().setAcceptAnyCertificate(true).setAllowPoolingConnections(false)
@@ -411,7 +449,7 @@ public class HookGSpec extends BaseGSpec {
      * @throws IOException IOException
      */
     @After(order = 10, value = "@rest")
-    public void restClientTeardown() throws IOException {
+    public void restClientTeardown() {
         commonspec.getLogger().debug("Shutting down REST client");
         commonspec.getClient().close();
 
@@ -423,7 +461,7 @@ public class HookGSpec extends BaseGSpec {
      * @throws Exception Exception
      */
     @After(order = 10)
-    public void remoteSSHConnectionTeardown() throws Exception {
+    public void remoteSSHConnectionTeardown() {
         if (commonspec.getRemoteSSHConnection() != null) {
             commonspec.getLogger().debug("Closing SSH remote connection");
             commonspec.getRemoteSSHConnection().getSession().disconnect();
