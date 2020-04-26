@@ -223,7 +223,7 @@ public class TestNGPrettyFormatter implements ConcurrentEventListener, ColorAwar
      */
     private void handleTestStepFinished(TestStepFinished event) {
         if (event.result.is(Result.Type.FAILED)) {
-            out.println(STEP_INDENT + formats.get("failed").text(event.result.getError().getMessage()));
+            out.println(STEP_INDENT + formats.get("failed").text(event.result.getError().getMessage().replace("\n", " ")));
         }
     }
 
