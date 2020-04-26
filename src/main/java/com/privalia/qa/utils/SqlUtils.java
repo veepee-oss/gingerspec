@@ -107,14 +107,14 @@ public class SqlUtils {
         }
 
 
-        /**
-         * MySQL databases often fail when executing multiple queries separated by comma ";". This was causing problems when executing
-         * a bunch of SQL statements from an SQL file. To avoid this problem, we had to set allowMultiQueries = true
+        /*
+          MySQL databases often fail when executing multiple queries separated by comma ";". This was causing problems when executing
+          a bunch of SQL statements from an SQL file. To avoid this problem, we had to set allowMultiQueries = true
          */
         Properties props = new Properties();
         String connectionString = "jdbc:" + dataBaseType.toLowerCase() + "://" + host + ":" + port + "/" + dataBaseName + "?allowMultiQueries=true&serverTimezone=UTC" + "&user=" + user;
 
-        /** You can use the step without password and a null will be passed to the password variable (for cases when the db does not use password)*/
+        /* You can use the step without password and a null will be passed to the password variable (for cases when the db does not use password)*/
         if (password != null) {
             connectionString = connectionString + "&password=" + password;
         }

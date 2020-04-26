@@ -579,7 +579,6 @@ public class CommonGTest {
         CommonG commong = new CommonG();
         String data = jsonObject1.toString();
         String expectedData = jsonObject4.toString();
-        ;
         String type = "json";
         List<List<String>> rawData = Arrays.asList(Arrays.asList("key2.key3", "REPLACE", "null", "null"));
         DataTable modifications = DataTable.create(rawData);

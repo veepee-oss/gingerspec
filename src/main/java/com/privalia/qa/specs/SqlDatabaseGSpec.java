@@ -23,6 +23,7 @@ import cucumber.api.java.en.When;
 import io.cucumber.datatable.DataTable;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -179,7 +180,7 @@ public class SqlDatabaseGSpec extends BaseGSpec {
     public void executeQueryFromFile(String baseData) throws IOException {
 
         InputStream stream = getClass().getClassLoader().getResourceAsStream(baseData);
-        Reader reader = new BufferedReader(new InputStreamReader(stream, "UTF-8"));
+        Reader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
 
         try {
             boolean r = this.commonspec.getSqlClient().executeQuery(reader);

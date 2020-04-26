@@ -10,9 +10,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.Map;
 
 
 /**
@@ -109,7 +107,7 @@ public class JsonUtils {
                         break;
 
                     } else if ("boolean".equals(typeJsonObject)) {
-                        jBoolean = new Boolean(newValue);
+                        jBoolean = Boolean.valueOf(newValue);
                         jsonAsMap = JsonPath.parse(modifiedData).set(composeKey, jBoolean).json();
                         break;
 
@@ -148,7 +146,7 @@ public class JsonUtils {
                         jsonAsMap = JsonPath.parse(modifiedData).add(composeKey, jNumber).json();
                         break;
                     } else if ("boolean".equals(typeJsonObject)) {
-                        jBoolean = new Boolean(newValue);
+                        jBoolean = Boolean.valueOf(newValue);
                         jsonAsMap = JsonPath.parse(modifiedData).add(composeKey, jBoolean).json();
                         break;
                     } else if ("null".equals(typeJsonObject)) {

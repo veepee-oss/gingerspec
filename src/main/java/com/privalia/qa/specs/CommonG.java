@@ -17,7 +17,6 @@ import com.ning.http.client.cookie.Cookie;
 import com.privalia.qa.conditions.Conditions;
 import com.privalia.qa.utils.*;
 import io.appium.java_client.MobileDriver;
-import io.appium.java_client.MobileElement;
 import io.cucumber.datatable.DataTable;
 import io.restassured.specification.RequestSpecification;
 import org.apache.commons.collections.IteratorUtils;
@@ -30,7 +29,6 @@ import org.json.JSONObject;
 import org.openqa.selenium.*;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.interactions.internal.Locatable;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
@@ -47,10 +45,10 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.concurrent.Future;
-import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -606,7 +604,7 @@ public class CommonG {
 
         if (expectedCount != -1) {
             PreviousWebElements pwel = new PreviousWebElements(wel);
-            assertThat(this, pwel).as("Couldn't find the expected amount of elements (%s) with the given %s", expectedCount, method).hasSize(expectedCount);
+            Assertions.assertThat(pwel.getPreviousWebElements().size()).as("Couldn't find the expected amount of elements (%s) with the given %s", expectedCount, method).isEqualTo(expectedCount);
         }
 
         return wel;
@@ -717,7 +715,7 @@ public class CommonG {
      * Dismiss any existing alert message in the current selenium context
      */
     public void dismissSeleniumAlert() {
-        assertThat(this, this.getSeleniumAlert()).as("There is not an alert present in the page").isNotEqualTo(null);
+        Assertions.assertThat(this.getSeleniumAlert()).as("There is not an alert present in the page").isNotEqualTo(null);
         this.getSeleniumAlert().dismiss();
     }
 
@@ -725,7 +723,7 @@ public class CommonG {
      * Accepts any existing alert message in the current selenium context
      */
     public void acceptSeleniumAlert() {
-        assertThat(this, this.getSeleniumAlert()).as("There is not an alert present in the page").isNotEqualTo(null);
+        Assertions.assertThat(this.getSeleniumAlert()).as("There is not an alert present in the page").isNotEqualTo(null);
         this.getSeleniumAlert().accept();
     }
 
@@ -799,7 +797,7 @@ public class CommonG {
                 boolean dirs = fout.getParentFile().mkdirs();
 
                 try (FileOutputStream fos = new FileOutputStream(fout, true)) {
-                    Writer out = new OutputStreamWriter(fos, "UTF8");
+                    Writer out = new OutputStreamWriter(fos, StandardCharsets.UTF_8);
                     PrintWriter writer = new PrintWriter(out, false);
                     writer.append(source);
                     writer.close();
@@ -825,11 +823,11 @@ public class CommonG {
                 file = chromeFullScreenCapture(driver);
             } else {
 
-                Screenshot screenshot = new AShot().shootingStrategy(ShootingStrategies.viewportPasting(500)).takeScreenshot(driver);
                 try {
+                    Screenshot screenshot = new AShot().shootingStrategy(ShootingStrategies.viewportPasting(500)).takeScreenshot(driver);
                     file = new File("target/temp");
                     ImageIO.write(screenshot.getImage(), "PNG", file);
-                } catch (IOException e) {
+                } catch (Exception e) {
                     logger.error("Exception on taking screenshot", e);
                 }
             }
@@ -869,7 +867,7 @@ public class CommonG {
             boolean dirs = fout.getParentFile().mkdirs();
 
             try (FileOutputStream fos = new FileOutputStream(fout, true)) {
-                Writer out = new OutputStreamWriter(fos, "UTF8");
+                Writer out = new OutputStreamWriter(fos, StandardCharsets.UTF_8);
                 PrintWriter writer = new PrintWriter(out, false);
                 writer.append(source);
                 writer.close();
@@ -930,7 +928,7 @@ public class CommonG {
 
             long ts = System.currentTimeMillis() / DEFAULT_CURRENT_TIME;
 
-            temp = File.createTempFile("chromecap" + Long.toString(ts), ".png");
+            temp = File.createTempFile("chromecap" + ts, ".png");
             temp.deleteOnExit();
             ImageIO.write(img, "png", temp);
 

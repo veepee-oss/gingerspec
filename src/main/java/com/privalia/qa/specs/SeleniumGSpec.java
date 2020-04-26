@@ -7,6 +7,7 @@ import com.privalia.qa.utils.ThreadProperty;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
+import org.assertj.core.api.Assertions;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.Select;
@@ -165,7 +166,7 @@ public class SeleniumGSpec extends BaseGSpec {
 
         //Assign the file absolute path to the file picker element previously set
         File f = new File(filePath);
-        assertThat(this.getCommonSpec(), f.exists()).as("The file located in " + filePath + " does not exists or is not accessible").isEqualTo(true);
+        Assertions.assertThat(f.exists()).as("The file located in " + filePath + " does not exists or is not accessible").isEqualTo(true);
         commonspec.getPreviousWebElements().getPreviousWebElements().get(index).sendKeys(filePath);
     }
 
@@ -192,8 +193,8 @@ public class SeleniumGSpec extends BaseGSpec {
     @Given("^I switch to the iframe on index '(\\d+?)'$")
     public void seleniumSwitchFrame(Integer index) {
 
-        assertThat(this.commonspec, commonspec.getPreviousWebElements()).as("Could not get webelement with index %s. Less elements were found. Allowed index: 0 to %s", index, commonspec.getPreviousWebElements().getPreviousWebElements().size() - 1)
-                .hasAtLeast(index + 1);
+        Assertions.assertThat(commonspec.getPreviousWebElements().getPreviousWebElements().size()).as("Could not get webelement with index %s. Less elements were found. Allowed index: 0 to %s", index, commonspec.getPreviousWebElements().getPreviousWebElements().size() - 1)
+                .isGreaterThanOrEqualTo(index + 1);
 
         WebElement elem = commonspec.getPreviousWebElements().getPreviousWebElements().get(index);
         commonspec.getDriver().switchTo().frame(elem);
@@ -263,9 +264,9 @@ public class SeleniumGSpec extends BaseGSpec {
      */
     @Then("^the element on index '(\\d+?)' has '(.+?)' as text$")
     public void assertSeleniumTextOnElementPresent(Integer index, String text) {
-        assertThat(this.commonspec, commonspec.getPreviousWebElements()).as("Could not get webelement with index %s. Less elements were found. Allowed index: 0 to %s", index, commonspec.getPreviousWebElements().getPreviousWebElements().size() - 1)
-                .hasAtLeast(index + 1);
-        assertThat(commonspec.getPreviousWebElements().getPreviousWebElements().get(index)).contains(text);
+        Assertions.assertThat(commonspec.getPreviousWebElements().getPreviousWebElements().size()).as("Could not get webelement with index %s. Less elements were found. Allowed index: 0 to %s", index, commonspec.getPreviousWebElements().getPreviousWebElements().size() - 1)
+                .isGreaterThanOrEqualTo(index + 1);
+        Assertions.assertThat(commonspec.getPreviousWebElements().getPreviousWebElements().get(index).getText()).contains(text);
     }
 
 
@@ -276,7 +277,7 @@ public class SeleniumGSpec extends BaseGSpec {
      */
     @Then("^this text exists:$")
     public void assertSeleniumTextInSource(String text) {
-        assertThat(this.commonspec, commonspec.getDriver()).as("Expected text not found at page").contains(text);
+        Assertions.assertThat(commonspec.getDriver().getPageSource()).as("Expected text not found at page").contains(text);
     }
 
 
@@ -301,7 +302,7 @@ public class SeleniumGSpec extends BaseGSpec {
         if (atLeast != null) {
             wel = commonspec.locateElement(method, element, -1);
             PreviousWebElements pwel = new PreviousWebElements(wel);
-            assertThat(this.commonspec, pwel).as("Couldn't find the expected amount of elements (at least %s) with the given %s", expectedCount, method).hasAtLeast(expectedCount);
+            Assertions.assertThat(pwel.getPreviousWebElements().size()).as("Couldn't find the expected amount of elements (at least %s) with the given %s", expectedCount, method).isGreaterThanOrEqualTo(expectedCount);
         } else {
             wel = commonspec.locateElement(method, element, expectedCount);
         }
@@ -346,7 +347,7 @@ public class SeleniumGSpec extends BaseGSpec {
         }
 
         PreviousWebElements pwel = new PreviousWebElements(wel);
-        assertThat(this.commonspec, pwel).as("Could not find the expected amount of element(s) (%s), with the given %s. Checked for %s secs, %s secs interval,", expectedCount, method, timeout, wait).hasSize(expectedCount);
+        Assertions.assertThat(pwel.getPreviousWebElements().size()).as("Could not find the expected amount of element(s) (%s), with the given %s. Checked for %s secs, %s secs interval,", expectedCount, method, timeout, wait).isEqualTo(expectedCount);
         commonspec.setPreviousWebElements(pwel);
 
     }
@@ -371,9 +372,9 @@ public class SeleniumGSpec extends BaseGSpec {
             isDisplayed = true;
         }
 
-        assertThat(this.commonspec, commonspec.getPreviousWebElements()).as("Could not get webelement with index %s. Less elements were found. Allowed index: 0 to %s", index, commonspec.getPreviousWebElements().getPreviousWebElements().size() - 1)
-                .hasAtLeast(index + 1);
-        assertThat(this.commonspec, commonspec.getPreviousWebElements().getPreviousWebElements().get(index).isDisplayed()).as(
+        Assertions.assertThat(commonspec.getPreviousWebElements().getPreviousWebElements().size()).as("Could not get webelement with index %s. Less elements were found. Allowed index: 0 to %s", index, commonspec.getPreviousWebElements().getPreviousWebElements().size() - 1)
+                .isGreaterThanOrEqualTo(index + 1);
+        Assertions.assertThat(commonspec.getPreviousWebElements().getPreviousWebElements().get(index).isDisplayed()).as(
                 "Unexpected element display property").isEqualTo(isDisplayed);
     }
 
@@ -397,9 +398,9 @@ public class SeleniumGSpec extends BaseGSpec {
             isEnabled = true;
         }
 
-        assertThat(this.commonspec, commonspec.getPreviousWebElements()).as("Could not get webelement with index %s. Less elements were found. Allowed index: 0 to %s", index, commonspec.getPreviousWebElements().getPreviousWebElements().size() - 1)
-                .hasAtLeast(index + 1);
-        assertThat(this.commonspec, commonspec.getPreviousWebElements().getPreviousWebElements().get(index).isEnabled())
+        Assertions.assertThat(commonspec.getPreviousWebElements().getPreviousWebElements().size()).as("Could not get webelement with index %s. Less elements were found. Allowed index: 0 to %s", index, commonspec.getPreviousWebElements().getPreviousWebElements().size() - 1)
+                .isGreaterThanOrEqualTo(index + 1);
+        Assertions.assertThat(commonspec.getPreviousWebElements().getPreviousWebElements().get(index).isEnabled())
                 .as("Unexpected element enabled property").isEqualTo(isEnabled);
     }
 
@@ -423,9 +424,9 @@ public class SeleniumGSpec extends BaseGSpec {
             isSelected = true;
         }
 
-        assertThat(this.commonspec, commonspec.getPreviousWebElements()).as("Could not get webelement with index %s. Less elements were found. Allowed index: 0 to %s", index, commonspec.getPreviousWebElements().getPreviousWebElements().size() - 1)
-                .hasAtLeast(index + 1);
-        assertThat(this.commonspec, commonspec.getPreviousWebElements().getPreviousWebElements().get(index).isSelected()).as(
+        Assertions.assertThat(commonspec.getPreviousWebElements().getPreviousWebElements().size()).as("Could not get webelement with index %s. Less elements were found. Allowed index: 0 to %s", index, commonspec.getPreviousWebElements().getPreviousWebElements().size() - 1)
+                .isGreaterThanOrEqualTo(index + 1);
+        Assertions.assertThat(commonspec.getPreviousWebElements().getPreviousWebElements().get(index).isSelected()).as(
                 "Unexpected element selected property").isEqualTo(isSelected);
     }
 
@@ -444,11 +445,11 @@ public class SeleniumGSpec extends BaseGSpec {
      */
     @Then("^the element on index '(\\d+?)' has '(.+?)' as '(.+?)'$")
     public void assertSeleniumHasAttributeValue(Integer index, String attribute, String value) {
-        assertThat(this.commonspec, commonspec.getPreviousWebElements()).as("Could not get webelement with index %s. Less elements were found. Allowed index: 0 to %s", index, commonspec.getPreviousWebElements().getPreviousWebElements().size() - 1)
-                .hasAtLeast(index + 1);
+        Assertions.assertThat(commonspec.getPreviousWebElements().getPreviousWebElements().size()).as("Could not get webelement with index %s. Less elements were found. Allowed index: 0 to %s", index, commonspec.getPreviousWebElements().getPreviousWebElements().size() - 1)
+                .isGreaterThanOrEqualTo(index + 1);
         String val = commonspec.getPreviousWebElements().getPreviousWebElements().get(index).getAttribute(attribute);
-        assertThat(this.commonspec, val).as("Attribute not found").isNotNull();
-        assertThat(this.commonspec, val).as("Unexpected value for specified attribute").matches(value);
+        Assertions.assertThat(val).as("Attribute not found").isNotNull();
+        Assertions.assertThat(val).as("Unexpected value for specified attribute").matches(value);
     }
 
 
@@ -481,7 +482,7 @@ public class SeleniumGSpec extends BaseGSpec {
 
         String webURL = commonspec.getWebHost();
 
-        assertThat(commonspec.getDriver().getCurrentUrl()).as("We are not in the expected url: " + webURL.toLowerCase() + url)
+        Assertions.assertThat(commonspec.getDriver().getCurrentUrl()).as("We are not in the expected url: " + webURL.toLowerCase() + url)
                 .endsWith(webURL.toLowerCase() + url);
     }
 
@@ -509,8 +510,8 @@ public class SeleniumGSpec extends BaseGSpec {
      */
     @Then("^I save content of element in index '(\\d+?)' in environment variable '(.+?)'$")
     public void saveContentWebElementInEnvVar(Integer index, String envVar) {
-        assertThat(this.commonspec, commonspec.getPreviousWebElements()).as("Could not get webelement with index %s. Less elements were found. Allowed index: 0 to %s", index, commonspec.getPreviousWebElements().getPreviousWebElements().size() - 1)
-                .hasAtLeast(index + 1);
+        Assertions.assertThat(commonspec.getPreviousWebElements().getPreviousWebElements().size()).as("Could not get webelement with index %s. Less elements were found. Allowed index: 0 to %s", index, commonspec.getPreviousWebElements().getPreviousWebElements().size() - 1)
+                .isGreaterThanOrEqualTo(index + 1);
         String text = commonspec.getPreviousWebElements().getPreviousWebElements().get(index).getText();
         ThreadProperty.set(envVar, text);
     }
@@ -579,8 +580,8 @@ public class SeleniumGSpec extends BaseGSpec {
     @When("^I click on the element on index '(\\d+?)'$")
     public void seleniumClick(Integer index) {
 
-        assertThat(this.commonspec, commonspec.getPreviousWebElements()).as("Could not get webelement with index %s. Less elements were found. Allowed index: 0 to %s", index, commonspec.getPreviousWebElements().getPreviousWebElements().size() - 1)
-                .hasAtLeast(index + 1);
+        Assertions.assertThat(commonspec.getPreviousWebElements().getPreviousWebElements().size()).as("Could not get webelement with index %s. Less elements were found. Allowed index: 0 to %s", index, commonspec.getPreviousWebElements().getPreviousWebElements().size() - 1)
+                .isGreaterThanOrEqualTo(index + 1);
         commonspec.getPreviousWebElements().getPreviousWebElements().get(index).click();
     }
 
@@ -597,10 +598,10 @@ public class SeleniumGSpec extends BaseGSpec {
      */
     @When("^I clear the content on text input at index '(\\d+?)'$")
     public void seleniumClear(Integer index) {
-        assertThat(this.commonspec, commonspec.getPreviousWebElements()).as("Could not get webelement with index %s. Less elements were found. Allowed index: 0 to %s", index, commonspec.getPreviousWebElements().getPreviousWebElements().size() - 1)
-                .hasAtLeast(index + 1);
+        Assertions.assertThat(commonspec.getPreviousWebElements().getPreviousWebElements().size()).as("Could not get webelement with index %s. Less elements were found. Allowed index: 0 to %s", index, commonspec.getPreviousWebElements().getPreviousWebElements().size() - 1)
+                .isGreaterThanOrEqualTo(index + 1);
 
-        assertThat(this.commonspec, commonspec.getPreviousWebElements().getPreviousWebElements().get(index)).isTextField(commonspec.getTextFieldCondition());
+        Assertions.assertThat(commonspec.getPreviousWebElements().getPreviousWebElements().get(index)).is(commonspec.getTextFieldCondition());
 
         commonspec.getPreviousWebElements().getPreviousWebElements().get(index).clear();
     }
@@ -623,8 +624,8 @@ public class SeleniumGSpec extends BaseGSpec {
         NullableStringConverter converter = new NullableStringConverter();
         String text = converter.transform(input);
 
-        assertThat(this.commonspec, commonspec.getPreviousWebElements()).as("Could not get webelement with index %s. Less elements were found. Allowed index: 0 to %s", index, commonspec.getPreviousWebElements().getPreviousWebElements().size() - 1)
-                .hasAtLeast(index + 1);
+        Assertions.assertThat(commonspec.getPreviousWebElements().getPreviousWebElements().size()).as("Could not get webelement with index %s. Less elements were found. Allowed index: 0 to %s", index, commonspec.getPreviousWebElements().getPreviousWebElements().size() - 1)
+                .isGreaterThanOrEqualTo(index + 1);
         while (text.length() > 0) {
             if (-1 == text.indexOf("\\n")) {
                 commonspec.getPreviousWebElements().getPreviousWebElements().get(index).sendKeys(text);
@@ -663,8 +664,8 @@ public class SeleniumGSpec extends BaseGSpec {
         List<String> strokes = converter.transform(text);
 
         if (index != null) {
-            assertThat(this.commonspec, commonspec.getPreviousWebElements()).as("Could not get webelement with index %s. Less elements were found. Allowed index: 0 to %s", index, commonspec.getPreviousWebElements().getPreviousWebElements().size() - 1)
-                    .hasAtLeast(index + 1);
+            Assertions.assertThat(commonspec.getPreviousWebElements().getPreviousWebElements().size()).as("Could not get webelement with index %s. Less elements were found. Allowed index: 0 to %s", index, commonspec.getPreviousWebElements().getPreviousWebElements().size() - 1)
+                    .isGreaterThanOrEqualTo(index + 1);
         }
         assertThat(strokes).isNotEmpty();
 

@@ -11,8 +11,6 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 import java.util.List;
 
-import static com.privalia.qa.assertions.Assertions.assertThat;
-import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
 
 /**

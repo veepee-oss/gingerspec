@@ -19,6 +19,7 @@ package com.privalia.qa.specs;
 import com.privalia.qa.utils.RemoteSSHConnection;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
+import org.assertj.core.api.Assertions;
 
 import java.io.File;
 
@@ -56,14 +57,14 @@ public class SshGSpec extends BaseGSpec {
     public void openSSHConnection(String remoteHost, String user, String foo, String password, String bar, String pemFile) throws Exception {
         if ((pemFile == null) || (pemFile.equals("none"))) {
             if (password == null) {
-                throw new Exception("You have to provide a password or a pem file to be used for connection");
+                Assertions.fail("You have to provide a password or a pem file to be used for connection");
             }
             commonspec.setRemoteSSHConnection(new RemoteSSHConnection(user, password, remoteHost, null));
             commonspec.getLogger().debug("Opening ssh connection with password: { " + password + "}", commonspec.getRemoteSSHConnection());
         } else {
             File pem = new File(pemFile);
             if (!pem.exists()) {
-                throw new Exception("Pem file: " + pemFile + " does not exist");
+                Assertions.fail("Pem file: " + pemFile + " does not exist");
             }
             commonspec.setRemoteSSHConnection(new RemoteSSHConnection(user, null, remoteHost, pemFile));
             commonspec.getLogger().debug("Opening ssh connection with pemFile: {}", commonspec.getRemoteSSHConnection());
@@ -115,7 +116,7 @@ public class SshGSpec extends BaseGSpec {
         commonspec.runLocalCommand(command);
         commonspec.runCommandLoggerAndEnvVar(exitStatus, envVar, Boolean.TRUE);
 
-        assertThat(commonspec.getCommandExitStatus()).isEqualTo(exitStatus);
+        Assertions.assertThat(commonspec.getCommandExitStatus()).as("Command actual exit status (%s) not equal to expected (%s)", commonspec.getCommandExitStatus(), exitStatus).isEqualTo(exitStatus);
     }
 
 
@@ -141,7 +142,7 @@ public class SshGSpec extends BaseGSpec {
         commonspec.setCommandExitStatus(commonspec.getRemoteSSHConnection().getExitStatus());
         commonspec.runCommandLoggerAndEnvVar(exitStatus, envVar, Boolean.FALSE);
 
-        assertThat(commonspec.getRemoteSSHConnection().getExitStatus()).isEqualTo(exitStatus);
+        Assertions.assertThat(commonspec.getRemoteSSHConnection().getExitStatus()).isEqualTo(exitStatus);
     }
 
 
@@ -193,7 +194,7 @@ public class SshGSpec extends BaseGSpec {
      **/
     @Then("^the command output contains '(.+?)'$")
     public void findShellOutput(String search) throws Exception {
-        assertThat(commonspec.getCommandResult()).as("Contains " + search + ".").contains(search);
+        assertThat(commonspec.getCommandResult()).as("Command output does not contain expected value").contains(search);
     }
 
     /**
@@ -204,7 +205,7 @@ public class SshGSpec extends BaseGSpec {
      **/
     @Then("^the command output does not contain '(.+?)'$")
     public void notFindShellOutput(String search) throws Exception {
-        assertThat(commonspec.getCommandResult()).as("NotContains " + search + ".").doesNotContain(search);
+        assertThat(commonspec.getCommandResult()).as("Command output do contain value").doesNotContain(search);
     }
 
 
@@ -219,7 +220,7 @@ public class SshGSpec extends BaseGSpec {
     @Deprecated
     @Then("^the command exit status is '(.+?)'$")
     public void checkShellExitStatus(int expectedExitStatus) throws Exception {
-        assertThat(commonspec.getCommandExitStatus()).as("Is equal to " + expectedExitStatus + ".").isEqualTo(expectedExitStatus);
+        assertThat(commonspec.getCommandExitStatus()).as("The actual command exit status value (%s) is different than expected value (%s)", commonspec.getCommandExitStatus(), expectedExitStatus).isEqualTo(expectedExitStatus);
     }
 
 }

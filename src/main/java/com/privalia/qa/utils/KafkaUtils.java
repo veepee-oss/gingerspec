@@ -330,8 +330,8 @@ public class KafkaUtils {
     /**
      * Returns the appropiate class for the given property
      *
-     * @param item
-     * @return
+     * @param item  the item
+     * @return      the class
      */
     private Class getProperClass(String item) {
         switch (item) {
@@ -504,11 +504,11 @@ public class KafkaUtils {
      */
     public void createGenericRecord(String key, String json, String schema) throws IOException {
 
-        /**
-         * This is the official way of creating a generic record using the standard
-         * library. However, the library requires the fields of type byte to be represented
-         * in a very special way, which I never figured out what it was. Thats why i decided to
-         * create my own method for creating a generic record
+        /*
+          This is the official way of creating a generic record using the standard
+          library. However, the library requires the fields of type byte to be represented
+          in a very special way, which I never figured out what it was. Thats why i decided to
+          create my own method for creating a generic record
          */
 
         /*
@@ -523,8 +523,8 @@ public class KafkaUtils {
         */
 
 
-        /**
-         * My way of creating a generic record
+        /*
+          My way of creating a generic record
          */
         Map<String, String> propertyList = new HashedMap();
         HashMap<String, String> result = new ObjectMapper().readValue(json, HashMap.class);
@@ -564,10 +564,10 @@ public class KafkaUtils {
     /**
      * Creates a {@link GenericRecord} given its schema and the list of key -> value
      *
-     * @param schema       Schema as string
-     * @param propertyList Property list (Key -> Value)
+     * @param schema                    Schema as string
+     * @param propertyList              Property list (Key -> Value)
      * @return {@link GenericRecord}
-     * @throws IOException
+     * @throws IOException              the IOException
      */
     private GenericRecord buildRecord(String schema, Map<String, String> propertyList) throws IOException {
 

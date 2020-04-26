@@ -187,6 +187,7 @@ public final class BrowsersDataProvider {
                                     try {
                                         nodeDetailsMap.put(detail.split("=")[0].trim(), detail.split("=")[1].trim());
                                     } catch (Exception e) {
+                                        LOGGER.error("Error including node detail: " + e.getMessage());
                                     }
                                 }
 
@@ -216,8 +217,8 @@ public final class BrowsersDataProvider {
             }
         } else if (node != null) {
 
-            /**
-             * Verify that the node actually exists and is online by trying a connection
+            /*
+              Verify that the node actually exists and is online by trying a connection
              */
             LOGGER.debug("Trying to connect to {}", "http://" + node + "/wd/hub/sessions");
             URL url = new URL("http://" + node + "/wd/hub/sessions");
@@ -228,7 +229,7 @@ public final class BrowsersDataProvider {
                 return response;
             }
 
-            LOGGER.debug("Response code {} with message ", con.getResponseCode(), con.getResponseMessage());
+            LOGGER.debug("Response code {} with message {}", con.getResponseCode(), con.getResponseMessage());
 
             //Read the json response to get the capabilities of the active sessions
             InputStream in = new BufferedInputStream(con.getInputStream());
@@ -248,9 +249,9 @@ public final class BrowsersDataProvider {
             if (sessions.size() == 0) {
                 LOGGER.warn("No sessions found in the standalone node!");
 
-                /**
-                 * if no sessions are found in the standalone node, the system will try to read the SELENIUM_NODE_TYPE
-                 * variable to get information on what kind of session it should bootstrap
+                /*
+                  if no sessions are found in the standalone node, the system will try to read the SELENIUM_NODE_TYPE
+                  variable to get information on what kind of session it should bootstrap
                  */
                 String nodeType = System.getProperty("SELENIUM_NODE_TYPE");
                 Map<String, String> nodeDetailsMap = new HashMap<String, String>();
@@ -273,10 +274,10 @@ public final class BrowsersDataProvider {
 
         } else {
 
-            /**
-             * If neither SELENIUM_GRID nor SELENIUM_NODE variables are found, the system will automatically try to use a
-             * local driver. For this, SELENIUM_GRID is set to "local" and if no browser found, chrome is used as default.
-             * Check {@link com.privalia.qa.specs.HookGSpec} for more info
+            /*
+              If neither SELENIUM_GRID nor SELENIUM_NODE variables are found, the system will automatically try to use a
+              local driver. For this, SELENIUM_GRID is set to "local" and if no browser found, chrome is used as default.
+              Check {@link com.privalia.qa.specs.HookGSpec} for more info
              */
 
             LOGGER.warn("No Selenium Grid or Node address specified!. Trying to use local webdriver....");

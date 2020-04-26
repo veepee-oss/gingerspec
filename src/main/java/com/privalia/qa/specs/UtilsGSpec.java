@@ -22,11 +22,12 @@ import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import io.cucumber.datatable.DataTable;
-import org.assertj.core.api.Fail;
+import org.assertj.core.api.Assertions;
 import org.hjson.JsonArray;
 import org.hjson.JsonValue;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -74,33 +75,33 @@ public class UtilsGSpec extends BaseGSpec {
     public void checkValue(String envVar, String operation, String value) throws Exception {
         switch (operation.toLowerCase()) {
             case "is":
-                assertThat(envVar).isEqualTo(value);
+                Assertions.assertThat(envVar).isEqualTo(value);
                 break;
             case "matches":
-                assertThat(envVar).matches(value);
+                Assertions.assertThat(envVar).matches(value);
                 break;
             case "is higher than":
                 if (envVar.matches("^-?\\d+$") && value.matches("^-?\\d+$")) {
-                    assertThat(Integer.parseInt(envVar)).isGreaterThan(Integer.parseInt(value));
+                    Assertions.assertThat(Integer.parseInt(envVar)).isGreaterThan(Integer.parseInt(value));
                 } else {
-                    Fail.fail("A number should be provided in order to perform a valid comparison.");
+                    Assertions.fail("A number should be provided in order to perform a valid comparison.");
                 }
                 break;
             case "is lower than":
                 if (envVar.matches("^-?\\d+$") && value.matches("^-?\\d+$")) {
-                    assertThat(Integer.parseInt(envVar)).isLessThan(Integer.parseInt(value));
+                    Assertions.assertThat(Integer.parseInt(envVar)).isLessThan(Integer.parseInt(value));
                 } else {
-                    Fail.fail("A number should be provided in order to perform a valid comparison.");
+                    Assertions.fail("A number should be provided in order to perform a valid comparison.");
                 }
                 break;
             case "contains":
-                assertThat(envVar).contains(value);
+                Assertions.assertThat(envVar).contains(value);
                 break;
             case "is different from":
-                assertThat(envVar).isNotEqualTo(value);
+                Assertions.assertThat(envVar).isNotEqualTo(value);
                 break;
             default:
-                Fail.fail("Not a valid comparison. Valid ones are: is | matches | is higher than | is lower than | contains | is different from");
+                Assertions.fail("Not a valid comparison. Valid ones are: is | matches | is higher than | is lower than | contains | is different from");
         }
     }
 
@@ -255,11 +256,11 @@ public class UtilsGSpec extends BaseGSpec {
         String modifiedData = commonspec.modifyData(retrievedData, type, modifications).toString();
 
         // Create file (temporary) and set path to be accessible within test
-        File tempDirectory = new File(String.valueOf(System.getProperty("user.dir") + "/target/test-classes/"));
+        File tempDirectory = new File(System.getProperty("user.dir") + "/target/test-classes/");
         String absolutePathFile = tempDirectory.getAbsolutePath() + "/" + fileName;
         commonspec.getLogger().debug("Creating file {} in 'target/test-classes'", absolutePathFile);
         // Note that this Writer will delete the file if it exists
-        Writer out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(absolutePathFile), "UTF-8"));
+        Writer out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(absolutePathFile), StandardCharsets.UTF_8));
         try {
             out.write(modifiedData);
         } catch (Exception e) {
