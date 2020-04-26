@@ -187,6 +187,7 @@ public final class BrowsersDataProvider {
                                     try {
                                         nodeDetailsMap.put(detail.split("=")[0].trim(), detail.split("=")[1].trim());
                                     } catch (Exception e) {
+                                        LOGGER.error("Error including node detail: " + e.getMessage());
                                     }
                                 }
 

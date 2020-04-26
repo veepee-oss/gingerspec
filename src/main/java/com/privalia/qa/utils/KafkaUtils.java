@@ -330,8 +330,8 @@ public class KafkaUtils {
     /**
      * Returns the appropiate class for the given property
      *
-     * @param item
-     * @return
+     * @param item  the item
+     * @return      the class
      */
     private Class getProperClass(String item) {
         switch (item) {
@@ -564,10 +564,10 @@ public class KafkaUtils {
     /**
      * Creates a {@link GenericRecord} given its schema and the list of key -> value
      *
-     * @param schema       Schema as string
-     * @param propertyList Property list (Key -> Value)
+     * @param schema                    Schema as string
+     * @param propertyList              Property list (Key -> Value)
      * @return {@link GenericRecord}
-     * @throws IOException
+     * @throws IOException              the IOException
      */
     private GenericRecord buildRecord(String schema, Map<String, String> propertyList) throws IOException {
 

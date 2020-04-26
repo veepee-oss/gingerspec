@@ -76,7 +76,7 @@ public class SoapServiceUtils {
 
     /**
      * Sets remote wsdl address
-     * @param wsdlAddress
+     * @param wsdlAddress   The web service address
      */
     private void setWsdlAddress(String wsdlAddress) {
         this.wsdlAddress = wsdlAddress;

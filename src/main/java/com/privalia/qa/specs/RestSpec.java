@@ -28,7 +28,6 @@ import io.restassured.http.ContentType;
 import io.restassured.response.ResponseBody;
 import io.restassured.specification.RequestSpecification;
 import org.assertj.core.api.Assertions;
-import org.testng.asserts.Assertion;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
