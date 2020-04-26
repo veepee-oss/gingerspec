@@ -27,6 +27,8 @@ import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
 import io.restassured.response.ResponseBody;
 import io.restassured.specification.RequestSpecification;
+import org.assertj.core.api.Assertions;
+import org.testng.asserts.Assertion;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
@@ -76,7 +78,7 @@ public class RestSpec extends BaseGSpec {
             restHost = "localhost";
         }
 
-        assertThat(restHost).as("Malformed url. No need to use http(s):// prefix").doesNotContain("http://").doesNotContain("https://");
+        Assertions.assertThat(restHost).as("Malformed url. No need to use http(s):// prefix").doesNotContain("http://").doesNotContain("https://");
         String[] restAddress = restHost.split(":");
 
         if (restAddress.length == 2) {
@@ -93,7 +95,7 @@ public class RestSpec extends BaseGSpec {
         }
 
         restPort = restPort.replace(":", "");
-        assertThat(commonspec.getRestRequest()).as("No rest client initialized. Did you forget to use @rest annotation in your feature?").isNotNull();
+        Assertions.assertThat(commonspec.getRestRequest()).as("No rest client initialized. Did you forget to use @rest annotation in your feature?").isNotNull();
         commonspec.setRestHost(restHost);
         commonspec.setRestPort(restPort);
         commonspec.setRestProtocol(restProtocol);
@@ -117,7 +119,7 @@ public class RestSpec extends BaseGSpec {
     public void matchWithExpresion(String envVar, DataTable table) throws Exception {
         String jsonString = ThreadProperty.get(envVar);
 
-        assertThat(jsonString).as("The variable '" + envVar + "' was not set correctly previously").isNotNull();
+        Assertions.assertThat(jsonString).as("The variable '" + envVar + "' was not set correctly previously").isNotNull();
 
         for (List<String> row : table.asLists()) {
             String expression = row.get(0);
@@ -195,8 +197,8 @@ public class RestSpec extends BaseGSpec {
     @When("^I send a '(.+?)' request to '(.+?)'( with user and password '(.+:.+?)')? based on '([^:]+?)'( as '(json|string)')? with:$")
     public void sendRequestDataTable(String requestType, String endPoint, String loginInfo, String baseData, String type, DataTable modifications) throws Exception {
 
-        String user = null;
-        String password = null;
+        String user;
+        String password;
 
         // Retrieve data
         String retrievedData = commonspec.retrieveData(baseData, type);
@@ -248,7 +250,7 @@ public class RestSpec extends BaseGSpec {
         }
 
         if (responseAssert.contains("length")) {
-            assertThat(commonspec.getRestResponse().getBody().asString().length()).as("The returned body does not have the expected length").isEqualTo(Integer.valueOf(parts[1]));
+            Assertions.assertThat(commonspec.getRestResponse().getBody().asString().length()).as("The returned body does not have the expected length").isEqualTo(Integer.valueOf(parts[1]));
         }
 
     }
@@ -263,7 +265,7 @@ public class RestSpec extends BaseGSpec {
     public void assertResponseMessage(String expectedText) throws SecurityException, IllegalArgumentException {
         ResponseBody body = commonspec.getRestResponse().getBody();
         String bodyAsString = body.asString();
-        assertThat(bodyAsString).as("Text '" + expectedText + "' was not found in response body").contains(expectedText);
+        Assertions.assertThat(bodyAsString).as("Text '" + expectedText + "' was not found in response body").contains(expectedText);
     }
 
 
@@ -310,10 +312,10 @@ public class RestSpec extends BaseGSpec {
         try {
             value = commonspec.getJSONPathString(json, parsedElement, position);
         } catch (PathNotFoundException pe) {
-            commonspec.getLogger().error(pe.getLocalizedMessage());
+            Assertions.fail("The given path was not found: " + pe.getMessage());
         }
 
-        assertThat(value).as("json result is empty").isNotEqualTo("");
+        Assertions.assertThat(value).as("json result is empty").isNotEmpty();
         ThreadProperty.set(envVar, value);
     }
 
@@ -574,7 +576,7 @@ public class RestSpec extends BaseGSpec {
     public void saveHeaderValue(String headerName, String varName) throws Throwable {
 
         String headerValue = commonspec.getRestResponse().getHeaders().getValue(headerName);
-        assertThat(headerValue).as("The header " + headerName + " is not present in the response").isNotNull();
+        Assertions.assertThat(headerValue).as("The header " + headerName + " is not present in the response").isNotNull();
         ThreadProperty.set(varName, headerValue);
     }
 
@@ -588,7 +590,7 @@ public class RestSpec extends BaseGSpec {
     public void saveCookieValue(String cookieName, String varName) throws Throwable {
 
         String cookieValue = commonspec.getRestResponse().getCookies().get(cookieName);
-        assertThat(cookieValue).as("The cookie " + cookieName + " is not present in the response").isNotNull();
+        Assertions.assertThat(cookieValue).as("The cookie " + cookieName + " is not present in the response").isNotNull();
         ThreadProperty.set(varName, cookieValue);
     }
 
