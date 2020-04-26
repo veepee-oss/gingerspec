@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.1.2-RC2
+
+* Capturing a screenshot after a selenium scenario fails is now performed in a cucumber hook. So, now there's no need for the SeleniumAspect or for the SeleniumAssert. The snapshot is now also embedded in the selenium step, so it can be directly shown in the HTML report :)
+
+* Modified formater to print the cause of the error in red color after each step. This removes the need for the AssertJAspect and makes errors much easier to spot
+
+* Upgraded Ashot dependency to get rid of warning messages during runtime
+
+* Miscellaneous optimizations and improvements in some assertion messages
+
 ## 2.1.2-RC1
 
 * Changed the way Gingerspec modifies the current cucumber options of a runner class. This change is located in BaseGTest class and it modifies the CucumberOptions annotation of the class before the TestNGCucumberRunner object is created. This new implementation is much cleaner and more decoupled from cucumber.
