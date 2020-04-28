@@ -28,6 +28,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 /**
  * Steps definitions for working with relational databases (postgresql and mysql)
@@ -63,11 +64,10 @@ public class SqlDatabaseGSpec extends BaseGSpec {
                 this.commonspec.getSqlClient().connect(host, Integer.parseInt(port), dataBaseType, database, Boolean.parseBoolean(isSecured), user, password);
             }
         } catch (ClassNotFoundException | SQLException e) {
-            commonspec.getLogger().error("There was a problem connecting to the DB\n{}", e.getMessage());
-            commonspec.getExceptions().add(e);
+            fail("There was a problem connecting to the DB: " + e.getMessage());
         }
 
-        assertThat(this.commonspec.getSqlClient().connectionStatus()).as(this.commonspec.getExceptions().toString()).isEqualTo(true);
+        assertThat(this.commonspec.getSqlClient().connectionStatus()).as("There was a problem connecting to the DB: The connection status is 'false'").isEqualTo(true);
 
     }
 
@@ -79,11 +79,10 @@ public class SqlDatabaseGSpec extends BaseGSpec {
         try {
             this.commonspec.getSqlClient().disconnect();
         } catch (SQLException e) {
-            commonspec.getLogger().error("Could not close DB connection\n{}", e.getMessage());
-            commonspec.getExceptions().add(e);
+            fail("Could not close DB connection" + e.getMessage());
         }
 
-        assertThat(this.commonspec.getSqlClient().connectionStatus()).as(this.commonspec.getExceptions().toString()).isEqualTo(false);
+        assertThat(this.commonspec.getSqlClient().connectionStatus()).as("Could not close DB connection. Connection status is 'true'").isEqualTo(false);
     }
 
     /**
@@ -99,7 +98,7 @@ public class SqlDatabaseGSpec extends BaseGSpec {
         try {
             result = this.commonspec.getSqlClient().executeUpdateQuery(query);
         } catch (SQLException e) {
-            assertThat(e.getMessage()).as("A problem was found while executing the query").isEmpty();
+            fail("A problem was found while executing the query: " + e.getMessage());
         }
 
     }
@@ -136,7 +135,7 @@ public class SqlDatabaseGSpec extends BaseGSpec {
             result = this.commonspec.getSqlClient().executeSelectQuery(query);
             this.commonspec.setPreviousSqlResult(result);
         } catch (SQLException e) {
-            assertThat(e.getMessage()).as("A problem was found while executing the query").isEmpty();
+            fail("A problem was found while executing the query: " + e.getMessage());
         }
 
     }
@@ -178,11 +177,11 @@ public class SqlDatabaseGSpec extends BaseGSpec {
      */
     @Then("^I execute query from '(.+?)'")
     public void executeQueryFromFile(String baseData) throws IOException {
-
         InputStream stream = getClass().getClassLoader().getResourceAsStream(baseData);
         Reader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
 
         try {
+
             boolean r = this.commonspec.getSqlClient().executeQuery(reader);
 
             if (r) {
@@ -190,7 +189,9 @@ public class SqlDatabaseGSpec extends BaseGSpec {
             }
 
         } catch (SQLException e) {
-            assertThat(e.getMessage()).as("A problem was found while executing the query").isEmpty();
+            fail("A problem was found while executing the query: " + e.getMessage());
+        } finally {
+            reader.close();
         }
     }
 
