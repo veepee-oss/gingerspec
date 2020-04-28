@@ -75,30 +75,30 @@ public class UtilsGSpec extends BaseGSpec {
     public void checkValue(String envVar, String operation, String value) throws Exception {
         switch (operation.toLowerCase()) {
             case "is":
-                Assertions.assertThat(envVar).as("%s is not equal to %s",envVar,value).isEqualTo(value);
+                Assertions.assertThat(envVar).as("%s is not equal to %s", envVar, value).isEqualTo(value);
                 break;
             case "matches":
-                Assertions.assertThat(envVar).as("%s does not match %s",envVar,value).matches(value);
+                Assertions.assertThat(envVar).as("%s does not match %s", envVar, value).matches(value);
                 break;
             case "is higher than":
                 if (envVar.matches("^-?\\d+$") && value.matches("^-?\\d+$")) {
-                    Assertions.assertThat(Integer.parseInt(envVar)).as("%s is not higher than %s",envVar,value).isGreaterThan(Integer.parseInt(value));
+                    Assertions.assertThat(Integer.parseInt(envVar)).as("%s is not higher than %s", envVar, value).isGreaterThan(Integer.parseInt(value));
                 } else {
                     Assertions.fail("A number should be provided in order to perform a valid comparison.");
                 }
                 break;
             case "is lower than":
                 if (envVar.matches("^-?\\d+$") && value.matches("^-?\\d+$")) {
-                    Assertions.assertThat(Integer.parseInt(envVar)).as("%s is not lower than %s",envVar,value).isLessThan(Integer.parseInt(value));
+                    Assertions.assertThat(Integer.parseInt(envVar)).as("%s is not lower than %s", envVar, value).isLessThan(Integer.parseInt(value));
                 } else {
                     Assertions.fail("A number should be provided in order to perform a valid comparison.");
                 }
                 break;
             case "contains":
-                Assertions.assertThat(envVar).as("%s does not contain %s",envVar,value).contains(value);
+                Assertions.assertThat(envVar).as("%s does not contain %s", envVar, value).contains(value);
                 break;
             case "is different from":
-                Assertions.assertThat(envVar).as("%s is not different than %s",envVar,value).isNotEqualTo(value);
+                Assertions.assertThat(envVar).as("%s is not different than %s", envVar, value).isNotEqualTo(value);
                 break;
             default:
                 Assertions.fail("Not a valid comparison. Valid ones are: is | matches | is higher than | is lower than | contains | is different from");
