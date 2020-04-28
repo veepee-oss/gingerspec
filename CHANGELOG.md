@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.1.2-RC3
+
+* Minor improvements on assertion messages.  Improved some assertion functions for better readability when executing the tests.
+ 
+* The screenshot functionality is now performed by the standard function of selenium, this produces a capture of only the current view instead of the whole page. Ashot was causing a weird-looking captures on pages with infinite scrolling.
+
 ## 2.1.2-RC2
 
 * Capturing a screenshot after a selenium scenario fails is now performed in a cucumber hook. So, now there's no need for the SeleniumAspect or for the SeleniumAssert. The snapshot is now also embedded in the selenium step, so it can be directly shown in the HTML report :)
