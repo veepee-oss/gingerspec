@@ -26,8 +26,8 @@ import org.assertj.core.api.Condition;
 import org.hjson.JsonValue;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.openqa.selenium.*;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -52,9 +52,9 @@ import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.privalia.qa.assertions.Assertions.assertThat;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.testng.Assert.fail;
-import static com.privalia.qa.assertions.Assertions.assertThat;
 
 /**
  * Class with common functions used by all the step definition classes
@@ -824,7 +824,7 @@ public class CommonG {
             } else {
 
                 try {
-                    Screenshot screenshot = new AShot().shootingStrategy(ShootingStrategies.viewportPasting(500)).takeScreenshot(driver);
+                    Screenshot screenshot = new AShot().shootingStrategy(ShootingStrategies.simple()).takeScreenshot(driver);
                     file = new File("target/temp");
                     ImageIO.write(screenshot.getImage(), "PNG", file);
                 } catch (Exception e) {

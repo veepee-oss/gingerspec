@@ -384,39 +384,40 @@ public class HookGSpec extends BaseGSpec {
     @After(order = 20, value = {"@web or @mobile"})
     public void seleniumTeardown(Scenario scenario) throws IOException {
         if (commonspec.getDriver() != null) {
+            try {
+                if (scenario.isFailed()) {
+                    //Include screenshot in the report
+                    commonspec.getLogger().debug("Scenario failed. Adding screenshot to report");
+                    Screenshot screenshot = new AShot().shootingStrategy(ShootingStrategies.simple()).takeScreenshot(driver);
 
-            if (scenario.isFailed()) {
-                //Include screenshot in the report
-                commonspec.getLogger().debug("Scenario failed. Adding screenshot to report");
-                Screenshot screenshot = new AShot().shootingStrategy(ShootingStrategies.viewportPasting(500)).takeScreenshot(driver);
+                    //transform the screenshot to byte[] to embed it in the report
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    ImageIO.write(screenshot.getImage(), "png", baos);
+                    baos.flush();
+                    byte[] imageInByte = baos.toByteArray();
+                    baos.close();
 
-                //transform the screenshot to byte[] to embed it in the report
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                ImageIO.write(screenshot.getImage(), "png", baos);
-                baos.flush();
-                byte[] imageInByte = baos.toByteArray();
-                baos.close();
+                    //Also include the page source in the report
+                    String source = ((RemoteWebDriver) driver).getPageSource();
+                    scenario.embed(imageInByte, "image/png");
+                    scenario.embed(source.getBytes(), "text");
 
-                //Also include the page source in the report
-                String source = ((RemoteWebDriver) driver).getPageSource();
-                scenario.embed(imageInByte, "image/png");
-                scenario.embed(source.getBytes(), "text");
-
-                //Take screenshot and save it in the target/execution folder
-                commonspec.getLogger().debug("Adding screenshot target/execution folder");
-                if (this.commonspec.getDriver() instanceof MobileDriver) {
-                    this.commonspec.captureEvidence(driver, "mobileScreenCapture", "exception");
-                    this.commonspec.captureEvidence(driver, "mobilePageSource", "exception");
-                } else {
-                    this.commonspec.captureEvidence(driver, "framehtmlSource", "exception");
-                    this.commonspec.captureEvidence(driver, "htmlSource", "exception");
-                    this.commonspec.captureEvidence(driver, "screenCapture", "exception");
+                    //Take screenshot and save it in the target/execution folder
+                    commonspec.getLogger().debug("Adding screenshot target/execution folder");
+                    if (this.commonspec.getDriver() instanceof MobileDriver) {
+                        this.commonspec.captureEvidence(driver, "mobileScreenCapture", "exception");
+                        this.commonspec.captureEvidence(driver, "mobilePageSource", "exception");
+                    } else {
+                        this.commonspec.captureEvidence(driver, "framehtmlSource", "exception");
+                        this.commonspec.captureEvidence(driver, "htmlSource", "exception");
+                        this.commonspec.captureEvidence(driver, "screenCapture", "exception");
+                    }
                 }
+            } finally {
+                //Close the selenium driver
+                commonspec.getLogger().debug("Shutting down Selenium client");
+                commonspec.getDriver().quit();
             }
-
-            //Close the selenium driver
-            commonspec.getLogger().debug("Shutting down Selenium client");
-            commonspec.getDriver().quit();
         }
     }
 
