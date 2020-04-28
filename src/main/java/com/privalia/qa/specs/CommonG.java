@@ -768,7 +768,7 @@ public class CommonG {
             currentData = "-" + HashUtils.doHash(currentData);
         }
 
-        Timestamp ts = new Timestamp(new java.util.Date().getTime());
+        Timestamp ts = new Timestamp(new Date().getTime());
         String outputFile = dir + clazz + "/"
                 + ThreadProperty.get("feature") + "." + ThreadProperty.get("scenario") + "/" + currentBrowser +
                 currentData + ts.toString() + suffix;
@@ -824,9 +824,9 @@ public class CommonG {
             } else {
 
                 try {
-                    Screenshot screenshot = new AShot().shootingStrategy(ShootingStrategies.simple()).takeScreenshot(driver);
+                    File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
                     file = new File("target/temp");
-                    ImageIO.write(screenshot.getImage(), "PNG", file);
+                    FileUtils.copyFile(screenshot, file);
                 } catch (Exception e) {
                     logger.error("Exception on taking screenshot", e);
                 }

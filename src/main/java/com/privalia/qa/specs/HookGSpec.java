@@ -28,10 +28,7 @@ import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import io.restassured.http.ContentType;
-import org.openqa.selenium.Dimension;
-import org.openqa.selenium.MutableCapabilities;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -46,6 +43,7 @@ import ru.yandex.qatools.ashot.shooting.ShootingStrategies;
 
 import javax.imageio.ImageIO;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -388,18 +386,11 @@ public class HookGSpec extends BaseGSpec {
                 if (scenario.isFailed()) {
                     //Include screenshot in the report
                     commonspec.getLogger().debug("Scenario failed. Adding screenshot to report");
-                    Screenshot screenshot = new AShot().shootingStrategy(ShootingStrategies.simple()).takeScreenshot(driver);
-
-                    //transform the screenshot to byte[] to embed it in the report
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    ImageIO.write(screenshot.getImage(), "png", baos);
-                    baos.flush();
-                    byte[] imageInByte = baos.toByteArray();
-                    baos.close();
+                    byte[] screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
 
                     //Also include the page source in the report
-                    String source = ((RemoteWebDriver) driver).getPageSource();
-                    scenario.embed(imageInByte, "image/png");
+                    String source = driver.getPageSource();
+                    scenario.embed(screenshot, "image/png");
                     scenario.embed(source.getBytes(), "text");
 
                     //Take screenshot and save it in the target/execution folder
