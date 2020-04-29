@@ -553,6 +553,8 @@ public class CommonG {
 
         List<WebElement> wel = null;
 
+        Assertions.assertThat(driver).as("Driver has not been initialized!").isNotNull();
+
         if (this.getDriver() instanceof MobileDriver) {
 
             if ("id".equals(method)) {
@@ -627,6 +629,8 @@ public class CommonG {
     public List<WebElement> locateElementWithPooling(int poolingInterval, int poolMaxTime, String method, String element,
                                                      Integer expectedCount, String type) {
 
+        Assertions.assertThat(driver).as("Driver has not been initialized!").isNotNull();
+
         FluentWait fluentWait = new FluentWait(driver)
                 .withTimeout(poolMaxTime, SECONDS)
                 .pollingEvery(poolingInterval, SECONDS)
@@ -653,7 +657,7 @@ public class CommonG {
             } else if ("hidden".matches(type)) {
                 fluentWait.until(ExpectedConditions.invisibilityOfElementLocated(getByType(method, element)));
             } else {
-                fail("Unknown type: " + type);
+                fail("Unknown element style: " + type);
             }
 
             return wel;
@@ -698,6 +702,9 @@ public class CommonG {
      * @return A selenium Alert object
      */
     public Alert waitAlertWithPooling(int poolingInterval, int poolMaxTime) {
+
+        Assertions.assertThat(driver).as("Driver has not been initialized!").isNotNull();
+
         Wait wait = new FluentWait(driver)
                 .withTimeout(poolMaxTime, SECONDS)
                 .pollingEvery(poolingInterval, SECONDS)
@@ -1522,7 +1529,7 @@ public class CommonG {
                 break;
 
             default:
-                throw new Exception("Operation not implemented: " + requestType);
+                Assertions.fail("Operation not implemented: " + requestType);
 
         }
 
