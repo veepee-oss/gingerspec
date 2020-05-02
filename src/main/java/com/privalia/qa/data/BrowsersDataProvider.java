@@ -153,7 +153,7 @@ public final class BrowsersDataProvider {
         String grid = System.getProperty("SELENIUM_GRID");
         String node = System.getProperty("SELENIUM_NODE");
 
-        if (grid != null) {
+        if (grid != null && !grid.matches("local")) {
             grid = "http://" + grid + "/grid/console";
             Document doc;
             try {
@@ -187,7 +187,7 @@ public final class BrowsersDataProvider {
                                     try {
                                         nodeDetailsMap.put(detail.split("=")[0].trim(), detail.split("=")[1].trim());
                                     } catch (Exception e) {
-                                        LOGGER.error("Error including node detail: " + e.getMessage());
+
                                     }
                                 }
 
