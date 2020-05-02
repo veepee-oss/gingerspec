@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1.2
+
+* Fix a minor problem when executing several cucumber runners with selenium features using cucumber tags. Now, they can be executed with 'mvn verify' (to execute everything) or for example 'mvn verify -Dcucumber.options="--tags @web"'
+
 ## 2.1.2-RC3
 
 * Minor improvements on assertion messages.  Improved some assertion functions for better readability when executing the tests.
