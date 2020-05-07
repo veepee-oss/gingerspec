@@ -94,11 +94,11 @@
     <properties>
         <cucumber-java.version>4.4.0</cucumber-java.version>
         <testng.version>6.14.3</testng.version>
-        <assertj-core.version>3.3.0</assertj-core.version>
+        <assertj-core.version>3.16.0</assertj-core.version>
         <slf4j-api.version>1.7.7</slf4j-api.version>
         <reflections.version>0.9.9-RC1</reflections.version>
         <org.jacoco.core.version>0.7.5.201505241946</org.jacoco.core.version>
-        <aspectjweaver.version>1.8.8</aspectjweaver.version>
+        <aspectjweaver.version>1.9.5</aspectjweaver.version>
         <cassandra-driver-core.version>3.2.0</cassandra-driver-core.version>
         <guava.version>23.0</guava.version>
         <lz4.version>1.2.0</lz4.version>
@@ -107,18 +107,17 @@
         <selenium-java.version>3.141.59</selenium-java.version>
         <jsoup.version>1.7.3</jsoup.version>
         <json.version>20140107</json.version>
-        <junit.version>4.11</junit.version>
         <hjson.version>1.1.4</hjson.version>
-        <json-path.version>2.2.0</json-path.version>
+        <json-path.version>2.4.0</json-path.version>
         <elasticsearch.version>2.2.0</elasticsearch.version>
-        <jackson-core.version>2.10.3</jackson-core.version>
+        <jackson-core.version>2.11.0</jackson-core.version>
         <jackson-databind.version>2.10.3</jackson-databind.version>
         <json-schema-validator.version>2.9.0</json-schema-validator.version>
         <kafka-clients.version>1.1.0</kafka-clients.version>
         <kafka-avro-serializer.version>3.1.1</kafka-avro-serializer.version>
         <avro.version>1.8.0</avro.version>
-        <mysql-connector-java.version>6.0.6</mysql-connector-java.version>
-        <postgresql.version>42.2.1</postgresql.version>
+        <mysql-connector-java.version>8.0.20</mysql-connector-java.version>
+        <postgresql.version>42.2.12</postgresql.version>
         <rest-assured.version>4.3.0</rest-assured.version>
         <webdrivermanager.version>3.8.1</webdrivermanager.version>
         <appium.version>7.3.0</appium.version>
@@ -128,11 +127,6 @@
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit-dep</artifactId>
-            <version>${junit.version}</version>
-        </dependency>
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
@@ -258,12 +252,6 @@
             <groupId>io.cucumber</groupId>
             <artifactId>cucumber-testng</artifactId>
             <version>${cucumber-java.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.cucumber</groupId>
-            <artifactId>cucumber-junit</artifactId>
-            <version>${cucumber-java.version}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.testng</groupId>
