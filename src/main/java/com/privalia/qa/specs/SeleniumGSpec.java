@@ -94,13 +94,9 @@ public class SeleniumGSpec extends BaseGSpec {
     public void seleniumBrowse(String isSecured, String path) throws Exception {
         assertThat(path).isNotEmpty();
 
-        if (commonspec.getWebHost() == null) {
-            throw new Exception("Web host has not been set. You may need to use the 'My app is running in...' step first");
-        }
+        Assertions.assertThat(commonspec.getWebHost()).as("Web host has not been set. You may need to use the 'My app is running in...' step first").isNotNull();
+        Assertions.assertThat(commonspec.getWebPort()).as("Web port has not been set. You may need to use the 'My app is running in...' step first").isNotNull();
 
-        if (commonspec.getWebPort() == null) {
-            throw new Exception("Web port has not been set. You may need to use the 'My app is running in...' step first");
-        }
         String protocol = "http://";
         if (isSecured != null) {
             protocol = "https://";
@@ -285,11 +281,9 @@ public class SeleniumGSpec extends BaseGSpec {
     public void seleniumIdFrame(String method, String idframe) throws IllegalAccessException, NoSuchFieldException, ClassNotFoundException {
         assertThat(commonspec.locateElement(method, idframe, 1));
 
-        if (method.equals("id") || method.equals("name")) {
-            commonspec.getDriver().switchTo().frame(idframe);
-        } else {
-            throw new ClassNotFoundException("Can not use this method to switch iframe");
-        }
+        Assertions.assertThat(method).as("Can not use '%s' to switch iframe. Use 'id' or 'name'", method).isEqualTo("id").isEqualTo("name");
+        commonspec.getDriver().switchTo().frame(idframe);
+
     }
 
 
@@ -650,30 +644,34 @@ public class SeleniumGSpec extends BaseGSpec {
      * <pre>
      * Example:
      * {@code
-     *      Given My app is running in 'demoqa.com:80'
-     *      And I browse to '/autocomplete'
-     *      Then we are in page '/autocomplete/'
+     *      Given I go to 'https://demoqa.com/'
+     *      Then we are in page 'https://demoqa.com/'
      * }
      * </pre>
      *
      * @param url the url to verify
-     * @throws Exception Exception
      */
     @Then("^we are in page '(.+?)'$")
-    public void checkURL(String url) throws Exception {
+    public void checkURL(String url) {
+        Assertions.assertThat(commonspec.getDriver().getCurrentUrl()).as("We are not in the expected url").isEqualTo(url);
+    }
 
-        if (commonspec.getWebHost() == null) {
-            throw new Exception("Web host has not been set");
-        }
 
-        if (commonspec.getWebPort() == null) {
-            throw new Exception("Web port has not been set");
-        }
-
-        String webURL = commonspec.getWebHost();
-
-        Assertions.assertThat(commonspec.getDriver().getCurrentUrl()).as("We are not in the expected url: " + webURL.toLowerCase() + url)
-                .endsWith(webURL.toLowerCase() + url);
+    /**
+     * Checks if the current URL contains the specified text
+     * <pre>
+     * Example:
+     * {@code
+     *      Given My app is running in 'demoqa.com:80'
+     *      And I browse to '/autocomplete'
+     *      Then the current url contains the text 'autocomplete'
+     * }
+     * </pre>
+     * @param text  Text to look for in the current url
+     */
+    @Then("^the current url contains the text '(.+?)'$")
+    public void checkURLContains(String text) {
+        Assertions.assertThat(commonspec.getDriver().getCurrentUrl()).as("We are not in the expected url").contains(text);
     }
 
 
@@ -1060,5 +1058,32 @@ public class SeleniumGSpec extends BaseGSpec {
             assertThat(output).as("The script did not return any value!").isNotNull();
             ThreadProperty.set(enVar, output.toString());
         }
+    }
+
+    /**
+     * Directly navigate go to the specified url
+     * <p>
+     * This step is a similar way of navigating to a web page by specifying the
+     * full url directly, instead of first setting the base path with {@link #setupApp(String)}
+     * and later navigate with {@link #seleniumBrowse(String, String)}
+     *
+     * <pre>
+     * Example:
+     * {@code
+     *      Given I go to 'http://www.demoqa.com/autocomplete'
+     * }
+     * You can also do it like this:
+     * {@code
+     *      Given My app is running in 'demoqa.com:80'
+     *      And I browse to '/autocomplete'
+     * }
+     * </pre>
+     *
+     * @param url   Url were to navigate
+     */
+    @Given("I go to '(.+?)'")
+    public void iGoToUrl(String url) {
+        commonspec.getDriver().get(url);
+        commonspec.setParentWindow(commonspec.getDriver().getWindowHandle());
     }
 }
