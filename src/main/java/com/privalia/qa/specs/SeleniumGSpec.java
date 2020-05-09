@@ -14,8 +14,10 @@ import org.openqa.selenium.support.ui.Select;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import static com.privalia.qa.assertions.Assertions.assertThat;
 
@@ -281,7 +283,10 @@ public class SeleniumGSpec extends BaseGSpec {
     public void seleniumIdFrame(String method, String idframe) throws IllegalAccessException, NoSuchFieldException, ClassNotFoundException {
         assertThat(commonspec.locateElement(method, idframe, 1));
 
-        Assertions.assertThat(method).as("Can not use '%s' to switch iframe. Use 'id' or 'name'", method).isEqualTo("id").isEqualTo("name");
+        if (!method.toLowerCase().matches("id") && !method.toLowerCase().matches("name")) {
+            Assertions.fail("Can not use '%s' to switch iframe. Use 'id' or 'name'", method);
+        }
+
         commonspec.getDriver().switchTo().frame(idframe);
 
     }
@@ -1083,6 +1088,11 @@ public class SeleniumGSpec extends BaseGSpec {
      */
     @Given("I go to '(.+?)'")
     public void iGoToUrl(String url) {
+
+        if (!url.toLowerCase().contains("http://") && !url.toLowerCase().contains("https://")) {
+            Assertions.fail("Could not infer hypertext transfer protocol. Include 'http://' or 'https://'");
+        }
+
         commonspec.getDriver().get(url);
         commonspec.setParentWindow(commonspec.getDriver().getWindowHandle());
     }
