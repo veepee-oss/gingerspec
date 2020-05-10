@@ -1,5 +1,17 @@
 # Changelog
 
+## 2.1.3
+
+* Junit dependency was removed and now assertj is the preferred assertion library
+
+* Small version bump in other dependencies
+
+* Added 2 new steps in SeleniumGSpec
+
+* Fixed error when printing the assertion error of a step
+
+* Improvements in javadoc for SleniumGSpec and RestSpec
+
 ## 2.1.2
 
 * Fix a minor problem when executing several cucumber runners with selenium features using cucumber tags. Now, they can be executed with 'mvn verify' (to execute everything) or for example 'mvn verify -Dcucumber.options="--tags @web"'
