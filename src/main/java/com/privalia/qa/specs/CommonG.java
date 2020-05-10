@@ -542,14 +542,8 @@ public class CommonG {
      * @param element       webElement searched in selenium context
      * @param expectedCount integer. Expected number of elements.
      * @return List(WebElement)
-     * @throws IllegalAccessException   exception
-     * @throws IllegalArgumentException exception
-     * @throws SecurityException        exception
-     * @throws NoSuchFieldException     exception
-     * @throws ClassNotFoundException   exception
      */
-    public List<WebElement> locateElement(String method, String element,
-                                          Integer expectedCount) throws ClassNotFoundException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+    public List<WebElement> locateElement(String method, String element, Integer expectedCount) {
 
         List<WebElement> wel = null;
 

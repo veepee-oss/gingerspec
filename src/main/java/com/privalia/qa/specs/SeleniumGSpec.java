@@ -48,7 +48,7 @@ public class SeleniumGSpec extends BaseGSpec {
      *      Given My app is running in 'demoqa.com:80'
      * }
      * </pre>
-     *
+     * @see #iGoToUrl(String)
      * @param host host where app is running (i.e "localhost" or "localhost:443")
      */
     @Given("^My app is running in '(.+?)'$")
@@ -87,13 +87,12 @@ public class SeleniumGSpec extends BaseGSpec {
      *      Then I securely browse to '/'               //will load https://mysecuresite.com:443/
      * }
      * </pre>
-     *
+     * @see #iGoToUrl(String)
      * @param isSecured If the connection should be secured
      * @param path      path of running app
-     * @throws Exception exception
      */
     @Given("^I( securely)? browse to '(.+?)'$")
-    public void seleniumBrowse(String isSecured, String path) throws Exception {
+    public void seleniumBrowse(String isSecured, String path) {
         assertThat(path).isNotEmpty();
 
         Assertions.assertThat(commonspec.getWebHost()).as("Web host has not been set. You may need to use the 'My app is running in...' step first").isNotNull();
@@ -130,10 +129,9 @@ public class SeleniumGSpec extends BaseGSpec {
      * @param method          class of element to be searched
      * @param element         webElement searched in selenium context
      * @param type            The expected style of the element: visible, clickable, present, hidden
-     * @throws Throwable Throwable
      */
     @Then("^I check every '(\\d+)' seconds for at least '(\\d+)' seconds until '(\\d+)' elements exists with '([^:]*?):(.+?)' and is '(visible|clickable|present|hidden)'$")
-    public void waitWebElementWithPooling(int poolingInterval, int poolMaxTime, int elementsCount, String method, String element, String type) throws Throwable {
+    public void waitWebElementWithPooling(int poolingInterval, int poolMaxTime, int elementsCount, String method, String element, String type) {
         List<WebElement> wel = commonspec.locateElementWithPooling(poolingInterval, poolMaxTime, method, element, elementsCount, type);
         PreviousWebElements pwel = new PreviousWebElements(wel);
         commonspec.setPreviousWebElements(pwel);
@@ -150,6 +148,8 @@ public class SeleniumGSpec extends BaseGSpec {
      *      And I check every '1' seconds for at least '5' seconds until an alert appears
      * }
      * </pre>
+     * @see #iAcceptTheAlert()
+     * @see #iDismissTheAlert()
      * @param poolingInterval Time between consecutive condition evaluations
      * @param poolMaxTime     Maximum time to wait for the condition to be true
      */
@@ -168,6 +168,8 @@ public class SeleniumGSpec extends BaseGSpec {
      *      And I dismiss the alert
      * }
      * </pre>
+     * @see #waitAlertWithPooling(int, int)
+     * @see #iAcceptTheAlert()
      */
     @Then("^I dismiss the alert$")
     public void iAcceptTheAlert() {
@@ -183,6 +185,8 @@ public class SeleniumGSpec extends BaseGSpec {
      *      And I accept the alert
      * }
      * </pre>
+     * @see #waitAlertWithPooling(int, int)
+     * @see #iDismissTheAlert()
      */
     @Then("^I accept the alert$")
     public void iDismissTheAlert() {
@@ -275,12 +279,9 @@ public class SeleniumGSpec extends BaseGSpec {
      *
      * @param method  the method (id, class, name, xpath)
      * @param idframe locator
-     * @throws IllegalAccessException exception
-     * @throws NoSuchFieldException   exception
-     * @throws ClassNotFoundException exception
      */
     @Given("^I switch to iframe with '([^:]*?):(.+?)'$")
-    public void seleniumIdFrame(String method, String idframe) throws IllegalAccessException, NoSuchFieldException, ClassNotFoundException {
+    public void seleniumIdFrame(String method, String idframe) {
         assertThat(commonspec.locateElement(method, idframe, 1));
 
         if (!method.toLowerCase().matches("id") && !method.toLowerCase().matches("name")) {
@@ -414,14 +415,9 @@ public class SeleniumGSpec extends BaseGSpec {
      * @param expectedCount the expected count of elements to find
      * @param method        method to locate the elements (id, name, class, css, xpath for regular html elements, and additionally, linkText, partialLinkText and tagName for mobile elements)
      * @param element       the relative reference to the element
-     * @throws ClassNotFoundException   the class not found exception
-     * @throws NoSuchFieldException     the no such field exception
-     * @throws SecurityException        the security exception
-     * @throws IllegalArgumentException the illegal argument exception
-     * @throws IllegalAccessException   the illegal access exception
      */
     @Then("^(at least )?'(\\d+?)' elements? exists? with '([^:]*?):(.+?)'$")
-    public void assertSeleniumNElementExists(String atLeast, Integer expectedCount, String method, String element) throws ClassNotFoundException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+    public void assertSeleniumNElementExists(String atLeast, Integer expectedCount, String method, String element) {
 
         List<WebElement> wel;
 
@@ -452,21 +448,17 @@ public class SeleniumGSpec extends BaseGSpec {
      *      And I click on the element on index '0'
      * }
      * </pre>
-     * @param timeout       the max time to wait for the condition to be true
-     * @param wait          interval between verification
-     * @param expectedCount the expected count of elements
-     * @param method        the method
-     * @param element       the web element element
-     * @throws InterruptedException     the interrupted exception
-     * @throws ClassNotFoundException   the class not found exception
-     * @throws NoSuchFieldException     the no such field exception
-     * @throws SecurityException        the security exception
-     * @throws IllegalArgumentException the illegal argument exception
-     * @throws IllegalAccessException   the illegal access exception
+     * @see #waitAlertWithPooling(int, int)
+     * @param timeout                   The max time to wait for the condition to be true
+     * @param wait                      Interval between verification
+     * @param expectedCount             The expected count of elements
+     * @param method                    The method
+     * @param element                   The web element element
+     * @throws InterruptedException     The interrupted exception
      */
     @Then("^in less than '(\\d+?)' seconds, checking each '(\\d+?)' seconds, '(\\d+?)' elements exists with '([^:]*?):(.+?)'$")
     public void assertSeleniumNElementExistsOnTimeOut(Integer timeout, Integer wait, Integer expectedCount,
-                                                      String method, String element) throws InterruptedException, ClassNotFoundException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+                                                      String method, String element) throws InterruptedException {
         List<WebElement> wel = null;
         for (int i = 0; i < timeout; i += wait) {
             wel = commonspec.locateElement(method, element, -1);
@@ -745,7 +737,6 @@ public class SeleniumGSpec extends BaseGSpec {
 
         String value = wel.get(index).getAttribute(customProperty);
         assertThat(value).as("The element doesn't have the property '%s'", customProperty).isNotEmpty().isNotNull();
-
         assertThat(value).as("The property '%s' doesn't have the text '%s'", customProperty, textValue).isEqualToIgnoringCase(textValue);
 
     }
@@ -758,14 +749,9 @@ public class SeleniumGSpec extends BaseGSpec {
      * @param source      initial web element
      * @param dmethod     the dmethod
      * @param destination destination web element
-     * @throws ClassNotFoundException   ClassNotFoundException
-     * @throws NoSuchFieldException     NoSuchFieldException
-     * @throws SecurityException        SecurityException
-     * @throws IllegalArgumentException IllegalArgumentException
-     * @throws IllegalAccessException   IllegalAccessException
      */
     @When("^I drag '([^:]*?):(.+?)' and drop it to '([^:]*?):(.+?)'$")
-    public void seleniumDrag(String smethod, String source, String dmethod, String destination) throws ClassNotFoundException, NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+    public void seleniumDrag(String smethod, String source, String dmethod, String destination) {
         Actions builder = new Actions(commonspec.getDriver());
 
         List<WebElement> sourceElement = commonspec.locateElement(smethod, source, 1);
@@ -1044,7 +1030,7 @@ public class SeleniumGSpec extends BaseGSpec {
      *
      * @param script Script to execute (i.e alert("This is an alert message"))
      * @param index  If used, the index of the previously found web element on which to execute the function
-     * @param enVar  if used, variable where to store the result of the execution of the script
+     * @param enVar  If used, variable where to store the result of the execution of the script
      */
     @Then("^I execute '(.+?)' as javascript( on the element on index '(.+?)')?( and save the result in the environment variable '(.+?)')?$")
     public void iExecuteTheScriptScriptOnTheElmentOnIndex(String script, String index, String enVar) {
@@ -1083,7 +1069,8 @@ public class SeleniumGSpec extends BaseGSpec {
      *      And I browse to '/autocomplete'
      * }
      * </pre>
-     *
+     * @see #setupApp(String)
+     * @see #seleniumBrowse(String, String)
      * @param url   Url were to navigate
      */
     @Given("I go to '(.+?)'")

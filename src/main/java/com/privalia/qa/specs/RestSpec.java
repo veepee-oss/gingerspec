@@ -56,11 +56,24 @@ public class RestSpec extends BaseGSpec {
     }
 
     /**
-     * Set app host and port {@code host, @code port} for Rest requests.
-     * This parameters will be used for all future requests in the same scenario.
+     * Set app host and port for Rest requests.
+     * <p>
+     * This is an initialization step. This is used as the first step in rest features to configure the basepath url.
+     * This parameters will be used for all future requests in the same scenario. The rest request is build within
+     * the {@link HookGSpec} class, so, don't forget to use the {@literal @}rest annotation at the beginning of your
+     * feature for a proper initialization.
+     * <pre>
+     * Example:
+     * {@code
+     *      Given I send requests to 'jsonplaceholder.typicode.com'       //If no port is specified, will default to 80 -> http://jsonplaceholder.typicode.com:80
+     *      Given I send requests to 'jsonplaceholder.typicode.com:8080'  //Will use -> http:jsonplaceholder.typicode.com:8080
+     * }
+     * Or su can use the keyword 'securely' to use https
+     * {@code
+     *      Given I securely send requests to 'jsonplaceholder.typicode.com'    //If no port is specified, will default to 443 -> https//:jsonplaceholder.typicode.com:443
+     * }
+     * </pre>
      *
-     * The rest request is build within the {@link HookGSpec} class, so, dont forget to use the
-     * {@literal @}rest annotation at the beginning of your feature for a proper initialization.
      * @param isSecured     Indicates if https:// should be used (if false, defaults to http://)
      * @param restHost      Port where the API is running. Defaults to 80 if null
      */
