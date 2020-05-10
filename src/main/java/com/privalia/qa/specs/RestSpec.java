@@ -31,6 +31,7 @@ import org.assertj.core.api.Assertions;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -120,15 +121,29 @@ public class RestSpec extends BaseGSpec {
     }
 
     /**
-     * Check if expression defined by JSOPath (http://goessner.net/articles/JsonPath/index.html)
-     * match in JSON stored in a environment variable.
-     *
-     * @param envVar        environment variable where JSON is stored
-     * @param table         data table in which each row stores one expression
-     * @throws Exception    Exception
+     * Verifies the structure of a json document against a set of test cases defined in a datatable
+     * <p>
+     * This step is typically used to verify the response body of a request. The json to verify
+     * must have been previously saved in a variable using for example
+     * {@link #saveElementEnvironment(String, String, String)}
+     * <pre>
+     * Example: Assuming that 'response' contains a json document
+     * {@code
+     *      And 'response' matches the following cases:
+     *       | $.title  | contains  | 2              |
+     *       | $.body   | contains  | This is a test |
+     *       | $.userId | not equal | 2              |
+     * }
+     * First column: jsonpath of the element in the body to verify
+     * Second column: operator (equal|not equal|contains|does not contain|length|exists|does not exists|size)
+     * Third column: Value to match against
+     * </pre>
+     * @see #saveElementEnvironment(String, String, String)
+     * @param envVar        Environment variable where JSON is stored
+     * @param table         Data table in which each row stores one expression
      */
     @Then("^'(.+?)' matches the following cases:$")
-    public void matchWithExpresion(String envVar, DataTable table) throws Exception {
+    public void matchWithExpresion(String envVar, DataTable table) {
         String jsonString = ThreadProperty.get(envVar);
 
         Assertions.assertThat(jsonString).as("The variable '" + envVar + "' was not set correctly previously").isNotNull();
@@ -149,6 +164,28 @@ public class RestSpec extends BaseGSpec {
 
     /**
      * Generates a REST request of the type specified to the indicated endpoint
+     * <p>
+     * The endpoint must be relative to the base path previously defined with {@link #setupApp(String, String)}
+     * <pre>
+     * Example: Executing a simple GET request
+     * {@code
+     *      Given I securely send requests to 'jsonplaceholder.typicode.com:443'
+     *      When I send a 'GET' request to '/posts'      //Executes a GET request to https://jsonplaceholder.typicode.com:443/posts
+     * }
+     * Example: Using basic authentication:
+     * {@code
+     *      Given I securely send requests to 'jsonplaceholder.typicode.com:443'
+     *      When I send a 'GET' request to '/posts' with user and password 'user:password'
+     * }
+     * Example: Sending a POST request with body
+     * {@code
+     *      Given I securely send requests to 'jsonplaceholder.typicode.com:443'
+     *      When I send a 'POST' request to '/posts' based on 'schemas/mytestdata.json' as 'json' //Executes a POST request with the content of mytestdata.json as body
+     * }
+     * If you need to alter the content of the json document before sending you could use {@link #sendRequestDataTable(String, String, String, String, String, DataTable)}
+     * </pre>
+     * @see #setupApp(String, String)
+     * @see #sendRequestDataTable(String, String, String, String, String, DataTable)
      * @param requestType   HTTP verb (type of request): POST, GET, PUT, PATCH, DELETE
      * @param endPoint      Endpoint (i.e /user/1). The base path used is the one indicated in a previous step
      * @param loginInfo     User and password to use if the endpoints requires basic authentication (user:password)
@@ -182,7 +219,24 @@ public class RestSpec extends BaseGSpec {
 
     /**
      * Send a request of the type specified
+     * <p>
+     * This function works in the same way as {@link #sendRequestNoDataTable(String, String, String, String, String)}
+     * the difference is that this one accepts a datatable with a list of modification to be applied to the json
+     * body before the request is executed
+     * <pre>
+     * Example: Send a POST request with the content of schemas/mytestdata.json as body data
+     * {@code
+     *      Given I securely send requests to 'jsonplaceholder.typicode.com:443'
+     *      When I send a 'POST' request to '/posts' based on 'schemas/mytestdata.json' as 'json' with:
+     *          | $.title | UPDATE | This is a test 2 |
+     * }
+     * First column: Element in the json document to modify
+     * Second column: Operation to execute (DELETE|ADD|UPDATE)
+     * Third column: New value
+     * </pre>
      *
+     * @see #setupApp(String, String)
+     * @see #sendRequestNoDataTable(String, String, String, String, String)
      * @param requestType   type of request to be sent. Possible values:
      *                      GET|DELETE|POST|PUT|PATCH
      * @param endPoint      end point to be used
@@ -235,10 +289,38 @@ public class RestSpec extends BaseGSpec {
 
     /**
      * Verifies the status response (HTTP response code) of a rest request.
-     * Aditionally, the step can verify the response (body) lenght, and if the body contains a given character or matches a defined schema
-     *
-     * @param expectedStatus    Expected HTTP status code
-     * @param responseAssert       Expresion to determine if assert length, text or schema
+     * <p>
+     * Additionally, the step can verify the response (body) length, and if the body contains a given character or matches a defined schema.
+     * For this step to work, a previous request must have been executed such as {@link #sendRequestNoDataTable(String, String, String, String, String)}
+     * or {@link #sendRequestDataTable(String, String, String, String, String, DataTable)}
+     * <pre>
+     * Example: Verify the response status code
+     * {@code
+     *      When I send a 'GET' request to '/posts'
+     *      Then the service response status must be '200'
+     * }
+     * Example: Checking the response body length
+     * {@code
+     *     When I send a 'GET' request to '/comments/1'
+     *     Then the service response status must be '200' and its response length must be '268'
+     * }
+     * Example: Verify the response body contains a specific text
+     * {@code
+     *     When I send a 'GET' request to '/posts'
+     *     Then the service response status must be '200' and its response must contain the text 'body'
+     * }
+     * Example: Verify that the response body matches a json schema
+     * {@code
+     *     When I send a 'GET' request to '/posts'
+     *     Then the service response status must be '200' and its response matches the schema in 'schemas/responseSchema.json'
+     * }
+     * * The file schemas/responseSchema.json must contains a valid json schema (http://json-schema.org/)
+     * </pre>
+     * @see #sendRequestNoDataTable(String, String, String, String, String)
+     * @see #sendRequestDataTable(String, String, String, String, String, DataTable)
+     * @see <a href="http://json-schema.org/">http://json-schema.org/</a>
+     * @param expectedStatus        Expected HTTP status code
+     * @param responseAssert        Expression to determine if assert length, text or schema
      */
     @Then("^the service response status must be '(.*?)'( (and its response length must be '.*?')| (and its response must contain the text '.*?')| (and its response matches the schema in '.*?'))?$")
     public void assertResponseStatusLength(Integer expectedStatus, String responseAssert) {
@@ -269,12 +351,23 @@ public class RestSpec extends BaseGSpec {
 
     /**
      * Verifies if the response body contains an specific string
-     * @param expectedText                  String to find in the response body
-     * @throws SecurityException            SecurityException
-     * @throws IllegalArgumentException     IllegalArgumentException
+     * <p>
+     * For this step to work, a previous request must have been executed such as {@link #sendRequestNoDataTable(String, String, String, String, String)}
+     * or {@link #sendRequestDataTable(String, String, String, String, String, DataTable)}
+     * <pre>
+     * Example:
+     * {@code
+     *     When I send a 'GET' request to '/posts'
+     *     And the service response must contain the text 'body'
+     * }
+     * </pre>
+     * @see #sendRequestDataTable(String, String, String, String, String, DataTable)
+     * @see #sendRequestNoDataTable(String, String, String, String, String)
+     * @see #assertResponseStatusLength(Integer, String)
+     * @param expectedText  String to find in the response body
      */
     @Then("^the service response must contain the text '(.*?)'$")
-    public void assertResponseMessage(String expectedText) throws SecurityException, IllegalArgumentException {
+    public void assertResponseMessage(String expectedText) {
         ResponseBody body = commonspec.getRestResponse().getBody();
         String bodyAsString = body.asString();
         Assertions.assertThat(bodyAsString).as("Text '" + expectedText + "' was not found in response body").contains(expectedText);
@@ -282,30 +375,41 @@ public class RestSpec extends BaseGSpec {
 
 
     /**
-     * Save value for future use.
+     * Saves value of a json document for future use.
      * <p>
-     * If element is a jsonpath expression (i.e. $.fragments[0].id), it will be
-     * applied over the last httpResponse.
-     * <p>
-     * If element is a jsonpath expression preceded by some other string
-     * (i.e. ["a","b",,"c"].$.[0]), it will be applied over this string.
-     * This will help to save the result of a jsonpath expression evaluated over
-     * previous stored variable.
-     *
+     * This step is typically used to save the body response of a HTTP request (either the full body
+     * response or just an specific element). If this is the case, a previous HTTP request operation
+     * must have been performed (with {@link #sendRequestDataTable(String, String, String, String, String, DataTable)} or with
+     * {@link #sendRequestNoDataTable(String, String, String, String, String)})
+     * <pre>
+     * Example: If element is a jsonpath expression (i.e. $.fragments[0].id), it will be applied over the last httpResponse.
+     * {@code
+     *      When I send a 'GET' request to '/posts'
+     *      And I save element '$' in environment variable 'response' //saves all body in variable response
+     *      And I save element '$.[0].userId' in environment variable 'USER_ID' //Saves only the element $.[0].userId of the response
+     * }
+     * Example: If element is a jsonpath expression preceded by some other string (i.e. ["a","b",,"c"].$.[0]), it will be applied over
+     * this string. This will help to save the result of a jsonpath expression evaluated over previous stored variable.
+     * {@code
+     *      And I save element '["a","b","c","d"].$.[0]' in environment variable 'letter' //Will save 'a' in variable 'letter'
+     * }
+     * Or from a previous HTTP request:
+     * {@code
+     *      When I send a 'GET' request to '/users'                                             //returns an array of 'users' objects
+     *      And I save element '$.[0]' in environment variable 'first_user'                     //stores the first user object in 'first_user'
+     *      And I save element '!{first_user}.$.username' in environment variable 'username'    //get the field 'username' from 'first_user' and stores it in 'username'
+     *      Then '!{username}' matches 'Bret'                                                   //Checks variable matches given value
+     * }
+     * </pre>
+     * @see #sendRequestNoDataTable(String, String, String, String, String)
+     * @see #sendRequestDataTable(String, String, String, String, String, DataTable)
+     * @see <a href="http://json-schema.org/">http://json-schema.org/</a>
      * @param position position from a search result
      * @param element  key in the json response to be saved
      * @param envVar   thread environment variable where to store the value
-     * @throws IllegalAccessException       exception
-     * @throws IllegalArgumentException     exception
-     * @throws SecurityException            exception
-     * @throws NoSuchFieldException         exception
-     * @throws ClassNotFoundException       exception
-     * @throws InstantiationException       exception
-     * @throws InvocationTargetException    exception
-     * @throws NoSuchMethodException        exception
      */
     @Given("^I save element (in position \'(.+?)\' in )?\'(.+?)\' in environment variable \'(.+?)\'$")
-    public void saveElementEnvironment(String position, String element, String envVar) throws Exception {
+    public void saveElementEnvironment(String position, String element, String envVar) {
 
         Pattern pattern = Pattern.compile("^((.*)(\\.)+)(\\$.*)$");
         Matcher matcher = pattern.matcher(element);
@@ -333,6 +437,22 @@ public class RestSpec extends BaseGSpec {
 
     /**
      * Specify a custom map of headers to be added to future requests
+     * <p>
+     * The headers will be applied to all following requests in the same scenario unless you clear then
+     * using {@link #clearHeaders()}
+     * <pre>
+     * Example: Set headers for following requests
+     * {@code
+     *      Given I send requests to 'dummy-test.com:80'
+     *      Given I set headers:
+     *          | Authorization  | mySecretToken1234 |
+     *          | Content-Type   | application/json  |
+     *      When I send a 'GET' request to '/api/v1/shipment/1' //this (and following) request(s) will contain those headers
+     * }
+     * </pre>
+     * @see #clearHeaders()
+     * @see #setCookies(DataTable)
+     * @see #clearCookies()
      * @param modifications DataTable containing the custom set of headers to be
      *                      added to the requests. Syntax will be:
      *                      {@code
@@ -345,14 +465,11 @@ public class RestSpec extends BaseGSpec {
      *                      if we want to add the header "token" with value "12345678", to the request header
      *                      the modification will be:
      *                      | token | 12345678 |
-     * @throws Exception    Exception
      */
     @Given("^I set headers:$")
-    public void setHeaders(DataTable modifications) throws Throwable {
+    public void setHeaders(DataTable modifications) {
 
         Map<String, String> headers = new HashMap<>();
-
-        LinkedHashMap jsonAsMap = new LinkedHashMap();
 
         for (List<String> row: modifications.asLists()) {
             String key = row.get(0);
@@ -364,6 +481,21 @@ public class RestSpec extends BaseGSpec {
 
     /**
      * Specify a custom map of cookies to be added to future requests
+     * <p>
+     * Works in a similar way that {@link #setHeaders(DataTable)}. The cookies will be applied
+     * to all following requests in the same scenario unless you clear then using {@link #clearCookies()}
+     * <pre>
+     * Example: Set cookies for following requests
+     * {@code
+     *      Given I send requests to 'dummy-test.com:80'
+     *      Given I set cookies:
+     *          | myCookieName  | myCookieValue |
+     *      When I send a 'GET' request to '/api/v1/shipment/1' //this (and following) request(s) will contain those cookies
+     * }
+     * </pre>
+     * @see #setHeaders(DataTable)
+     * @see #clearHeaders()
+     * @see #clearCookies()
      * @param modifications DataTable containing the custom set of cookies to be
      *                      added to the requests. Syntax will be:
      *                      {@code
@@ -376,10 +508,9 @@ public class RestSpec extends BaseGSpec {
      *                      if we want to add the cookie "token" with value "12345678", to the request cookie
      *                      the modification will be:
      *                      | token | 12345678 |
-     * @throws Exception    Exception
      */
     @Given("^I set cookies:$")
-    public void setCookies(DataTable modifications) throws Throwable {
+    public void setCookies(DataTable modifications) {
 
         Map<String, String> cookies = new HashMap<>();
 
@@ -395,12 +526,27 @@ public class RestSpec extends BaseGSpec {
     }
 
     /**
-     * Clears the headers set by any previous request. A request will reuse the headers/cookies
-     * that were set in any previous call within the same scenario
-     * @throws Throwable    Throwable
+     * Clears the headers set by any previous request.
+     * <p>
+     * A request will reuse the headers/cookies that were set in any previous call within the same scenario
+     * <pre>
+     * Example:
+     * {@code
+     *      Given I send requests to 'dummy-test.com:80'
+     *      Given I set headers:
+     *          | Authorization  | mySecretToken1234 |
+     *          | Content-Type   | application/json  |
+     *      When I send a 'GET' request to '/api/v1/shipment/1' //this (and following) request(s) will contain those headers
+     *      Then I clear headers from previous request
+     *      When I send a 'GET' request to '/api/v1/settings'   //This request will not contains previous set headers
+     * }
+     * </pre>
+     * @see #setHeaders(DataTable)
+     * @see #setCookies(DataTable)
+     * @see #clearCookies()
      */
     @Then("^I clear headers from previous request$")
-    public void clearHeaders() throws Throwable {
+    public void clearHeaders() {
 
         /*
           Since there is no easy way to remove all headers from the request,
@@ -420,12 +566,26 @@ public class RestSpec extends BaseGSpec {
     }
 
     /**
-     * Clears the cookies set by any previous request. A request will reuse the headers/cookies
-     * that were set in any previous call within the same scenario
-     * @throws Throwable    Throwable
+     * Clears the cookies set by any previous request.
+     * <p>
+     * A request will reuse the headers/cookies that were set in any previous call within the same scenario
+     * <pre>
+     * Example:
+     * {@code
+     *      Given I send requests to 'dummy-test.com:80'
+     *      Given I set cookies:
+     *          | myCookieName  | myCookieValue |
+     *      When I send a 'GET' request to '/api/v1/shipment/1' //this (and following) request(s) will contain those cookies
+     *      Then I clear cookies from previous request
+     *      When I send a 'GET' request to '/api/v1/shipment/1' //this request will not contain the cookies
+     * }
+     * </pre>
+     * @see #setCookies(DataTable)
+     * @see #setHeaders(DataTable)
+     * @see #clearHeaders()
      */
     @Then("^I clear cookies from previous request$")
-    public void clearCookies() throws Throwable {
+    public void clearCookies() {
 
         /*
           Since there is no easy way to remove all cookies from the request,
@@ -445,7 +605,7 @@ public class RestSpec extends BaseGSpec {
 
 
     /**
-     * SExecutes the given request to the REST endpont for the specified amount of time in regular intervals, until the response body contains
+     * Executes the given request to the REST endpont for the specified amount of time in regular intervals, until the response body contains
      * the specified text
      *
      * @param timeout       Maximum time to wait for the text to be present in the response body
@@ -454,10 +614,11 @@ public class RestSpec extends BaseGSpec {
      * @param endPoint      Endpoint (i.e /user/1)
      * @param responseVal   Expected value to evaluate in the response body
      * @param contains      parameter generated by cucumber because of the optional expression
-     * @throws Exception    Exception
+     * @throws InterruptedException InterruptedException
      */
+    @Deprecated
     @When("^in less than '(\\d+?)' seconds, checking each '(\\d+?)' seconds, I send a '(.+?)' request to '(.+?)' so that the response( does not)? contains '(.+?)'$")
-    public void sendRequestTimeout(Integer timeout, Integer wait, String requestType, String endPoint, String contains, String responseVal) throws Exception {
+    public void sendRequestTimeout(Integer timeout, Integer wait, String requestType, String endPoint, String contains, String responseVal) throws InterruptedException {
 
         Boolean searchUntilContains;
         if (contains == null || contains.isEmpty()) {
@@ -516,6 +677,19 @@ public class RestSpec extends BaseGSpec {
 
     /**
      * Checks if the headers in the response matches the specified values
+     * <p>
+     * A previous HTTP request operation must have been executed, such as {@link #sendRequestNoDataTable(String, String, String, String, String)}
+     * or {@link #sendRequestDataTable(String, String, String, String, String, DataTable)}
+     * <pre>
+     * Example:
+     * {@code
+     *     When I send a 'GET' request to '/api/v1/shipment/1' as 'json'
+     *     Then the service response status must be '200'
+     *     And the service response headers match the following cases:
+     *       | Server           | equal           | nginx |
+     *       | Content-Encoding | equal           | gzip  |
+     * }
+     * </pre>
      * @param table DataTable containing the custom set of headers to be
      *                      added to the requests. Syntax will be:
      *                      {@code
@@ -530,10 +704,9 @@ public class RestSpec extends BaseGSpec {
      *                      If we want to verify that the header "Content-Encoding" is equal
      *                      to "application/json" we would do
      *                      | Content-Encoding | equal | application/json |
-     * @throws Throwable    Throwable
      */
     @And("^the service response headers match the following cases:$")
-    public void checkHeaders(DataTable table) throws Throwable {
+    public void checkHeaders(DataTable table) {
 
         for (List<String> row: table.asLists()) {
             String header = row.get(0);
@@ -548,6 +721,10 @@ public class RestSpec extends BaseGSpec {
 
     /**
      * Checks if the cookies in the response matches the specified values
+     * <p>
+     * Works in a similar way that {@link #checkHeaders(DataTable)}. A previous HTTP request operation must have been executed
+     * such as {@link #sendRequestNoDataTable(String, String, String, String, String)} or {@link #sendRequestDataTable(String, String, String, String, String, DataTable)}
+     * @see #checkHeaders(DataTable)
      * @param table DataTable containing the custom set of cookies to be
      *                      added to the requests. Syntax will be:
      *                      {@code
@@ -562,10 +739,9 @@ public class RestSpec extends BaseGSpec {
      *                      If we want to verify that the cookies "Content-Encoding" is equal
      *                      to "application/json" we would do
      *                      | Content-Encoding | equal | application/json |
-     * @throws Throwable    Throwable
      */
     @And("^the service response cookies match the following cases:$")
-    public void checkCookies(DataTable table) throws Throwable {
+    public void checkCookies(DataTable table) {
 
         for (List<String> row: table.asLists()) {
             String cookie = row.get(0);
@@ -580,12 +756,21 @@ public class RestSpec extends BaseGSpec {
 
     /**
      * Saves the header value for future use
+     * <pre>
+     * Example:
+     * {@code
+     *      Given I securely send requests to 'jsonplaceholder.typicode.com:443'
+     *      When I send a 'GET' request to '/users'
+     *      And I save the response header 'Content-Type' in environment variable 'content-type'
+     *      Then '!{content-type}' matches 'application/json; charset=utf-8'
+     * }
+     * </pre>
+     *
      * @param headerName    Header name
      * @param varName       Name of the environmental variable
-     * @throws Throwable    Throwable
      */
     @And("^I save the response header '(.+?)' in environment variable '(.+?)'$")
-    public void saveHeaderValue(String headerName, String varName) throws Throwable {
+    public void saveHeaderValue(String headerName, String varName) {
 
         String headerValue = commonspec.getRestResponse().getHeaders().getValue(headerName);
         Assertions.assertThat(headerValue).as("The header " + headerName + " is not present in the response").isNotNull();
@@ -594,6 +779,8 @@ public class RestSpec extends BaseGSpec {
 
     /**
      * Saves the cookie value for future use
+     * <p>
+     * Similar to {@link #saveHeaderValue(String, String)}
      * @param cookieName  Cookie name
      * @param varName     Name of the environmental variable
      * @throws Throwable  Throwable
@@ -608,6 +795,15 @@ public class RestSpec extends BaseGSpec {
 
     /**
      * Specify a custom map of url query parameters to be added to future requests
+     * <pre>
+     * Example:
+     * {@code
+     *      Given I securely send requests to 'jsonplaceholder.typicode.com:443'
+     *      Given I set url parameters:
+     *           | userId | 3 |
+     *      When I send a 'GET' request to '/posts'     //will execute https://jsonplaceholder.typicode.com:443/posts?userId=3
+     * }
+     * </pre>
      * @param modifications DataTable containing the custom set of url query parameters to be
      *                      added to the requests. Syntax will be:
      *                      {@code
@@ -625,10 +821,9 @@ public class RestSpec extends BaseGSpec {
      *                      When I send a 'GET' request to '/posts'
      *
      *                      This will produce the request '/posts?id=1'
-     * @throws Exception    Exception
      */
     @Given("^I set url parameters:$")
-    public void iSetUrlQueryParameters(DataTable modifications) throws Throwable {
+    public void iSetUrlQueryParameters(DataTable modifications) {
 
         Map<String, String> queryParams = new HashMap<>();
 
@@ -642,16 +837,29 @@ public class RestSpec extends BaseGSpec {
 
     /**
      * Clears the url query parameters that were configured in a previous step.
-     *
+     * <p>
      * Once the user uses the step to set url query parameters (Given I set url parameters),
      * the parameters are automatically added to all future requests in the same scenario. This
      * step allows to delete this parameters from the system, so new requests are created without
      * any url query parameters
+     * <pre>
+     * Example:
+     * {@code
+     *      Given I securely send requests to 'jsonplaceholder.typicode.com:443'
+     *      Given I set url parameters:
+     *           | userId | 3 |
+     *      When I send a 'GET' request to '/posts'                 //will execute https://jsonplaceholder.typicode.com:443/posts?userId=3
+     *      Then I clear the url parameters from previous request
+     *      Given I set url parameters:
+     *       | userId | 4 |
+     *     When I send a 'GET' request to '/posts'                  //will execute https://jsonplaceholder.typicode.com:443/posts?userId=4
+     * }
+     * </pre>
      *
-     * @throws Throwable    Throwable
+     * @see #iSetUrlQueryParameters(DataTable)
      */
     @Then("^I clear the url parameters from previous request$")
-    public void iClearTheUrlParametersFromPreviousRequest() throws Throwable {
+    public void iClearTheUrlParametersFromPreviousRequest() {
         /*
           Since there is no easy way to remove all url parameters from the request,
           a new request object is created with the same configuration
@@ -672,10 +880,10 @@ public class RestSpec extends BaseGSpec {
      * Adds the specified file to the request as a form-params parameter
      * (the request contentType must be changed to 'multipart/form-data')
      * @param filePath      file path
-     * @throws Throwable    Throwable
+     * @throws URISyntaxException    URISyntaxException
      */
     @And("^I add the file in '(.+?)' to the request$")
-    public void iAddTheFileToTheRequest(String filePath) throws Throwable {
+    public void iAddTheFileToTheRequest(String filePath) throws URISyntaxException {
 
         URL url = getClass().getClassLoader().getResource(filePath);
         File file = new File(url.toURI());

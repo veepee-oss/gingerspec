@@ -1493,9 +1493,8 @@ public class CommonG {
      *
      * @param requestType Request type (GET, POST, PUT, DELETE, PATCH)
      * @param endPoint    Final endpoint (i.e /user/1)
-     * @throws Exception Exception
      */
-    public void generateRestRequest(String requestType, String endPoint) throws Exception {
+    public void generateRestRequest(String requestType, String endPoint) {
 
         this.getRestRequest().basePath(endPoint);
 
@@ -2056,9 +2055,8 @@ public class CommonG {
      * @param o         object to be evaluated
      * @param condition condition to compare
      * @param result    expected result
-     * @throws Exception Exception
      */
-    public void evaluateJSONElementOperation(Object o, String condition, String result) throws Exception {
+    public void evaluateJSONElementOperation(Object o, String condition, String result) {
 
         if (o instanceof String) {
             String value = (String) o;
