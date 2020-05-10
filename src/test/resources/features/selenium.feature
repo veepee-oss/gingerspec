@@ -54,6 +54,12 @@ Feature: Selenium steps
     When I securely browse to '/'
 
 
+  Scenario: Navigating directly to a web page
+    Given I go to 'http://${DEMO_SITE_HOST}/registration'
+    And we are in page 'http://${DEMO_SITE_HOST}/registration/'
+    And the current url contains the text 'registration'
+
+
   Scenario: Interacting with different elements in a form
     Given My app is running in '${DEMO_SITE_HOST}'
     When I browse to '/registration'
