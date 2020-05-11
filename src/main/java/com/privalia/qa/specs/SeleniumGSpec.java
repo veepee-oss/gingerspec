@@ -23,6 +23,9 @@ import static com.privalia.qa.assertions.Assertions.assertThat;
 
 /**
  * Steps definitions for selenium (web application automation)
+ *
+ * @see <a href="https://www.selenium.dev/">https://www.selenium.dev/</a>
+ * @author José Fernández
  */
 public class SeleniumGSpec extends BaseGSpec {
 
@@ -41,13 +44,15 @@ public class SeleniumGSpec extends BaseGSpec {
      * Set app host and port.
      * <p>
      * This is an initialization step. This is used as the first step in Selenium features to configure
-     * the basepath url
+     * the basepath url. This step does not directly take the user to the given url, just sets the base url that
+     * is later used in {@link #seleniumBrowse(String, String)}. You can also check {@link #iGoToUrl(String)}
      * <pre>
      * Example:
      * {@code
      *      Given My app is running in 'demoqa.com:80'
      * }
      * </pre>
+     * @see #seleniumBrowse(String, String)
      * @see #iGoToUrl(String)
      * @param host host where app is running (i.e "localhost" or "localhost:443")
      */
@@ -74,12 +79,14 @@ public class SeleniumGSpec extends BaseGSpec {
     /**
      * Browse to {@code url} using the current browser.
      * <p>
-     * The {@code url} is relative to the basepath configured with {@link SeleniumGSpec#setupApp(String)} method
+     * The {@code url} is relative to the basepath configured with {@link SeleniumGSpec#setupApp(String)} method. You
+     * can also use {@link #iGoToUrl(String)} to directly navigate to the given url.
      * <pre>
      * Example:
      * {@code
      *      Given My app is running in 'demoqa.com:80'
      *      Then I browse to '/'                        //will load http://demoqa.com:80/
+     *      Then I browse to '/login'                   //will load http://demoqa.com:80/login
      * }
      * Or if the site uses https
      * {@code
@@ -87,6 +94,7 @@ public class SeleniumGSpec extends BaseGSpec {
      *      Then I securely browse to '/'               //will load https://mysecuresite.com:443/
      * }
      * </pre>
+     * @see #setupApp(String)
      * @see #iGoToUrl(String)
      * @param isSecured If the connection should be secured
      * @param path      path of running app
@@ -122,7 +130,7 @@ public class SeleniumGSpec extends BaseGSpec {
      *      Then in less than '10' seconds, checking each '1' seconds, '1' elements exists with 'id:name_3_firstname'
      * }
      * </pre>
-     *
+     * @see #assertSeleniumNElementExists(String, Integer, String, String)
      * @param poolingInterval Time between consecutive condition evaluations
      * @param poolMaxTime     Maximum time to wait for the condition to be true
      * @param elementsCount   integer. Expected number of elements.
@@ -410,7 +418,7 @@ public class SeleniumGSpec extends BaseGSpec {
      * }
      * </pre>
      *
-     *
+     * @see #seleniumClick(Integer)
      * @param atLeast       asserts that the amount of elements if greater or equal to expectedCount. If null, asserts the amount of element is equal to expectedCount
      * @param expectedCount the expected count of elements to find
      * @param method        method to locate the elements (id, name, class, css, xpath for regular html elements, and additionally, linkText, partialLinkText and tagName for mobile elements)
@@ -449,6 +457,7 @@ public class SeleniumGSpec extends BaseGSpec {
      * }
      * </pre>
      * @see #waitAlertWithPooling(int, int)
+     * @see #seleniumClick(Integer)
      * @param timeout                   The max time to wait for the condition to be true
      * @param wait                      Interval between verification
      * @param expectedCount             The expected count of elements
@@ -497,6 +506,9 @@ public class SeleniumGSpec extends BaseGSpec {
      * }
      * </pre>
      *
+     * @see #assertSeleniumNElementExists(String, Integer, String, String)
+     * @see #assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)
+     * @see #waitWebElementWithPooling(int, int, int, String, String, String)
      * @param index  the index of the element
      * @param option the option (is selected or not)
      */
@@ -697,6 +709,9 @@ public class SeleniumGSpec extends BaseGSpec {
      * }
      * </pre>
      *
+     * @see #assertSeleniumNElementExists(String, Integer, String, String)
+     * @see #assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)
+     * @see #waitWebElementWithPooling(int, int, int, String, String, String)
      * @param index  position of the element in the array of webElements found
      * @param envVar name of the thread environment variable where to store the text
      */
@@ -724,7 +739,9 @@ public class SeleniumGSpec extends BaseGSpec {
      *      Then the element in index '1' has 'radio_4[]' in property 'name'
      * }
      * </pre>
-     *
+     * @see #assertSeleniumNElementExists(String, Integer, String, String)
+     * @see #assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)
+     * @see #waitWebElementWithPooling(int, int, int, String, String, String)
      * @param index          Position of the element in the array of webElements
      * @param textValue      Value expected in the property
      * @param customProperty Property of webElement to verify
@@ -776,7 +793,9 @@ public class SeleniumGSpec extends BaseGSpec {
      *      And I click on the element on index '0'
      * }
      * </pre>
-     *
+     * @see #assertSeleniumNElementExists(String, Integer, String, String)
+     * @see #assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)
+     * @see #waitWebElementWithPooling(int, int, int, String, String, String)
      * @param index Index of the webelement in the list
      */
     @When("^I click on the element on index '(\\d+?)'$")
@@ -804,7 +823,9 @@ public class SeleniumGSpec extends BaseGSpec {
      *      And I clear the content on text input at index '0'
      * }
      * </pre>
-     *
+     * @see #assertSeleniumNElementExists(String, Integer, String, String)
+     * @see #assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)
+     * @see #waitWebElementWithPooling(int, int, int, String, String, String)
      * @param index index of the web element
      */
     @When("^I clear the content on text input at index '(\\d+?)'$")
@@ -834,7 +855,9 @@ public class SeleniumGSpec extends BaseGSpec {
      *      And I clear the content on text input at index '0'
      * }
      * </pre>
-     *
+     * @see #assertSeleniumNElementExists(String, Integer, String, String)
+     * @see #assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)
+     * @see #waitWebElementWithPooling(int, int, int, String, String, String)
      * @param input Text to write on the element
      * @param index Index of the webelement in the list
      */
@@ -883,7 +906,10 @@ public class SeleniumGSpec extends BaseGSpec {
      *      Then I send 'ENTER' on the element on index '0'
      * }
      * </pre>
-     *
+     * @see #seleniumType(String, Integer)
+     * @see #assertSeleniumNElementExists(String, Integer, String, String)
+     * @see #assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)
+     * @see #waitWebElementWithPooling(int, int, int, String, String, String)
      * @param text  key stroke to send
      * @param index index of the web element in the list
      */
@@ -930,6 +956,9 @@ public class SeleniumGSpec extends BaseGSpec {
      * {@link SeleniumGSpec#assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)} <br>
      * {@link SeleniumGSpec#waitWebElementWithPooling(int, int, int, String, String, String)}
      *
+     * @see #assertSeleniumNElementExists(String, Integer, String, String)
+     * @see #assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)
+     * @see #waitWebElementWithPooling(int, int, int, String, String, String)
      * @param option option in the select element
      * @param index  index of the web element in the list
      */
@@ -994,6 +1023,9 @@ public class SeleniumGSpec extends BaseGSpec {
      *      Then I save the value of the property 'class' of the element in index '0' in variable 'VAR2'
      * }
      * </pre>
+     * @see #assertSeleniumNElementExists(String, Integer, String, String)
+     * @see #assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)
+     * @see #waitWebElementWithPooling(int, int, int, String, String, String)
      * @param propertyName Name of the property
      * @param index        Index of the webelement in the list
      * @param variable     Variable where to save the result
@@ -1027,7 +1059,9 @@ public class SeleniumGSpec extends BaseGSpec {
      *      And I execute 'arguments[0].click();' as javascript on the element on index '0'
      * }
      * </pre>
-     *
+     * @see #assertSeleniumNElementExists(String, Integer, String, String)
+     * @see #assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)
+     * @see #waitWebElementWithPooling(int, int, int, String, String, String)
      * @param script Script to execute (i.e alert("This is an alert message"))
      * @param index  If used, the index of the previously found web element on which to execute the function
      * @param enVar  If used, variable where to store the result of the execution of the script

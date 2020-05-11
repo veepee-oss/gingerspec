@@ -690,6 +690,9 @@ public class RestSpec extends BaseGSpec {
      *       | Content-Encoding | equal           | gzip  |
      * }
      * </pre>
+     *
+     * @see #sendRequestDataTable(String, String, String, String, String, DataTable)
+     * @see #sendRequestNoDataTable(String, String, String, String, String)
      * @param table DataTable containing the custom set of headers to be
      *                      added to the requests. Syntax will be:
      *                      {@code
@@ -725,6 +728,8 @@ public class RestSpec extends BaseGSpec {
      * Works in a similar way that {@link #checkHeaders(DataTable)}. A previous HTTP request operation must have been executed
      * such as {@link #sendRequestNoDataTable(String, String, String, String, String)} or {@link #sendRequestDataTable(String, String, String, String, String, DataTable)}
      * @see #checkHeaders(DataTable)
+     * @see #sendRequestDataTable(String, String, String, String, String, DataTable)
+     * @see #sendRequestNoDataTable(String, String, String, String, String)
      * @param table DataTable containing the custom set of cookies to be
      *                      added to the requests. Syntax will be:
      *                      {@code
@@ -765,7 +770,8 @@ public class RestSpec extends BaseGSpec {
      *      Then '!{content-type}' matches 'application/json; charset=utf-8'
      * }
      * </pre>
-     *
+     * @see #sendRequestDataTable(String, String, String, String, String, DataTable)
+     * @see #sendRequestNoDataTable(String, String, String, String, String)
      * @param headerName    Header name
      * @param varName       Name of the environmental variable
      */
@@ -804,6 +810,9 @@ public class RestSpec extends BaseGSpec {
      *      When I send a 'GET' request to '/posts'     //will execute https://jsonplaceholder.typicode.com:443/posts?userId=3
      * }
      * </pre>
+     * @see #setupApp(String, String)
+     * @see #sendRequestDataTable(String, String, String, String, String, DataTable)
+     * @see #sendRequestNoDataTable(String, String, String, String, String)
      * @param modifications DataTable containing the custom set of url query parameters to be
      *                      added to the requests. Syntax will be:
      *                      {@code
