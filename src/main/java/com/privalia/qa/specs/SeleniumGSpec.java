@@ -332,13 +332,17 @@ public class SeleniumGSpec extends BaseGSpec {
 
 
     /**
-     * Get all opened windows and store it.
+     * Assert that a new window is open
+     * <p>
+     * This step verifies that at least one new window is open. You can switch focus to this new window using
+     * the step {@link #seleniumChangeWindow()}
      * <pre>
      * Example:
      * {@code
      *      Then a new window is opened
      * }
      * </pre>
+     * @see #seleniumChangeWindow()
      */
     @Given("^a new window is opened$")
     public void seleniumGetwindows() {
@@ -632,7 +636,7 @@ public class SeleniumGSpec extends BaseGSpec {
 
 
     /**
-     * Takes an snapshot of the current page.
+     * Takes a snapshot/screenshot/screen capture of the current page.
      * <p>
      * Snapshots are stored under target/executions
      * <pre>
@@ -993,7 +997,19 @@ public class SeleniumGSpec extends BaseGSpec {
 
 
     /**
-     * Change current window to another opened window.
+     * Change current focus to another opened window.
+     * <p>
+     * All further selenium actions will be executed in this new window. You can use the step
+     * {@link #seleniumGetwindows()} to assert that a new window is indeed open
+     * <pre>
+     * Example:
+     * {@code
+     *      Given a new window is opened
+     *      Then I change active window
+     * }
+     * </pre>
+     *
+     * @see #seleniumGetwindows()
      */
     @When("^I change active window$")
     public void seleniumChangeWindow() {
