@@ -4,6 +4,7 @@ import com.privalia.qa.cucumber.converter.ArrayListConverter;
 import com.privalia.qa.cucumber.converter.NullableStringConverter;
 import com.privalia.qa.utils.PreviousWebElements;
 import com.privalia.qa.utils.ThreadProperty;
+import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
@@ -425,7 +426,7 @@ public class SeleniumGSpec extends BaseGSpec {
      * @see #seleniumClick(Integer)
      * @param atLeast       asserts that the amount of elements if greater or equal to expectedCount. If null, asserts the amount of element is equal to expectedCount
      * @param expectedCount the expected count of elements to find
-     * @param method        method to locate the elements (id, name, class, css, xpath for regular html elements, and additionally, linkText, partialLinkText and tagName for mobile elements)
+     * @param method        method to locate the elements (id, name, class, css, xpath, linkText, partialLinkText and tagName)
      * @param element       the relative reference to the element
      */
     @Then("^(at least )?'(\\d+?)' elements? exists? with '([^:]*?):(.+?)'$")
@@ -788,7 +789,8 @@ public class SeleniumGSpec extends BaseGSpec {
      * This step requires a previous operation for finding elements to have been executed, such as: <br>
      * {@link SeleniumGSpec#assertSeleniumNElementExists(String, Integer, String, String)} <br>
      * {@link SeleniumGSpec#assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)} <br>
-     * {@link SeleniumGSpec#waitWebElementWithPooling(int, int, int, String, String, String)}
+     * {@link SeleniumGSpec#waitWebElementWithPooling(int, int, int, String, String, String)}<br>.
+     * You can also perform click action on an element using {@link #seleniumClickByLocator(String, String, Integer)}
      *
      * <pre>
      * Example:
@@ -800,6 +802,7 @@ public class SeleniumGSpec extends BaseGSpec {
      * @see #assertSeleniumNElementExists(String, Integer, String, String)
      * @see #assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)
      * @see #waitWebElementWithPooling(int, int, int, String, String, String)
+     * @see #seleniumClickByLocator(String, String, Integer)
      * @param index Index of the webelement in the list
      */
     @When("^I click on the element on index '(\\d+?)'$")
@@ -1133,4 +1136,53 @@ public class SeleniumGSpec extends BaseGSpec {
         commonspec.getDriver().get(url);
         commonspec.setParentWindow(commonspec.getDriver().getWindowHandle());
     }
+
+    /**
+     * Directly clicks the given element referenced by locator
+     * <p>
+     * This step performs a click action on the element. This step is similar to {@link #seleniumClick(Integer)}
+     * but, it does not require a previous operation for finding elements, such as {@link #assertSeleniumNElementExists(String, Integer, String, String)}
+     * or {@link #assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)}. If the page contains
+     * several web elements with the given locator, the click action will be performed to the first element found by default,
+     * unless an index is specified
+     * <pre>
+     * Example: Perform click on the element with id 'username'
+     * {@code
+     *      When I click on the element with 'id:username'
+     * }
+     * Example: Using index in case more than one element is found (first element has index 0)
+     * {@code
+     *      When I click on the element with 'tagName:button' index 1  //clicks the second element with tag name 'button'
+     * }
+     * </pre>
+     * @see #seleniumClick(Integer)
+     * @see #assertSeleniumNElementExists(String, Integer, String, String)
+     * @see #assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)
+     * @param method        method to locate the elements (id, name, class, css, xpath, linkText, partialLinkText and tagName)
+     * @param element       the relative reference to the element
+     * @param index         Index of the element, in case one or more elements with the given locator are found (first element starts with index 0)
+     */
+    @Then("^I click on the element with '([^:]*?):(.+?)'( index '(.+?)')?$")
+    public void seleniumClickByLocator(String method, String element, Integer index) {
+        this.assertSeleniumNElementExists("at least", 1, method, element);
+        if (index == null) {
+            index = 0;
+        }
+        this.seleniumClick(index);
+    }
+
+    @And("^I go back (\\d+) (?:page|pages)?$")
+    public void goBackBrowserHistory( Integer numberOfPages ) {
+        for (int i = 0; i < numberOfPages; i++) {
+            this.commonspec.getDriver().navigate().back();
+        }
+    }
+
+    @And("^I go forward (\\d+) (?:page|pages)?$")
+    public void goForwardBrowserHistory( Integer numberOfPages ) {
+        for (int i = 0; i < numberOfPages; i++) {
+            this.commonspec.getDriver().navigate().forward();
+        }
+    }
+
 }

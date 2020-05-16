@@ -549,19 +549,17 @@ public class CommonG {
 
         Assertions.assertThat(driver).as("Driver has not been initialized!").isNotNull();
 
+        logger.debug("Locating {} by {}", element, method);
+
         if (this.getDriver() instanceof MobileDriver) {
 
             if ("id".equals(method)) {
-                logger.debug("Locating {} by id", element);
                 wel = ((MobileDriver) this.getDriver()).findElementsById(element);
             } else if ("name".equals(method)) {
-                logger.debug("Locating {} by name", element);
                 wel = ((MobileDriver) this.getDriver()).findElementsByName(element);
             } else if ("class".equals(method)) {
-                logger.debug("Locating {} by class", element);
                 wel = ((MobileDriver) this.getDriver()).findElementsByClassName(element);
             } else if ("xpath".equals(method)) {
-                logger.debug("Locating {} by xpath", element);
                 wel = ((MobileDriver) this.getDriver()).findElementsByXPath(element);
             } else if ("css".equals(method)) {
                 wel = ((MobileDriver) this.getDriver()).findElementsByCssSelector(element);
@@ -578,19 +576,21 @@ public class CommonG {
         } else {
 
             if ("id".equals(method)) {
-                logger.debug("Locating {} by id", element);
                 wel = this.getDriver().findElements(By.id(element));
             } else if ("name".equals(method)) {
-                logger.debug("Locating {} by name", element);
                 wel = this.getDriver().findElements(By.name(element));
             } else if ("class".equals(method)) {
-                logger.debug("Locating {} by class", element);
                 wel = this.getDriver().findElements(By.className(element));
             } else if ("xpath".equals(method)) {
-                logger.debug("Locating {} by xpath", element);
                 wel = this.getDriver().findElements(By.xpath(element));
             } else if ("css".equals(method)) {
                 wel = this.getDriver().findElements(By.cssSelector(element));
+            } else if ("linkText".equals(method)) {
+                wel = this.getDriver().findElements(By.linkText(element));
+            } else if ("partialLinkText".equals(method)) {
+                wel = this.getDriver().findElements(By.partialLinkText(element));
+            } else if ("tagName".equals(method)) {
+                wel = this.getDriver().findElements(By.tagName(element));
             } else {
                 fail("Unknown search method: " + method);
             }

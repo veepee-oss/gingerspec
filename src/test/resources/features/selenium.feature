@@ -157,6 +157,7 @@ Feature: Selenium steps
     And I check every '1' seconds for at least '5' seconds until an alert appears
     And I accept the alert
 
+
   Scenario: Executing a javascript to click on an element and to get info of the page
     Given My app is running in '${DEMO_SITE_HOST}'
     When I browse to '/'
@@ -168,4 +169,12 @@ Feature: Selenium steps
     And '!{PAGE}' contains 'index.html'
 
 
-
+  Scenario: Testing direct steps and new locators
+    Given I go to 'https://demoqa.com/'
+    When I click on the element with 'partialLinkText:Sortable'
+    Then the current url contains the text 'sortable'
+    Then I go back 1 page
+    When I click on the element with 'partialLinkText:Resizable'
+    Then the current url contains the text 'resizable'
+    Then I go back 1 page
+    Then I go forward 1 page
