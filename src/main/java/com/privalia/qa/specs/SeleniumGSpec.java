@@ -1172,14 +1172,14 @@ public class SeleniumGSpec extends BaseGSpec {
     }
 
     @And("^I go back (\\d+) (?:page|pages)?$")
-    public void goBackBrowserHistory( Integer numberOfPages ) {
+    public void goBackBrowserHistory(Integer numberOfPages) {
         for (int i = 0; i < numberOfPages; i++) {
             this.commonspec.getDriver().navigate().back();
         }
     }
 
     @And("^I go forward (\\d+) (?:page|pages)?$")
-    public void goForwardBrowserHistory( Integer numberOfPages ) {
+    public void goForwardBrowserHistory(Integer numberOfPages) {
         for (int i = 0; i < numberOfPages; i++) {
             this.commonspec.getDriver().navigate().forward();
         }
