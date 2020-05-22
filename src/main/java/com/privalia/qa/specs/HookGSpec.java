@@ -19,6 +19,7 @@ package com.privalia.qa.specs;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
+import com.privalia.qa.data.BrowsersDataProvider;
 import com.privalia.qa.utils.ThreadProperty;
 import cucumber.api.Scenario;
 import cucumber.api.java.After;
@@ -47,6 +48,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -98,6 +100,7 @@ public class HookGSpec extends BaseGSpec {
 
         /*Clears the exceptions stacktrace for the new test*/
         commonspec.getExceptions().clear();
+
     }
 
 
@@ -108,29 +111,34 @@ public class HookGSpec extends BaseGSpec {
      * @throws MalformedURLException MalformedURLException
      */
     @Before(order = 10, value = "@web")
-    public void seleniumSetup() throws IOException {
+    public void seleniumSetup() throws Exception {
 
         String grid = System.getProperty("SELENIUM_GRID");
         String b = ThreadProperty.get("browser");
         ObjectMapper mapper = new ObjectMapper();
 
         if (grid == null) {
-            fail("Selenium grid not available");
-        }
-
-        if ("".equals(b)) {
-            fail("Non available browsers");
-        }
-
-        Map<String, String> capabilitiesMap = mapper.readValue(b, Map.class);
-
-        commonspec.setBrowserName(capabilitiesMap.get("browserName"));
-        commonspec.getLogger().debug("Setting up selenium for {}", capabilitiesMap.get("browserName"));
-
-        if (grid.matches("local")) {
+            Object[] browsersObjects = BrowsersDataProvider.availableUniqueBrowsers(null, null);
+            String[] browserStrings = Arrays.stream(browsersObjects).toArray(String[]::new);
+            Map<String, String> capabilitiesMap = mapper.readValue(browserStrings[0], Map.class);
             this.useLocalDriver(capabilitiesMap.get("browserName"));
+
         } else {
-            this.useRemoteGrid(grid, capabilitiesMap);
+            if ("".equals(b)) {
+                fail("Non available browsers");
+            }
+
+            Map<String, String> capabilitiesMap = mapper.readValue(b, Map.class);
+
+            commonspec.setBrowserName(capabilitiesMap.get("browserName"));
+            commonspec.getLogger().debug("Setting up selenium for {}", capabilitiesMap.get("browserName"));
+
+            if (grid.matches("local")) {
+                this.useLocalDriver(capabilitiesMap.get("browserName"));
+            } else {
+                this.useRemoteGrid(grid, capabilitiesMap);
+            }
+
         }
 
     }
@@ -384,14 +392,15 @@ public class HookGSpec extends BaseGSpec {
         if (commonspec.getDriver() != null) {
             try {
                 if (scenario.isFailed()) {
-                    //Include screenshot in the report
-                    commonspec.getLogger().debug("Scenario failed. Adding screenshot to report");
-                    byte[] screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
-
-                    //Also include the page source in the report
+                    //Include the page source in the report
+                    commonspec.getLogger().debug("Scenario failed. Adding page source to report");
                     String source = driver.getPageSource();
-                    scenario.embed(screenshot, "image/png");
                     scenario.embed(source.getBytes(), "text");
+
+                    //Include screenshot in the report
+                    commonspec.getLogger().debug("Adding screenshot to report");
+                    byte[] screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
+                    scenario.embed(screenshot, "image/png");
 
                     //Take screenshot and save it in the target/execution folder
                     commonspec.getLogger().debug("Adding screenshot target/execution folder");
@@ -412,12 +421,6 @@ public class HookGSpec extends BaseGSpec {
         }
     }
 
-    /**
-     * Close logger.
-     */
-    @After(order = 0)
-    public void teardown() {
-    }
 
     /**
      * If the feature has the @rest annotation, creates a new REST client before each scenario
