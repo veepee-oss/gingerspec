@@ -168,7 +168,7 @@ Feature: Selenium steps
     And I execute 'return document.URL;' as javascript and save the result in the environment variable 'PAGE'
     And '!{PAGE}' contains 'index.html'
 
-
+  @ignore @toocomplex
   Scenario: Testing direct steps and new locators
     Given I go to 'https://demoqa.com/'
     When I click on the element with 'partialLinkText:Sortable'
