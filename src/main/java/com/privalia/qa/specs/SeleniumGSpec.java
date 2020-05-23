@@ -1342,7 +1342,7 @@ public class SeleniumGSpec extends BaseGSpec {
      * @param method                    method to locate the elements (id, name, class, css, xpath, linkText, partialLinkText and tagName)
      * @param element                   The relative reference to the element
      * @param index                     Index of the element, in case one or more elements with the given locator are found (first element starts with index 0)
-     * @throws InterruptedException
+     * @throws InterruptedException     InterruptedException
      */
     @Then("^I scroll (up|down) until the element with '(" + LOCATORS +  "):(.*)'( index '(\\d+)')? is visible$")
     public void scrollUntilElementVisibleByLocator(String direction, String method, String element, Integer index) throws InterruptedException {
