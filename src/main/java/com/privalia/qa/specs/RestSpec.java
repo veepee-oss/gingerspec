@@ -78,7 +78,7 @@ public class RestSpec extends BaseGSpec {
      * @param isSecured     Indicates if https:// should be used (if false, defaults to http://)
      * @param restHost      Port where the API is running. Defaults to 80 if null
      */
-    @Given("^I( securely)? send requests to '(.+?)'$")
+    @Given("^I( securely)? send requests to '(.*)'$")
     public void setupApp(String isSecured, String restHost) {
         String restProtocol = "http://";
         String restPort = null;
@@ -142,7 +142,7 @@ public class RestSpec extends BaseGSpec {
      * @param envVar        Environment variable where JSON is stored
      * @param table         Data table in which each row stores one expression
      */
-    @Then("^'(.+?)' matches the following cases:$")
+    @Then("^'(.*)' matches the following cases:$")
     public void matchWithExpresion(String envVar, DataTable table) {
         String jsonString = ThreadProperty.get(envVar);
 
@@ -366,7 +366,7 @@ public class RestSpec extends BaseGSpec {
      * @see #assertResponseStatusLength(Integer, String)
      * @param expectedText  String to find in the response body
      */
-    @Then("^the service response must contain the text '(.*?)'$")
+    @Then("^the service response must contain the text '(.*)'$")
     public void assertResponseMessage(String expectedText) {
         ResponseBody body = commonspec.getRestResponse().getBody();
         String bodyAsString = body.asString();
@@ -408,7 +408,7 @@ public class RestSpec extends BaseGSpec {
      * @param element  key in the json response to be saved
      * @param envVar   thread environment variable where to store the value
      */
-    @Given("^I save element (in position \'(.+?)\' in )?\'(.+?)\' in environment variable \'(.+?)\'$")
+    @Given("^I save element (in position '(.+?)' in )?'(.+?)' in environment variable '(.+?)'$")
     public void saveElementEnvironment(String position, String element, String envVar) {
 
         Pattern pattern = Pattern.compile("^((.*)(\\.)+)(\\$.*)$");
@@ -617,7 +617,7 @@ public class RestSpec extends BaseGSpec {
      * @throws InterruptedException InterruptedException
      */
     @Deprecated
-    @When("^in less than '(\\d+?)' seconds, checking each '(\\d+?)' seconds, I send a '(.+?)' request to '(.+?)' so that the response( does not)? contains '(.+?)'$")
+    @When("^in less than '(\\d+)' seconds, checking each '(\\d+)' seconds, I send a '(.*)' request to '(.*)' so that the response( does not)? contains '(.*)'$")
     public void sendRequestTimeout(Integer timeout, Integer wait, String requestType, String endPoint, String contains, String responseVal) throws InterruptedException {
 
         Boolean searchUntilContains;
@@ -775,7 +775,7 @@ public class RestSpec extends BaseGSpec {
      * @param headerName    Header name
      * @param varName       Name of the environmental variable
      */
-    @And("^I save the response header '(.+?)' in environment variable '(.+?)'$")
+    @And("^I save the response header '(.*)' in environment variable '(.*)'$")
     public void saveHeaderValue(String headerName, String varName) {
 
         String headerValue = commonspec.getRestResponse().getHeaders().getValue(headerName);
@@ -791,7 +791,7 @@ public class RestSpec extends BaseGSpec {
      * @param varName     Name of the environmental variable
      * @throws Throwable  Throwable
      */
-    @And("^I save the response cookie '(.+?)' in environment variable '(.+?)'$")
+    @And("^I save the response cookie '(.*)' in environment variable '(.*)'$")
     public void saveCookieValue(String cookieName, String varName) throws Throwable {
 
         String cookieValue = commonspec.getRestResponse().getCookies().get(cookieName);
@@ -891,7 +891,7 @@ public class RestSpec extends BaseGSpec {
      * @param filePath      file path
      * @throws URISyntaxException    URISyntaxException
      */
-    @And("^I add the file in '(.+?)' to the request$")
+    @And("^I add the file in '(.*)' to the request$")
     public void iAddTheFileToTheRequest(String filePath) throws URISyntaxException {
 
         URL url = getClass().getClassLoader().getResource(filePath);
