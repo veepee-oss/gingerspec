@@ -57,7 +57,7 @@ public class UtilsGSpec extends BaseGSpec {
      * @param seconds                   Seconds to wait
      * @throws InterruptedException     InterruptedException
      */
-    @When("^I wait '(.+?)' seconds?$")
+    @When("^I wait '(\\d+)' seconds?$")
     public void idleWait(Integer seconds) throws InterruptedException {
         Thread.sleep(seconds * DEFAULT_TIMEOUT);
     }
@@ -65,13 +65,19 @@ public class UtilsGSpec extends BaseGSpec {
 
     /**
      * Check value stored in environment variable "is|matches|is higher than|is lower than|contains|is different from" to value provided
-     *
+     * <pre>
+     * Examples:
+     * {@code
+     *      Then '!{content-type}' matches 'application/json; charset=utf-8'   //checks if the value of the variable matches the string 'application/json; charset=utf-8'
+     *      Then '!{DEFEXSTAT}' contains 'total'                               //checks if the value of the variable contains the string 'total'
+     * }
+     * </pre>
      * @param envVar        The env var to verify
      * @param operation     Operation
      * @param value         The value to match against the condition
      * @throws Exception    Exception
      */
-    @Then("^'(.+?)' ((is|matches|is higher than|is lower than|contains|is different from)) '(.+?)'$")
+    @Then("^'(.*)' (is|matches|is higher than|is lower than|contains|is different from) '(.*)'$")
     public void checkValue(String envVar, String operation, String value) throws Exception {
         switch (operation.toLowerCase()) {
             case "is":
@@ -112,7 +118,7 @@ public class UtilsGSpec extends BaseGSpec {
      * @param value  value to be saved
      * @param envVar thread environment variable where to store the value
      */
-    @Given("^I save \'(.+?)\' in variable \'(.+?)\'$")
+    @Given("^I save '(.*)' in variable '(.*)'$")
     public void saveInEnvironment(String value, String envVar) {
         ThreadProperty.set(envVar, value);
     }
@@ -124,7 +130,7 @@ public class UtilsGSpec extends BaseGSpec {
      * @param csvFile       the csv file
      * @throws Exception    the exception
      */
-    @When("^I read info from csv file '(.+?)'$")
+    @When("^I read info from csv file '(.*)'$")
     public void readFromCSV(String csvFile) throws Exception {
         CsvReader rows = new CsvReader(csvFile);
 

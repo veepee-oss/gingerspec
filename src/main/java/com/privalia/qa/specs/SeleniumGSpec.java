@@ -988,7 +988,7 @@ public class SeleniumGSpec extends BaseGSpec {
      * @param text  key stroke to send
      * @param index index of the web element in the list
      */
-    @When("^I send '(.+?)'( on the element on index '(\\d+)')?$")
+    @When("^I send '(.*)'( on the element on index '(\\d+)')?$")
     public void seleniumKeys(String text, Integer index) {
 
         ArrayListConverter converter = new ArrayListConverter();

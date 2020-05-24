@@ -16,14 +16,13 @@ import com.ning.http.client.Response;
 import com.ning.http.client.cookie.Cookie;
 import com.privalia.qa.aspects.ReplacementAspect;
 import com.privalia.qa.conditions.Conditions;
-import com.privalia.qa.exceptions.NonReplaceableException;
 import com.privalia.qa.utils.*;
 import io.appium.java_client.MobileDriver;
 import io.cucumber.datatable.DataTable;
 import io.restassured.specification.RequestSpecification;
 import org.apache.commons.collections.IteratorUtils;
-import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.io.FileUtils;
+import org.aspectj.lang.JoinPoint;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.Condition;
 import org.hjson.JsonValue;
@@ -39,16 +38,12 @@ import org.openqa.selenium.support.ui.Wait;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.yandex.qatools.ashot.AShot;
-import ru.yandex.qatools.ashot.Screenshot;
-import ru.yandex.qatools.ashot.shooting.ShootingStrategies;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.util.*;
@@ -2180,7 +2175,21 @@ public class CommonG {
         return cookiesAttributes;
     }
 
-
+    /**
+     * Returns the value of the given placeholder as used in the gherkin step
+     * <pre>
+     * Examples:
+     * {@code
+     *      getVariable("${variable}")      //returns the java property
+     *      getVariable("!{variable}")      //returns the thread property
+     *      getVariable("#{variable}")      //returns the corresponding value from the properties file.
+     *      getVariable("@{variable}")      //returns attribute value
+     * }
+     * </pre>
+     * @see ReplacementAspect#replacedElement(String, JoinPoint) 
+     * @param variable      Variable placeholder as used in the gherkin file
+     * @return              Value assign to that variable
+     */
     public String getVariable(String variable) {
         try {
             return ReplacementAspect.replacedElement(variable, null);
