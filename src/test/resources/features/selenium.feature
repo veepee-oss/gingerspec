@@ -168,13 +168,16 @@ Feature: Selenium steps
     And I execute 'return document.URL;' as javascript and save the result in the environment variable 'PAGE'
     And '!{PAGE}' contains 'index.html'
 
-  @ignore @toocomplex
+
   Scenario: Testing direct steps and new locators
-    Given I go to 'https://demoqa.com/'
-    When I click on the element with 'partialLinkText:Sortable'
-    Then the current url contains the text 'sortable'
-    Then I go back 1 page
-    When I click on the element with 'partialLinkText:Resizable'
-    Then the current url contains the text 'resizable'
-    Then I go back 1 page
-    Then I go forward 1 page
+    Given I go to 'http://${DEMO_SITE_HOST}/index.html@p=49.html'
+    When I type 'Jose' on the element with 'id:name_3_firstname'
+    Then I type 'Fernandez' on the element with 'id:name_3_lastname' index '0'
+    Then I click on the element with 'name:radio_4[]' index '0'
+    Then I click on the element with 'name:checkbox_5[]' index '1'
+    Then I click on the element with 'name:checkbox_5[]' index '2'
+    Then I scroll down until the element with 'name:pie_submit' is visible
+    Then I scroll up until the element with 'id:name_3_firstname' is visible
+    Then I scroll down until the element with 'name:pie_submit' is visible
+    Then I click on the element with 'name:pie_submit'
+    Then I wait '3' seconds

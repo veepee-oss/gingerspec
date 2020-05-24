@@ -988,7 +988,7 @@ public class SeleniumGSpec extends BaseGSpec {
      * @param text  key stroke to send
      * @param index index of the web element in the list
      */
-    @When("^I send '(.*)'( on the element on index '(\\d+)')?$")
+    @When("^I send '(.*)' on the element on index '(\\d+)'$")
     public void seleniumKeys(String text, Integer index) {
 
         ArrayListConverter converter = new ArrayListConverter();
@@ -1230,7 +1230,7 @@ public class SeleniumGSpec extends BaseGSpec {
      * @param element       the relative reference to the element
      * @param index         Index of the element, in case one or more elements with the given locator are found (first element starts with index 0)
      */
-    @Then("^I click on the element with '(" + LOCATORS + "):(.*)'( index '(\\d+)')?$")
+    @Then("^I click on the element with '(" + LOCATORS + "):(.*?)'( index '(\\d+)')?$")
     public void seleniumClickByLocator(String method, String element, Integer index) {
         this.assertSeleniumNElementExists("at least", 1, method, element);
         if (index == null) {
@@ -1264,7 +1264,7 @@ public class SeleniumGSpec extends BaseGSpec {
      * @param element   the relative reference to the element
      * @param index     Index of the element, in case one or more elements with the given locator are found (first element starts with index 0)
      */
-    @When("^I type '(.*)' on the element with '(" + LOCATORS + "):(.*)'( index '(\\d+)')?$")
+    @When("^I type '(.*)' on the element with '(" + LOCATORS + "):(.*?)'( index '(\\d+)')?$")
     public void seleniumTypeByLocator(String input, String method, String element, Integer index) {
         this.assertSeleniumNElementExists("at least", 1, method, element);
         if (index == null) {
@@ -1301,6 +1301,7 @@ public class SeleniumGSpec extends BaseGSpec {
      *      Then I click on the element on index '0'
      * }
      * </pre>
+     * @see #scrollUntilElementVisibleByLocator(String, String, String, Integer)
      * @see #assertSeleniumNElementExists(String, Integer, String, String)
      * @see #assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)
      * @param direction             Indicates if the scroll is upwards or downwards
@@ -1344,7 +1345,7 @@ public class SeleniumGSpec extends BaseGSpec {
      * @param index                     Index of the element, in case one or more elements with the given locator are found (first element starts with index 0)
      * @throws InterruptedException     InterruptedException
      */
-    @Then("^I scroll (up|down) until the element with '(" + LOCATORS +  "):(.*)'( index '(\\d+)')? is visible$")
+    @Then("^I scroll (up|down) until the element with '(" + LOCATORS +  "):(.*?)'( index '(\\d+)')? is visible$")
     public void scrollUntilElementVisibleByLocator(String direction, String method, String element, Integer index) throws InterruptedException {
         this.assertSeleniumNElementExists("at least", 1, method, element);
         if (index == null) {
@@ -1378,7 +1379,7 @@ public class SeleniumGSpec extends BaseGSpec {
      * @param element       the relative reference to the element
      * @param index         Index of the element, in case one or more elements with the given locator are found (first element starts with index 0)
      */
-    @Then("^I double click on the element with '(" + LOCATORS + "):(.*)'( index '(\\d+)')?$")
+    @Then("^I double click on the element with '(" + LOCATORS + "):(.*?)'( index '(\\d+)')?$")
     public void seleniumDoubleClickByLocator(String method, String element, Integer index) {
         this.assertSeleniumNElementExists("at least", 1, method, element);
         if (index == null) {
@@ -1413,7 +1414,7 @@ public class SeleniumGSpec extends BaseGSpec {
      * @param element       the relative reference to the element
      * @param index         Index of the element, in case one or more elements with the given locator are found (first element starts with index 0)
      */
-    @Then("^I right click on the element with '(" + LOCATORS + "):(.*)'( index '(\\d+)')?$")
+    @Then("^I right click on the element with '(" + LOCATORS + "):(.*?)'( index '(\\d+)')?$")
     public void seleniumRightClickByLocator(String method, String element, Integer index) {
         this.assertSeleniumNElementExists("at least", 1, method, element);
         if (index == null) {
@@ -1421,6 +1422,5 @@ public class SeleniumGSpec extends BaseGSpec {
         }
         this.seleniumRightClick(index);
     }
-
 
 }
