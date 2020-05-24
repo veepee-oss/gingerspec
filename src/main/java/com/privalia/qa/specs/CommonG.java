@@ -14,12 +14,15 @@ import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Realm;
 import com.ning.http.client.Response;
 import com.ning.http.client.cookie.Cookie;
+import com.privalia.qa.aspects.ReplacementAspect;
 import com.privalia.qa.conditions.Conditions;
+import com.privalia.qa.exceptions.NonReplaceableException;
 import com.privalia.qa.utils.*;
 import io.appium.java_client.MobileDriver;
 import io.cucumber.datatable.DataTable;
 import io.restassured.specification.RequestSpecification;
 import org.apache.commons.collections.IteratorUtils;
+import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.io.FileUtils;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.Condition;
@@ -45,6 +48,7 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.util.*;
@@ -2174,6 +2178,15 @@ public class CommonG {
                     null, 999999, false, false));
         }
         return cookiesAttributes;
+    }
+
+
+    public String getVariable(String variable) {
+        try {
+            return ReplacementAspect.replacedElement(variable, null);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
 }

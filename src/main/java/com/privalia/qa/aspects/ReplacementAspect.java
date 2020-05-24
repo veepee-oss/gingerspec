@@ -53,9 +53,9 @@ import java.util.List;
  * @author Jose Fernandez
  */
 @Aspect
-public class ReplacementAspect {
+public final class ReplacementAspect {
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
+    private static Logger logger = LoggerFactory.getLogger(ReplacementAspect.class.getCanonicalName());
 
     private StepDefinitionMatch lastEchoedStep;
 
@@ -217,7 +217,7 @@ public class ReplacementAspect {
     }
 
 
-    protected String replacedElement(String el, JoinPoint jp) throws NonReplaceableException, ConfigurationException, URISyntaxException, FileNotFoundException {
+    public static String replacedElement(String el, JoinPoint jp) throws NonReplaceableException, ConfigurationException, URISyntaxException, FileNotFoundException {
         if (el.contains("${")) {
             el = replaceEnvironmentPlaceholders(el, jp);
         }
@@ -233,9 +233,9 @@ public class ReplacementAspect {
         return el;
     }
 
-    private File getfile(String environment) throws URISyntaxException, FileNotFoundException {
+    private static File getfile(String environment) throws URISyntaxException, FileNotFoundException {
 
-        URL url = getClass().getClassLoader().getResource("configuration/" + environment + ".properties");
+        URL url = ReplacementAspect.class.getClassLoader().getResource("configuration/" + environment + ".properties");
 
         if (url != null) {
             return new File(url.toURI());
@@ -269,7 +269,7 @@ public class ReplacementAspect {
      * @throws NonReplaceableException NonReplaceableException
      * @throws FileNotFoundException   FileNotFoundException
      */
-    protected String replacePropertyPlaceholders(String element, JoinPoint pjp) throws ConfigurationException, URISyntaxException, NonReplaceableException, FileNotFoundException {
+    protected static String replacePropertyPlaceholders(String element, JoinPoint pjp) throws ConfigurationException, URISyntaxException, NonReplaceableException, FileNotFoundException {
 
         String newVal = element;
         Parameters params = new Parameters();
@@ -279,14 +279,14 @@ public class ReplacementAspect {
         String environment = System.getProperty("env", null);
         if (environment != null) {
             FileBasedConfigurationBuilder<FileBasedConfiguration> config2 = new FileBasedConfigurationBuilder<FileBasedConfiguration>(
-                    PropertiesConfiguration.class).configure(params.properties().setFile(this.getfile(environment)));
+                    PropertiesConfiguration.class).configure(params.properties().setFile(getfile(environment)));
             config.addConfiguration(config2.getConfiguration());
         }
 
         /*Add the file common.properties as a source of properties*/
         FileBasedConfigurationBuilder<FileBasedConfiguration> config1 = new FileBasedConfigurationBuilder<FileBasedConfiguration>(
                 PropertiesConfiguration.class)
-                .configure(params.properties().setFile(this.getfile("common")));
+                .configure(params.properties().setFile(getfile("common")));
 
         config.addConfiguration(config1.getConfiguration());
 
@@ -328,7 +328,7 @@ public class ReplacementAspect {
      * @return String
      * @throws NonReplaceableException exception
      */
-    protected String replaceCodePlaceholders(String element, JoinPoint pjp) throws NonReplaceableException {
+    protected static String replaceCodePlaceholders(String element, JoinPoint pjp) throws NonReplaceableException {
         String newVal = element;
         while (newVal.contains("@{")) {
             String placeholder = newVal.substring(newVal.indexOf("@{"), newVal.indexOf("}", newVal.indexOf("@{")) + 1);
@@ -355,7 +355,7 @@ public class ReplacementAspect {
                         try {
                             ifs = NetworkInterface.getByName(subproperty).getInetAddresses();
                         } catch (SocketException e) {
-                            this.logger.error(e.getMessage());
+                            logger.error(e.getMessage());
                         }
                         while (ifs.hasMoreElements() && !found) {
                             InetAddress itf = ifs.nextElement();
@@ -392,7 +392,7 @@ public class ReplacementAspect {
      * @param pjp     JoinPoint
      * @return String string
      */
-    protected String replaceReflectionPlaceholders(String element, JoinPoint pjp) {
+    protected static String replaceReflectionPlaceholders(String element, JoinPoint pjp) {
         String newVal = element;
         while (newVal.contains("!{")) {
             String placeholder = newVal.substring(newVal.indexOf("!{"),
@@ -423,7 +423,7 @@ public class ReplacementAspect {
      * @return String
      * @throws NonReplaceableException exception
      */
-    protected String replaceEnvironmentPlaceholders(String element, JoinPoint jp) throws NonReplaceableException {
+    protected static String replaceEnvironmentPlaceholders(String element, JoinPoint jp) throws NonReplaceableException {
         String newVal = element;
         while (newVal.contains("${")) {
             String placeholder = newVal.substring(newVal.indexOf("${"),
