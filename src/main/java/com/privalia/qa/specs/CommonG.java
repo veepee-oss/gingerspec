@@ -2186,7 +2186,7 @@ public class CommonG {
      *      getVariable("@{variable}")      //returns attribute value
      * }
      * </pre>
-     * @see ReplacementAspect#replacedElement(String, JoinPoint) 
+     * @see ReplacementAspect#replacedElement(String, JoinPoint)
      * @param variable      Variable placeholder as used in the gherkin file
      * @return              Value assign to that variable
      */
