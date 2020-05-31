@@ -14,6 +14,7 @@ import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.Select;
 
+import javax.swing.*;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1452,6 +1453,36 @@ public class SeleniumGSpec extends BaseGSpec {
         }
         Actions action = new Actions(this.commonspec.getDriver());
         action.moveToElement(this.commonspec.getPreviousWebElements().getPreviousWebElements().get(index)).perform();
+    }
+
+
+    /**
+     * Temporally stop the execution of the feature
+     * <p>
+     * This step shows a dialog in the center of the screen and interrupts the execution of the rest
+     * of the steps in the feature until the "Ok" button in the dialog is pressed. This comes handy when
+     * debugging and the user needs to execute some manual actions before continuing
+     * <pre>
+     * Example:
+     * {@code
+     *     Given I go to 'http://demoqa.com/automation-practice-form'
+     *     Then I pause                                             //This will show the pause dialog
+     *     Then I type 'Jose' on the element with 'id:firstName'    //This will only be executed when the "Ok" button in previous dialog is pressed
+     * }
+     * </pre>
+     * @see UtilsGSpec#idleWait(Integer) 
+     * @see #waitWebElementWithPooling(int, int, int, String, String, String) 
+     * @see #waitAlertWithPooling(int, int)
+     */
+    @Then("^I pause$")
+    public void SeleniumPause() {
+        this.commonspec.getLogger().info( "Pausing feature execution until button in dialog is pressed..." );
+
+        JFrame jf = new JFrame();
+        JOptionPane.showMessageDialog( jf, "Feature execution is paused and will resume when you click OK.",
+                    "Cucumber paused", JOptionPane.INFORMATION_MESSAGE );
+        jf.toFront();
+        jf.repaint();
     }
 
 }
