@@ -1470,17 +1470,17 @@ public class SeleniumGSpec extends BaseGSpec {
      *     Then I type 'Jose' on the element with 'id:firstName'    //This will only be executed when the "Ok" button in previous dialog is pressed
      * }
      * </pre>
-     * @see UtilsGSpec#idleWait(Integer) 
-     * @see #waitWebElementWithPooling(int, int, int, String, String, String) 
+     * @see UtilsGSpec#idleWait(Integer)
+     * @see #waitWebElementWithPooling(int, int, int, String, String, String)
      * @see #waitAlertWithPooling(int, int)
      */
     @Then("^I pause$")
     public void SeleniumPause() {
-        this.commonspec.getLogger().info( "Pausing feature execution until button in dialog is pressed..." );
+        this.commonspec.getLogger().info("Pausing feature execution until button in dialog is pressed...");
 
         JFrame jf = new JFrame();
-        JOptionPane.showMessageDialog( jf, "Feature execution is paused and will resume when you click OK.",
-                    "Cucumber paused", JOptionPane.INFORMATION_MESSAGE );
+        JOptionPane.showMessageDialog(jf, "Feature execution is paused and will resume when you click OK.",
+                    "Cucumber paused", JOptionPane.INFORMATION_MESSAGE);
         jf.toFront();
         jf.repaint();
     }
