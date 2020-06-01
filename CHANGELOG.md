@@ -1,5 +1,27 @@
 # Changelog
 
+## 2.1.4
+
+* Overall improvements in the Javadocs for the Selenium and Rest steps. Improved documentation.
+
+* Updated jweaver dependency. Client projects must update this in their POMS to correctly inject the javaagent ar runtime.
+
+* Added tagName, LinkText y partialLinkText to the list of supported locator for selenium. Added 3 more steps for selenium.
+
+* Added changed in logger to allow the execution of feature files directly from intellij IDEA.
+
+* Selenium features can now be executed via runners without contructor, and also through intellij IDEA directly.
+
+* Improvements in the regex of some steps. Added selenium steps for right click, double click, scroll until element visible and type directly by locator.
+
+* ReplacementAspect was changed to final so its functions can be used directly from te class CommonG to get variables at runtime.
+
+* Improvements in the regex for many steps to get better suggestions when using Intellij
+
+* Added function to perform hovering on a web element.
+
+* Added step to temporally stops the execution of a feature.
+
 ## 2.1.3
 
 * Junit dependency was removed and now assertj is the preferred assertion library
