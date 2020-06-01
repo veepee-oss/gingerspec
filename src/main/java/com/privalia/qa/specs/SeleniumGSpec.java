@@ -14,6 +14,7 @@ import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.Select;
 
+import javax.swing.*;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1404,7 +1405,7 @@ public class SeleniumGSpec extends BaseGSpec {
      * }
      * Example: Using index in case more than one element is found (first element has index 0)
      * {@code
-     *      When I right click on the element with 'tagName:button' index 1  //clicks the second element with tag name 'button'
+     *      When I right click on the element with 'tagName:button' index '1'  //clicks the second element with tag name 'button'
      * }
      * </pre>
      * @see #seleniumRightClick(Integer)
@@ -1421,6 +1422,67 @@ public class SeleniumGSpec extends BaseGSpec {
             index = 0;
         }
         this.seleniumRightClick(index);
+    }
+
+
+    /**
+     * Directly hovers on the given element referenced by locator
+     * <p>
+     * This step performs the function of hovering, or, directly placing the cursor (mouse pointer)
+     * on top of the specified element. This is particularly useful since in some situations, DOM elements
+     * are only revealed after the mouse is directly placed on top of another element (like tooltips)
+     * <pre>
+     * Example:
+     * {@code
+     *      Given I hover on the element with 'id:revelPopUpButton'
+     * }
+     * Example: Using index in case more than one element is found (first element has index 0)
+     * {@code
+     *      Given I hover on the element with 'id:revelPopUpButton' index '1'   //clicks the second element with tag name 'button'
+     * }
+     * </pre>
+     * @param method        method to locate the elements (id, name, class, css, xpath, linkText, partialLinkText and tagName)
+     * @param element       the relative reference to the element
+     * @param index         Index of the element, in case one or more elements with the given locator are found (first element starts with index 0)
+     */
+    @Then("^I hover on the element with '(" + LOCATORS + "):(.*?)'( index '(\\d+)')?$")
+    public void seleniumHoverByLocator(String method, String element, Integer index) {
+        this.assertSeleniumNElementExists("at least", 1, method, element);
+        if (index == null) {
+            index = 0;
+        }
+        Actions action = new Actions(this.commonspec.getDriver());
+        action.moveToElement(this.commonspec.getPreviousWebElements().getPreviousWebElements().get(index)).perform();
+    }
+
+
+    /**
+     * Temporally stop the execution of the feature
+     * <p>
+     * This step shows a dialog in the center of the screen and interrupts the execution of the rest
+     * of the steps in the feature until the "Ok" button in the dialog is pressed. This comes handy when
+     * debugging and the user needs to execute some manual actions before continuing
+     * <pre>
+     * Example:
+     * {@code
+     *     Given I go to 'http://demoqa.com/automation-practice-form'
+     *     Then I pause                                             //This will show the pause dialog
+     *     Then I type 'Jose' on the element with 'id:firstName'    //This will only be executed when the "Ok" button in previous dialog is pressed
+     * }
+     * </pre>
+     * @see UtilsGSpec#idleWait(Integer)
+     * @see #waitWebElementWithPooling(int, int, int, String, String, String)
+     * @see #waitAlertWithPooling(int, int)
+     */
+    @Then("^I pause$")
+    public void SeleniumPause() {
+        this.commonspec.getLogger().info("Pausing feature execution until button in dialog is pressed...");
+
+        JFrame jf = new JFrame();
+        JOptionPane.showMessageDialog(jf, "Feature execution is paused and will resume when you click OK.",
+                    "Cucumber paused", JOptionPane.INFORMATION_MESSAGE);
+        jf.toFront();
+        jf.repaint();
     }
 
 }
