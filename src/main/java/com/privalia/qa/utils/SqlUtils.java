@@ -202,7 +202,7 @@ public class SqlUtils {
         while (resultSet.next()) {
             List<String> sqlTableAux = new LinkedList<>();
             for (int i = 1; i <= count; i++) {
-                sqlTableAux.add(resultSet.getObject(i).toString());
+                sqlTableAux.add(String.valueOf(resultSet.getObject(i)));
             }
             sqlTable.add(sqlTableAux);
         }
