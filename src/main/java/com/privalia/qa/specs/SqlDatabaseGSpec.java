@@ -44,7 +44,28 @@ public class SqlDatabaseGSpec extends BaseGSpec {
 
 
     /**
-     * Attempts to establish a connection with the given parameters. The DriverManager attempts to select an appropriate driver from the set of registered JDBC drivers.
+     * Attempts to establish a connection with the given database.
+     * <p>
+     * The DriverManager attempts to select an appropriate driver from the set of registered JDBC drivers.
+     * All subsequent steps that interact with the database will be performed on this connection. You can also use the
+     * step {@link #disconnectDatabase()} to close this connection at the end of your scenarios, however, it is recommended
+     * to include the @sql tag in your scenarios to allow gingerspec to do this automatically. The current supported types of
+     * databases are postgresql/mysql
+     * <pre>
+     * Example: Connecting to a mysql database with user/password
+     * {@code
+     *      Given I connect with JDBC to database 'databaseName' type 'mysql' on host '121.0.0.1' and port '3306' with user 'root' and password 'P@$$W0RD'
+     * }
+     * Example: If the database does not have a password
+     * {@code
+     *      Given I connect with JDBC to database 'databaseName' type 'mysql' on host '121.0.0.1' and port '3306' with user 'root'
+     * }
+     * Example: Connecting to a postgresql database
+     * {@code
+     *      Given I connect with JDBC to database 'databaseName' type 'postgresql' on host '121.0.0.1' and port '5432' with user 'postgres' and password 'P@$$W0RD'
+     * }
+     * </pre>
+     * @see #disconnectDatabase()
      * @param isSecured     True if secure connection
      * @param database      Name of the remote database
      * @param dataBaseType  Database type (currently MYSQL/POSTGRESQL)
@@ -73,6 +94,18 @@ public class SqlDatabaseGSpec extends BaseGSpec {
 
     /**
      * Close the Database connection
+     * <p>
+     * Closes the active database connection. To create a database connection use the step {@link #connectDatabase(String, String, String, String, String, String, String)}
+     * You can use this step to close the database connection at the end of your scenarios, however, it is recommended to include
+     * the @sql tag in your scenarios to allow gingerspec to do this automatically.
+     * <pre>
+     * Example: Closing an existing database connection
+     * {@code
+     *      Given I connect with JDBC to database 'databaseName' type 'mysql' on host '121.0.0.1' and port '3306' with user 'root' and password 'P@$$W0RD'
+     *      Then I close database connection
+     * }
+     * </pre>
+     * @see #connectDatabase(String, String, String, String, String, String, String)
      */
     @Then("^I close database connection$")
     public void disconnectDatabase() {
@@ -87,7 +120,23 @@ public class SqlDatabaseGSpec extends BaseGSpec {
 
     /**
      * Executes the given SQL statement, which may be an INSERT, UPDATE, or DELETE statement
-     * or an SQL statement that returns nothing, such as an SQL DDL statement.
+     * <p>
+     * The given SQL statement must be an INSERT, UPDATE, or DELETE statement or an SQL statement
+     * that returns nothing, such as an SQL DDL statement. To execute an statement that does return a
+     * ResultSet (rows), such as a <code>SELECT</code> statement, use the step {@link #executeSelectQuery(String)}
+     * <pre>
+     * Example: Create a table (CREATE statement returns nothing, as well as TRUNCATE, INSERT)
+     * {@code
+     *      Given I connect with JDBC to database 'databaseName' type 'mysql' on host '121.0.0.1' and port '3306' with user 'root' and password 'P@$$W0RD'
+     *      And I execute query 'CREATE TABLE IF NOT EXISTS weather1 (city varchar(80), temp_lo int, temp_hi int, prcp real, date date);'
+     *      And I execute query 'TRUNCATE weather1'
+     *      When I execute query 'INSERT INTO weather1 (city, temp_lo, temp_hi, prcp, date) VALUES ('San Francisco', 15, 43, 0.0, '2004-11-29');'
+     *      Then I close database connection
+     * }
+     * </pre>
+     * @see #executeSelectQuery(String)
+     * @see #connectDatabase(String, String, String, String, String, String, String)
+     * @see #disconnectDatabase()
      * @param query An SQL Data Manipulation Language (DML) statement, such as INSERT, UPDATE or DELETE;
      *              or an SQL statement that returns nothing, such as a DDL statement.
      */
@@ -105,6 +154,18 @@ public class SqlDatabaseGSpec extends BaseGSpec {
 
     /**
      * Verify if a table exists
+     * <pre>
+     * Example: Create a table and then verify it was created
+     * {@code
+     *      Given I connect with JDBC to database 'databaseName' type 'mysql' on host '121.0.0.1' and port '3306' with user 'root' and password 'P@$$W0RD'
+     *      When I execute query 'CREATE TABLE IF NOT EXISTS weather1 (city varchar(80), temp_lo int, temp_hi int, prcp real, date date);'
+     *      Then table 'weather1' exists
+     *      Then I close database connection
+     * }
+     * </pre>
+     * @see #connectDatabase(String, String, String, String, String, String, String)
+     * @see #executeQuery(String)
+     * @see #disconnectDatabase()
      * @param tableName Table name
      */
     @Then("^table '(.+?)' exists$")
@@ -115,6 +176,18 @@ public class SqlDatabaseGSpec extends BaseGSpec {
 
     /**
      * Verify if a table does not exists
+     * <pre>
+     * Example: DROP a table and verify it was deleted
+     * {@code
+     *      Given I connect with JDBC to database 'databaseName' type 'mysql' on host '121.0.0.1' and port '3306' with user 'root' and password 'P@$$W0RD'
+     *      When I execute query 'DROP TABLE weather1;'
+     *      Then table 'weather1' doesn't exists
+     *      Then I close database connection
+     * }
+     * </pre>
+     * @see #connectDatabase(String, String, String, String, String, String, String)
+     * @see #executeQuery(String)
+     * @see #disconnectDatabase()
      * @param tableName Table name
      */
     @Then("^table '(.+?)' doesn't exists$")
@@ -124,7 +197,20 @@ public class SqlDatabaseGSpec extends BaseGSpec {
     }
 
     /**
-     * Executes the given SQL statement, which returns a single ResultSet object.
+     * Executes an SQL statement which returns a ResultSet, such as a <code>SELECT</code> statement
+     * <p>
+     * This step is for executing a SQL statement which returns a ResultSet object, typically a
+     * static SQL <code>SELECT</code> statement. The result is stored in a local variable that
+     * can be read by future steps in the same scenario. Other types of statements (statements that dont
+     * return a result such as INSERT, UPDATE, DROP, CREATE, etc) must be executed with {@link #executeQuery(String)}
+     * <pre>
+     * {@code
+     *      Given I connect with JDBC to database 'databaseName' type 'mysql' on host '121.0.0.1' and port '3306' with user 'root' and password 'P@$$W0RD'
+     *      When I query the database with 'SELECT * FROM weather1;'
+     * }
+     * </pre>
+     * @see #connectDatabase(String, String, String, String, String, String, String)
+     * @see #compareTable(DataTable)
      * @param query An SQL statement to be sent to the database, typically a static SQL SELECT statement
      */
     @When("^I query the database with '(.+?)'$")
@@ -142,7 +228,27 @@ public class SqlDatabaseGSpec extends BaseGSpec {
 
     /**
      * Verifies the results of a SELECT query against a {@link DataTable}
-     * @param dataTable     list of casses to assert in a table format
+     * <p>
+     * This step compares the result of a previous SELECT operation to the given datatable.
+     * The datatable must contain the result as it is expected from the database. If the given SELECT
+     * statement did not return any rows, only the columns names will be returned as a single row
+     * <pre>
+     * Example: Check the result of a SELECT statement
+     * {@code
+     *      Given I connect with JDBC to database 'databaseName' type 'mysql' on host '121.0.0.1' and port '3306' with user 'root' and password 'P@$$W0RD'
+     *      When I query the database with 'SELECT * FROM weather1;'
+     *      Then I check that result is:
+     *       | city      | temp_lo | temp_hi | prcp | date       |
+     *       | Caracas   | 15      | 43      | 0.0  | 2004-11-29 |
+     *       | Barcelona | 5       | 37      | 0.4  | 2014-11-29 |
+     *       | Madrid    | 8       | 37      | 0.4  | 2016-11-30 |
+     *      Then I close database connection
+     * }
+     * </pre>
+     * @see #connectDatabase(String, String, String, String, String, String, String)
+     * @see #executeSelectQuery(String)
+     * @see #disconnectDatabase()
+     * @param dataTable     list of cases to assert in a table format
      */
     @Then("^I check that result is:$")
     public void compareTable(DataTable dataTable) {
@@ -156,6 +262,23 @@ public class SqlDatabaseGSpec extends BaseGSpec {
 
     /**
      * Verify if the content of a table matches the given {@link DataTable}
+     * <p>
+     * This step verifies the whole content of the table specified. That is like performing a <code>SELECT * FROM</code> statement
+     * on the table and then using the datatable to check the result. This, of course, makes sense on tables that dont contain too many rows
+     * <pre>
+     * Example: Checking the content of a table
+     * {@code
+     *      Given I connect with JDBC to database 'databaseName' type 'mysql' on host '121.0.0.1' and port '3306' with user 'root' and password 'P@$$W0RD'
+     *      Then I check that table 'weather1' is iqual to
+     *       | city      | temp_lo | temp_hi | prcp | date       |
+     *       | Caracas   | 15      | 43      | 0.0  | 2004-11-29 |
+     *       | Barcelona | 5       | 37      | 0.4  | 2014-11-29 |
+     *       | Madrid    | 8       | 37      | 0.4  | 2016-11-30 |
+     *      Then I close database connection
+     * }
+     * </pre>
+     * @see #connectDatabase(String, String, String, String, String, String, String)
+     * @see #disconnectDatabase()
      * @param tableName Table name
      * @param dataTable {@link DataTable} to match against
      */
@@ -169,9 +292,27 @@ public class SqlDatabaseGSpec extends BaseGSpec {
     }
 
     /**
-     * Executes an SQL from a file. The SQL could be of any kind (a typical SELECT or a SQL Data
+     * Executes an SQL from a file.
+     * <p>
+     * The SQL could be of any kind (a typical SELECT or a SQL Data
      * Manipulation Language (DML) statement, such as INSERT, UPDATE or DELETE) or even SQL Scripts.
      * If the SQL returns a {@link java.sql.ResultSet}, it is stored internally so further steps can use it
+     * <pre>
+     * Example: Execute query from a file:
+     * {@code
+     *      Given I connect with JDBC to database 'databaseName' type 'mysql' on host '121.0.0.1' and port '3306' with user 'root' and password 'P@$$W0RD'
+     *      When I execute query from 'sql/selectWeather.sql'
+     *      Then I check that result is:
+     *       | city          | temp_lo | temp_hi | prcp | date       |
+     *       | San Francisco | 15      | 43      | 0.0  | 2004-11-29 |
+     *       | Kyiv          | 5       | 37      | 0.4  | 2014-11-29 |
+     *       | Paris         | 8       | 37      | 0.4  | 2016-11-30 |
+     *      Then I close database connection
+     * }
+     * </pre>
+     * @see #connectDatabase(String, String, String, String, String, String, String)
+     * @see #compareTable(DataTable)
+     * @see #disconnectDatabase()
      * @param baseData      File location (typically schemas/myfile.sql)
      * @throws IOException  IOException
      */
@@ -197,8 +338,21 @@ public class SqlDatabaseGSpec extends BaseGSpec {
 
 
     /**
-     * Save an specific element (by row and column) in an environmental variable
-     *
+     * Save a specific element (by row and column) in an environmental variable
+     * <pre>
+     * Example:
+     * {@code
+     *      Given I connect with JDBC to database 'databaseName' type 'mysql' on host '121.0.0.1' and port '3306' with user 'root' and password 'P@$$W0RD'
+     *      When I execute query from 'sql/selectWeather.sql'
+     *      Then I save the value of the row number '1' and the column with name 'city' in environment variable 'CITY'
+     *      Then I save the value of the row number '2' and the column with name 'temp_hi' in environment variable 'TEMP_BARCELONA'
+     *      Then '!{CITY}' matches 'Caracas'
+     *      Then '!{TEMP_BARCELONA}' matches '37'
+     * }
+     * </pre>
+     * @see #connectDatabase(String, String, String, String, String, String, String)
+     * @see #executeQueryFromFile(String)
+     * @see UtilsGSpec#checkValue(String, String, String)
      * @param rowNumber  the row number
      * @param columnName the column name
      * @param envVar     the env var Name
