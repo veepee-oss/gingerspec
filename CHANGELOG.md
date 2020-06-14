@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.1.5
+
+* Minor fix in SqlUtils class. Database cells with null values were causing an exception when transforming the resulset to List
+
+* Improved javadoc for SQL database steps
+
 ## 2.1.4
 
 * Overall improvements in the Javadocs for the Selenium and Rest steps. Improved documentation.
