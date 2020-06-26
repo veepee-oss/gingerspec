@@ -339,9 +339,19 @@ public class SqlDatabaseGSpec extends BaseGSpec {
 
     /**
      * Save a specific element (by row and column) in an environmental variable
+     * <p>
+     * The first row (row number 0) corresponds to the column names. If the previous SELECT statement did
+     * not return any rows, only the columns names will be returned as a single row
      * <pre>
      * Example:
      * {@code
+     * Assuming the result of the query in sql/selectWeather.sql is this:
+     *       | city      | temp_lo | temp_hi | prcp | date       |
+     *       | Caracas   | 15      | 43      | 0.0  | 2004-11-29 |
+     *       | Barcelona | 5       | 37      | 0.4  | 2014-11-29 |
+     *
+     * And I want to save the first city name (Caracas) and the temp_hi of the second city (37) in variables, then:
+     *
      *      Given I connect with JDBC to database 'databaseName' type 'mysql' on host '121.0.0.1' and port '3306' with user 'root' and password 'P@$$W0RD'
      *      When I execute query from 'sql/selectWeather.sql'
      *      Then I save the value of the row number '1' and the column with name 'city' in environment variable 'CITY'

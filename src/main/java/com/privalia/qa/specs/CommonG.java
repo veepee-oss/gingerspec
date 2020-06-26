@@ -2180,8 +2180,8 @@ public class CommonG {
      * <pre>
      * Examples:
      * {@code
-     *      getVariable("${variable}")      //returns the java property
-     *      getVariable("!{variable}")      //returns the thread property
+     *      getVariable("${variable}")      //returns the java property, same as doing System.getProperty("variable")
+     *      getVariable("!{variable}")      //returns the thread property, same as doing ThreadProperty.get("variable")
      *      getVariable("#{variable}")      //returns the corresponding value from the properties file.
      *      getVariable("@{variable}")      //returns attribute value
      * }
