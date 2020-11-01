@@ -44,7 +44,21 @@ public class SshGSpec extends BaseGSpec {
 
     /**
      * Opens a ssh connection to remote host
+     * <p>
+     * Connects to the remote server by ssh with the given username and password. After the connection is open,
+     * you can execute commands on the remote server or send and receive commands.
      *
+     * <pre>
+     * Example: Connecting to a remote server
+     * {@code
+     *      Given I open a ssh connection to '10.200.56.59' with user 'myuser' and password 'temporal'
+     *      When I run 'ls -l' in the ssh connection and save the value in environment variable 'RESULT'
+     *      Then '!{RESULT}' contains 'total'
+     * }
+     * </pre>
+     *
+     * @see #executeCommand(String, String, Integer, String, String) 
+     * @see UtilsGSpec#checkValue(String, String, String) 
      * @param remoteHost remote host
      * @param user       remote user
      * @param foo        the foo
@@ -74,7 +88,17 @@ public class SshGSpec extends BaseGSpec {
 
     /**
      * Copies file/s from remote system into local system
+     * <p>
+     * Before using this step, you must first open a ssh connection with {@link #openSSHConnection(String, String, String, String, String, String)}
      *
+     * <pre>
+     * Example:
+     * {@code
+     *      Given I open a ssh connection to '10.200.56.59' with user 'myuser' and password 'temporal'
+     *      Then I inbound copy '/tmp/exampleJSON.conf' through a ssh connection to 'fileFromSsh.conf'
+     * }
+     * </pre>
+     * @see #openSSHConnection(String, String, String, String, String, String)
      * @param remotePath path where file is going to be copy
      * @param localPath path where file is located
      * @throws Exception exception
@@ -88,7 +112,17 @@ public class SshGSpec extends BaseGSpec {
 
     /**
      * Copies file/s from local system to remote system
+     * <p>
+     * Before using this step, you must first open a ssh connection with {@link #openSSHConnection(String, String, String, String, String, String)}
      *
+     * <pre>
+     * Example:
+     * {@code
+     *      Given I open a ssh connection to '10.200.56.59' with user 'myuser' and password 'temporal'
+     *      Then I outbound copy 'exampleJSON.conf' through a ssh connection to '/tmp/exampleJSON.conf'
+     * }
+     * </pre>
+     * @see #openSSHConnection(String, String, String, String, String, String)
      * @param localPath  path where file is located
      * @param remotePath path where file is going to be copy
      * @throws Exception exception
@@ -100,8 +134,29 @@ public class SshGSpec extends BaseGSpec {
 
 
     /**
-     * Executes the command specified in local system
+     * Executes the command specified in the local system
+     * <p>
+     * Executes the given command in the local system. Unless specified, this step specs the returned exit status
+     * of the executed command to be zero (more info <a href="https://www.gnu.org/software/bash/manual/html_node/Exit-Status.html">here</a>),
+     * however, you can also specify any exit code you like. This steps also provides the possibility of saving the returned
+     * response into a variable and use it in the following steps
      *
+     * <pre>
+     * Example: Run a command locally
+     * {@code
+     *      Given I run 'ls /tmp | wc -l' locally
+     * }
+     * Example: Run a command locally and expect exit status to be 127
+     * {@code
+     *      Then I run 'lss /tmp' in the ssh connection with exit status '127'
+     * }
+     * Example: Run a command and save its value in variable for further inspection
+     * {@code
+     *      Given I run 'ls /tmp | wc -l' locally and save the value in environment variable 'WORDCOUNT'
+     *      Then '!{WORDCOUNT}' is '14'
+     * }
+     * @see UtilsGSpec#checkValue(String, String, String)
+     * @see <a href="https://www.gnu.org/software/bash/manual/html_node/Exit-Status.html">Exit status</a>
      * @param command    command to be run locally
      * @param exitStatus command exit status
      * @param envVar     environment variable name
@@ -122,7 +177,34 @@ public class SshGSpec extends BaseGSpec {
 
     /**
      * Executes the command specified in remote system
+     * <p>
+     * Executes the given command in the ssh connection. For this step to work, you must first connect to a remote server
+     * by ssh using the step {@link #openSSHConnection(String, String, String, String, String, String)}. Unless specified,
+     * this step specs the returned exit status of the executed command to be zero
+     * (more info <a href="https://www.gnu.org/software/bash/manual/html_node/Exit-Status.html">here</a>), however, you can
+     * also specify any exit code you like. This steps also provides the possibility of saving the returned response into a
+     * variable and use it in the following steps
      *
+     * <pre>
+     * Example: Run a command locally
+     * {@code
+     *      Given I open a ssh connection to '10.200.56.59' with user 'myuser' and password 'temporal'
+     *      Then I run 'ls /tmp' in the ssh connection
+     * }
+     * Example: Run a command locally and expect exit status to be 127
+     * {@code
+     *      Given I open a ssh connection to '10.200.56.59' with user 'myuser' and password 'temporal'
+     *      When I run 'lss /tmp' in the ssh connection with exit status '127'
+     * }
+     * Example: Run a command and save its value in variable for further inspection
+     * {@code
+     *      Given I open a ssh connection to '10.200.56.59' with user 'myuser' and password 'temporal'
+     *      When I run 'ls -la /tmp' in the ssh connection and save the value in environment variable 'DEFEXSTAT'
+     *      Then '!{DEFEXSTAT}' contains 'total'
+     * }
+     * @see #openSSHConnection(String, String, String, String, String, String)
+     * @see UtilsGSpec#checkValue(String, String, String)
+     * @see <a href="https://www.gnu.org/software/bash/manual/html_node/Exit-Status.html">Exit status</a>
      * @param command    command to be run locally
      * @param foo        regex needed to match method
      * @param exitStatus command exit status
