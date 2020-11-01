@@ -155,6 +155,7 @@ public class SshGSpec extends BaseGSpec {
      *      Given I run 'ls /tmp | wc -l' locally and save the value in environment variable 'WORDCOUNT'
      *      Then '!{WORDCOUNT}' is '14'
      * }
+     * </pre>
      * @see UtilsGSpec#checkValue(String, String, String)
      * @see <a href="https://www.gnu.org/software/bash/manual/html_node/Exit-Status.html">Exit status</a>
      * @param command    command to be run locally
@@ -202,6 +203,7 @@ public class SshGSpec extends BaseGSpec {
      *      When I run 'ls -la /tmp' in the ssh connection and save the value in environment variable 'DEFEXSTAT'
      *      Then '!{DEFEXSTAT}' contains 'total'
      * }
+     * </pre>
      * @see #openSSHConnection(String, String, String, String, String, String)
      * @see UtilsGSpec#checkValue(String, String, String)
      * @see <a href="https://www.gnu.org/software/bash/manual/html_node/Exit-Status.html">Exit status</a>
@@ -270,7 +272,16 @@ public class SshGSpec extends BaseGSpec {
 
     /**
      * Check the existence of a text at a command output
-     *
+     * <p>
+     * Verifies that the result of a previously executed command contains the given text.
+     * <pre>
+     * Example: Check if the result of the command contains the string '2'
+     * {@code
+     *      Given I run 'wc -l testOutput.txt' locally
+     *      Then the command output contains '2'
+     * }
+     * </pre>
+     * @see #executeLocalCommand(String, Integer, String)
      * @param search        Text to search
      * @throws Exception    Exception
      **/
@@ -281,7 +292,16 @@ public class SshGSpec extends BaseGSpec {
 
     /**
      * Check the non existence of a text at a command output
-     *
+     * <p>
+     * Verifies that the result of a previously executed command does not contains the given text.
+     * <pre>
+     * Example: Check if the result of the command does not contains the string '2'
+     * {@code
+     *      Given I run 'wc -l testOutput.txt' locally
+     *      Then the command output does not contains '2'
+     * }
+     * </pre>
+     * @see #executeLocalCommand(String, Integer, String)
      * @param search    Text to search
      * @throws Exception    Exception
      **/
