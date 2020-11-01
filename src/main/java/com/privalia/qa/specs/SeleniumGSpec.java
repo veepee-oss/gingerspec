@@ -50,11 +50,17 @@ public class SeleniumGSpec extends BaseGSpec {
      * <p>
      * This is an initialization step. This is used as the first step in Selenium features to configure
      * the basepath url. This step does not directly take the user to the given url, just sets the base url that
-     * is later used in {@link #seleniumBrowse(String, String)}. You can also check {@link #iGoToUrl(String)}
+     * is later used in {@link #seleniumBrowse(String, String)}. Notice that is not necessary to specify http://
+     * or https://, this is automatically inferred when using {@link #seleniumBrowse(String, String)}, check this step
+     * for more concrete examples.
+     * <br>
+     * You can also consider using {@link #iGoToUrl(String)} instead. This step just navigates the user to the given full
+     * URL and can be easier to read in the gherkin files
      * <pre>
      * Example:
      * {@code
-     *      Given My app is running in 'demoqa.com:80'
+     *      Given My app is running in 'demoqa.com:80'  //Sets the base path
+     *      When I browse to '/login'                   //will navigate to http://demoqa.com:80/login
      * }
      * </pre>
      * @see #seleniumBrowse(String, String)
@@ -126,16 +132,21 @@ public class SeleniumGSpec extends BaseGSpec {
     /**
      * Checks that a web elements exists in the page and if it is of the type specified in the given time interval.
      * <p>
+     * Elements found are internally stored to be used in subsequent steps in the same scenario.
      * This method is similar to {@link SeleniumGSpec#assertSeleniumNElementExists(String, Integer, String, String)} <br>
      * but implements a pooling mechanism with a maximum pooling time instead of a static wait
      *
      * <pre>
      * Example:
      * {@code
-     *      Then in less than '10' seconds, checking each '1' seconds, '1' elements exists with 'id:name_3_firstname'
+     *      Given I go to 'http://mydummysite.com/login'
+     *      Then I check every '1' seconds for at least '10' seconds until '1' elements exists with 'id:loginbutton' and is 'clickable'
+     *      And I click on the element on index '0'
      * }
      * </pre>
+     * @see #seleniumBrowse(String, String)
      * @see #assertSeleniumNElementExists(String, Integer, String, String)
+     * @see #seleniumClick(Integer)
      * @param poolingInterval Time between consecutive condition evaluations
      * @param poolMaxTime     Maximum time to wait for the condition to be true
      * @param elementsCount   integer. Expected number of elements.
@@ -427,6 +438,7 @@ public class SeleniumGSpec extends BaseGSpec {
      * }
      * </pre>
      *
+     * @see #waitWebElementWithPooling(int, int, int, String, String, String)
      * @see #seleniumClick(Integer)
      * @param atLeast       asserts that the amount of elements if greater or equal to expectedCount. If null, asserts the amount of element is equal to expectedCount
      * @param expectedCount the expected count of elements to find
@@ -465,7 +477,10 @@ public class SeleniumGSpec extends BaseGSpec {
      *      And I click on the element on index '0'
      * }
      * </pre>
-     * @see #waitAlertWithPooling(int, int)
+     *
+     * @deprecated use {@link #waitWebElementWithPooling(int, int, int, String, String, String)} instead.
+     * @see #waitWebElementWithPooling(int, int, int, String, String, String)
+     * @see #assertSeleniumNElementExists(String, Integer, String, String)
      * @see #seleniumClick(Integer)
      * @param timeout                   The max time to wait for the condition to be true
      * @param wait                      Interval between verification
