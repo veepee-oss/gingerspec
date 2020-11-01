@@ -57,8 +57,8 @@ public class SshGSpec extends BaseGSpec {
      * }
      * </pre>
      *
-     * @see #executeCommand(String, String, Integer, String, String) 
-     * @see UtilsGSpec#checkValue(String, String, String) 
+     * @see #executeCommand(String, String, Integer, String, String)
+     * @see UtilsGSpec#checkValue(String, String, String)
      * @param remoteHost remote host
      * @param user       remote user
      * @param foo        the foo
