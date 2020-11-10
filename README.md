@@ -27,7 +27,7 @@ GingerSpec provides common functionality that can be reused by different test pr
 
 ## Documentation
 * [Project wiki](https://github.com/PrivaliaTech/gingerspec/wiki)
-* [Javadoc](https://privaliatech.github.io/gingerspec/)  
+* [Javadoc](https://vptechoss.github.io/gingerspec/)  
 
 ### Requirements
 * Java 8+
