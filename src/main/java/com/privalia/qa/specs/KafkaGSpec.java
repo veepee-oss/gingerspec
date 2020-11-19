@@ -46,13 +46,13 @@ public class KafkaGSpec extends BaseGSpec {
      *      Given I connect to kafka at 'localhost:2181'
      * }
      * </pre>
-     * @see #iCloseTheConnectionToKafka()
+     * @see #disconnectFromKafka()
      * @param zkHost ZK host
      * @param zkPath ZK port
      * @throws UnknownHostException exception
      */
     @Given("^I connect to kafka at '(.+?)'( using path '(.+?)')?$")
-    public void connectKafka(String zkHost, String zkPath) throws UnknownHostException {
+    public void connectToKafka(String zkHost, String zkPath) throws UnknownHostException {
         String zkPort = zkHost.split(":")[1];
         zkHost = zkHost.split(":")[0];
         commonspec.getKafkaUtils().setZkHost(zkHost, zkPort, zkPath);
@@ -76,13 +76,15 @@ public class KafkaGSpec extends BaseGSpec {
      * }
      * </pre>
      *
-     * @see #deleteKafkaTopic(String)
+     * @see #deleteTopic(String)
+     * @see #assertTopicExists(String)
+     * @see #modifyTopicPartitions(int, String)
      * @param topic_name topic name
      * @param ifExists   String fro matching optional text in Gherkin
      * @throws Exception Exception
      */
     @When("^I create a Kafka topic named '(.+?)'( if it doesn't exists)?")
-    public void createKafkaTopic(String topic_name, String ifExists) throws Exception {
+    public void createTopic(String topic_name, String ifExists) throws Exception {
         if (ifExists != null) {
             commonspec.getLogger().debug("Checking if topic " + topic_name + " exists before creation");
             List<String> topics = this.commonspec.getKafkaUtils().listTopics();
@@ -104,12 +106,14 @@ public class KafkaGSpec extends BaseGSpec {
      * }
      * </pre>
      *
-     * @see #createKafkaTopic(String, String)
+     * @see #createTopic(String, String)
+     * @see #assertTopicExists(String)
+     * @see #modifyTopicPartitions(int, String)
      * @param topic_name topic name
      * @throws Exception Exception
      */
     @When("^I delete a Kafka topic named '(.+?)'")
-    public void deleteKafkaTopic(String topic_name) throws Exception {
+    public void deleteTopic(String topic_name) throws Exception {
         commonspec.getKafkaUtils().deleteTopic(topic_name);
     }
 
@@ -126,12 +130,15 @@ public class KafkaGSpec extends BaseGSpec {
      * }
      * </pre>
      *
+     * @see #deleteTopic(String)
+     * @see #createTopic(String, String)
+     * @see #modifyTopicPartitions(int, String)
      * @param numPartitions number of partitions to add to the current amount of partitions for the topic
      * @param topic_name    topic name
      * @throws Exception Exception
      */
     @When("^I increase '(.+?)' partitions in a Kafka topic named '(.+?)'")
-    public void modifyPartitions(int numPartitions, String topic_name) throws Exception {
+    public void modifyTopicPartitions(int numPartitions, String topic_name) throws Exception {
         int currentPartitions = commonspec.getKafkaUtils().getPartitions(topic_name);
         commonspec.getKafkaUtils().modifyTopicPartitioning(topic_name, currentPartitions + numPartitions);
         assertThat(commonspec.getKafkaUtils().getPartitions(topic_name)).as("Number of partitions is not the expected after operation").isEqualTo(currentPartitions + numPartitions);
@@ -161,7 +168,8 @@ public class KafkaGSpec extends BaseGSpec {
      * }
      * </pre>
      *
-     * @see #sendAMessageWithDatatable(String, String, String, DataTable)
+     * @see #sendMessageToTopicWithProperties(String, String, String, DataTable)
+     * @see #sendAvroMessageToTopicWithProperties(String, String, String, DataTable)
      * @param message    string that you send to topic
      * @param topic_name topic name
      * @param recordKey  the record key
@@ -169,7 +177,7 @@ public class KafkaGSpec extends BaseGSpec {
      * @throws Exception Exception
      */
     @When("^I send a message '(.+?)' to the kafka topic named '(.+?)'( with key '(.+?)')?( if not exists)?$")
-    public void sendAMessage(String message, String topic_name, String recordKey, String ifExists) throws Exception {
+    public void sendMessageToTopic(String message, String topic_name, String recordKey, String ifExists) throws Exception {
         if (ifExists != null) {
             Map<Object, Object> result = commonspec.getKafkaUtils().readTopicFromBeginning(topic_name);
             if (result.containsKey(recordKey)) {
@@ -187,7 +195,7 @@ public class KafkaGSpec extends BaseGSpec {
     /**
      * Sends a message to a Kafka topic with properties.
      * <p>
-     * Similar to the {@link #sendAMessage(String, String, String, String)} step, but gives the possibility to override
+     * Similar to the {@link #sendMessageToTopic(String, String, String, String)} step, but gives the possibility to override
      * the properties of the producer before sending a message. For example, the properties of the producer can be altered
      * to change the default serializer for key/value before sending. In this case, for the key.serializer property the
      * value should be "org.apache.kafka.common.serialization.StringSerializer" and for the value.serializer the value
@@ -214,7 +222,8 @@ public class KafkaGSpec extends BaseGSpec {
      * - client.id (defaults to KafkaQAProducer)
      * </pre>
      *
-     * @see #sendAMessage(String, String, String, String)
+     * @see #sendMessageToTopic(String, String, String, String)
+     * @see #sendAvroMessageToTopicWithProperties(String, String, String, DataTable)
      * @param message    Message to send (will be converted to the proper type specified by the value.serializer prop). String is default
      * @param topic_name Name of the topic where to send the message
      * @param recordKey  Key of the kafka record
@@ -224,7 +233,7 @@ public class KafkaGSpec extends BaseGSpec {
      * @throws TimeoutException     TimeoutException
      */
     @Given("I send a message '(.+?)' to the kafka topic named '(.+?)'( with key '(.+?)')? with:$")
-    public void sendAMessageWithDatatable(String message, String topic_name, String recordKey, DataTable table) throws InterruptedException, ExecutionException, TimeoutException {
+    public void sendMessageToTopicWithProperties(String message, String topic_name, String recordKey, DataTable table) throws InterruptedException, ExecutionException, TimeoutException {
 
         for (List<String> row : table.asLists()) {
             String key = row.get(0);
@@ -245,20 +254,23 @@ public class KafkaGSpec extends BaseGSpec {
      * }
      * </pre>
      *
-     * @see #createKafkaTopic(String, String)
-     * @see #deleteKafkaTopic(String)
+     * @see #createTopic(String, String)
+     * @see #deleteTopic(String)
+     * @see #modifyTopicPartitions(int, String)
+     * @see #assertTopicExists(String)
      * @param topic_name name of topic
      * @throws KeeperException      KeeperException
      * @throws InterruptedException InterruptedException
      */
     @Then("^A kafka topic named '(.+?)' does not exist")
-    public void kafkaTopicNotExist(String topic_name) throws KeeperException, InterruptedException {
+    public void assertTopicDoesntExist(String topic_name) throws KeeperException, InterruptedException {
         assert !commonspec.getKafkaUtils().getZkUtils().pathExists("/" + topic_name) : "There is a topic with that name";
     }
 
     /**
      * Check that the number of partitions is the expected for the given topic.
      *
+     * @see #modifyTopicPartitions(int, String)
      * @param topic_name      Name of kafka topic
      * @param numOfPartitions Number of partitions
      * @throws Exception Exception
@@ -290,16 +302,16 @@ public class KafkaGSpec extends BaseGSpec {
      * }
      * </pre>
      *
-     * @see #theKafkaTopicStringTopicHasAMessageContainingHelloWith(String, String, String, DataTable)
-     * @see #theKafkaTopicAvroTopicHasAnAvroMessageRecordWith(String, String, DataTable)
-     * @see #theKafkaTopicHasAnAvroMessageWith(String, String, int, DataTable)
+     * @see #assertTopicContainsMessageWithProperties(String, String, String, DataTable)
+     * @see #assertTopicContainsAvroMessageWithProperties(String, String, DataTable)
+     * @see #assertTopicContainsPartialAvroMessageWithProperties(String, String, int, DataTable)
      * @param topic   Topic to poll
      * @param content Value to look for (as String)
      * @param key     key of the record
      * @throws InterruptedException InterruptedException
      */
     @Then("^The kafka topic '(.*?)' has a message containing '(.*?)'( as key)?$")
-    public void checkMessages(String topic, String content, String key) throws InterruptedException {
+    public void assertTopicContainsMessage(String topic, String content, String key) throws InterruptedException {
         if (key != null) {
             assertThat(commonspec.getKafkaUtils().readTopicFromBeginning(topic).containsKey(content)).as("Topic does not exist or the content does not match").isTrue();
         } else {
@@ -317,15 +329,16 @@ public class KafkaGSpec extends BaseGSpec {
      * }
      * </pre>
      *
-     * @see #createKafkaTopic(String, String)
-     * @see #deleteKafkaTopic(String)
-     * @see #kafkaTopicNotExist(String)
+     * @see #createTopic(String, String)
+     * @see #deleteTopic(String)
+     * @see #assertTopicDoesntExist(String)
+     * @see #modifyTopicPartitions(int, String)
      * @param topic_name name of topic
      * @throws KeeperException      KeeperException
      * @throws InterruptedException InterruptedException
      */
     @Then("^A kafka topic named '(.+?)' exists")
-    public void kafkaTopicExist(String topic_name) throws KeeperException, InterruptedException {
+    public void assertTopicExists(String topic_name) throws KeeperException, InterruptedException {
         List<String> topics = this.commonspec.getKafkaUtils().listTopics();
         assertThat(topics.contains(topic_name)).as("There is no topic with that name").isTrue();
     }
@@ -344,12 +357,13 @@ public class KafkaGSpec extends BaseGSpec {
      * }
      * </pre>
      *
-     * @see #iRegisterANewVersionOfASchemaUnderTheSubject(String, String)
+     * @see #registerNewSchema(String, String)
+     * @see #createNewAvroMessageFromRegistry(String, String, String, String, DataTable)
      * @param host Remote host and port (defaults to http://0.0.0.0:8081)
      * @throws Throwable Throwable
      */
     @Given("^My schema registry is running at '(.+)'$")
-    public void mySchemaRegistryIsRunningAtLocalhost(String host) throws Throwable {
+    public void setSchemaRegistryURL(String host) throws Throwable {
         commonspec.getKafkaUtils().setSchemaRegistryUrl("http://" + host);
         commonspec.getKafkaUtils().modifyProducerProperties("schema.registry.url", "http://" + host);
     }
@@ -379,12 +393,14 @@ public class KafkaGSpec extends BaseGSpec {
      * }
      * </pre>
      *
+     * @see #setSchemaRegistryURL(String)
+     * @see #createNewAvroMessageFromRegistry(String, String, String, String, DataTable)
      * @param subjectName Name of the subject where register the new schema
      * @param filepath    Path of the file containing the schema
      * @throws Throwable Throwable
      */
     @Then("^I register a new version of a schema under the subject '(.+)' with '(.+)'$")
-    public void iRegisterANewVersionOfASchemaUnderTheSubject(String subjectName, String filepath) throws Throwable {
+    public void registerNewSchema(String subjectName, String filepath) throws Throwable {
 
         String retrievedData = commonspec.retrieveData(filepath, "json");
         Response response = commonspec.getKafkaUtils().registerNewSchema(subjectName, retrievedData);
@@ -424,9 +440,9 @@ public class KafkaGSpec extends BaseGSpec {
      *
      * </pre>
      *
-     * @see #checkMessages(String, String, String)
-     * @see #theKafkaTopicHasAnAvroMessageWith(String, String, int, DataTable)
-     * @see #theKafkaTopicAvroTopicHasAnAvroMessageRecordWith(String, String, DataTable)
+     * @see #assertTopicContainsMessage(String, String, String)
+     * @see #assertTopicContainsPartialAvroMessageWithProperties(String, String, int, DataTable)
+     * @see #assertTopicContainsAvroMessageWithProperties(String, String, DataTable)
      * @param topicName Name of the topic where to send the message
      * @param message   Message to send (will be converted to the correct type according to the value.deserializer property)
      * @param isKey     the is key
@@ -434,7 +450,7 @@ public class KafkaGSpec extends BaseGSpec {
      * @throws Throwable Throwable
      */
     @Then("^The kafka topic '(.+?)' has a message containing '(.+?)'( as key)? with:$")
-    public void theKafkaTopicStringTopicHasAMessageContainingHelloWith(String topicName, String message, String isKey, DataTable dataTable) throws Throwable {
+    public void assertTopicContainsMessageWithProperties(String topicName, String message, String isKey, DataTable dataTable) throws Throwable {
 
         for (List<String> row : dataTable.asLists()) {
             String key = row.get(0);
@@ -494,8 +510,8 @@ public class KafkaGSpec extends BaseGSpec {
      * to insert an string for "int1" will generate an error
      * </pre>
      *
-     * @see #iSendTheAvroRecordRecordToTheKafkaTopic(String, String, String, DataTable)
-     * @see #iCreateTheAvroRecordRecordUsingVersionOfSubjectRecordFromRegistryWith(String, String, String, String, DataTable)
+     * @see #sendAvroMessageToTopicWithProperties(String, String, String, DataTable)
+     * @see #createNewAvroMessageFromRegistry(String, String, String, String, DataTable)
      * @param recordName Name of the Avro generic record
      * @param schemaFile File containing the schema of the message
      * @param seedFile   the seed file
@@ -503,7 +519,7 @@ public class KafkaGSpec extends BaseGSpec {
      * @throws Throwable Throwable
      */
     @Then("^I create the avro record '(.+?)' from the schema in '(.+?)'( based on '(.+?)')? with:$")
-    public void iCreateTheAvroRecordRecord(String recordName, String schemaFile, String seedFile, DataTable table) throws Throwable {
+    public void createNewAvroMessage(String recordName, String schemaFile, String seedFile, DataTable table) throws Throwable {
 
         String schemaString = commonspec.retrieveData(schemaFile, "json");
         this.createRecord(recordName, schemaString, seedFile, table);
@@ -521,7 +537,7 @@ public class KafkaGSpec extends BaseGSpec {
      * @throws Throwable Throwable
      */
     @Then("^I create the avro record '(.+?)' using version '(.+?)' of subject '(.+?)' from registry( based on '(.+?)')? with:$")
-    public void iCreateTheAvroRecordRecordUsingVersionOfSubjectRecordFromRegistryWith(String recordName, String versionNumber, String subject, String seedFile, DataTable table) throws Throwable {
+    public void createNewAvroMessageFromRegistry(String recordName, String versionNumber, String subject, String seedFile, DataTable table) throws Throwable {
 
         String schema = this.commonspec.getKafkaUtils().getSchemaFromRegistry(subject, versionNumber);
         this.createRecord(recordName, schema, seedFile, table);
@@ -578,7 +594,8 @@ public class KafkaGSpec extends BaseGSpec {
      * }
      * </pre>
      *
-     * @see #iCreateTheAvroRecordRecord(String, String, String, DataTable)
+     * @see #createNewAvroMessage(String, String, String, DataTable)
+     * @see #createNewAvroMessageFromRegistry(String, String, String, String, DataTable)
      * @param genericRecord Name of the record to send
      * @param topicName     Topic where to send the record
      * @param recordKey     Record key
@@ -586,7 +603,7 @@ public class KafkaGSpec extends BaseGSpec {
      * @throws Throwable Throwable
      */
     @When("^I send the avro record '(.+?)' to the kafka topic '(.+?)'( with key '(.+?)')? with:$")
-    public void iSendTheAvroRecordRecordToTheKafkaTopic(String genericRecord, String topicName, String recordKey, DataTable table) throws Throwable {
+    public void sendAvroMessageToTopicWithProperties(String genericRecord, String topicName, String recordKey, DataTable table) throws Throwable {
 
         for (List<String> row : table.asLists()) {
             String key = row.get(0);
@@ -616,15 +633,16 @@ public class KafkaGSpec extends BaseGSpec {
      * }
      * </pre>
      *
-     * @see #iCreateTheAvroRecordRecord(String, String, String, DataTable)
-     * @see #iSendTheAvroRecordRecordToTheKafkaTopic(String, String, String, DataTable)
+     * @see #createNewAvroMessage(String, String, String, DataTable)
+     * @see #createNewAvroMessageFromRegistry(String, String, String, String, DataTable)
+     * @see #sendAvroMessageToTopicWithProperties(String, String, String, DataTable)
      * @param topicName  Topic to read from
      * @param avroRecord Name of the record to read
      * @param dataTable  Table containing modifications for the consumer properties
      * @throws Throwable Throwable
      */
     @Then("^The kafka topic '(.+?)' has an avro message '(.+?)' with:$")
-    public void theKafkaTopicAvroTopicHasAnAvroMessageRecordWith(String topicName, String avroRecord, DataTable dataTable) throws Throwable {
+    public void assertTopicContainsAvroMessageWithProperties(String topicName, String avroRecord, DataTable dataTable) throws Throwable {
 
         for (List<String> row : dataTable.asLists()) {
             String key = row.get(0);
@@ -637,7 +655,7 @@ public class KafkaGSpec extends BaseGSpec {
         commonspec.getKafkaUtils().modifyConsumerProperties("schema.registry.url", this.getCommonSpec().getKafkaUtils().getSchemaRegistryUrl());
 
 
-        this.kafkaTopicExist(topicName);
+        this.assertTopicExists(topicName);
         Map<Object, Object> results = commonspec.getKafkaUtils().readTopicFromBeginning(topicName);
         this.commonspec.getLogger().debug("Found " + results.size() + "records in topic " + topicName);
         assertThat(results.containsValue(commonspec.getKafkaUtils().getAvroRecords().get(avroRecord))).as("Topic does not contain message that matches the specified record").isTrue();
@@ -659,11 +677,11 @@ public class KafkaGSpec extends BaseGSpec {
      *          | bootstrap.servers  | srdc1kafkassl5.privalia.pin:9092,srdc1kafkassl9.privalia.pin:9092,srdc1kafkassl10.privalia.pin:9092 |
      * }
      * </pre>
-     * @see #iConfigureProducerProperties(DataTable)
+     * @see #configureProducerProperties(DataTable)
      * @param dataTable table with consumer properties
      */
     @Then("^I configure the kafka consumers with:$")
-    public void iConfigureConsumerProperties(DataTable dataTable) {
+    public void configureConsumerProperties(DataTable dataTable) {
 
         for (List<String> row : dataTable.asLists()) {
             String key = row.get(0);
@@ -691,11 +709,11 @@ public class KafkaGSpec extends BaseGSpec {
      * }
      * </pre>
      *
-     * @see #iConfigureConsumerProperties(DataTable)
+     * @see #configureConsumerProperties(DataTable)
      * @param dataTable table with consumer properties
      */
     @Then("^I configure the kafka producer with:$")
-    public void iConfigureProducerProperties(DataTable dataTable) {
+    public void configureProducerProperties(DataTable dataTable) {
 
         for (List<String> row : dataTable.asLists()) {
             String key = row.get(0);
@@ -709,10 +727,18 @@ public class KafkaGSpec extends BaseGSpec {
     /**
      * Close the connection to kafka.
      *
+     * <pre>
+     * Example:
+     * {@code
+     *      Then I close the connection to kafka
+     * }
+     * </pre>
+     *
+     * @see #connectToKafka(String, String)
      * @throws Throwable the throwable
      */
     @Then("^I close the connection to kafka$")
-    public void iCloseTheConnectionToKafka() throws Throwable {
+    public void disconnectFromKafka() throws Throwable {
 
         this.getCommonSpec().getLogger().debug("Closing connection to kafka..");
         if (this.getCommonSpec().getKafkaUtils().getZkUtils() != null) {
@@ -732,6 +758,7 @@ public class KafkaGSpec extends BaseGSpec {
      * }
      * </pre>
      *
+     * @see #assertTopicContainsAvroMessageWithProperties(String, String, DataTable)
      * @param topicName     Name of the topic to read messages from
      * @param atLeast       Indicates to find at least the expectedCount. If ignored, asserts the exact quantity is found
      * @param expectedCount Expected amount of records to find that match the given conditions
@@ -739,12 +766,12 @@ public class KafkaGSpec extends BaseGSpec {
      * @throws Throwable    the throwable
      */
     @And("^The kafka topic '(.+?)' has( at least)? '(.+?)' an avro message with:$")
-    public void theKafkaTopicHasAnAvroMessageWith(String topicName, String atLeast, int expectedCount, DataTable datatable) throws Throwable {
+    public void assertTopicContainsPartialAvroMessageWithProperties(String topicName, String atLeast, int expectedCount, DataTable datatable) throws Throwable {
 
         commonspec.getKafkaUtils().modifyConsumerProperties("value.deserializer", "io.confluent.kafka.serializers.KafkaAvroDeserializer");
         assertThat(this.getCommonSpec().getKafkaUtils().getSchemaRegistryUrl()).as("Could not build avro consumer since no schema registry was defined").isNotNull();
         commonspec.getKafkaUtils().modifyConsumerProperties("schema.registry.url", this.getCommonSpec().getKafkaUtils().getSchemaRegistryUrl());
-        this.kafkaTopicExist(topicName);
+        this.assertTopicExists(topicName);
 
         Map<Object, Object> results = commonspec.getKafkaUtils().readTopicFromBeginning(topicName);
 
