@@ -53,6 +53,19 @@ public class UtilsGSpec extends BaseGSpec {
 
     /**
      * Wait seconds.
+     * <p>
+     * Static wait used to halt the execution of the feature for a given amount of seconds. After the time completes,
+     * the remaining steps in the feature are executed. This step is commonly used to wait for a background operation to complete,
+     * so next steps wont return false negatives. This step completely halts the operation of the feature for the given time and
+     * could reduce performance (increase the feature execution time) if used too frequently or if the time used is unnecessarily
+     * large. Try to use a reasonable time in your tests, or in the case of cucumber related scenarios, there is a much better
+     * alternative to the static wait: {@link SeleniumGSpec#waitWebElementWithPooling(int, int, int, String, String, String)}
+     *
+     * <pre>
+     * {@code
+     *      When I wait '10' seconds
+     * }
+     * </pre>
      *
      * @param seconds                   Seconds to wait
      * @throws InterruptedException     InterruptedException
@@ -205,8 +218,23 @@ public class UtilsGSpec extends BaseGSpec {
 
 
     /**
-     * Create a JSON in resources directory with given name, so for using it you've to reference it as:
-     * $(pwd)/target/test-classes/fileName
+     * Create a file from seed.
+     * <p>
+     * Creates a JSON file in the /target/test-classes directory of the project with the specified name.
+     * This file can later be referenced using $(pwd)/target/test-classes/fileName. This steps receives a
+     * datatable with a list of all modifications to be performed in the seed file (ADD, REPLACE, APPEND,
+     * ADDTO, etc)
+     * <p>
+     * You can specify a seed file that uses the contents of another file to create a single merged file with ADDTO. For example
+     * <pre>
+     * {@code
+     *      Given I create file 'testCreateFilePlain.json' based on 'schemas/testCreateFile.json' as 'json' with:
+     *          | $.key2 | ADDTO | @{FILE.schemas/testCreateFileReplacePlainText.json} | string |
+     * }
+     * </pre>
+     * Will create a file with name testCreateFilePlain under /target/test-classes, using'schemas/testCreateFile.json' as template,
+     * changing the value $.key2 with the contents of schemas/testCreateFileReplacePlainText.json as string
+     *
      *
      * @param fileName      name of the JSON file to be created
      * @param baseData      path to file containing the schema to be used
@@ -279,8 +307,27 @@ public class UtilsGSpec extends BaseGSpec {
     }
 
     /**
+     * Saves file in variable with modifications.
+     * <p>
      * Read the file passed as parameter, perform the modifications specified and save the result in the environment
      * variable passed as parameter.
+     * <p>
+     * Using a json file and updating its contents
+     * <pre>
+     * {@code
+     *      Given I read file 'schemas/testCreateFile.json' as 'json' and save it in environment variable 'myjson' with:
+     *          | $.key1 | UPDATE | new_value     | n/a   |
+     *          | $.key2 | ADDTO  | ["new_value"] | array |
+     * }
+     * </pre>
+     * Reading a plain text file and editin its contents
+     * <pre>
+     * {@code
+     *       Given I read file 'schemas/krb5.conf' as 'string' and save it in environment variable 'mystring' with:
+     *          | foo | REPLACE | bar | n/a |
+     * }
+     * </pre>
+     *
      * @param baseData      file to read
      * @param type          whether the info in the file is a 'json' or a simple 'string'
      * @param envVar        name of the variable where to store the result
@@ -301,8 +348,18 @@ public class UtilsGSpec extends BaseGSpec {
     }
 
     /**
-     * Read the file passed as parameter and save the result in the environment
-     * variable passed as parameter.
+     * Saves file in variable.
+     * <p>
+     * Read the file passed as parameter and save the result in the environment variable passed as parameter. Unlike the previous
+     * example, if no modifications are necessary in the file, there is no need to specify a datatable with modifications.
+     * <p>
+     * Example
+     * <pre>
+     * {@code
+     *      Given I read file 'schemas/testCreateFile.json' as 'json' and save it in environment variable 'myjson'
+     * }
+     * </pre>
+     *
      * @param baseData      file to read
      * @param type          whether the info in the file is a 'json' or a simple 'string'
      * @param envVar        name of the variable where to store the result
@@ -320,6 +377,31 @@ public class UtilsGSpec extends BaseGSpec {
 
     /**
      * Checks if an exception has been thrown.
+     * <p>
+     * Checks if an exception is/is not thrown during the execution of the previous step. It can also check the exception
+     * class and the message of the exception
+     * <p>
+     * Example: Checking if any exception is thrown
+     * <pre>
+     * {@code
+     *      When I execute a jdbc select 'SELECT count(*) FROM crossdataTables''
+     *      Then an exception 'IS NOT' thrown
+     * }
+     * </pre>
+     * Example: Checking if not exception is thrown
+     * <pre>
+     * {@code
+     *      Given I execute 'CREATE TABLE newCatalog.newTable'
+     *      Then an exception 'IS' thrown
+     * }
+     * </pre>
+     * Example: Checking if a particular exception is thrown
+     * <pre>
+     * {@code
+     *      When I delete the stream 'testStreamACK0'
+     *      Then an exception 'IS' thrown with class 'PrivaliaEngineConnectionException' and message like 'Acknowledge timeout expired'
+     * }
+     * </pre>
      *
      * @param exception                 : "IS NOT" | "IS"
      * @param foo                       parameter generated by cucumber because of the optional expression
