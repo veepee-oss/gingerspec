@@ -1,7 +1,5 @@
 @ignore @toocomplex
-Feature: Simple run test
-
-  Example on how to execute commands in the system shell
+Feature: Example on how to execute commands in the system shell
 
   Background: Connect to bootstrap machine
     Given I open a ssh connection to '${SSH}' with user 'root' and password 'temporal'

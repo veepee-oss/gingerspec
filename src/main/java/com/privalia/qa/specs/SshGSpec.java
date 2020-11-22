@@ -89,6 +89,7 @@ public class SshGSpec extends BaseGSpec {
     /**
      * Copies file/s from remote system into local system
      * <p>
+     * Copies a file located in a remote server to a local destination via scp (secure copy) command in Linux.
      * Before using this step, you must first open a ssh connection with {@link #openSSHConnection(String, String, String, String, String, String)}
      *
      * <pre>
@@ -98,7 +99,9 @@ public class SshGSpec extends BaseGSpec {
      *      Then I inbound copy '/tmp/exampleJSON.conf' through a ssh connection to 'fileFromSsh.conf'
      * }
      * </pre>
+     *
      * @see #openSSHConnection(String, String, String, String, String, String)
+     * @see #copyToRemoteFile(String, String)
      * @param remotePath path where file is going to be copy
      * @param localPath path where file is located
      * @throws Exception exception
@@ -113,6 +116,7 @@ public class SshGSpec extends BaseGSpec {
     /**
      * Copies file/s from local system to remote system
      * <p>
+     * Copies a file located in the local machine to a remote server via scp (secure copy) command in Linux.
      * Before using this step, you must first open a ssh connection with {@link #openSSHConnection(String, String, String, String, String, String)}
      *
      * <pre>
@@ -122,7 +126,9 @@ public class SshGSpec extends BaseGSpec {
      *      Then I outbound copy 'exampleJSON.conf' through a ssh connection to '/tmp/exampleJSON.conf'
      * }
      * </pre>
+     *
      * @see #openSSHConnection(String, String, String, String, String, String)
+     * @see #copyFromRemoteFile(String, String)
      * @param localPath  path where file is located
      * @param remotePath path where file is going to be copy
      * @throws Exception exception
@@ -136,9 +142,9 @@ public class SshGSpec extends BaseGSpec {
     /**
      * Executes the command specified in the local system
      * <p>
-     * Executes the given command in the local system. Unless specified, this step specs the returned exit status
+     * Executes the given command in the local system. Unless specified, this step expects the returned exit status
      * of the executed command to be zero (more info <a href="https://www.gnu.org/software/bash/manual/html_node/Exit-Status.html">here</a>),
-     * however, you can also specify any exit code you like. This steps also provides the possibility of saving the returned
+     * however, you can also specify any exit code you like. This step also provides the possibility of saving the returned
      * response into a variable and use it in the following steps
      *
      * <pre>
@@ -181,9 +187,9 @@ public class SshGSpec extends BaseGSpec {
      * <p>
      * Executes the given command in the ssh connection. For this step to work, you must first connect to a remote server
      * by ssh using the step {@link #openSSHConnection(String, String, String, String, String, String)}. Unless specified,
-     * this step specs the returned exit status of the executed command to be zero
+     * this step expects the returned exit status of the executed command to be zero.
      * (more info <a href="https://www.gnu.org/software/bash/manual/html_node/Exit-Status.html">here</a>), however, you can
-     * also specify any exit code you like. This steps also provides the possibility of saving the returned response into a
+     * also specify any exit code you like. This step also provides the possibility of saving the returned response into a
      * variable and use it in the following steps
      *
      * <pre>
@@ -231,14 +237,26 @@ public class SshGSpec extends BaseGSpec {
 
 
     /**
-     * Checks if {@code expectedCount} element is found, whithin a {@code timeout} and with a location
-     * {@code method}. Each negative lookup is followed by a wait of {@code wait} seconds. Selenium times are not
-     * accounted for the mentioned timeout.
+     * Validates command output with timeout
+     * <p>
+     * This step executes a shell command periodically on a remote ssh connection and evaluates the command output for a
+     * given string. The control flow of the feature continue if the string is found before the maximun amount of time
+     * (in seconds), otherwise, the feature fails. An ssh connection needs to be established for this step to work
+     * <p>
+     * For example, to check every 2 seconds, for a maximum of 20 seconds if the file "text.txt" exists in the remote server
      *
-     * @param timeout the max timeto wait
+     * <pre>
+     * {@code
+     *      Given I open a ssh connection to 'my-remote-server-address' with user 'root' and password '1234'
+     *      Then in less than '20' seconds, checking each '2' seconds, the command output 'ls' contains 'test.txt'
+     * }
+     * </pre>
+     *
+     * @see #openSSHConnection(String, String, String, String, String, String)
+     * @param timeout the max time to wait
      * @param wait    checking interval
-     * @param command the command
-     * @param search  text to search for
+     * @param command the command to execute
+     * @param search  text to search on the command output
      * @throws Exception exception
      */
     @Then("^in less than '(\\d+?)' seconds, checking each '(\\d+?)' seconds, the command output '(.+?)' contains '(.+?)'$")
@@ -282,6 +300,7 @@ public class SshGSpec extends BaseGSpec {
      * }
      * </pre>
      * @see #executeLocalCommand(String, Integer, String)
+     * @see #notFindShellOutput(String)
      * @param search        Text to search
      * @throws Exception    Exception
      **/
@@ -302,6 +321,7 @@ public class SshGSpec extends BaseGSpec {
      * }
      * </pre>
      * @see #executeLocalCommand(String, Integer, String)
+     * @see #findShellOutput(String)
      * @param search    Text to search
      * @throws Exception    Exception
      **/
