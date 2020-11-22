@@ -31,33 +31,66 @@ public class MobileGSpec extends BaseGSpec {
 
 
     /**
+     * Launches an application,
+     * <p>
      * Launches the app, which was provided in the capabilities at session creation,
      * and (re)starts the session.
+     * <pre>
+     * Example:
+     * {@code
+     *      Scenario: Opening an closing the app
+     *          Given I open the application
+     *          And I wait '5' seconds
+     * }
+     * </pre>
+     *
+     * @see #closeApplication()
      */
     @Given("^I open the application$")
-    public void iOpenTheApplication() {
+    public void launchApplication() {
         ((MobileDriver) this.commonspec.getDriver()).launchApp();
     }
 
 
     /**
+     * Closes an application
+     * <p>
      * Close the app which was provided in the capabilities at session creation
      * and quits the session.
+     * <pre>
+     * Example:
+     * {@code
+     *      Scenario: Opening an closing the app
+     *          Given I open the application
+     *          And I wait '5' seconds
+     *          Given I close the application
+     * }
+     * </pre>
+     * @see #launchApplication()
      */
     @Given("^I close the application$")
-    public void iCloseTheApplication() {
+    public void closeApplication() {
         ((MobileDriver) this.commonspec.getDriver()).closeApp();
     }
 
 
     /**
      * Changes the device orientation
+     * <pre>
+     * Example
+     * {@code
+     *      Scenario: Changing orientation
+     *          Given I rotate the device to 'landscape' mode
+     *          And I wait '3' seconds
+     *          Given I rotate the device to 'portrait' mode
+     * }
+     * </pre>
      *
      * @param orientation   Device orientation (portrait/landscape)
      * @throws Throwable    Throwable
      */
     @Given("^I rotate the device to '(landscape|portrait)' mode$")
-    public void iRotateTheDeviceToLandscapeMode(String orientation) throws Throwable {
+    public void rotateDevice(String orientation) throws Throwable {
 
         if (orientation.matches("landscape")) {
             ((MobileDriver) this.commonspec.getDriver()).rotate(ScreenOrientation.LANDSCAPE);
