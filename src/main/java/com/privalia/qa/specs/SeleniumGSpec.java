@@ -63,10 +63,13 @@ public class SeleniumGSpec extends BaseGSpec {
      *      When I browse to '/login'                   //will navigate to http://demoqa.com:80/login
      * }
      * </pre>
+     *
+     * @deprecated This method is deprecated, use {@link #iGoToUrl(String)} instead
      * @see #seleniumBrowse(String, String)
      * @see #iGoToUrl(String)
      * @param host host where app is running (i.e "localhost" or "localhost:443")
      */
+    @Deprecated(since = "2.1.4")
     @Given("^My app is running in '(.*)'$")
     public void setupApp(String host) {
         assertThat(host).isNotEmpty();
@@ -105,11 +108,14 @@ public class SeleniumGSpec extends BaseGSpec {
      *      Then I securely browse to '/'               //will load https://mysecuresite.com:443/
      * }
      * </pre>
+     *
+     * @deprecated This method is deprecated, use {@link #iGoToUrl(String)} instead
      * @see #setupApp(String)
      * @see #iGoToUrl(String)
      * @param isSecured If the connection should be secured
      * @param path      path of running app
      */
+    @Deprecated(since = "2.1.4")
     @Given("^I( securely)? browse to '(.*)'$")
     public void seleniumBrowse(String isSecured, String path) {
         assertThat(path).isNotEmpty();
@@ -489,6 +495,7 @@ public class SeleniumGSpec extends BaseGSpec {
      * @param element                   The web element element
      * @throws InterruptedException     The interrupted exception
      */
+    @Deprecated(since = "2.1.4")
     @Then("^in less than '(\\d+)' seconds, checking each '(\\d+)' seconds, '(\\d+)' elements exists with '(" + LOCATORS + "):(.*)'$")
     public void assertSeleniumNElementExistsOnTimeOut(Integer timeout, Integer wait, Integer expectedCount,
                                                       String method, String element) throws InterruptedException {
@@ -818,12 +825,15 @@ public class SeleniumGSpec extends BaseGSpec {
      *      And I click on the element on index '0'
      * }
      * </pre>
+     *
+     * @deprecated This method is deprecated, use {@link #seleniumClickByLocator(String, String, Integer)} instead
      * @see #assertSeleniumNElementExists(String, Integer, String, String)
      * @see #assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)
      * @see #waitWebElementWithPooling(int, int, int, String, String, String)
      * @see #seleniumClickByLocator(String, String, Integer)
      * @param index Index of the webelement in the list
      */
+    @Deprecated(since = "2.1.4")
     @When("^I click on the element on index '(\\d+)'$")
     public void seleniumClick(Integer index) {
 
@@ -848,12 +858,15 @@ public class SeleniumGSpec extends BaseGSpec {
      *      And I double click on the element on index '0'
      * }
      * </pre>
+     *
+     * @deprecated This method is deprecated, use {@link #seleniumDoubleClickByLocator(String, String, Integer)} instead
      * @see #seleniumDoubleClickByLocator(String, String, Integer)
      * @see #assertSeleniumNElementExists(String, Integer, String, String)
      * @see #assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)
      * @see #waitWebElementWithPooling(int, int, int, String, String, String)
      * @param index Index of the webelement in the list
      */
+    @Deprecated(since = "2.1.4")
     @When("^I double click on the element on index '(\\d+)'$")
     public void seleniumDoubleClick(Integer index) {
 
@@ -878,12 +891,15 @@ public class SeleniumGSpec extends BaseGSpec {
      *      And I right click on the element on index '0'
      * }
      * </pre>
+     *
+     * @deprecated This method is deprecated, use {@link #seleniumRightClickByLocator(String, String, Integer)} instead
      * @see #seleniumRightClickByLocator(String, String, Integer)
      * @see #assertSeleniumNElementExists(String, Integer, String, String)
      * @see #assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)
      * @see #waitWebElementWithPooling(int, int, int, String, String, String)
      * @param index Index of the webelement in the list
      */
+    @Deprecated(since = "2.1.4")
     @When("^I right click on the element on index '(\\d+)'$")
     public void seleniumRightClick(Integer index) {
 
@@ -945,6 +961,8 @@ public class SeleniumGSpec extends BaseGSpec {
      *      And I clear the content on text input at index '0'
      * }
      * </pre>
+     *
+     * @deprecated This method is deprecated, use {@link #seleniumTypeByLocator(String, String, String, Integer)} instead
      * @see #seleniumTypeByLocator(String, String, String, Integer)
      * @see #assertSeleniumNElementExists(String, Integer, String, String)
      * @see #assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)
@@ -952,6 +970,7 @@ public class SeleniumGSpec extends BaseGSpec {
      * @param input Text to write on the element
      * @param index Index of the webelement in the list
      */
+    @Deprecated(since = "2.1.4")
     @When("^I type '(.*)' on the element on index '(\\d+)'$")
     public void seleniumType(String input, Integer index) {
 

@@ -58,7 +58,7 @@ public class FileParserGSpec extends BaseGSpec {
      * @throws URISyntaxException   URISyntaxException
      */
     @Given("^I parse the file located at '(.+?)' using the template defined in '(.+?)'$")
-    public void iParseTheFileLocatedAtUsingTheTemplateDefinedIn(String fileToParse, String XMLDefinitionFile) throws IOException, JAXBException, URISyntaxException {
+    public void parseTemplateFile(String fileToParse, String XMLDefinitionFile) throws IOException, JAXBException, URISyntaxException {
 
         InputStream stream = getClass().getClassLoader().getResourceAsStream(fileToParse);
         Config config = new ConfigLoader().loadConfig(getClass().getClassLoader().getResource(XMLDefinitionFile).toURI().toURL());
@@ -76,7 +76,7 @@ public class FileParserGSpec extends BaseGSpec {
      * @param quantity  Expected quantity
      */
     @Then("^the result contains( at least)? '(\\d+)' records$")
-    public void theFileContainsRecords(String atLeast, int quantity) {
+    public void verifyLastResult(String atLeast, int quantity) {
 
         if (atLeast != null) {
             assertThat(this.commonspec.getLastFileParseResult().size()).as("The result is not of the size expècted").isGreaterThanOrEqualTo(quantity);
@@ -93,20 +93,20 @@ public class FileParserGSpec extends BaseGSpec {
      * @throws ParseException   Exception if the column does not contain numeric values
      */
     @And("^the total of the column '(.+?)' is '(.+?)'$")
-    public void theTotalOfTheColumnColumnaNameIs(String columnName, float expectedTotal) throws ParseException {
+    public void sumColumn(String columnName, float expectedTotal) throws ParseException {
 
         String result = this.getCommonSpec().getFileParserUtil().sumColumn(this.commonspec.getLastFileParseResult(), columnName);
         assertThat(Float.parseFloat(result)).as("The total of the column " + expectedTotal + " is not the value expected").isEqualTo(expectedTotal);
     }
 
     /**
-     * Calculates the ammount of records in the last operation where the column matches the expected value
+     * Calculates the amount of records in the last operation where the column matches the expected value
      * @param quantity      Expected amount of columns to find that match the condition
      * @param columnName    Column name to consider
      * @param expectedValue Expected value for the command
      */
     @And("^there are '(\\d+)' records with column '(.+?)' equal to '(.+?)'$")
-    public void thereAreRecordsWithColumnEqualTo(int quantity, String columnName, String expectedValue) {
+    public void assertNumberOfRecordsWithColumn(int quantity, String columnName, String expectedValue) {
 
         assertThat(this.commonspec.getFileParserUtil().elementsWhereEqual(this.commonspec.getLastFileParseResult(), columnName, expectedValue)).as("The amount of " +
                 "records with column " + columnName + "equal to " + expectedValue + " did not match the expected value").isEqualTo(quantity);
@@ -120,7 +120,7 @@ public class FileParserGSpec extends BaseGSpec {
      * @param valueExpected     valueExpected
      */
     @And("^the record at position '(\\d+)' at column '(.+?)' has the value '(.+?)'$")
-    public void theRecordAtPositionAtColumnColumnHasTheValueValue(int position, String columnName, String valueExpected) {
+    public void assertRecordValue(int position, String columnName, String valueExpected) {
 
         assertThat(this.getCommonSpec().getFileParserUtil().getValueofColumnAtPosition(this.commonspec.getLastFileParseResult(), columnName, position)).as("The record " +
                 "at position " + position + " did not have the expected value: " + valueExpected + " for column " + columnName).isEqualTo(valueExpected);
@@ -132,7 +132,7 @@ public class FileParserGSpec extends BaseGSpec {
      * @param value         Expected value
      */
     @And("^I get the first record with column '(.+?)' equal to '(.+?)'$")
-    public void iGetTheFirstRecordWithColumnXEqualToY(String columnName, String value) {
+    public void getFirstRecordWithColumn(String columnName, String value) {
 
         Map<String, String> record = this.commonspec.getFileParserUtil().getFirstRecordThatMatches(this.commonspec.getLastFileParseResult(), columnName, value);
         assertThat(record).as("No record found with columhn: " + columnName + " and value: " + value + " found in the record set").isNotNull();
@@ -145,7 +145,7 @@ public class FileParserGSpec extends BaseGSpec {
      * @throws Throwable    Throwable
      */
     @Then("^I get the record at position '(\\d+)'$")
-    public void iGetTheRecordAtPosition(int rowNUmber) throws Throwable {
+    public void getRecord(int rowNUmber) throws Throwable {
 
         Map<String, String> record = this.commonspec.getFileParserUtil().getRecordAtPosition(this.commonspec.getLastFileParseResult(), rowNUmber);
         assertThat(record).as("No record found at position: " + rowNUmber).isNotNull();
@@ -170,7 +170,7 @@ public class FileParserGSpec extends BaseGSpec {
      *                      | uptime | equal | 10:37:12 |
      */
     @And("^the selected record matches the following cases:$")
-    public void theSelectedRecordMatchesTheFollowingCases(DataTable dataTable) {
+    public void assertRecordMatchesProperties(DataTable dataTable) {
 
         assertThat(this.commonspec.getLastFileParseRecord()).as("No record was selected in a previous step").isNotNull();
 
@@ -211,7 +211,7 @@ public class FileParserGSpec extends BaseGSpec {
      *                      | status    | does not contain  | 0 |
      */
     @And("^I select all records that match the following cases:$")
-    public void iSelectAllRecordsThatMatchTheFollowingCases(DataTable dataTable) {
+    public void selectRecordsWithProperties(DataTable dataTable) {
 
         List<Map<String, String>> result = this.commonspec.getLastFileParseResult();
 
