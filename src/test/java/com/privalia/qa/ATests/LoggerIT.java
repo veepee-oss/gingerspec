@@ -22,7 +22,6 @@ import cucumber.api.CucumberOptions;
         features = {
         "src/test/resources/features/titlesReplacements.feature",
         "src/test/resources/features/logger.feature",
-        "src/test/resources/features/backgroundlogger.feature",
         "src/test/resources/features/outlineReplacements.feature"
         },
         glue = "com.privalia.qa.specs")

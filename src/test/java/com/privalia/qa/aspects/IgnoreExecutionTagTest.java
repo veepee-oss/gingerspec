@@ -22,9 +22,9 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class IgnoreTagAspectTest {
+public class IgnoreExecutionTagTest {
 
-    public IgnoreTagAspect ignoretag = new IgnoreTagAspect();
+    public executionTags ignoretag = new executionTags();
 
     @Test
     public void testJiraTicket() throws Exception {
@@ -32,9 +32,9 @@ public class IgnoreTagAspectTest {
         tagList.add(0, "@ignore");
         tagList.add(1, "@tillfixed(XXX-123)");
         String scnName = "Jira ticket ignore";
-        IgnoreTagAspect.ignoreReasons exit = IgnoreTagAspect.ignoreReasons.JIRATICKET;
+        executionTags.ignoreReasons exit = executionTags.ignoreReasons.JIRATICKET;
 
-        assertThat(exit).as("Scenario 'Jira ticket ignore' ignored because of ticket: XXX-123").isEqualTo(ignoretag.manageTags(tagList,scnName));
+        assertThat(exit).as("Scenario 'Jira ticket ignore' ignored because of ticket: XXX-123").isEqualTo(ignoretag.printIgnoreReason(tagList));
     }
 
     @Test
@@ -43,9 +43,9 @@ public class IgnoreTagAspectTest {
         tagList.add(0, "@ignore");
         tagList.add(1, "@manual");
         String scnName = "Manual ignore";
-        IgnoreTagAspect.ignoreReasons exit = IgnoreTagAspect.ignoreReasons.MANUAL;
+        executionTags.ignoreReasons exit = executionTags.ignoreReasons.MANUAL;
 
-        assertThat(exit).as("Scenario 'Manual ignore' ignored because it is marked as manual test.").isEqualTo(ignoretag.manageTags(tagList,scnName));
+        assertThat(exit).as("Scenario 'Manual ignore' ignored because it is marked as manual test.").isEqualTo(ignoretag.printIgnoreReason(tagList));
     }
 
     @Test
@@ -54,9 +54,9 @@ public class IgnoreTagAspectTest {
         tagList.add(0, "@ignore");
         tagList.add(1, "@toocomplex");
         String scnName = "Too complex ignore";
-        IgnoreTagAspect.ignoreReasons exit = IgnoreTagAspect.ignoreReasons.TOOCOMPLEX;
+        executionTags.ignoreReasons exit = executionTags.ignoreReasons.TOOCOMPLEX;
 
-        assertThat(exit).as("Scenario 'Too complex ignore' ignored because the test is too complex.").isEqualTo(ignoretag.manageTags(tagList,scnName));
+        assertThat(exit).as("Scenario 'Too complex ignore' ignored because the test is too complex.").isEqualTo(ignoretag.printIgnoreReason(tagList));
     }
 
     @Test
@@ -65,9 +65,9 @@ public class IgnoreTagAspectTest {
         tagList.add(0, "@ignore");
         tagList.add(1, "@envCondition");
         String scnName = "Condition ignore";
-        IgnoreTagAspect.ignoreReasons exit = IgnoreTagAspect.ignoreReasons.ENVCONDITION;
+        executionTags.ignoreReasons exit = executionTags.ignoreReasons.ENVCONDITION;
 
-        assertThat(exit).isEqualTo(ignoretag.manageTags(tagList,scnName));
+        assertThat(exit).isEqualTo(ignoretag.printIgnoreReason(tagList));
     }
 
     @Test
@@ -76,9 +76,9 @@ public class IgnoreTagAspectTest {
         tagList.add(0, "@ignore");
         tagList.add(1, "@unimplemented");
         String scnName = "Unimplemented ignore";
-        IgnoreTagAspect.ignoreReasons exit = IgnoreTagAspect.ignoreReasons.UNIMPLEMENTED;
+        executionTags.ignoreReasons exit = executionTags.ignoreReasons.UNIMPLEMENTED;
 
-        assertThat(exit).as("Scenario 'Unimplemented ignore' ignored because it is not yet implemented.").isEqualTo(ignoretag.manageTags(tagList,scnName));
+        assertThat(exit).as("Scenario 'Unimplemented ignore' ignored because it is not yet implemented.").isEqualTo(ignoretag.printIgnoreReason(tagList));
     }
 
     @Test
@@ -87,9 +87,9 @@ public class IgnoreTagAspectTest {
         tagList.add(0, "@ignore");
         tagList.add(1, "@hellomyfriend");
         String scnName = "Not known reason ignore";
-        IgnoreTagAspect.ignoreReasons exit = IgnoreTagAspect.ignoreReasons.NOREASON;
+        executionTags.ignoreReasons exit = executionTags.ignoreReasons.NOREASON;
 
-        assertThat(exit).as("Scenario 'test ignore in scenario' ignored because of ticket: XXX-123").isEqualTo(ignoretag.manageTags(tagList,scnName));
+        assertThat(exit).as("Scenario 'test ignore in scenario' ignored because of ticket: XXX-123").isEqualTo(ignoretag.printIgnoreReason(tagList));
     }
 
     @Test
@@ -97,8 +97,8 @@ public class IgnoreTagAspectTest {
         List<String> tagList = new ArrayList<>();
         tagList.add(0, "@hellomyfriend");
         String scnName = "Not ignored scenario";
-        IgnoreTagAspect.ignoreReasons exit = IgnoreTagAspect.ignoreReasons.NOTIGNORED;
+        executionTags.ignoreReasons exit = executionTags.ignoreReasons.NOREASON;
 
-        assertThat(exit).as("Scenario not ignored.").isEqualTo(ignoretag.manageTags(tagList,scnName));
+        assertThat(exit).as("Scenario not ignored.").isEqualTo(ignoretag.printIgnoreReason(tagList));
     }
 }

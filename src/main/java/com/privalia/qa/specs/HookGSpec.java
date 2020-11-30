@@ -38,6 +38,8 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.safari.SafariOptions;
 import org.slf4j.LoggerFactory;
+import org.testng.Assert;
+import org.testng.TestNG;
 import ru.yandex.qatools.ashot.AShot;
 import ru.yandex.qatools.ashot.Screenshot;
 import ru.yandex.qatools.ashot.shooting.ShootingStrategies;
@@ -56,6 +58,7 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 import static io.restassured.RestAssured.given;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.fail;
 
 
@@ -469,4 +472,5 @@ public class HookGSpec extends BaseGSpec {
             commonspec.getSqlClient().disconnect();
         }
     }
+
 }

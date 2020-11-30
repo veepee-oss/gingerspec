@@ -16,10 +16,14 @@
 
 package com.privalia.qa.utils;
 
+import com.privalia.qa.aspects.executionTags;
 import com.privalia.qa.cucumber.testng.CucumberOptionsImpl;
 import cucumber.api.CucumberOptions;
 import cucumber.api.testng.AbstractTestNGCucumberTests;
+import cucumber.api.testng.CucumberFeatureWrapper;
+import cucumber.api.testng.PickleEventWrapper;
 import cucumber.api.testng.TestNGCucumberRunner;
+import gherkin.pickles.PickleTag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.ITestContext;
@@ -29,6 +33,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -46,6 +51,7 @@ abstract public class BaseGTest extends AbstractTestNGCucumberTests {
 
     protected String browser = "";
 
+    private executionTags executionTags;
 
     @BeforeSuite(alwaysRun = true)
     public void beforeGSuite(ITestContext context) {
@@ -72,6 +78,28 @@ abstract public class BaseGTest extends AbstractTestNGCucumberTests {
     public void setUpClass() throws Exception {
         this.modifyCucumberOptions();
         super.setUpClass();
+    }
+
+    @Override
+    @Test(groups = "cucumber", description = "Runs Cucumber Scenarios", dataProvider = "scenarios")
+    public void runScenario(PickleEventWrapper pickleWrapper, CucumberFeatureWrapper featureWrapper) throws Throwable {
+        List<PickleTag> tags = pickleWrapper.getPickleEvent().pickle.getTags();
+        String scenarioName = pickleWrapper.getPickleEvent().pickle.getName();
+        executionTags = new executionTags(tags, scenarioName);
+
+        if (this.executionTags.shouldRun()) {
+            super.runScenario(pickleWrapper, featureWrapper);
+        }
+    }
+
+    private Boolean containsTag(List<PickleTag> tags, String tag) {
+        for (PickleTag t: tags) {
+            if (t.getName().toLowerCase().matches("@ignore")) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

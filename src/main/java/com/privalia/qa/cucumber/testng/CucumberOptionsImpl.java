@@ -13,8 +13,7 @@ import java.util.LinkedHashSet;
  * configuration parameters needed for GingerSpec:
  *
  * * Automatically adds reference of {@link com.privalia.qa.specs} to the glue
- * * Automatically adds reference of {@link com.privalia.qa.cucumber.reporter.TestNGPrettyFormatter}
- * to the plugins
+ * * Automatically adds reference of {@link com.privalia.qa.cucumber.reporter.TestNGPrettyFormatter} to the plugins
  * * Automatically include path to store TestNG reports
  *
  * @author Jose Fernandez
