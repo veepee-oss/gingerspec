@@ -17,9 +17,9 @@
 package com.privalia.qa.utils;
 
 import com.privalia.qa.cucumber.testng.CucumberOptionsImpl;
-import cucumber.api.CucumberOptions;
-import cucumber.api.testng.AbstractTestNGCucumberTests;
-import cucumber.api.testng.TestNGCucumberRunner;
+import io.cucumber.testng.AbstractTestNGCucumberTests;
+import io.cucumber.testng.CucumberOptions;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.ITestContext;
@@ -63,14 +63,22 @@ abstract public class BaseGTest extends AbstractTestNGCucumberTests {
 
     /**
      * Overrides the parent method {@link AbstractTestNGCucumberTests#setUpClass()} and executes custom
-     * code before the {@link TestNGCucumberRunner} object is created
-     *
-     * @throws Exception    Exception
+     * code before the  object is created
      */
     @Override
     @BeforeClass(alwaysRun = true)
-    public void setUpClass() throws Exception {
-        this.modifyCucumberOptions();
+    public void setUpClass() {
+        try {
+            this.modifyCucumberOptions();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        }
         super.setUpClass();
     }
 

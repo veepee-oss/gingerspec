@@ -17,7 +17,7 @@ package com.privalia.qa.ATests;
 
 
 import com.privalia.qa.utils.BaseGTest;
-import cucumber.api.CucumberOptions;
+import io.cucumber.testng.CucumberOptions;
 
 @CucumberOptions(
         features = {

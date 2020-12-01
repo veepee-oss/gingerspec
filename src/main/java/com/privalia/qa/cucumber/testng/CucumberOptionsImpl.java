@@ -1,7 +1,8 @@
 package com.privalia.qa.cucumber.testng;
 
-import cucumber.api.CucumberOptions;
-import cucumber.api.SnippetType;
+import io.cucumber.core.backend.ObjectFactory;
+import io.cucumber.testng.CucumberOptions;
+
 
 import java.lang.annotation.*;
 import java.util.Arrays;
@@ -13,7 +14,6 @@ import java.util.LinkedHashSet;
  * configuration parameters needed for GingerSpec:
  *
  * * Automatically adds reference of {@link com.privalia.qa.specs} to the glue
- * * Automatically adds reference of {@link com.privalia.qa.cucumber.reporter.TestNGPrettyFormatter}
  * to the plugins
  * * Automatically include path to store TestNG reports
  *
@@ -63,12 +63,12 @@ public class CucumberOptionsImpl implements CucumberOptions {
     }
 
     @Override
-    public String[] tags() {
+    public String tags() {
         return cucumberOptionsAnnotation.tags();
     }
 
     /**
-     * Automatically adds reference of {@link com.privalia.qa.cucumber.reporter.TestNGPrettyFormatter}
+     * Automatically adds reference of
      * to the plugins and includes path to store TestNG reports
      * @return  Array with reference path to the plugins
      */
@@ -85,12 +85,18 @@ public class CucumberOptionsImpl implements CucumberOptions {
 
         /* Include TestNG reporter (store TestNG reports under /target/executions/com.mypackage.myClass.xml) */
         plugin.add("testng:" + targetExecutionsPath + this.className + ".xml");
+        plugin.add("pretty");
 
         /*Include custom reporter*/
-        plugin.add("com.privalia.qa.cucumber.reporter.TestNGPrettyFormatter");
+        //plugin.add("com.privalia.qa.cucumber.reporter.TestNGPrettyFormatter");
 
         return plugin.toArray(new String[]{});
 
+    }
+
+    @Override
+    public boolean publish() {
+        return false;
     }
 
     @Override
@@ -109,8 +115,8 @@ public class CucumberOptionsImpl implements CucumberOptions {
     }
 
     @Override
-    public String[] junit() {
-        return cucumberOptionsAnnotation.junit();
+    public Class<? extends ObjectFactory> objectFactory() {
+        return null;
     }
 
     @Override
