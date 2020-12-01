@@ -40,8 +40,8 @@ public class IgnoreTagAspect {
 
     /**
      * Pointcut is executed for {@link io.cucumber.testng.AbstractTestNGCucumberTests#runScenario(PickleWrapper, FeatureWrapper)}
-     * @param pickleWrapper
-     * @param featureWrapper
+     * @param pickleWrapper         the pickleWrapper
+     * @param featureWrapper        the featureWrapper
      */
     @Pointcut("execution (void *.runScenario(..)) && args(pickleWrapper, featureWrapper)")
     protected void addIgnoreTagPointcutScenario(PickleWrapper pickleWrapper, FeatureWrapper featureWrapper) {
