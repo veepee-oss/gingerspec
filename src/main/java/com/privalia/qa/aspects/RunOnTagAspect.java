@@ -31,8 +31,8 @@ import java.util.List;
  * Allows conditional scenario execution using @skipOnEnv and @runOnEnv tags
  * <pre>
  * {@code
- *      runOnEnv(param1,param2,param3,..): The scenario will only be executed if ALL the params are defined.
- *      skipOnEnv(param1,param2,param3,..) The scenario will omitted if ANY of params are defined.
+ *      \@runOnEnv(param1,param2,param3,..): The scenario will only be executed if ALL the params are defined.
+ *      \@skipOnEnv(param1,param2,param3,..) The scenario will omitted if ANY of params are defined.
  * }</pre>
  *
  * @author Jose Fernandez
