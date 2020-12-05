@@ -70,7 +70,7 @@ public class UtilsGSpec extends BaseGSpec {
      * @param seconds                   Seconds to wait
      * @throws InterruptedException     InterruptedException
      */
-    @When("^I wait '(\\d+)' seconds?$")
+    @When("^I wait '(.*)' seconds?$")
     public void idleWait(Integer seconds) throws InterruptedException {
         Thread.sleep(seconds * DEFAULT_TIMEOUT);
     }

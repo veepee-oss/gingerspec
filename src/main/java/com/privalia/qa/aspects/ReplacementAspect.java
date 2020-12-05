@@ -1,64 +1,64 @@
-///*
-// * Copyright (C) 2014 Stratio (http://stratio.com)
-// *
-// * Licensed under the Apache License, Version 2.0 (the "License");
-// * you may not use this file except in compliance with the License.
-// * You may obtain a copy of the License at
-// *
-// *         http://www.apache.org/licenses/LICENSE-2.0
-// *
-// * Unless required by applicable law or agreed to in writing, software
-// * distributed under the License is distributed on an "AS IS" BASIS,
-// * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// * See the License for the specific language governing permissions and
-// * limitations under the License.
-// */
-//
-//package com.privalia.qa.aspects;
-//
-//
-//import com.privalia.qa.exceptions.NonReplaceableException;
-//import com.privalia.qa.specs.CommonG;
-//import com.privalia.qa.utils.ThreadProperty;
-//import cucumber.runtime.StepDefinitionMatch;
+/*
+ * Copyright (C) 2014 Stratio (http://stratio.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.privalia.qa.aspects;
+
+
+import com.privalia.qa.exceptions.NonReplaceableException;
+import com.privalia.qa.specs.CommonG;
+import com.privalia.qa.utils.ThreadProperty;
+//import io.cucumber.core.runner.StepDefinitionMatch;
 //import gherkin.ast.*;
-//import io.cucumber.cucumberexpressions.Group;
-//import io.cucumber.stepexpression.DataTableArgument;
-//import io.cucumber.stepexpression.DocStringArgument;
-//import io.cucumber.stepexpression.ExpressionArgument;
-//import org.apache.commons.configuration2.CombinedConfiguration;
-//import org.apache.commons.configuration2.FileBasedConfiguration;
-//import org.apache.commons.configuration2.PropertiesConfiguration;
-//import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
-//import org.apache.commons.configuration2.builder.fluent.Parameters;
-//import org.apache.commons.configuration2.ex.ConfigurationException;
-//import org.apache.commons.configuration2.tree.OverrideCombiner;
-//import org.aspectj.lang.JoinPoint;
-//import org.aspectj.lang.annotation.Aspect;
-//import org.aspectj.lang.annotation.Before;
-//import org.aspectj.lang.annotation.Pointcut;
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
-//
-//import java.io.File;
-//import java.io.FileNotFoundException;
-//import java.lang.reflect.Field;
-//import java.net.*;
-//import java.util.Enumeration;
-//import java.util.List;
-//
-///**
-// * Aspect to replace variables used in the feature files
-// *
-// * @author Jose Fernandez
-// */
-//@Aspect
-//public final class ReplacementAspect {
-//
-//    private static Logger logger = LoggerFactory.getLogger(ReplacementAspect.class.getCanonicalName());
+import io.cucumber.cucumberexpressions.Group;
+import io.cucumber.core.stepexpression.DataTableArgument;
+import io.cucumber.core.stepexpression.DocStringArgument;
+import io.cucumber.core.stepexpression.ExpressionArgument;
+import org.apache.commons.configuration2.CombinedConfiguration;
+import org.apache.commons.configuration2.FileBasedConfiguration;
+import org.apache.commons.configuration2.PropertiesConfiguration;
+import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
+import org.apache.commons.configuration2.builder.fluent.Parameters;
+import org.apache.commons.configuration2.ex.ConfigurationException;
+import org.apache.commons.configuration2.tree.OverrideCombiner;
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
+import org.aspectj.lang.annotation.Pointcut;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.lang.reflect.Field;
+import java.net.*;
+import java.util.Enumeration;
+import java.util.List;
+
+/**
+ * Aspect to replace variables used in the feature files
+ *
+ * @author Jose Fernandez
+ */
+@Aspect
+public final class ReplacementAspect {
+
+    private static Logger logger = LoggerFactory.getLogger(ReplacementAspect.class.getCanonicalName());
 //
 //    private StepDefinitionMatch lastEchoedStep;
-//
+
 //    @Pointcut("execution (gherkin.ast.Scenario.new(..)) && args(tags, location, keyword, name, description, steps)")
 //    protected void replacementScenarios(List<Tag> tags, Location location, String keyword, String name, String description, List<Step> steps) {
 //    }
@@ -110,31 +110,31 @@
 //            field.set(scenario, replacedElement(name, jp));
 //        }
 //    }
-//
-//
-//    @Pointcut("execution (* cucumber.runner.Match.getArguments(..)) && args()")
-//    protected void replacementArguments() {
-//    }
-//
-//    /**
-//     * When a step is about to be executed, the Match#getArguments method is called. this function retrieves the the arguments that
-//     * are going to be used when executing the glue method.
-//     * <p>
-//     * This method captures this event and replaces the variables with their appropriate value using reflection
-//     *
-//     * @param jp the jp
-//     * @throws NoSuchFieldException    the no such field exception
-//     * @throws IllegalAccessException  the illegal access exception
-//     * @throws FileNotFoundException   the file not found exception
-//     * @throws NonReplaceableException the non replaceable exception
-//     * @throws ConfigurationException  the configuration exception
-//     * @throws URISyntaxException      the uri syntax exception
-//     */
-//    @Before(value = "replacementArguments()")
-//    public void aroundReplacementArguments(JoinPoint jp) throws NoSuchFieldException, IllegalAccessException, FileNotFoundException, NonReplaceableException, ConfigurationException, URISyntaxException {
-//
-//        Object match = jp.getThis();
-//
+
+
+    @Pointcut("execution (* io.cucumber.core.runner.Match.getArguments(..)) && args()")
+    protected void replacementArguments() {
+    }
+
+    /**
+     * When a step is about to be executed, the Match#getArguments method is called. this function retrieves the the arguments that
+     * are going to be used when executing the glue method.
+     * <p>
+     * This method captures this event and replaces the variables with their appropriate value using reflection
+     *
+     * @param jp the jp
+     * @throws NoSuchFieldException    the no such field exception
+     * @throws IllegalAccessException  the illegal access exception
+     * @throws FileNotFoundException   the file not found exception
+     * @throws NonReplaceableException the non replaceable exception
+     * @throws ConfigurationException  the configuration exception
+     * @throws URISyntaxException      the uri syntax exception
+     */
+    @Before(value = "replacementArguments()")
+    public void aroundReplacementArguments(JoinPoint jp) throws NoSuchFieldException, IllegalAccessException, FileNotFoundException, NonReplaceableException, ConfigurationException, URISyntaxException {
+
+        Object match = jp.getThis();
+
 //        /*To avoid executing replacement on the same step several times*/
 //        if (match.equals(lastEchoedStep)) {
 //            return;
@@ -214,8 +214,8 @@
 //        } else {
 //            logger.error("Incorrect step definition match in Feature. Could not apply replacements");
 //        }
-//    }
-//
+    }
+
 //
 //    public static String replacedElement(String el, JoinPoint jp) throws NonReplaceableException, ConfigurationException, URISyntaxException, FileNotFoundException {
 //        if (el.contains("${")) {
@@ -483,7 +483,7 @@
 //
 //        return newVal;
 //    }
-//
-//
-//}
-//
+
+
+}
+

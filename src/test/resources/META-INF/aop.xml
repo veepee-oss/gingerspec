@@ -20,7 +20,7 @@
     <aspects>
         <aspect name="com.privalia.qa.aspects.RunOnTagAspect"/>
         <aspect name="com.privalia.qa.aspects.LoopIncludeTagAspect"/>
-<!--        <aspect name="com.privalia.qa.aspects.ReplacementAspect"/>-->
+        <aspect name="com.privalia.qa.aspects.ReplacementAspect"/>
 <!--        <aspect name="com.privalia.qa.aspects.LogTagAspect"/>-->
         <aspect name="com.privalia.qa.aspects.IgnoreTagAspect"/>
 <!--        <aspect name="com.privalia.qa.aspects.BrowsersDataProviderAspect"/>-->
