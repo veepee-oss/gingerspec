@@ -85,10 +85,9 @@ public class CucumberOptionsImpl implements CucumberOptions {
 
         /* Include TestNG reporter (store TestNG reports under /target/executions/com.mypackage.myClass.xml) */
         plugin.add("testng:" + targetExecutionsPath + this.className + ".xml");
-        plugin.add("pretty");
 
         /*Include custom reporter*/
-        //plugin.add("com.privalia.qa.cucumber.reporter.TestNGPrettyFormatter");
+        plugin.add("com.privalia.qa.cucumber.reporter.TestNGPrettyFormatter");
 
         return plugin.toArray(new String[]{});
 
