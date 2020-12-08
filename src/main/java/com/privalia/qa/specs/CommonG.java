@@ -503,7 +503,8 @@ public class CommonG {
      * @return RemoteWebDriver
      */
     public WebDriver getDriver() {
-        return driver;
+        Assertions.assertThat(this.driver).as("Web driver has not been correctly initialized").isNotNull();
+        return this.driver;
     }
 
     /**

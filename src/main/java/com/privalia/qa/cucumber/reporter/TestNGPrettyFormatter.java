@@ -1,13 +1,16 @@
 package com.privalia.qa.cucumber.reporter;
 
+import com.privalia.qa.aspects.ReplacementAspect;
+import com.privalia.qa.exceptions.NonReplaceableException;
 import com.privalia.qa.utils.ThreadProperty;
 import io.cucumber.core.exception.CucumberException;
-
 import io.cucumber.core.stepexpression.ExpressionArgument;
 import io.cucumber.messages.Messages;
 import io.cucumber.plugin.ColorAware;
 import io.cucumber.plugin.ConcurrentEventListener;
 import io.cucumber.plugin.event.*;
+import org.apache.commons.configuration2.ex.ConfigurationException;
+import org.aspectj.lang.ProceedingJoinPoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,16 +19,11 @@ import java.lang.reflect.Field;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.privalia.qa.cucumber.reporter.Formats.ansi;
-
 import static com.privalia.qa.cucumber.reporter.Formats.monochrome;
-
 import static io.cucumber.core.exception.ExceptionUtils.printStackTrace;
-
 import static java.lang.Math.max;
-
 import static java.util.Locale.ROOT;
 
 /**
@@ -38,13 +36,13 @@ import static java.util.Locale.ROOT;
  * formatting options. Error messages generated from other classes are printed using the standard log4j.
  * <p>
  * There are several reason to implement a custom formatter in Gingerspec:
- * * Unlike regular PrettyFormatter, this formatter prints steps BEFORE
- * they are executed, giving real-time feedback to the user about the test progress
  * * Unlike PrettyFormatter, this formatter also prints things like Docstrings and datatables
  * * Instead of printing the whole stacktrace of the error when an assertion fails, only the main message
- * of the assertion is printed, which makes tests easier to read
+ * of the assertion is printed, which makes tests easier to read (this can be override by using -DSHOW_ERRORS_STACKTRACE)
+ * If the variable -DSHOW_STACK_INFO, the formatter will print the step definition location and arguments
+ * * Print comments written on top of steps (#log) and even do variable replacement on them
  * * Last but not least, this formatter also makes variable replacement, so it will correctly
- * print Gingerspec custon variables (!{VAR}, #{VAR}, ${VAR} and @{VAR})
+ * print Gingerspec custom variables (!{VAR}, #{VAR}, ${VAR} and @{VAR})
  *
  * @author Jose Fernandez
  */
@@ -58,6 +56,8 @@ public class TestNGPrettyFormatter implements ConcurrentEventListener, ColorAwar
 
     private static final String LOCATION_INDENT = "         ";
 
+    private static final String TABLES_INDENT = "     ";
+
     private final Map<UUID, Integer> commentStartIndex = new HashMap<>();
 
     private final NiceAppendable out;
@@ -70,18 +70,48 @@ public class TestNGPrettyFormatter implements ConcurrentEventListener, ColorAwar
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
 
+    private final ReplacementAspect replacementAspect = new ReplacementAspect();
+
     public TestNGPrettyFormatter(OutputStream out) {
         this.out = new NiceAppendable(new UTF8OutputStreamWriter(out));
     }
 
     @Override
     public void setEventPublisher(EventPublisher publisher) {
+        publisher.registerHandlerFor(TestRunStarted.class, this::handleTestRunStarted);
         publisher.registerHandlerFor(TestSourceRead.class, this::handleTestSourceRead);
         publisher.registerHandlerFor(TestCaseStarted.class, this::handleTestCaseStarted);
         publisher.registerHandlerFor(TestStepFinished.class, this::handleTestStepFinished);
         publisher.registerHandlerFor(WriteEvent.class, this::handleWrite);
         publisher.registerHandlerFor(EmbedEvent.class, this::handleEmbed);
         publisher.registerHandlerFor(TestRunFinished.class, this::handleTestRunFinished);
+    }
+
+    /**
+     * Prints a cool looking banner at the beginning of the test suite
+     * @param event  event
+     */
+    private void handleTestRunStarted(TestRunStarted event) {
+        try {
+            printLinesFromResourcesFile("banner.txt", "output");
+        } catch (IOException e) {
+        }
+    }
+
+    /**
+     * Prints the given txt file located in the resources folder with the given format
+     * @param resourcesFile     File name (must be located in resources/ folder)
+     * @param format            Format to use (colour)
+     * @throws IOException      If file is not found
+     */
+    private void printLinesFromResourcesFile(String resourcesFile, String format) throws IOException {
+        InputStream is = getClass().getClassLoader().getResourceAsStream(resourcesFile);
+        BufferedReader br = new BufferedReader(new InputStreamReader(is));
+        String line = null;
+        while ((line = br.readLine()) != null) {
+            StringBuilder formattedComment = new StringBuilder(formats.get(format).text(line));
+            out.println(formattedComment);
+        }
     }
 
     private void handleTestSourceRead(TestSourceRead event) {
@@ -128,7 +158,15 @@ public class TestNGPrettyFormatter implements ConcurrentEventListener, ColorAwar
 
     }
 
+    /**
+     * Prints some useful commands at the end of the test suite
+     * @param event event
+     */
     private void handleTestRunFinished(TestRunFinished event) {
+        try {
+            printLinesFromResourcesFile("helpMessage.txt", "comment");
+        } catch (IOException e) {
+        }
         out.close();
     }
 
@@ -145,7 +183,8 @@ public class TestNGPrettyFormatter implements ConcurrentEventListener, ColorAwar
     /**
      * Prints the beginning of the feature file, from the Feature tags to the
      * description
-     * @param path      Path of the feature file
+     *
+     * @param path Path of the feature file
      */
     private void printFeature(String path) {
         Messages.GherkinDocument.Feature feature = null;
@@ -157,7 +196,7 @@ public class TestNGPrettyFormatter implements ConcurrentEventListener, ColorAwar
 
         List<Messages.GherkinDocument.Feature.Tag> tags = feature.getTagsList();
         String tagsList = "";
-        for (Messages.GherkinDocument.Feature.Tag tag: tags) {
+        for (Messages.GherkinDocument.Feature.Tag tag : tags) {
             tagsList = tag.getName() + " ";
         }
         Format format = formats.get("pending_arg");
@@ -169,6 +208,14 @@ public class TestNGPrettyFormatter implements ConcurrentEventListener, ColorAwar
         }
     }
 
+    /**
+     * Gingerspec formatter can also print comments, as long as these comments are placed right
+     * before the step and if the comment starts with the word "log" (i.e "#log This is a comment").
+     * GingerSPec variables can also be used in comments, this allow greater flexibility when
+     * debugging (i.e "#log print variable !{VAR}")
+     *
+     * @param event event
+     */
     private void printComments(TestStepFinished event) {
         if (event.getTestStep() instanceof PickleStepTestStep) {
             PickleStepTestStep testStep = (PickleStepTestStep) event.getTestStep();
@@ -177,7 +224,7 @@ public class TestNGPrettyFormatter implements ConcurrentEventListener, ColorAwar
             StringBuilder formattedComment;
             try {
                 if (comment.substring(0, 4).toLowerCase().matches("#log")) {
-                    formattedComment = new StringBuilder(formats.get("output").text(comment));
+                    formattedComment = new StringBuilder(formats.get("output").text(getReplacedValue(comment)));
                     out.println(STEP_INDENT + formattedComment);
                 }
             } catch (Exception e) {
@@ -204,7 +251,8 @@ public class TestNGPrettyFormatter implements ConcurrentEventListener, ColorAwar
     private void printTags(TestCaseStarted event) {
         List<String> tags = event.getTestCase().getTags();
         if (!tags.isEmpty()) {
-            out.println(TestNGPrettyFormatter.SCENARIO_INDENT + String.join(" ", tags));
+            StringBuilder formattedTags = new StringBuilder(formats.get("unused_arg").text(String.join(" ", tags)));
+            out.println(SCENARIO_INDENT + formattedTags);
         }
     }
 
@@ -217,6 +265,12 @@ public class TestNGPrettyFormatter implements ConcurrentEventListener, ColorAwar
                 + formatLocation(path + ":" + testCase.getLocation().getLine()));
     }
 
+    /**
+     * Before printing a step, this formatter will replace any variable placeholder
+     * (!{VAR}, ${VAR},#{VAR} and @{VAR}). This operation is performed in {@link #formatStepText(String, String, Format, Format, List)}
+     *
+     * @param event event
+     */
     private void printStep(TestStepFinished event) {
         if (event.getTestStep() instanceof PickleStepTestStep) {
             PickleStepTestStep testStep = (PickleStepTestStep) event.getTestStep();
@@ -226,51 +280,86 @@ public class TestNGPrettyFormatter implements ConcurrentEventListener, ColorAwar
             String formattedStepText = formatStepText(keyword, stepText, formats.get(status),
                     formats.get(status + "_arg"), testStep.getDefinitionArgument());
             String locationIndent = calculateLocationIndent(event.getTestCase(), formatPlainStep(keyword, stepText));
+            out.println(STEP_INDENT + formattedStepText + locationIndent);
+            printStepExtraArguments(formats.get(status), testStep);
 
             if (System.getProperty("SHOW_STACK_INFO") != null) {
-                out.println(STEP_INDENT + formattedStepText + locationIndent);
                 this.printStepStackInformation(event.getTestStep());
-            } else {
-                out.println(STEP_INDENT + formattedStepText + locationIndent);
             }
         }
     }
 
     /**
+     * This method was specifically created to print Docstrings and datatables
+     * <p>
+     * Reflection had to be used since only doing {@link PickleStepTestStep#getStepArgument()} would return
+     * the arguments without the necessary replacements done by {@link com.privalia.qa.aspects.ReplacementAspect}
+     *
+     * @param format   Format to apply
+     * @param testStep PickleStepTestStep object where to get the elements
+     */
+    private void printStepExtraArguments(Format format, PickleStepTestStep testStep) {
+
+        try {
+            for (io.cucumber.core.stepexpression.Argument argument : this.getArguments(testStep)) {
+
+                if (argument instanceof io.cucumber.core.stepexpression.DocStringArgument) {
+                    out.println(TABLES_INDENT + format.text("\"\"\""));
+                    try {
+                        out.println(TABLES_INDENT + format.text(getReplacedValue(argument.getValue().toString())));
+                    } catch (Exception e) {
+                        out.println(TABLES_INDENT + format.text(argument.getValue().toString()));
+                    }
+                    out.println(TABLES_INDENT + format.text("\"\"\""));
+                }
+                if (argument instanceof io.cucumber.core.stepexpression.DataTableArgument) {
+                    String[] rows = argument.getValue().toString().split("\n");
+                    for (String row : rows) {
+                        out.println(TABLES_INDENT + format.text(getReplacedValue(row.trim())));
+                    }
+                }
+            }
+        } catch (Exception e) {
+
+        }
+    }
+
+    /**
      * Shows information about the underlying test step definition function, its location and the arguments used
-     * @param testStep  PickleStepTestStep instance
+     *
+     * @param testStep PickleStepTestStep instance
      */
     private void printStepStackInformation(TestStep testStep) {
 
-        out.println(LOCATION_INDENT +  getLocationText(testStep.getCodeLocation()));
+        out.println(LOCATION_INDENT + getLocationText(testStep.getCodeLocation()));
 
         int argumentIndex = 0;
 
         try {
 
-            for (io.cucumber.core.stepexpression.Argument argument: this.getArguments(testStep)) {
+            for (io.cucumber.core.stepexpression.Argument argument : this.getArguments(testStep)) {
 
-                if (argument instanceof ExpressionArgument) {
+                if (argument instanceof io.cucumber.core.stepexpression.ExpressionArgument) {
 
                     io.cucumber.cucumberexpressions.Group group = (io.cucumber.cucumberexpressions.Group) ((ExpressionArgument) argument).getGroup();
 
                     if (group.getChildren().size() > 0) {
-                        out.println(LOCATION_INDENT +  getLocationText("Argument " + argumentIndex + ": " + group.getChildren().get(0).getValue()));
+                        out.println(LOCATION_INDENT + getLocationText("Argument " + argumentIndex + ": " + group.getChildren().get(0).getValue()));
                     } else {
-                        out.println(LOCATION_INDENT +  getLocationText("Argument " + argumentIndex + ": " + group.getValue()));
+                        out.println(LOCATION_INDENT + getLocationText("Argument " + argumentIndex + ": " + group.getValue()));
                     }
                 }
 
-                if (argument instanceof DocStringArgument) {
-                    out.println(LOCATION_INDENT +  getLocationText("Argument " + argumentIndex + ": " + argument.getValue().toString()));
+                if (argument instanceof io.cucumber.core.stepexpression.DocStringArgument) {
+                    out.println(LOCATION_INDENT + getLocationText("Argument " + argumentIndex + ": " + argument.getValue().toString()));
                 }
 
-                if (argument instanceof DataTableArgument) {
+                if (argument instanceof io.cucumber.core.stepexpression.DataTableArgument) {
                     Field argumentField = argument.getClass().getDeclaredField("argument");
                     argumentField.setAccessible(true);
                     List<List<String>> finalList = (List<List<String>>) argumentField.get(argument);
 
-                    out.println(LOCATION_INDENT +  getLocationText("Argument " + argumentIndex + ": " + Arrays.toString(finalList.toArray())));
+                    out.println(LOCATION_INDENT + getLocationText("Argument " + argumentIndex + ": " + Arrays.toString(finalList.toArray())));
                 }
 
                 argumentIndex += 1;
@@ -288,10 +377,11 @@ public class TestNGPrettyFormatter implements ConcurrentEventListener, ColorAwar
 
     /**
      * Returns the list of arguments for the given step
-     * @param testStep                  PickleStepTestStep instance
-     * @return                          list of Arguments
-     * @throws NoSuchFieldException     NoSuchFieldException
-     * @throws IllegalAccessException   IllegalAccessException
+     *
+     * @param testStep PickleStepTestStep instance
+     * @return list of Arguments
+     * @throws NoSuchFieldException   NoSuchFieldException
+     * @throws IllegalAccessException IllegalAccessException
      */
     private List<io.cucumber.core.stepexpression.Argument> getArguments(TestStep testStep) throws NoSuchFieldException, IllegalAccessException {
         Field definitionMatchField = testStep.getClass().getDeclaredField("definitionMatch");
@@ -303,13 +393,26 @@ public class TestNGPrettyFormatter implements ConcurrentEventListener, ColorAwar
         return arguments;
     }
 
+    /**
+     * Errors will be printed in a different way than with the standard {@link io.cucumber.core.plugin.PrettyFormatter}.
+     * By default, Gingerspec will only print the message of the assertion/exception right after the step in red colour,
+     * this makes the console output less verbose an easier to read. This behaviour can be overridden by using
+     * -DSHOW_ERRORS_STACKTRACE when running the tests
+     *
+     * @param event event
+     */
     private void printError(TestStepFinished event) {
         Result result = event.getResult();
         Throwable error = result.getError();
         if (error != null) {
             try {
                 String name = result.getStatus().name().toLowerCase(ROOT);
-                out.println(STEP_INDENT + formats.get(name).text(event.getResult().getError().getMessage().replace("\n", " ")));
+                if (System.getProperty("SHOW_ERRORS_STACKTRACE") != null) {
+                    String text = printStackTrace(error);
+                    out.println("      " + formats.get(name).text(text));
+                } else {
+                    out.println(STEP_INDENT + formats.get(name).text(event.getResult().getError().getMessage().replace("\n", " ")));
+                }
             } catch (Exception e) {
                 out.println(STEP_INDENT + formats.get("failed").text("Unexpected exception retrieving error message: " + e.getMessage() + ". Check the stacktrace for more details"));
             }
@@ -408,11 +511,29 @@ public class TestNGPrettyFormatter implements ConcurrentEventListener, ColorAwar
             String text = stepText.substring(beginIndex);
             result.append(textFormat.text(text));
         }
-        return result.toString();
+        try {
+            return getReplacedValue(result.toString());
+        } catch (Exception e) {
+            return result.toString();
+        }
     }
 
     @Override
     public void setMonochrome(boolean monochrome) {
         formats = monochrome ? monochrome() : Formats.ansi();
+    }
+
+    /**
+     * Sometimes, when trying to use Replacement aspect with !{VAR}, using a null JoinPoint
+     * can return an unexpected exception
+     * @param text
+     * @return
+     */
+    private String getReplacedValue(String text) {
+        try {
+            return replacementAspect.replacedElement(text, null);
+        } catch (Exception e) {
+            return text;
+        }
     }
 }

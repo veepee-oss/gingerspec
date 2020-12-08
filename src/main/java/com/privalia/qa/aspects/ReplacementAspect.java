@@ -37,6 +37,7 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
+import org.assertj.core.api.Assertions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -158,7 +159,7 @@ public final class ReplacementAspect {
             //If is a Docstring argument
             if (argument instanceof DocStringArgument) {
                 DocStringArgument docStringArgument = (DocStringArgument) argument;
-                Field docstringField = docStringArgument.getClass().getDeclaredField("argument");
+                Field docstringField = docStringArgument.getClass().getDeclaredField("content");
                 docstringField.setAccessible(true);
                 String docStringValue = (String) docstringField.get(docStringArgument);
                 String replacedDocStringValue = replacedElement(docStringValue, jp);
@@ -251,8 +252,9 @@ public final class ReplacementAspect {
             if (prop != null) {
                 newVal = newVal.replace(placeholder, prop);
             } else {
-                logger.error("Could not find property {} in included files", property);
-                throw new NonReplaceableException("Unreplaceable placeholder: " + placeholder);
+                Assertions.fail("Could not find property %s in included files", property);
+                //logger.error("Could not find property {} in included files", property);
+                //throw new NonReplaceableException("Unreplaceable placeholder: " + placeholder);
             }
         }
 
@@ -294,8 +296,9 @@ public final class ReplacementAspect {
                 if (pjp.getThis().getClass().getName().matches("io.cucumber.core.gherkin.messages.GherkinMessagesPickle")) {
                     return newVal;
                 } else {
-                    logger.error("{} -> {} placeholded element has not been replaced previously.", element, property);
-                    throw new NonReplaceableException("Unreplaceable placeholder: " + placeholder);
+                    Assertions.fail("%s -> %s placeholded element has not been replaced previously.", element, property);
+                    //logger.error("{} -> {} placeholded element has not been replaced previously.", element, property);
+                    //throw new NonReplaceableException("Unreplaceable placeholder: " + placeholder);
                 }
             }
 
@@ -356,8 +359,9 @@ public final class ReplacementAspect {
             if (prop == null && (pjp.getThis().getClass().getName().matches("io.cucumber.core.gherkin.messages.GherkinMessagesPickle"))) {
                 return element;
             } else if (prop == null) {
-                logger.warn("{} -> {} local var has not been saved correctly previously.", element, attribute);
                 newVal = newVal.replace(placeholder, "NULL");
+                Assertions.fail("%s -> %s local variable has not been saved correctly previously.", element, attribute);
+                //logger.warn("{} -> {} local var has not been saved correctly previously.", element, attribute);
                 //throw new NonReplaceableException("Unreplaceable placeholder: " + placeholder);
             } else {
                 newVal = newVal.replace(placeholder, prop);
@@ -421,8 +425,9 @@ public final class ReplacementAspect {
             if (prop == null && (jp.getThis().getClass().getName().matches("io.cucumber.core.gherkin.messages.GherkinMessagesPickle"))) {
                 return element;
             } else if (prop == null) {
-                logger.error("{} -> {} env var has not been defined.", element, sysProp);
-                throw new NonReplaceableException("Unreplaceable placeholder: " + placeholder);
+                Assertions.fail("%s -> %s env variable has not been defined.", element, sysProp);
+                //logger.error("{} -> {} env var has not been defined.", element, sysProp);
+                //throw new NonReplaceableException("Unreplaceable placeholder: " + placeholder);
             }
 
             if ("toLower".equals(modifier)) {
