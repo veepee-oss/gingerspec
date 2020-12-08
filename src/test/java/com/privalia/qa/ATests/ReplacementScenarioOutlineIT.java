@@ -19,7 +19,8 @@ import com.privalia.qa.utils.BaseGTest;
 import io.cucumber.testng.CucumberOptions;
 
 @CucumberOptions(
-        features = {"src/test/resources/features/replacementScenarioOutline.feature"},
+        features = {"src/test/resources/features/replacementScenarioOutline.feature",
+        "src/test/resources/features/backgroundlogger.feature"},
         glue = "com.privalia.qa.specs")
 public class ReplacementScenarioOutlineIT extends BaseGTest {
 

@@ -2,6 +2,10 @@ Feature: Scenario outline replacements
 
   this is a comment
 
+  Background: esto es un background
+    #log esto es una prueba
+    And I wait '#{wait.time}' seconds
+
   Scenario: inner scenario outline replacements ${VAR}
     Given I save '2' in variable 'SO_ENV_VAR'
     And I wait '!{SO_ENV_VAR}' seconds
