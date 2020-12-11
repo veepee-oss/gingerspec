@@ -9,6 +9,7 @@ Feature: Rest Assured Feature
   Scenario: How to perform a simple request, verify the HTTP code returned, and check the body and its schema
     Given I send requests to '${REST_SERVER_HOST}:3000'
     When I send a 'GET' request to '/posts'
+    Then the service response status must be '200'
     Then the service response status must be '200' and its response must contain the text 'body'
     Then the service response status must be '200' and its response matches the schema in 'schemas/responseSchema.json'
     When I send a 'GET' request to '/comments/1'

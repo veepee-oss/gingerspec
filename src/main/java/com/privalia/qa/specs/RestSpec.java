@@ -322,7 +322,10 @@ public class RestSpec extends BaseGSpec {
      * @param expectedStatus        Expected HTTP status code
      * @param responseAssert        Expression to determine if assert length, text or schema
      */
-    @Then("^the service response status must be '(.*?)'( (and its response length must be '.*?')| (and its response must contain the text '.*?')| (and its response matches the schema in '.*?'))?$")
+    @Then("^the service response status must be '(\\S+)()'$")
+    @Then("^the service response status must be '(\\S+)' (and its response length must be '.*?')$")
+    @Then("^the service response status must be '(\\S+)' (and its response must contain the text '.*?')$")
+    @Then("^the service response status must be '(\\S+)' (and its response matches the schema in '.*?')$")
     public void assertResponseStatusLength(Integer expectedStatus, String responseAssert) {
 
         commonspec.getRestResponse().then().statusCode(expectedStatus);
