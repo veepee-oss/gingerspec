@@ -103,70 +103,72 @@ public final class ReplacementAspect {
     public void aroundReplacementArguments(JoinPoint jp, TestCaseState state) throws NoSuchFieldException, IllegalAccessException, FileNotFoundException, NonReplaceableException, ConfigurationException, URISyntaxException {
 
         Object pickleStepDefinitionMatch = jp.getThis();
-        Field argumentsField = pickleStepDefinitionMatch.getClass().getSuperclass().getDeclaredField("arguments");
-        argumentsField.setAccessible(true);
-        List<io.cucumber.core.stepexpression.Argument> arguments = (List<io.cucumber.core.stepexpression.Argument>) argumentsField.get(pickleStepDefinitionMatch);
 
-        for (io.cucumber.core.stepexpression.Argument argument : arguments) {
+        if (pickleStepDefinitionMatch.getClass().getName().matches("io.cucumber.core.runner.PickleStepDefinitionMatch")) {
+            Field argumentsField = pickleStepDefinitionMatch.getClass().getSuperclass().getDeclaredField("arguments");
+            argumentsField.setAccessible(true);
+            List<io.cucumber.core.stepexpression.Argument> arguments = (List<io.cucumber.core.stepexpression.Argument>) argumentsField.get(pickleStepDefinitionMatch);
 
-            //If is a normal expression argument
-            if (argument instanceof ExpressionArgument) {
-                ExpressionArgument expressionArgument = (ExpressionArgument) argument;
-                Field textField = expressionArgument.getClass().getDeclaredField("argument");
-                textField.setAccessible(true);
-                io.cucumber.cucumberexpressions.Argument textArgument = (io.cucumber.cucumberexpressions.Argument) textField.get(expressionArgument);
-                String currentTextValue = textArgument.getGroup().getValue();
+            for (io.cucumber.core.stepexpression.Argument argument : arguments) {
 
-                /*In steps with optional params, the argument could be null*/
-                if (currentTextValue != null) {
-                    String replacedValue = replacedElement(currentTextValue, jp);
+                //If is a normal expression argument
+                if (argument instanceof ExpressionArgument) {
+                    ExpressionArgument expressionArgument = (ExpressionArgument) argument;
+                    Field textField = expressionArgument.getClass().getDeclaredField("argument");
+                    textField.setAccessible(true);
+                    io.cucumber.cucumberexpressions.Argument textArgument = (io.cucumber.cucumberexpressions.Argument) textField.get(expressionArgument);
+                    String currentTextValue = textArgument.getGroup().getValue();
 
-                    Group group = textArgument.getGroup();
-                    Field valueField = group.getClass().getDeclaredField("value");
-                    valueField.setAccessible(true);
-                    valueField.set(group, replacedValue);
+                    /*In steps with optional params, the argument could be null*/
+                    if (currentTextValue != null) {
+                        String replacedValue = replacedElement(currentTextValue, jp);
 
-                    List<Group> children = group.getChildren();
-                    for (Group child : children) {
-                        Field valueFieldChild = child.getClass().getDeclaredField("value");
-                        String valuechild = child.getValue();
-                        if (valuechild != null) {
-                            String replacedValueChild = replacedElement(valuechild, jp);
-                            valueFieldChild.setAccessible(true);
-                            valueFieldChild.set(child, replacedValueChild);
+                        Group group = textArgument.getGroup();
+                        Field valueField = group.getClass().getDeclaredField("value");
+                        valueField.setAccessible(true);
+                        valueField.set(group, replacedValue);
+
+                        List<Group> children = group.getChildren();
+                        for (Group child : children) {
+                            Field valueFieldChild = child.getClass().getDeclaredField("value");
+                            String valuechild = child.getValue();
+                            if (valuechild != null) {
+                                String replacedValueChild = replacedElement(valuechild, jp);
+                                valueFieldChild.setAccessible(true);
+                                valueFieldChild.set(child, replacedValueChild);
+                            }
+                        }
+
+                    }
+                }
+
+                //If is a datatable argument
+                if (argument instanceof DataTableArgument) {
+                    DataTableArgument dataTabeArgument = (DataTableArgument) argument;
+                    Field listField = dataTabeArgument.getClass().getDeclaredField("argument");
+                    listField.setAccessible(true);
+                    List<List<String>> rows = (List<List<String>>) listField.get(dataTabeArgument);
+
+                    for (List<String> row : rows) {
+                        for (int i = 0; i <= row.size() - 1; i++) {
+                            row.set(i, replacedElement(row.get(i), jp));
                         }
                     }
 
-                }
-            }
-
-            //If is a datatable argument
-            if (argument instanceof DataTableArgument) {
-                DataTableArgument dataTabeArgument = (DataTableArgument) argument;
-                Field listField = dataTabeArgument.getClass().getDeclaredField("argument");
-                listField.setAccessible(true);
-                List<List<String>> rows = (List<List<String>>) listField.get(dataTabeArgument);
-
-                for (List<String> row : rows) {
-                    for (int i = 0; i <= row.size() - 1; i++) {
-                        row.set(i, replacedElement(row.get(i), jp));
-                    }
+                    listField.set(dataTabeArgument, rows);
                 }
 
-                listField.set(dataTabeArgument, rows);
-            }
-
-            //If is a Docstring argument
-            if (argument instanceof DocStringArgument) {
-                DocStringArgument docStringArgument = (DocStringArgument) argument;
-                Field docstringField = docStringArgument.getClass().getDeclaredField("content");
-                docstringField.setAccessible(true);
-                String docStringValue = (String) docstringField.get(docStringArgument);
-                String replacedDocStringValue = replacedElement(docStringValue, jp);
-                docstringField.set(docStringArgument, replacedDocStringValue);
+                //If is a Docstring argument
+                if (argument instanceof DocStringArgument) {
+                    DocStringArgument docStringArgument = (DocStringArgument) argument;
+                    Field docstringField = docStringArgument.getClass().getDeclaredField("content");
+                    docstringField.setAccessible(true);
+                    String docStringValue = (String) docstringField.get(docStringArgument);
+                    String replacedDocStringValue = replacedElement(docStringValue, jp);
+                    docstringField.set(docStringArgument, replacedDocStringValue);
+                }
             }
         }
-
     }
 
 
