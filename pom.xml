@@ -546,6 +546,15 @@
                 </executions>
             </plugin>
         </plugins>
+        <resources>
+            <resource>
+                <directory>src/test/resources</directory>
+                <includes>
+                    <include>banner.txt</include>
+                    <include>helpMessage.txt</include>
+                </includes>
+            </resource>
+        </resources>
     </build>
 
     <profiles>
