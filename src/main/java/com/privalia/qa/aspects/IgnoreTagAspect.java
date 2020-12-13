@@ -16,100 +16,89 @@
 
 package com.privalia.qa.aspects;
 
-import cucumber.api.TestCase;
-import cucumber.runner.EventBus;
-import gherkin.pickles.PickleTag;
+import io.cucumber.testng.FeatureWrapper;
+import io.cucumber.testng.PickleWrapper;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
-import static com.privalia.qa.aspects.IgnoreTagAspect.ignoreReasons.NOREASON;
-import static com.privalia.qa.aspects.IgnoreTagAspect.ignoreReasons.NOTIGNORED;
 
 /**
- * Aspect for managing the @ignore annotation on a feature/scenario
+ * Aspect for managing the @ignore tag on a feature/scenario
  */
 @Aspect
 public class IgnoreTagAspect {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
 
+    public enum ignoreReasons { ENVCONDITION, UNIMPLEMENTED, MANUAL, TOOCOMPLEX, JIRATICKET, NOREASON }
 
-    @Pointcut("execution (void cucumber.runner.TestCase.run(..)) && args(bus)")
-    protected void addIgnoreTagPointcutScenario(EventBus bus) {
+    /**
+     * Pointcut is executed for {@link io.cucumber.testng.AbstractTestNGCucumberTests#runScenario(PickleWrapper, FeatureWrapper)}
+     * @param pickleWrapper         the pickleWrapper
+     * @param featureWrapper        the featureWrapper
+     */
+    @Pointcut("execution (void *.runScenario(..)) && args(pickleWrapper, featureWrapper)")
+    protected void addIgnoreTagPointcutScenario(PickleWrapper pickleWrapper, FeatureWrapper featureWrapper) {
     }
 
 
-    @Around(value = "addIgnoreTagPointcutScenario(bus)")
-    public void aroundAddIgnoreTagPointcut(ProceedingJoinPoint pjp, EventBus bus) throws Throwable {
+    @Around(value = "addIgnoreTagPointcutScenario(pickleWrapper, featureWrapper)")
+    public void aroundAddIgnoreTagPointcut(ProceedingJoinPoint pjp, PickleWrapper pickleWrapper, FeatureWrapper featureWrapper) throws Throwable {
 
-        TestCase testCase = (TestCase) pjp.getThis();
-        List<PickleTag> tags = testCase.getTags();
+        List<String> tags = pickleWrapper.getPickle().getTags();
+        String scenarioName = pickleWrapper.getPickle().getName();
 
-        String scenarioName = testCase.getName();
+        if (tags.contains("@ignore")) {
+            ignoreReasons exitReason = manageTags(tags, scenarioName);
 
-        List<String> tagList = new ArrayList<>();
-        tagList = tags.stream().map(PickleTag::getName).collect(Collectors.toList());
+            if (exitReason.equals(ignoreReasons.NOREASON)) {
+                logger.warn("Scenario '" + scenarioName + "' ignored, no reason specified.");
+            }
 
+            return;
 
-        ignoreReasons exitReason = manageTags(tagList, scenarioName);
-        if (exitReason.equals(NOREASON)) {
-            logger.error("Scenario '" + scenarioName + "' failed due to wrong use of the @ignore tag. ");
-        }
-
-        if ((!(exitReason.equals(NOTIGNORED))) && (!(exitReason.equals(NOREASON)))) {
-            /*
-            runtime.buildBackendWorlds(reporter, tags, scenario);
-            formatter.startOfScenarioLifeCycle(scenario);
-            formatter.endOfScenarioLifeCycle(scenario);
-            runtime.disposeBackendWorlds();
-            */
         } else {
             pjp.proceed();
         }
-
     }
 
     public ignoreReasons manageTags(List<String> tagList, String scenarioName) {
-        ignoreReasons exit = NOTIGNORED;
-        if (tagList.contains("@ignore")) {
-            exit = NOREASON;
-            for (String tag: tagList) {
-                Pattern pattern = Pattern.compile("@tillfixed\\((.*?)\\)");
-                Matcher matcher = pattern.matcher(tag);
-                if (matcher.find()) {
-                    String ticket = matcher.group(1);
-                    logger.warn("Scenario '" + scenarioName + "' ignored because of ticket: " + ticket);
-                    exit = ignoreReasons.JIRATICKET;
-                }
-            }
-            if (tagList.contains("@envCondition")) {
-                exit = ignoreReasons.ENVCONDITION;
-            }
-            if (tagList.contains("@unimplemented")) {
-                logger.warn("Scenario '" + scenarioName + "' ignored because it is not yet implemented.");
-                exit = ignoreReasons.UNIMPLEMENTED;
-            }
-            if (tagList.contains("@manual")) {
-                logger.warn("Scenario '" + scenarioName + "' ignored because it is marked as manual test.");
-                exit = ignoreReasons.MANUAL;
-            }
-            if (tagList.contains("@toocomplex")) {
-                logger.warn("Scenario '" + scenarioName + "' ignored because the test is too complex.");
-                exit = ignoreReasons.TOOCOMPLEX;
+
+        ignoreReasons exit = ignoreReasons.NOREASON;
+
+        for (String tag : tagList) {
+            Pattern pattern = Pattern.compile("@tillfixed\\((.*?)\\)");
+            Matcher matcher = pattern.matcher(tag);
+            if (matcher.find()) {
+                String ticket = matcher.group(1);
+                logger.warn("Scenario '" + scenarioName + "' ignored because of ticket: " + ticket);
+                exit = ignoreReasons.JIRATICKET;
             }
         }
+        if (tagList.contains("@envCondition")) {
+            exit = ignoreReasons.ENVCONDITION;
+        }
+        if (tagList.contains("@unimplemented")) {
+            logger.warn("Scenario '" + scenarioName + "' ignored because it is not yet implemented.");
+            exit = ignoreReasons.UNIMPLEMENTED;
+        }
+        if (tagList.contains("@manual")) {
+            logger.warn("Scenario '" + scenarioName + "' ignored because it is marked as manual test.");
+            exit = ignoreReasons.MANUAL;
+        }
+        if (tagList.contains("@toocomplex")) {
+            logger.warn("Scenario '" + scenarioName + "' ignored because the test is too complex.");
+            exit = ignoreReasons.TOOCOMPLEX;
+        }
+
         return exit;
     }
 
-    public enum ignoreReasons { NOTIGNORED, ENVCONDITION, UNIMPLEMENTED, MANUAL, TOOCOMPLEX, JIRATICKET, NOREASON }
+
 }

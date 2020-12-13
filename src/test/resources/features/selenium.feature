@@ -5,7 +5,7 @@ Feature: Selenium steps
   steps for testing web pages using selenium (such as this one) must include the "@web" annotation at the beginning of the file.
   This is necessary, since it signals the library that it should bootstrap selenium and other important components.
 
-  Scenario: Finding a text anyware on the page
+  Scenario: Finding a text anywhere on the page
     Given My app is running in '${DEMO_SITE_HOST}'
     When I browse to '/'
     And I wait '1' seconds

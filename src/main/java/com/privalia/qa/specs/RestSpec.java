@@ -18,10 +18,10 @@ package com.privalia.qa.specs;
 
 import com.jayway.jsonpath.PathNotFoundException;
 import com.privalia.qa.utils.ThreadProperty;
-import cucumber.api.java.en.And;
-import cucumber.api.java.en.Given;
-import cucumber.api.java.en.Then;
-import cucumber.api.java.en.When;
+import io.cucumber.java.en.And;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
 import io.cucumber.datatable.DataTable;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
@@ -322,7 +322,10 @@ public class RestSpec extends BaseGSpec {
      * @param expectedStatus        Expected HTTP status code
      * @param responseAssert        Expression to determine if assert length, text or schema
      */
-    @Then("^the service response status must be '(.*?)'( (and its response length must be '.*?')| (and its response must contain the text '.*?')| (and its response matches the schema in '.*?'))?$")
+    @Then("^the service response status must be '(\\S+)()'$")
+    @Then("^the service response status must be '(\\S+)' (and its response length must be '.*?')$")
+    @Then("^the service response status must be '(\\S+)' (and its response must contain the text '.*?')$")
+    @Then("^the service response status must be '(\\S+)' (and its response matches the schema in '.*?')$")
     public void assertResponseStatusLength(Integer expectedStatus, String responseAssert) {
 
         commonspec.getRestResponse().then().statusCode(expectedStatus);

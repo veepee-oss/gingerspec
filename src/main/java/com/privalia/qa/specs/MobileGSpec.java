@@ -1,6 +1,6 @@
 package com.privalia.qa.specs;
 
-import cucumber.api.java.en.Given;
+import io.cucumber.java.en.Given;
 import io.appium.java_client.MobileDriver;
 import org.openqa.selenium.ScreenOrientation;
 

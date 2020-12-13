@@ -21,12 +21,12 @@ import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
 import com.privalia.qa.data.BrowsersDataProvider;
 import com.privalia.qa.utils.ThreadProperty;
-import cucumber.api.Scenario;
-import cucumber.api.java.After;
-import cucumber.api.java.Before;
 import io.appium.java_client.MobileDriver;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
+import io.cucumber.java.After;
+import io.cucumber.java.Before;
+import io.cucumber.java.Scenario;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import io.restassured.http.ContentType;
 import org.openqa.selenium.*;
@@ -387,7 +387,7 @@ public class HookGSpec extends BaseGSpec {
      * @param scenario      Instance of the scenario just executed
      * @throws IOException  The IOException
      */
-    @After(order = 20, value = {"@web or @mobile"})
+    @After(order = 20, value = "@web or @mobile")
     public void seleniumTeardown(Scenario scenario) throws IOException {
         if (commonspec.getDriver() != null) {
             try {
@@ -395,12 +395,12 @@ public class HookGSpec extends BaseGSpec {
                     //Include the page source in the report
                     commonspec.getLogger().debug("Scenario failed. Adding page source to report");
                     String source = driver.getPageSource();
-                    scenario.embed(source.getBytes(), "text");
+                    scenario.attach(source.getBytes(), "page source", "text");
 
                     //Include screenshot in the report
                     commonspec.getLogger().debug("Adding screenshot to report");
                     byte[] screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
-                    scenario.embed(screenshot, "image/png");
+                    scenario.attach(screenshot, "image", "image/png");
 
                     //Take screenshot and save it in the target/execution folder
                     commonspec.getLogger().debug("Adding screenshot target/execution folder");

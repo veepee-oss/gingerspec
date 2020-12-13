@@ -2,7 +2,7 @@ package com.privalia.qa.ATests;
 
 import com.privalia.qa.data.BrowsersDataProvider;
 import com.privalia.qa.utils.BaseGTest;
-import cucumber.api.CucumberOptions;
+import io.cucumber.testng.CucumberOptions;
 import org.testng.annotations.Factory;
 
 @CucumberOptions(

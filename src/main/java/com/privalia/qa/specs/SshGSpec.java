@@ -17,8 +17,8 @@
 package com.privalia.qa.specs;
 
 import com.privalia.qa.utils.RemoteSSHConnection;
-import cucumber.api.java.en.Given;
-import cucumber.api.java.en.Then;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
 import org.assertj.core.api.Assertions;
 
 import java.io.File;

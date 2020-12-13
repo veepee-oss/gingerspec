@@ -4,10 +4,10 @@ import com.privalia.qa.cucumber.converter.ArrayListConverter;
 import com.privalia.qa.cucumber.converter.NullableStringConverter;
 import com.privalia.qa.utils.PreviousWebElements;
 import com.privalia.qa.utils.ThreadProperty;
-import cucumber.api.java.en.And;
-import cucumber.api.java.en.Given;
-import cucumber.api.java.en.Then;
-import cucumber.api.java.en.When;
+import io.cucumber.java.en.And;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
 import org.apache.kafka.common.protocol.types.Field;
 import org.assertj.core.api.Assertions;
 import org.openqa.selenium.*;
@@ -1229,7 +1229,7 @@ public class SeleniumGSpec extends BaseGSpec {
      * @see #seleniumBrowse(String, String)
      * @param url   Url were to navigate
      */
-    @Given("I go to '(.*)'")
+    @Given("^I go to '(.*)'$")
     public void iGoToUrl(String url) {
 
         if (!url.toLowerCase().contains("http://") && !url.toLowerCase().contains("https://")) {

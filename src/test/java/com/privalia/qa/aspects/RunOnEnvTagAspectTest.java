@@ -15,13 +15,10 @@
  */
 package com.privalia.qa.aspects;
 
-import gherkin.ast.Location;
-import gherkin.ast.Tag;
-import org.testng.annotations.Test;
 
+import org.testng.annotations.Test;
 import java.util.ArrayList;
 import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 
@@ -60,30 +57,30 @@ public class RunOnEnvTagAspectTest {
     @Test
     public void testTagIterationRun() throws Exception {
         System.setProperty("HELLO","OK");
-        List<Tag> tagList = new ArrayList<>();
-        tagList.add(new Tag(new Location(1,1),"@runOnEnv(HELLO)"));
-        assertThat(false).isEqualTo(runontag.tagsIteration(tagList,new Location(1,1)));
+        List<String> tagList = new ArrayList<>();
+        tagList.add("@runOnEnv(HELLO)");
+        assertThat(false).isEqualTo(runontag.tagsIteration(tagList));
     }
 
     @Test
     public void testTagIterationIgnoreRun() throws Exception {
-        List<Tag> tagList = new ArrayList<>();
-        tagList.add(new Tag(new Location(1,1), "@runOnEnv(BYE)"));
-        assertThat(true).isEqualTo(runontag.tagsIteration(tagList,new Location(1,1)));
+        List<String> tagList = new ArrayList<>();
+        tagList.add("@runOnEnv(BYE)");
+        assertThat(true).isEqualTo(runontag.tagsIteration(tagList));
     }
 
     @Test
     public void testTagIterationSkip() throws Exception {
-        List<Tag> tagList = new ArrayList<>();
-        tagList.add(new Tag(new Location(1,1), "@skipOnEnv(HELLO_NO)"));
-        assertThat(false).isEqualTo(runontag.tagsIteration(tagList,new Location(1,1)));
+        List<String> tagList = new ArrayList<>();
+        tagList.add("@skipOnEnv(HELLO_NO)");
+        assertThat(false).isEqualTo(runontag.tagsIteration(tagList));
     }
 
     @Test
     public void testTagIterationIgnoreSkip() throws Exception {
         System.setProperty("HELLO","OK");
-        List<Tag> tagList = new ArrayList<>();
-        tagList.add(new Tag(new Location(1,1), "@skipOnEnv(HELLO)"));
-        assertThat(true).isEqualTo(runontag.tagsIteration(tagList,new Location(1,1)));
+        List<String> tagList = new ArrayList<>();
+        tagList.add("@skipOnEnv(HELLO)");
+        assertThat(true).isEqualTo(runontag.tagsIteration(tagList));
     }
 }

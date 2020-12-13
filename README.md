@@ -18,12 +18,12 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 ![GitHub Release Date](https://img.shields.io/github/release-date/PrivaliaTech/gingerspec)
 
-Privalia Acceptance Test library. Testing runtime to rule over Privalia's acceptance tests
+Acceptance Test library. General purpose automation framework.
 
 ## Project Intro/Objective
 The purpose of this project is to provide a generic BDT (behaviour driven testing) library with common BDD steps and extended gherkin language.
 
-GingerSpec provides common functionality that can be reused by different test projects, It encourage code reusability, as we test (in most of the cases) the same, it will help our QA Community to get our objectives much faster. It focus on the reuse of actions (also steps or keytabs) that implement low level functionality and that can be organized to create much more complex features
+GingerSpec provides common functionality that can be reused by different test projects, It encourages code reusability, as we test (in most of the cases) the same, it will help our QA Community to get our objectives much faster. It focuses on the reuse of actions (also steps or key tabs) that implement low level functionality and that can be organized to create much more complex features.
 
 ## Documentation
 * [Project wiki](https://github.com/PrivaliaTech/gingerspec/wiki)
@@ -53,11 +53,9 @@ GingerSpec provides common functionality that can be reused by different test pr
 
 Check the following articles to get more information about how to use GingerSpec:
 
-* [Compiling the library](https://github.com/PrivaliaTech/gingerspec/wiki/Getting-started#compiling-the-library)
-* [Testing with alternative SDK](https://github.com/PrivaliaTech/gingerspec/wiki/Getting-started#testing-with-alternative-sdk)  
-* [Tests execution](https://github.com/PrivaliaTech/gingerspec/wiki/Getting-started#tests-execution)
-
-<br>
+* [Technical documentation](https://github.com/vpTechOSS/gingerspec/wiki/Technical-documentation)
+* [Getting started](https://github.com/vpTechOSS/gingerspec/wiki/Getting-started)  
+* [Running your tests](https://github.com/vpTechOSS/gingerspec/wiki/Running-your-tests)
 
 ## Using the library
 
@@ -67,7 +65,7 @@ You must use the following dependency in your testng project to get access to al
 <dependency>
     <groupId>com.github.privaliatech</groupId>
     <artifactId>gingerspec</artifactId>
-    <version>2.1.0-RC3</version>
+    <version>2.1.5</version>
 </dependency>
 ``` 
 
@@ -85,19 +83,19 @@ This will create a ready-to-use project based on a template with best practices 
   
 As part of GingerSpec implementation, there are a couple of AspectJ aspects which may be useful for your scenarios:  
   
-- [RunOnTagAspect](https://github.com/PrivaliaTech/gingerspec/wiki/Gherkin-extended-language#runonenv-tag):  Allow the conditional execution of scenarios based on a given environment variable
+- [RunOnTagAspect](https://github.com/vpTechOSS/gingerspec/wiki/Gherkin-tags#runonenv-tag):  Allow the conditional execution of scenarios based on a given environment variable
   
-- [IgnoreTagAspect](https://github.com/PrivaliaTech/gingerspec/wiki/Gherkin-extended-language#ignore-tags): An AspectJ aspect that allows to skip an scenario or a whole feature. To do so, a tag must be used before the scenario or the feature keyword. Additionally an ignored reason can be set.  
+- [IgnoreTagAspect](https://github.com/vpTechOSS/gingerspec/wiki/Gherkin-tags#ignore-tag): An AspectJ aspect that allows to skip an scenario or a whole feature. To do so, a tag must be used before the scenario or the feature keyword. Additionally, an ignored reason can be set.  
   
-- [IncludeTagAspect](https://github.com/PrivaliaTech/gingerspec/wiki/Gherkin-extended-language#include-tag): An AspectJ aspect that includes an scenario before the tagged one. It manages parameters as well. Scenario name of the included feature can not contain spaces. Parameters should be wrapped in []  
+- [IncludeTagAspect](https://github.com/vpTechOSS/gingerspec/wiki/Gherkin-tags#include-tag): An AspectJ aspect that includes an scenario before the tagged one. It manages parameters as well. Scenario name of the included feature cannot contain spaces. Parameters should be wrapped in []  
 
-- [LoopTagAspect](https://github.com/PrivaliaTech/gingerspec/wiki/Gherkin-extended-language#loop-tag): An AspectJ aspect that allows looping over scenarios. Using this tag before an scenario will convert this scenario into an scenario outline
+- [LoopTagAspect](https://github.com/vpTechOSS/gingerspec/wiki/Gherkin-tags#loop-tag): An AspectJ aspect that allows looping over scenarios. Using this tag before an scenario will convert this scenario into a scenario outline.
   
-- [BackgroundTagAspect](https://github.com/PrivaliaTech/gingerspec/wiki/Gherkin-extended-language#background-extension): An AspectJ aspect included in loopTagAspect that allows conditional backgrounds, or conditional executions of group of steps based in a environmental variable.
+- [BackgroundTagAspect](https://github.com/vpTechOSS/gingerspec/wiki/Gherkin-tags#background-tag): An AspectJ aspect included in loopTagAspect that allows conditional backgrounds, or conditional executions of group of steps based in a environmental variable.
 
-- [ReplacementAspect](https://github.com/PrivaliaTech/gingerspec/wiki/Gherkin-extended-language#environment-variables): Allows the use of variables in the Feature file. Variables are enclosed in #{}, ${}, @{} and !{} symbols and could be global (feature level) or local (scenario level)
+- [ReplacementAspect](https://github.com/vpTechOSS/gingerspec/wiki/Gherkin-variables): Allows the use of variables in the Feature file. Variables are enclosed in #{}, ${}, @{} and !{} symbols and could be global (feature level) or local (scenario level)
   
-- [LogTagAspect](https://github.com/PrivaliaTech/gingerspec/wiki/Gherkin-extended-language#log-aspect): Allows comments in the feature file to be printed in console when tests are executed.
+- [LogTagAspect](https://github.com/vpTechOSS/gingerspec/wiki/Gherkin-tags#log-tag): Allows comments in the feature file to be printed in console when tests are executed.
   
   <br>
   
@@ -120,15 +118,17 @@ _Testing Rest services_
 
 _Testing a web page_
 ```
-  Scenario: Test send keys function
-    Given My app is running in 'mytestpage.com'
-    When I browse to '/registration'
-    When '1' elements exists with 'id:name_3_firstname'
-    Then I type 'testUser' on the element on index '0'
-    Then I send 'ENTER' on the element on index '0'
+  Scenario: Fill the form and click the submit button
+    Given I go to 'http://demoqa.com/text-box'
+    And I type 'John' on the element with 'id:userName'
+    And I type 'john.smith@email.com' on the element with 'id:userEmail'
+    And I type '123 fake address' on the element with 'id:currentAddress'
+    When I scroll down until the element with 'id:submit' is visible
+    And I click on the element with 'id:submit'
+    Then at least '1' elements exists with 'id:output'
 ```
 
-_Testing a kafka service_
+_Testing database_
 ```
 Scenario: Send message to kafka topic
     Given I connect to kafka at 'myzookeeperaddress:2181'

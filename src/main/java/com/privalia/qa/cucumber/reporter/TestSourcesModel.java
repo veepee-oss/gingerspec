@@ -1,54 +1,53 @@
 package com.privalia.qa.cucumber.reporter;
 
-import cucumber.api.TestCase;
-import cucumber.api.event.TestSourceRead;
-import gherkin.*;
-import gherkin.ast.*;
+import io.cucumber.gherkin.Gherkin;
+import io.cucumber.messages.Messages;
+import io.cucumber.messages.Messages.GherkinDocument;
+import io.cucumber.messages.Messages.GherkinDocument.Feature;
+import io.cucumber.messages.Messages.GherkinDocument.Feature.*;
+import io.cucumber.messages.Messages.GherkinDocument.Feature.FeatureChild.RuleChild;
+import io.cucumber.messages.Messages.GherkinDocument.Feature.Scenario.Examples;
+import io.cucumber.messages.internal.com.google.protobuf.GeneratedMessageV3;
+import io.cucumber.messages.internal.com.google.protobuf.Message;
+import io.cucumber.plugin.event.TestCase;
+import io.cucumber.plugin.event.TestSourceRead;
 
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
-public class TestSourcesModel {
+import static io.cucumber.gherkin.Gherkin.makeSourceEnvelope;
+import static java.util.Collections.singletonList;
+import static java.util.stream.Collectors.toList;
 
-    private final Map<String, TestSourceRead> pathToReadEventMap = new HashMap<String, TestSourceRead>();
+final class TestSourcesModel {
 
-    private final Map<String, GherkinDocument> pathToAstMap = new HashMap<String, GherkinDocument>();
+    private final Map<URI, TestSourceRead> pathToReadEventMap = new HashMap<>();
 
-    private final Map<String, Map<Integer, AstNode>> pathToNodeMap = new HashMap<String, Map<Integer, AstNode>>();
+    private final Map<URI, GherkinDocument> pathToAstMap = new HashMap<>();
 
-    static Feature getFeatureForTestCase(AstNode astNode) {
-        while (astNode.parent != null) {
-            astNode = astNode.parent;
+    private final Map<URI, Map<Integer, AstNode>> pathToNodeMap = new HashMap<>();
+
+    static Scenario getScenarioDefinition(AstNode astNode) {
+        AstNode candidate = astNode;
+        while (candidate != null && !(candidate.node instanceof Scenario)) {
+            candidate = candidate.parent;
         }
-        return (Feature) astNode.node;
+        return candidate == null ? null : (Scenario) candidate.node;
     }
 
-    public static Background getBackgroundForTestCase(AstNode astNode) {
-        Feature feature = getFeatureForTestCase(astNode);
-        ScenarioDefinition backgound = feature.getChildren().get(0);
-        if (backgound instanceof Background) {
-            return (Background) backgound;
-        } else {
-            return null;
-        }
-    }
-
-    public static ScenarioDefinition getScenarioDefinition(AstNode astNode) {
-        return astNode.node instanceof ScenarioDefinition ? (ScenarioDefinition) astNode.node : (ScenarioDefinition) astNode.parent.parent.node;
-    }
-
-    public static boolean isScenarioOutlineScenario(AstNode astNode) {
-        return !(astNode.node instanceof ScenarioDefinition);
-    }
-
-    public static boolean isBackgroundStep(AstNode astNode) {
+    static boolean isBackgroundStep(AstNode astNode) {
         return astNode.parent.node instanceof Background;
     }
 
     static String calculateId(AstNode astNode) {
-        Node node = astNode.node;
-        if (node instanceof ScenarioDefinition) {
-            return calculateId(astNode.parent) + ";" + convertToId(((ScenarioDefinition) node).getName());
+        GeneratedMessageV3 node = astNode.node;
+        if (node instanceof Scenario) {
+            return calculateId(astNode.parent) + ";" + convertToId(((Scenario) node).getName());
         }
         if (node instanceof ExamplesRowWrapperNode) {
             return calculateId(astNode.parent) + ";" + (((ExamplesRowWrapperNode) node).bodyRowIndex + 2);
@@ -69,11 +68,29 @@ public class TestSourcesModel {
         return name.replaceAll("[\\s'_,!]", "-").toLowerCase();
     }
 
-    public void addTestSourceReadEvent(String path, TestSourceRead event) {
+    static URI relativize(URI uri) {
+        if (!"file".equals(uri.getScheme())) {
+            return uri;
+        }
+        if (!uri.isAbsolute()) {
+            return uri;
+        }
+
+        try {
+            URI root = new File("").toURI();
+            URI relative = root.relativize(uri);
+            // Scheme is lost by relativize
+            return new URI("file", relative.getSchemeSpecificPart(), relative.getFragment());
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException(e.getMessage(), e);
+        }
+    }
+
+    void addTestSourceReadEvent(URI path, TestSourceRead event) {
         pathToReadEventMap.put(path, event);
     }
 
-    public Feature getFeature(String path) {
+    Feature getFeature(URI path) {
         if (!pathToAstMap.containsKey(path)) {
             parseGherkinSource(path);
         }
@@ -83,11 +100,99 @@ public class TestSourcesModel {
         return null;
     }
 
-    public ScenarioDefinition getScenarioDefinition(String path, int line) {
-        return getScenarioDefinition(getAstNode(path, line));
+    private void parseGherkinSource(URI path) {
+        if (!pathToReadEventMap.containsKey(path)) {
+            return;
+        }
+        String source = pathToReadEventMap.get(path).getSource();
+
+        List<Messages.Envelope> sources = singletonList(
+            makeSourceEnvelope(source, path.toString()));
+
+        List<Messages.Envelope> envelopes = Gherkin.fromSources(
+            sources,
+            true,
+            true,
+            true,
+            () -> String.valueOf(UUID.randomUUID())).collect(toList());
+
+        GherkinDocument gherkinDocument = envelopes.stream()
+                .filter(Messages.Envelope::hasGherkinDocument)
+                .map(Messages.Envelope::getGherkinDocument)
+                .findFirst()
+                .orElse(null);
+
+        pathToAstMap.put(path, gherkinDocument);
+        Map<Integer, AstNode> nodeMap = new HashMap<>();
+        AstNode currentParent = new AstNode(gherkinDocument.getFeature(), null);
+        for (FeatureChild child : gherkinDocument.getFeature().getChildrenList()) {
+            processFeatureDefinition(nodeMap, child, currentParent);
+        }
+        pathToNodeMap.put(path, nodeMap);
+
     }
 
-    public AstNode getAstNode(String path, int line) {
+    private void processFeatureDefinition(Map<Integer, AstNode> nodeMap, FeatureChild child, AstNode currentParent) {
+        if (child.hasBackground()) {
+            processBackgroundDefinition(nodeMap, child.getBackground(), currentParent);
+        } else if (child.hasScenario()) {
+            processScenarioDefinition(nodeMap, child.getScenario(), currentParent);
+        } else if (child.hasRule()) {
+            AstNode childNode = new AstNode(child.getRule(), currentParent);
+            nodeMap.put(child.getRule().getLocation().getLine(), childNode);
+            for (RuleChild ruleChild : child.getRule().getChildrenList()) {
+                processRuleDefinition(nodeMap, ruleChild, childNode);
+            }
+        }
+    }
+
+    private void processBackgroundDefinition(
+            Map<Integer, AstNode> nodeMap, Background background, AstNode currentParent
+    ) {
+        AstNode childNode = new AstNode(background, currentParent);
+        nodeMap.put(background.getLocation().getLine(), childNode);
+        for (Step step : background.getStepsList()) {
+            nodeMap.put(step.getLocation().getLine(), new AstNode(step, childNode));
+        }
+    }
+
+    private void processScenarioDefinition(Map<Integer, AstNode> nodeMap, Scenario child, AstNode currentParent) {
+        AstNode childNode = new AstNode(child, currentParent);
+        nodeMap.put(child.getLocation().getLine(), childNode);
+        for (Step step : child.getStepsList()) {
+            nodeMap.put(step.getLocation().getLine(), new AstNode(step, childNode));
+        }
+        if (child.getExamplesCount() > 0) {
+            processScenarioOutlineExamples(nodeMap, child, childNode);
+        }
+    }
+
+    private void processRuleDefinition(Map<Integer, AstNode> nodeMap, RuleChild child, AstNode currentParent) {
+        if (child.hasBackground()) {
+            processBackgroundDefinition(nodeMap, child.getBackground(), currentParent);
+        } else if (child.hasScenario()) {
+            processScenarioDefinition(nodeMap, child.getScenario(), currentParent);
+        }
+    }
+
+    private void processScenarioOutlineExamples(
+            Map<Integer, AstNode> nodeMap, Scenario scenarioOutline, AstNode parent
+    ) {
+        for (Examples examples : scenarioOutline.getExamplesList()) {
+            AstNode examplesNode = new AstNode(examples, parent);
+            TableRow headerRow = examples.getTableHeader();
+            AstNode headerNode = new AstNode(headerRow, examplesNode);
+            nodeMap.put(headerRow.getLocation().getLine(), headerNode);
+            for (int i = 0; i < examples.getTableBodyCount(); ++i) {
+                TableRow examplesRow = examples.getTableBody(i);
+                GeneratedMessageV3 rowNode = new ExamplesRowWrapperNode(examplesRow, i);
+                AstNode expandedScenarioNode = new AstNode(rowNode, examplesNode);
+                nodeMap.put(examplesRow.getLocation().getLine(), expandedScenarioNode);
+            }
+        }
+    }
+
+    AstNode getAstNode(URI path, int line) {
         if (!pathToNodeMap.containsKey(path)) {
             parseGherkinSource(path);
         }
@@ -97,7 +202,7 @@ public class TestSourcesModel {
         return null;
     }
 
-    public boolean hasBackground(String path, int line) {
+    boolean hasBackground(URI path, int line) {
         if (!pathToNodeMap.containsKey(path)) {
             parseGherkinSource(path);
         }
@@ -108,111 +213,86 @@ public class TestSourcesModel {
         return false;
     }
 
-    public String getKeywordFromSource(String uri, int stepLine) {
+    static Background getBackgroundForTestCase(AstNode astNode) {
+        Feature feature = getFeatureForTestCase(astNode);
+        return feature.getChildrenList()
+                .stream()
+                .filter(FeatureChild::hasBackground)
+                .map(FeatureChild::getBackground)
+                .findFirst()
+                .orElse(null);
+    }
+
+    private static Feature getFeatureForTestCase(AstNode astNode) {
+        while (astNode.parent != null) {
+            astNode = astNode.parent;
+        }
+        return (Feature) astNode.node;
+    }
+
+    public String getRawLineString(URI uri, int stepLine) {
         Feature feature = getFeature(uri);
         if (feature != null) {
             TestSourceRead event = getTestSourceReadEvent(uri);
-            String trimmedSourceLine = event.source.split("\n")[stepLine - 1].trim();
-            GherkinDialect dialect = new GherkinDialectProvider(feature.getLanguage()).getDefaultDialect();
-            for (String keyword : dialect.getStepKeywords()) {
-                if (trimmedSourceLine.startsWith(keyword)) {
-                    return keyword;
-                }
-            }
+            String trimmedSourceLine = event.getSource().split("\n")[stepLine].trim();
+            return trimmedSourceLine;
         }
         return "";
     }
 
-    private TestSourceRead getTestSourceReadEvent(String uri) {
+    private TestSourceRead getTestSourceReadEvent(URI uri) {
         if (pathToReadEventMap.containsKey(uri)) {
             return pathToReadEventMap.get(uri);
         }
         return null;
     }
 
-    String getFeatureName(String uri) {
-        Feature feature = getFeature(uri);
-        if (feature != null) {
-            return feature.getName();
-        }
-        return "";
-    }
+    static class ExamplesRowWrapperNode extends GeneratedMessageV3 {
 
-    private void parseGherkinSource(String path) {
-        if (!pathToReadEventMap.containsKey(path)) {
-            return;
-        }
-        Parser<GherkinDocument> parser = new Parser<GherkinDocument>(new AstBuilder());
-        TokenMatcher matcher = new TokenMatcher();
-        try {
-            GherkinDocument gherkinDocument = parser.parse(pathToReadEventMap.get(path).source, matcher);
-            pathToAstMap.put(path, gherkinDocument);
-            Map<Integer, AstNode> nodeMap = new HashMap<Integer, AstNode>();
-            AstNode currentParent = new AstNode(gherkinDocument.getFeature(), null);
-            for (ScenarioDefinition child : gherkinDocument.getFeature().getChildren()) {
-                processScenarioDefinition(nodeMap, child, currentParent);
-            }
-            pathToNodeMap.put(path, nodeMap);
-        } catch (ParserException e) {
-            // Ignore exceptions
-        }
-    }
-
-    private void processScenarioDefinition(Map<Integer, AstNode> nodeMap, ScenarioDefinition child, AstNode currentParent) {
-        AstNode childNode = new AstNode(child, currentParent);
-        nodeMap.put(child.getLocation().getLine(), childNode);
-        for (Step step : child.getSteps()) {
-            nodeMap.put(step.getLocation().getLine(), new AstNode(step, childNode));
-        }
-        if (child instanceof ScenarioOutline) {
-            processScenarioOutlineExamples(nodeMap, (ScenarioOutline) child, childNode);
-        }
-    }
-
-    private void processScenarioOutlineExamples(Map<Integer, AstNode> nodeMap, ScenarioOutline scenarioOutline, AstNode childNode) {
-        for (Examples examples : scenarioOutline.getExamples()) {
-            AstNode examplesNode = new AstNode(examples, childNode);
-            TableRow headerRow = examples.getTableHeader();
-            AstNode headerNode = new AstNode(headerRow, examplesNode);
-            nodeMap.put(headerRow.getLocation().getLine(), headerNode);
-            for (int i = 0; i < examples.getTableBody().size(); ++i) {
-                TableRow examplesRow = examples.getTableBody().get(i);
-                Node rowNode = new ExamplesRowWrapperNode(examplesRow, i);
-                AstNode expandedScenarioNode = new AstNode(rowNode, examplesNode);
-                nodeMap.put(examplesRow.getLocation().getLine(), expandedScenarioNode);
-            }
-        }
-    }
-
-    public String getRawLineString(TestCase testCase, int stepLine) {
-        Feature feature = getFeature(testCase.getUri());
-        if (feature != null) {
-            TestSourceRead event = getTestSourceReadEvent(testCase.getUri());
-            String trimmedSourceLine = event.source.split("\n")[stepLine].trim();
-            return trimmedSourceLine;
-        }
-        return "";
-    }
-
-
-    public class ExamplesRowWrapperNode extends Node {
         final int bodyRowIndex;
 
-        ExamplesRowWrapperNode(Node examplesRow, int bodyRowIndex) {
-            super(examplesRow.getLocation());
+        ExamplesRowWrapperNode(GeneratedMessageV3 examplesRow, int bodyRowIndex) {
             this.bodyRowIndex = bodyRowIndex;
         }
+
+        @Override
+        protected FieldAccessorTable internalGetFieldAccessorTable() {
+            throw new UnsupportedOperationException("not implemented");
+        }
+
+        @Override
+        protected Message.Builder newBuilderForType(BuilderParent builderParent) {
+            throw new UnsupportedOperationException("not implemented");
+        }
+
+        @Override
+        public Message.Builder newBuilderForType() {
+            throw new UnsupportedOperationException("not implemented");
+        }
+
+        @Override
+        public Message.Builder toBuilder() {
+            throw new UnsupportedOperationException("not implemented");
+        }
+
+        @Override
+        public Message getDefaultInstanceForType() {
+            throw new UnsupportedOperationException("not implemented");
+        }
+
     }
 
-    public class AstNode {
+    static class AstNode {
 
-        public final Node node;
+        final GeneratedMessageV3 node;
 
-        public final AstNode parent;
+        final AstNode parent;
 
-        AstNode(Node node, AstNode parent) {
+        AstNode(GeneratedMessageV3 node, AstNode parent) {
             this.node = node;
             this.parent = parent;
         }
+
     }
+
 }

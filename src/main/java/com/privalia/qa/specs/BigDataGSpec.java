@@ -1,8 +1,8 @@
 package com.privalia.qa.specs;
 
-import cucumber.api.java.en.Given;
-import cucumber.api.java.en.When;
-import cucumber.api.java.en.Then;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.When;
+import io.cucumber.java.en.Then;
 import com.ning.http.client.Response;
 import com.privalia.qa.exceptions.DBException;
 import com.privalia.qa.utils.ThreadProperty;

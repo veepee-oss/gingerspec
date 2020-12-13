@@ -20,12 +20,11 @@ package com.privalia.qa.aspects;
 import com.privalia.qa.exceptions.NonReplaceableException;
 import com.privalia.qa.specs.CommonG;
 import com.privalia.qa.utils.ThreadProperty;
-import cucumber.runtime.StepDefinitionMatch;
-import gherkin.ast.*;
+import io.cucumber.core.backend.TestCaseState;
+import io.cucumber.core.stepexpression.DataTableArgument;
+import io.cucumber.core.stepexpression.DocStringArgument;
+import io.cucumber.core.stepexpression.ExpressionArgument;
 import io.cucumber.cucumberexpressions.Group;
-import io.cucumber.stepexpression.DataTableArgument;
-import io.cucumber.stepexpression.DocStringArgument;
-import io.cucumber.stepexpression.ExpressionArgument;
 import org.apache.commons.configuration2.CombinedConfiguration;
 import org.apache.commons.configuration2.FileBasedConfiguration;
 import org.apache.commons.configuration2.PropertiesConfiguration;
@@ -34,18 +33,23 @@ import org.apache.commons.configuration2.builder.fluent.Parameters;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.configuration2.tree.OverrideCombiner;
 import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
+import org.assertj.core.api.Assertions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.*;
 import java.util.Enumeration;
 import java.util.List;
+
 
 /**
  * Aspect to replace variables used in the feature files
@@ -57,63 +61,28 @@ public final class ReplacementAspect {
 
     private static Logger logger = LoggerFactory.getLogger(ReplacementAspect.class.getCanonicalName());
 
-    private StepDefinitionMatch lastEchoedStep;
+    private Object lastEchoedStep;
 
-    @Pointcut("execution (gherkin.ast.Scenario.new(..)) && args(tags, location, keyword, name, description, steps)")
-    protected void replacementScenarios(List<Tag> tags, Location location, String keyword, String name, String description, List<Step> steps) {
+    @Pointcut("execution (String io.cucumber.core.gherkin.messages.GherkinMessagesPickle.getName(..)) && args()")
+    protected void replacementScenarios() {
     }
 
-    @Pointcut("execution (gherkin.ast.ScenarioOutline.new(..)) && args(tags, location, keyword, name, description, steps, examples)")
-    protected void replacementScenariosOutline(List<Tag> tags, Location location, String keyword, String name, String description, List<Step> steps, List<Examples> examples) {
+    @Around(value = "replacementScenarios()")
+    public String aroundReplacementScenarios(JoinPoint jp) throws NoSuchFieldException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, FileNotFoundException, NonReplaceableException, ConfigurationException, URISyntaxException {
+
+        Object GherkinMessage = jp.getThis();
+        Field pickleField = GherkinMessage.getClass().getDeclaredField("pickle");
+        pickleField.setAccessible(true);
+        Object pickle = pickleField.get(GherkinMessage);
+        Method m = pickle.getClass().getDeclaredMethod("getName", null);
+        m.setAccessible(true);
+        String scenarioName = (String) m.invoke(pickle, null);
+        return replacedElement(scenarioName, jp);
+
     }
 
-    @Before("replacementScenariosOutline(tags, location, keyword, name, description, steps, examples)")
-    public void aroundScenariosOutlineDefinition(JoinPoint jp, List<Tag> tags, Location location, String keyword, String name, String description, List<Step> steps, List<Examples> examples) throws Throwable {
-        this.aroundScenarios(jp, tags, location, keyword, name, description, steps, examples);
-    }
-
-    @Before("replacementScenarios(tags, location, keyword, name, description, steps)")
-    public void aroundScenariosDefinition(JoinPoint jp, List<Tag> tags, Location location, String keyword, String name, String description, List<Step> steps) throws Throwable {
-        this.aroundScenarios(jp, tags, location, keyword, name, description, steps, null);
-    }
-
-    /**
-     * replaces any variable placeholder in the scenario/Scenario Outline title.
-     *
-     * @param jp          the jp
-     * @param tags        the tags
-     * @param location    the location
-     * @param keyword     the keyword
-     * @param name        the name
-     * @param description the description
-     * @param steps       the steps
-     * @param examples    the examples
-     * @throws Throwable the throwable
-     */
-    public void aroundScenarios(JoinPoint jp, List<Tag> tags, Location location, String keyword, String name, String description, List<Step> steps, List<Examples> examples) throws Throwable {
-
-        ScenarioDefinition scenario = (ScenarioDefinition) jp.getThis();
-        String scenarioName = scenario.getName();
-        String newScenarioName = replacedElement(scenarioName, jp);
-
-        if (!scenarioName.equals(newScenarioName)) {
-            Field field = null;
-            Class current = scenario.getClass();
-            do {
-                try {
-                    field = current.getDeclaredField("name");
-                } catch (Exception e) {
-                }
-            } while ((current = current.getSuperclass()) != null);
-
-            field.setAccessible(true);
-            field.set(scenario, replacedElement(name, jp));
-        }
-    }
-
-
-    @Pointcut("execution (* cucumber.runner.Match.getArguments(..)) && args()")
-    protected void replacementArguments() {
+    @Pointcut("execution (* io.cucumber.core.runner.PickleStepDefinitionMatch.runStep(..)) && args(state)")
+    protected void replacementArguments(TestCaseState state) {
     }
 
     /**
@@ -130,27 +99,17 @@ public final class ReplacementAspect {
      * @throws ConfigurationException  the configuration exception
      * @throws URISyntaxException      the uri syntax exception
      */
-    @Before(value = "replacementArguments()")
-    public void aroundReplacementArguments(JoinPoint jp) throws NoSuchFieldException, IllegalAccessException, FileNotFoundException, NonReplaceableException, ConfigurationException, URISyntaxException {
+    @Before(value = "replacementArguments(state)")
+    public void aroundReplacementArguments(JoinPoint jp, TestCaseState state) throws NoSuchFieldException, IllegalAccessException, FileNotFoundException, NonReplaceableException, ConfigurationException, URISyntaxException {
 
-        Object match = jp.getThis();
+        Object pickleStepDefinitionMatch = jp.getThis();
 
-        /*To avoid executing replacement on the same step several times*/
-        if (match.equals(lastEchoedStep)) {
-            return;
-        } else {
-            lastEchoedStep = (StepDefinitionMatch) match;
-        }
-
-        if (match.getClass().getName().matches("cucumber.runner.PickleStepDefinitionMatch")) {
-
-            Field argumentsField = match.getClass().getSuperclass().getDeclaredField("arguments");
+        if (pickleStepDefinitionMatch.getClass().getName().matches("io.cucumber.core.runner.PickleStepDefinitionMatch")) {
+            Field argumentsField = pickleStepDefinitionMatch.getClass().getSuperclass().getDeclaredField("arguments");
             argumentsField.setAccessible(true);
-            List<io.cucumber.stepexpression.Argument> arguments = (List<io.cucumber.stepexpression.Argument>) argumentsField.get(match);
+            List<io.cucumber.core.stepexpression.Argument> arguments = (List<io.cucumber.core.stepexpression.Argument>) argumentsField.get(pickleStepDefinitionMatch);
 
-            for (io.cucumber.stepexpression.Argument argument : arguments) {
-
-                //if (argument.getValue() != null) {
+            for (io.cucumber.core.stepexpression.Argument argument : arguments) {
 
                 //If is a normal expression argument
                 if (argument instanceof ExpressionArgument) {
@@ -170,7 +129,7 @@ public final class ReplacementAspect {
                         valueField.set(group, replacedValue);
 
                         List<Group> children = group.getChildren();
-                        for (Group child: children) {
+                        for (Group child : children) {
                             Field valueFieldChild = child.getClass().getDeclaredField("value");
                             String valuechild = child.getValue();
                             if (valuechild != null) {
@@ -202,17 +161,13 @@ public final class ReplacementAspect {
                 //If is a Docstring argument
                 if (argument instanceof DocStringArgument) {
                     DocStringArgument docStringArgument = (DocStringArgument) argument;
-                    Field docstringField = docStringArgument.getClass().getDeclaredField("argument");
+                    Field docstringField = docStringArgument.getClass().getDeclaredField("content");
                     docstringField.setAccessible(true);
                     String docStringValue = (String) docstringField.get(docStringArgument);
                     String replacedDocStringValue = replacedElement(docStringValue, jp);
                     docstringField.set(docStringArgument, replacedDocStringValue);
                 }
-                //}
             }
-
-        } else {
-            logger.error("Incorrect step definition match in Feature. Could not apply replacements");
         }
     }
 
@@ -299,8 +254,9 @@ public final class ReplacementAspect {
             if (prop != null) {
                 newVal = newVal.replace(placeholder, prop);
             } else {
-                logger.error("Could not find property {} in included files", property);
-                throw new NonReplaceableException("Unreplaceable placeholder: " + placeholder);
+                Assertions.fail("Could not find property %s in included files", property);
+                //logger.error("Could not find property {} in included files", property);
+                //throw new NonReplaceableException("Unreplaceable placeholder: " + placeholder);
             }
         }
 
@@ -339,11 +295,12 @@ public final class ReplacementAspect {
                 property = placeholder.substring(2, placeholder.indexOf(".")).toLowerCase();
                 subproperty = placeholder.substring(placeholder.indexOf(".") + 1, placeholder.length() - 1);
             } else {
-                if (pjp.getThis() instanceof ScenarioDefinition) {
+                if (pjp.getThis().getClass().getName().matches("io.cucumber.core.gherkin.messages.GherkinMessagesPickle")) {
                     return newVal;
                 } else {
-                    logger.error("{} -> {} placeholded element has not been replaced previously.", element, property);
-                    throw new NonReplaceableException("Unreplaceable placeholder: " + placeholder);
+                    Assertions.fail("%s -> %s placeholded element has not been replaced previously.", element, property);
+                    //logger.error("{} -> {} placeholded element has not been replaced previously.", element, property);
+                    //throw new NonReplaceableException("Unreplaceable placeholder: " + placeholder);
                 }
             }
 
@@ -401,11 +358,12 @@ public final class ReplacementAspect {
             // we want to use value previously saved
             String prop = ThreadProperty.get(attribute);
 
-            if (prop == null && (pjp.getThis() instanceof ScenarioDefinition)) {
+            if (prop == null && (pjp.getThis().getClass().getName().matches("io.cucumber.core.gherkin.messages.GherkinMessagesPickle"))) {
                 return element;
             } else if (prop == null) {
-                logger.warn("{} -> {} local var has not been saved correctly previously.", element, attribute);
                 newVal = newVal.replace(placeholder, "NULL");
+                Assertions.fail("%s -> %s local variable has not been saved correctly previously.", element, attribute);
+                //logger.warn("{} -> {} local var has not been saved correctly previously.", element, attribute);
                 //throw new NonReplaceableException("Unreplaceable placeholder: " + placeholder);
             } else {
                 newVal = newVal.replace(placeholder, prop);
@@ -466,11 +424,12 @@ public final class ReplacementAspect {
                 prop = System.getProperty(sysProp, defaultValue);
             }
 
-            if (prop == null && (jp.getThis() instanceof ScenarioDefinition)) {
+            if (prop == null && (jp.getThis().getClass().getName().matches("io.cucumber.core.gherkin.messages.GherkinMessagesPickle"))) {
                 return element;
             } else if (prop == null) {
-                logger.error("{} -> {} env var has not been defined.", element, sysProp);
-                throw new NonReplaceableException("Unreplaceable placeholder: " + placeholder);
+                Assertions.fail("%s -> %s env variable has not been defined.", element, sysProp);
+                //logger.error("{} -> {} env var has not been defined.", element, sysProp);
+                //throw new NonReplaceableException("Unreplaceable placeholder: " + placeholder);
             }
 
             if ("toLower".equals(modifier)) {

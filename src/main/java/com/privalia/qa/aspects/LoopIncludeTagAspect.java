@@ -17,7 +17,11 @@
 package com.privalia.qa.aspects;
 
 import com.privalia.qa.exceptions.IncludeException;
-import cucumber.runtime.io.Resource;
+//import cucumber.runtime.io.Resource;
+import io.cucumber.core.feature.FeatureParser;
+import io.cucumber.core.resource.Resource;
+import io.cucumber.testng.FeatureWrapper;
+import io.cucumber.testng.PickleWrapper;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -41,7 +45,11 @@ public class LoopIncludeTagAspect {
     private final Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
 
 
-    @Pointcut("execution (* cucumber.runtime.model.FeatureParser.read(..)) && args(resource)")
+    /**
+     * Pointcut is executed for {@link io.cucumber.core.feature.FeatureParser#read(Resource)}
+     * @param resource     the resource
+     */
+    @Pointcut("execution (String io.cucumber.core.feature.FeatureParser.read(..)) && args(resource)")
     protected void featureBuilderRead(Resource resource) {
     }
 
@@ -65,7 +73,7 @@ public class LoopIncludeTagAspect {
 
         String listParams;
         String paramReplace;
-        String path = resource.getPath().getSchemeSpecificPart();
+        String path = resource.getUri().getPath();
         int endIndex = path.lastIndexOf("/") + 1;
         path = path.substring(0, endIndex);
 
