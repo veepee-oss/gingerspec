@@ -27,22 +27,22 @@ import static java.lang.Math.max;
 import static java.util.Locale.ROOT;
 
 /**
+ * This class is responsible for printing the steps/features/scenarios to console. This is a custom
+ * implementation of the cucumber PrettyFormatter that allows more flexibility with colors and other
+ * formatting options. Error messages generated from other classes are printed using the standard log4j.
+ * <p>
  * This class implements a set of eventListeners for the tests suite. This methods are fired before/after
  * specific events during tests execution. Since the library uses testng and not junit to run the test
  * {@link ConcurrentEventListener} should be used instead of {@link EventListener}
  * <p>
- * This class is responsible for printing the steps/features/scenarios to console. This is a custom
- * implementation of the cucumber PrettyFormatter that allow more flexibility with colors and other
- * formatting options. Error messages generated from other classes are printed using the standard log4j.
- * <p>
- * There are several reason to implement a custom formatter in Gingerspec:
- * * Unlike PrettyFormatter, this formatter also prints things like Docstrings and datatables
+ * There are several reasons to implement a custom formatter in Gingerspec:
+ * * Unlike PrettyFormatter, this formatter also prints things like Docstrings and Datatables
  * * Instead of printing the whole stacktrace of the error when an assertion fails, only the main message
- * of the assertion is printed, which makes tests easier to read (this can be override by using -DSHOW_ERRORS_STACKTRACE)
- * If the variable -DSHOW_STACK_INFO, the formatter will print the step definition location and arguments
+ *   of the assertion is printed, which makes tests easier to read (this can be overridden by using -DSHOW_ERRORS_STACKTRACE)
+ * * If the variable -DSHOW_STACK_INFO is present, the formatter will print the step definition location and arguments
  * * Print comments written on top of steps (#log) and even do variable replacement on them
  * * Last but not least, this formatter also makes variable replacement, so it will correctly
- * print Gingerspec custom variables (!{VAR}, #{VAR}, ${VAR} and @{VAR})
+ *   print Gingerspec custom variables (!{VAR}, #{VAR}, ${VAR} and @{VAR})
  *
  * @author Jose Fernandez
  */
@@ -202,9 +202,9 @@ public class TestNGPrettyFormatter implements ConcurrentEventListener, ColorAwar
         Format format = formats.get("pending_arg");
         out.println(tagsList);
 
-        out.println(feature.getKeyword() + ": " + feature.getName());
+        out.println(feature.getKeyword() + ": " + this.getReplacedValue(feature.getName()));
         if (feature.getDescription() != null) {
-            out.println(feature.getDescription());
+            out.println(this.getReplacedValue(feature.getDescription()));
         }
     }
 

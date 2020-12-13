@@ -1,17 +1,45 @@
-Feature: JSON replacements
+Feature: Testing variable replacements ${VERSION}
 
-  Scenario: Simplest read
+  This features provides examples on how to use variable replacement. You can use variables at any point in your
+  feature file: feature title, description, scenario description steps, datatables, docstrings and even comments.
+
+  Scenario: Replacements in comments
+    #log the value of time.wait is #{wait.time}
+    And I wait '#{wait.time}' seconds
+
+  Scenario: Replacements scenario title (${VERSION})
+    #log the value of time.wait is #{wait.time}
+    And I wait '#{wait.time}' seconds
+
+  Scenario: Operations with global variables
+    Then '${VARNAME.toUpper}' matches 'FOO'
+    Then '${VARNAME.toLower}' matches 'foo'
+    Then '${INVALID:-bb}' matches 'bb'
+
+  Scenario: Saving and replacing local variables
+    Given I save '2' in variable 'SO_ENV_VAR'
+    And I wait '!{SO_ENV_VAR}' seconds
+
+  Scenario Outline: Replacements in an scenario outline
+    Given I save '2' in variable 'SO_ENV_VAR'
+    And I wait '!{SO_ENV_VAR}' seconds
+    And I wait '<other>' seconds
+    And I wait '#{wait.time}' seconds
+
+    Examples:
+      | other        |
+      | 1            |
+      | #{wait.time} |
+
+  Scenario: Reading a file and saving it in a variable
     Given I save '@{JSON.schemas/empty.json}' in variable 'VAR'
     Then I run '[ "!{VAR}" = "{}" ]' locally
 
-  Scenario: Simplest read with failure message
+  Scenario: Reading a file with failure message
     Given I save '@{JSON.schemas/otherempty.json}' in variable 'VAR'
     Then I run '[ "!{VAR}" = "ERR! File not found: schemas/otherempty.json" ]' locally
 
   Scenario: Simplest read @{JSON.schemas/empty.json} on scenario name
-    Given I run 'ls' locally
-
-  Scenario: Simplest read ${WAIT} on scenario name 2
     Given I run 'ls' locally
 
   Scenario Outline: With scenarios outlines
