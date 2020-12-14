@@ -60,7 +60,7 @@ jobs:
       file:
         - gingerspec/target/gingerspec-$project_version.jar
       on:
-        repo: PrivaliaTech/gingerspec
+        repo: vpTechOSS/gingerspec
         tags: false
         all_branches: true
         condition: ${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH} =~ ^release\/.*$
