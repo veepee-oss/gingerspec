@@ -93,7 +93,6 @@
 
     <properties>
         <cucumber-java.version>6.9.0</cucumber-java.version>
-        <testng.version>7.3.0</testng.version>
         <assertj-core.version>3.16.0</assertj-core.version>
         <slf4j-api.version>1.7.30</slf4j-api.version>
         <reflections.version>0.9.9-RC1</reflections.version>
@@ -252,12 +251,6 @@
             <groupId>io.cucumber</groupId>
             <artifactId>cucumber-testng</artifactId>
             <version>${cucumber-java.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.testng</groupId>
-            <artifactId>testng</artifactId>
-            <version>${testng.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.jcraft</groupId>
