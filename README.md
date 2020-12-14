@@ -97,8 +97,6 @@ As part of GingerSpec implementation, there are a couple of AspectJ aspects whic
   
 - [LogTagAspect](https://github.com/vpTechOSS/gingerspec/wiki/Gherkin-tags#log-tag): Allows comments in the feature file to be printed in console when tests are executed.
   
-  <br>
-  
   
 ## Steps
 
