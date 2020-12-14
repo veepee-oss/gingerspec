@@ -289,43 +289,19 @@ public class RestSpec extends BaseGSpec {
 
     /**
      * Verifies the status response (HTTP response code) of a rest request.
-     * <p>
-     * Additionally, the step can verify the response (body) length, and if the body contains a given character or matches a defined schema.
-     * For this step to work, a previous request must have been executed such as {@link #sendRequestNoDataTable(String, String, String, String, String)}
-     * or {@link #sendRequestDataTable(String, String, String, String, String, DataTable)}
-     * <pre>
-     * Example: Verify the response status code
-     * {@code
-     *      When I send a 'GET' request to '/posts'
-     *      Then the service response status must be '200'
-     * }
-     * Example: Checking the response body length
-     * {@code
-     *     When I send a 'GET' request to '/comments/1'
-     *     Then the service response status must be '200' and its response length must be '268'
-     * }
-     * Example: Verify the response body contains a specific text
-     * {@code
-     *     When I send a 'GET' request to '/posts'
-     *     Then the service response status must be '200' and its response must contain the text 'body'
-     * }
-     * Example: Verify that the response body matches a json schema
-     * {@code
-     *     When I send a 'GET' request to '/posts'
-     *     Then the service response status must be '200' and its response matches the schema in 'schemas/responseSchema.json'
-     * }
-     * * The file schemas/responseSchema.json must contains a valid json schema (http://json-schema.org/)
-     * </pre>
-     * @see #sendRequestNoDataTable(String, String, String, String, String)
-     * @see #sendRequestDataTable(String, String, String, String, String, DataTable)
+     *
+     * This step was deprecated, please, use {@link #assertResponseStatusCode(Integer)}, {@link #assertResponseMessage(String)},
+     * {@link #assertResponseLength(Integer)} or {@link #assertResponseSchema(String)}
+     *
+     * @see #assertResponseStatusCode(Integer)
+     * @see #assertResponseMessage(String)
+     * @see #assertResponseLength(Integer)
+     * @see #assertResponseSchema(String)
      * @see <a href="http://json-schema.org/">http://json-schema.org/</a>
      * @param expectedStatus        Expected HTTP status code
      * @param responseAssert        Expression to determine if assert length, text or schema
      */
-    @Then("^the service response status must be '(\\S+)()'$")
-    @Then("^the service response status must be '(\\S+)' (and its response length must be '.*?')$")
-    @Then("^the service response status must be '(\\S+)' (and its response must contain the text '.*?')$")
-    @Then("^the service response status must be '(\\S+)' (and its response matches the schema in '.*?')$")
+    @Deprecated
     public void assertResponseStatusLength(Integer expectedStatus, String responseAssert) {
 
         commonspec.getRestResponse().then().statusCode(expectedStatus);
@@ -350,6 +326,74 @@ public class RestSpec extends BaseGSpec {
             Assertions.assertThat(commonspec.getRestResponse().getBody().asString().length()).as("The returned body does not have the expected length").isEqualTo(Integer.valueOf(parts[1]));
         }
 
+    }
+
+    /**
+     * Verifies the response body matches a json schema.
+     * <p>
+     * For this step to work, a previous request must have been executed such as {@link #sendRequestNoDataTable(String, String, String, String, String)}
+     * or {@link #sendRequestDataTable(String, String, String, String, String, DataTable)}
+     * <pre>
+     * Example: Verify that the response body matches a json schema
+     * {@code
+     *     When I send a 'GET' request to '/posts'
+     *     Then the service response matches the schema in 'schemas/responseSchema.json'
+     * }
+     * * The file schemas/responseSchema.json must contains a valid json schema (http://json-schema.org/)
+     * </pre>
+     * @see #sendRequestNoDataTable(String, String, String, String, String)
+     * @see #sendRequestDataTable(String, String, String, String, String, DataTable)
+     * @see <a href="http://json-schema.org/">http://json-schema.org/</a>
+     * @param expectedSchema        File under /resources directory that contains the expected schema
+     */
+    @Then("^the service response matches the schema in '(.*?)'$")
+    public void assertResponseSchema(String expectedSchema) {
+        String schemaData = commonspec.retrieveData(expectedSchema, "json");
+        commonspec.getRestResponse().then().assertThat().body(matchesJsonSchema(schemaData));
+    }
+
+    /**
+     * Verifies the length of the response body.
+     * <p>
+     * For this step to work, a previous request must have been executed such as {@link #sendRequestNoDataTable(String, String, String, String, String)}
+     * or {@link #sendRequestDataTable(String, String, String, String, String, DataTable)}
+     * <pre>
+     * Example: Checking the response body length
+     * {@code
+     *     When I send a 'GET' request to '/comments/1'
+     *     Then the service response length must be '268'
+     * }
+     * </pre>
+     * @see #sendRequestNoDataTable(String, String, String, String, String)
+     * @see #sendRequestDataTable(String, String, String, String, String, DataTable)
+     * @see <a href="http://json-schema.org/">http://json-schema.org/</a>
+     * @param expextedLength        Expected response body length
+     */
+    @Then("^the service response length must be '(.*?)'$")
+    public void assertResponseLength(Integer expextedLength) {
+        Assertions.assertThat(commonspec.getRestResponse().getBody().asString().length()).as("The returned body does not have the expected length").isEqualTo(expextedLength);
+    }
+
+    /**
+     * Verifies the status response (HTTP response code) of a rest request.
+     * <p>
+     * For this step to work, a previous request must have been executed such as {@link #sendRequestNoDataTable(String, String, String, String, String)}
+     * or {@link #sendRequestDataTable(String, String, String, String, String, DataTable)}
+     * <pre>
+     * Example: Verify the response status code
+     * {@code
+     *      When I send a 'GET' request to '/posts'
+     *      Then the service response status must be '200'
+     * }
+     * </pre>
+     * @see #sendRequestNoDataTable(String, String, String, String, String)
+     * @see #sendRequestDataTable(String, String, String, String, String, DataTable)
+     * @see <a href="http://json-schema.org/">http://json-schema.org/</a>
+     * @param expectedStatus        Expected HTTP status code
+     */
+    @Then("^the service response status must be '(.*?)'$")
+    public void assertResponseStatusCode(Integer expectedStatus) {
+        commonspec.getRestResponse().then().statusCode(expectedStatus);
     }
 
     /**
