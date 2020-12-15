@@ -15,6 +15,7 @@ import com.ning.http.client.Realm;
 import com.ning.http.client.Response;
 import com.ning.http.client.cookie.Cookie;
 
+import com.privalia.qa.aspects.ReplacementAspect;
 import com.privalia.qa.conditions.Conditions;
 import com.privalia.qa.utils.*;
 import io.appium.java_client.MobileDriver;
@@ -2191,12 +2192,12 @@ public class CommonG {
      * @param variable      Variable placeholder as used in the gherkin file
      * @return              Value assign to that variable
      */
-//    public String getVariable(String variable) {
-//        try {
-//            return ReplacementAspect.replacedElement(variable, null);
-//        } catch (Exception e) {
-//            return null;
-//        }
-//    }
+    public String getVariable(String variable) {
+        try {
+            return ReplacementAspect.replacedElement(variable, null);
+        } catch (Exception e) {
+            return null;
+        }
+    }
 
 }
