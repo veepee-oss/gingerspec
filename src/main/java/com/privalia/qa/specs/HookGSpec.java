@@ -395,12 +395,12 @@ public class HookGSpec extends BaseGSpec {
                     //Include the page source in the report
                     commonspec.getLogger().debug("Scenario failed. Adding page source to report");
                     String source = driver.getPageSource();
-                    scenario.attach(source.getBytes(), "page source", "text");
+                    scenario.attach(source.getBytes(), "text/html", "Page source html");
 
                     //Include screenshot in the report
                     commonspec.getLogger().debug("Adding screenshot to report");
                     byte[] screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
-                    scenario.attach(screenshot, "image", "image/png");
+                    scenario.attach(screenshot, "image/png", "Screenshot");
 
                     //Take screenshot and save it in the target/execution folder
                     commonspec.getLogger().debug("Adding screenshot target/execution folder");
