@@ -1,5 +1,23 @@
 # Changelog
 
+## 2.2.0-RC1
+
+* Cucumber and TestNG dependencies updated to the latest version.
+
+* IgnoreTagAspect, RunOnEvnAspect, LoopTagAspect, BackgroundAspect, and ReplacementAspect were rewritten to comply with the API changes.
+
+* LogTagAspect was removed (functionality is now only in the formatter). Its reference was also removed from aop.xml file.
+
+* TestNGPrettyFormatter was completely rewritten. Steps are now printed after the execution and the correct color is now applied, along with a new banner and information message at the beginning of a test suite.
+
+* Some unnecessary feature files were removed or merged. Code cleanup.
+
+* Minor fixes links in README file.
+
+* Fixed problem with repo name in travis.yml file.
+
+* Some steps in Rest were modified since the regex was complicated to maintain.
+
 ## 2.1.5
 
 * Minor fix in SqlUtils class. Database cells with null values were causing an exception when transforming the resulset to List
