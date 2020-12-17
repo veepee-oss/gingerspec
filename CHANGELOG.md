@@ -1,5 +1,17 @@
 # Changelog
 
+## 2.2.0-RC2
+
+* Uncommented method to perform variables replacement in the commonG class.
+
+* Fixed after web hook for adding images to failing steps in reports.
+
+* Fixed minor javadoc error and simplified documentation for background tag.
+
+* Improvements in the documentation of some features. Code cleanup.
+
+* Minor fix in banner.
+
 ## 2.2.0-RC1
 
 * Cucumber and TestNG dependencies updated to the latest version.
