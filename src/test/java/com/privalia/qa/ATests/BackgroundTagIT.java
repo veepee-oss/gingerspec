@@ -21,9 +21,7 @@ import io.cucumber.testng.CucumberOptions;
 
 @CucumberOptions(
         features = {
-                "src/test/resources/features/backgroundTag1.feature",
-                "src/test/resources/features/backgroundTag2.feature",
-                "src/test/resources/features/backgroundTag3.feature"
+                "src/test/resources/features/backgroundTag.feature",
         },
         glue = "com.privalia.qa.specs")
 public class BackgroundTagIT extends BaseGTest {

@@ -1,6 +1,6 @@
 Feature: Testing variable replacements ${VERSION}
 
-  This features provides examples on how to use variable replacement. You can use variables at any point in your
+  This feature provides an example on how to use variable replacement. You can use variables at any point in your
   feature file: feature title, description, scenario description steps, datatables, docstrings and even comments.
 
   Scenario: Replacements in comments
