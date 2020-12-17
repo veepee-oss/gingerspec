@@ -1,5 +1,8 @@
-
 Feature: Feature used in testing loop tag aspect
+
+  This feature provides examples on how to use the @loop tag. Using this tag before a scenario will
+  convert this scenario into a scenario outline, changing parameter defined "NAME" for every element
+  in the environment variable list received.
 
   Scenario: wipe test file.
     Given I run 'rm -f testOutput.txt' locally
@@ -18,10 +21,6 @@ Feature: Feature used in testing loop tag aspect
       | $.a | REPLACE | @{JSON.schemas/empty.json}     | object   |
     Given I save '@{JSON.testSOATtag<VAR_NAME.id>.json}' in variable 'VAR'
     Then I run '[ "!{VAR}" = "{"a":{}}" ]' locally
-
-#  @loop(AGENT_LIST,VAR_NAME)
-#  Scenario: This is an omitted scenario so it contains a failing assert
-#    Given I run '[ "SHOULDNT_RUN" = "FAIL OTHERWISE" ]' locally
 
   @skipOnEnv(AGENT_LIST)
   Scenario: This scenario should be omitted.

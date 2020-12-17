@@ -1,5 +1,9 @@
+Feature: Testing the @runOnEnv and @skipOnEnv tags
 
-Feature: Feature used in testing runOnEnv tag aspect
+  This feature shows examples on how to use the @runOnEnv and @skipOnEnv tags. These tags allows the
+  conditional execution of scenarios. You can think of @runOnEnv as IF and @skipOnEnv as an IF NOT
+  statement. With @runOnEnv the scenario will only be executed if ALL the params are defined. And
+  with @skipOnEnv the scenario will be omitted if ANY of params are defined.
 
   @runOnEnv(WAIT)
   Scenario: RunOnEnv with param defined.
@@ -35,8 +39,3 @@ Feature: Feature used in testing runOnEnv tag aspect
   @skipOnEnv(NO_WAIT)
   Scenario: RunOnEnv with more than one param. Ones defined and others not defined.
     Given I run 'sleep 1' locally
-
-#  @runOnEnv(WAIT)
-#  @skipOnEnv(NO_WAIT)
-#  Scenario: This is an omitted scenario so it contains a failing assert
-#    Given I run 'sleep ${WAIT}' locally

@@ -1,4 +1,3 @@
-@web
 Feature: This feature is used to be included as part of includetagAspect testing
 
   Scenario: Dummy_scenario

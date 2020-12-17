@@ -42,12 +42,6 @@ Feature: Selenium steps
     And I wait '2' seconds
 
 
-  @include(feature:scenarioIncluded.feature,scenario:Dummy_scenario)
-  Scenario: Testing include
-    When '7' elements exists with 'class:legend_txt'
-    And I wait '2' seconds
-
-
   @ignore @toocomplex
   Scenario: Dummy scenario with HTTPS
     Given My app is running in 'es.dummy-test.com'

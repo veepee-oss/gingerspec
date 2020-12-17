@@ -1,5 +1,10 @@
 @rest
-Feature: Test print comments via CLI
+Feature: Testing the #log comments
+
+  This feature provides examples on how to use the #log tag. This tag allows you to print comments during
+  the execution of your tests. All comments that starts with the word #log will be printed. You can even
+  use variables inside comments. The only condition is that #log must be placed right on top of a step, in
+  that way, GingerSpec will recognize it as a comment of that step.
 
   Scenario: Testing comments via CLI
     #log this is a log comment, SHOULD be printed

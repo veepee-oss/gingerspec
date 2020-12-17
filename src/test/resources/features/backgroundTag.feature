@@ -1,11 +1,11 @@
 Feature: Testing background tag
 
   This feature provides an example on how to use the @BACKGROUND tag. You can use this tag to enclose
-  an step or group of steps and execute them only if the provided global variable is present.
+  a step or group of steps and execute them only if the provided global variable is present.
   You can use @BACKGROUND tag within regular scenarios or, as in this example, within a background. You can
   even use this tag within datatables.
 
-  Background:
+  Background: Executing steps conditionally depending on the WAIT and WAIT_NO variables
   @BACKGROUND(WAIT)
     Given I run '[ "SHOULD_RUN_WAIT" = "SHOULD_RUN_WAIT" ]' locally
   @/BACKGROUND

@@ -1,4 +1,13 @@
-Feature: Every scenario should be ignored, not failing the tests
+Feature: Testing the @ignore tag
+
+  This feature shows an example on how to use the @ignore tag. You can place @ignore on top of the scenario
+  to just ignore that particular scenario, or at feature level, to ignore all scenarios in the feature. You just can
+  also use the tag @ignore + <ignore reason> to provide more context.
+
+  @ignore
+  Scenario: Ignored scenario (no reason specified)
+    Given I run '[ "THIS SHOULDNT HAVE BEEN RUN" = "@{JSON.unexistant.json}" ]' locally
+    Given I run 'exit 1' locally
 
   @ignore @unimplemented
   Scenario: Ignored scenario (unimplemented)
@@ -19,14 +28,3 @@ Feature: Every scenario should be ignored, not failing the tests
   Scenario: Ignored scenario (till ticket fixed)
     Given I run '[ "THIS SHOULDNT HAVE BEEN RUN" = "" ]' locally
     Given I run 'exit 1' locally
-
-  Scenario: included_scenario
-    Given I run '[ "SHOULD_RUN" = "SHOULD_RUN" ]' locally
-
-  @include(feature:ignored.feature,scenario:included_scenario)
-  Scenario: Including scenario
-    Given I run '[ "SHOULD_RUN" = "SHOULD_RUN" ]' locally
-
-#  @include(feature:non_existant.feature,scenario:non_existant_scenario)
-  Scenario: Ignoring include tag so non scenanrio is included.
-    Given I run '[ "SHOULD_RUN" = "SHOULD_RUN" ]' locally

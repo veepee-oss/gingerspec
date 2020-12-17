@@ -1,4 +1,6 @@
-Feature: Create file test
+Feature: Create JSON file test
+
+  This feature provides examples of creation of JSON files
 
   Scenario: Create JSON file (simple)
     Given I create file 'testCreateFileSimple.json' based on 'schemas/testCreateFile.json' as 'json' with:

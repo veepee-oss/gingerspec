@@ -32,7 +32,7 @@ import java.util.List;
  * <pre>
  * {@code
  *      \@runOnEnv(param1,param2,param3,..): The scenario will only be executed if ALL the params are defined.
- *      \@skipOnEnv(param1,param2,param3,..) The scenario will omitted if ANY of params are defined.
+ *      \@skipOnEnv(param1,param2,param3,..) The scenario will be omitted if ANY of params are defined.
  * }</pre>
  *
  * @author Jose Fernandez
