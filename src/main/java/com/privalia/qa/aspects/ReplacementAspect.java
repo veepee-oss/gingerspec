@@ -66,11 +66,13 @@ public final class ReplacementAspect {
 
     private static Logger logger = LoggerFactory.getLogger(ReplacementAspect.class.getCanonicalName());
 
-    private static Map<String, StringLookup> stringLookupMap = new HashMap<String, StringLookup>() {{
-        put("envProperties", new EnvPropertyLookup());
-        put("toUpperCase", new UpperCaseLookUp());
-        put("toLowerCase", new LowerCaseLookup());
-    }};
+    private static Map<String, StringLookup> stringLookupMap = new HashMap<String, StringLookup>() {
+        {
+            put("envProperties", new EnvPropertyLookup());
+            put("toUpperCase", new UpperCaseLookUp());
+            put("toLowerCase", new LowerCaseLookup());
+        }
+    };
 
     private static StringSubstitutor interpolator = new StringSubstitutor(StringLookupFactory.INSTANCE.interpolatorStringLookup(stringLookupMap, new DefaultLookUp(), true))
             .setEnableSubstitutionInVariables(true);
@@ -105,7 +107,7 @@ public final class ReplacementAspect {
      * <p>
      * This method captures this event and replaces the variables with their appropriate value using reflection
      *
-     * @param jp the jp
+     * @param jp    the jp
      * @param state the state
      * @throws NoSuchFieldException    the no such field exception
      * @throws IllegalAccessException  the illegal access exception
@@ -231,8 +233,6 @@ public final class ReplacementAspect {
      * /resources/configuration/pre.properties, just pass -Denv=pre when
      * running your tests
      *
-     * @deprecated  Deprecated. This same function can now be perform via {@link StringSubstitutor} with the {@link EnvPropertyLookup}
-     * (i.e. #{my.key} -> ${envProperties:my.key})
      * @param element element to be replaced
      * @param pjp     JoinPoint
      * @return resulting string
@@ -240,6 +240,8 @@ public final class ReplacementAspect {
      * @throws URISyntaxException      URISyntaxException
      * @throws NonReplaceableException NonReplaceableException
      * @throws FileNotFoundException   FileNotFoundException
+     * @deprecated Deprecated. This same function can now be perform via {@link StringSubstitutor} with the {@link EnvPropertyLookup}
+     * (i.e. #{my.key} can be represented as ${envProperties:my.key})
      */
     @Deprecated
     protected static String replacePropertyPlaceholders(String element, JoinPoint pjp) throws ConfigurationException, URISyntaxException, NonReplaceableException, FileNotFoundException {
@@ -297,12 +299,12 @@ public final class ReplacementAspect {
      * - FILE: We expect it to be followed by '.' + path_to_file (relative to src/test/resources or
      * target/test-classes). The file is read and its content is returned as a string
      *
-     * @deprecated    Deprecated. @{} functions can now be performed using {@link StringSubstitutor} with the ${}
-     * variable placeholder
      * @param element element to be replaced
      * @param pjp     JoinPoint
      * @return String
      * @throws NonReplaceableException exception
+     * @deprecated Deprecated. @{} functions can now be performed using {@link StringSubstitutor} with the ${}
+     * variable placeholder
      */
     @Deprecated
     protected static String replaceCodePlaceholders(String element, JoinPoint pjp) throws NonReplaceableException {
@@ -366,10 +368,10 @@ public final class ReplacementAspect {
      * Replaces every placeholded element, enclosed in !{} with the
      * corresponding attribute value in local Common class
      *
-     * @deprecated    Deprecated. ${} placeholder can also be used as placeholder for Thread variables
      * @param element element to be replaced
      * @param pjp     JoinPoint
      * @return String string
+     * @deprecated Deprecated. ${} placeholder can also be used as placeholder for Thread variables
      */
     @Deprecated
     protected static String replaceReflectionPlaceholders(String element, JoinPoint pjp) {
