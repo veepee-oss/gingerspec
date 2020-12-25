@@ -10,7 +10,7 @@ Feature: Testing variable replacements ${VERSION}
     And I wait '${envProperties:wait.time}' seconds
 
   Scenario: Operations with global variables
-    Then '${toUpperCase:${VARNAMEs}}' matches 'FOO'
+    Then '${toUpperCase:${VARNAME}}' matches 'FOO'
     Then '${toLowerCase:${VARNAME}}' matches 'foo'
     Then '${INVALID:-bb}' matches 'bb'
 
