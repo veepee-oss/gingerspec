@@ -56,9 +56,6 @@ import java.lang.reflect.Method;
 import java.net.*;
 import java.util.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-
 /**
  * Aspect to replace variables used in the feature files
  *
@@ -234,6 +231,8 @@ public final class ReplacementAspect {
      * /resources/configuration/pre.properties, just pass -Denv=pre when
      * running your tests
      *
+     * @deprecated  Deprecated. This same function can now be perform via {@link StringSubstitutor} with the {@link EnvPropertyLookup}
+     * (i.e. #{my.key} -> ${envProperties:my.key})
      * @param element element to be replaced
      * @param pjp     JoinPoint
      * @return resulting string
@@ -242,6 +241,7 @@ public final class ReplacementAspect {
      * @throws NonReplaceableException NonReplaceableException
      * @throws FileNotFoundException   FileNotFoundException
      */
+    @Deprecated
     protected static String replacePropertyPlaceholders(String element, JoinPoint pjp) throws ConfigurationException, URISyntaxException, NonReplaceableException, FileNotFoundException {
 
         String newVal = element;
@@ -297,11 +297,14 @@ public final class ReplacementAspect {
      * - FILE: We expect it to be followed by '.' + path_to_file (relative to src/test/resources or
      * target/test-classes). The file is read and its content is returned as a string
      *
+     * @deprecated    Deprecated. @{} functions can now be performed using {@link StringSubstitutor} with the ${}
+     * variable placeholder
      * @param element element to be replaced
      * @param pjp     JoinPoint
      * @return String
      * @throws NonReplaceableException exception
      */
+    @Deprecated
     protected static String replaceCodePlaceholders(String element, JoinPoint pjp) throws NonReplaceableException {
         String newVal = element;
         while (newVal.contains("@{")) {
@@ -363,10 +366,12 @@ public final class ReplacementAspect {
      * Replaces every placeholded element, enclosed in !{} with the
      * corresponding attribute value in local Common class
      *
+     * @deprecated    Deprecated. ${} placeholder can also be used as placeholder for Thread variables
      * @param element element to be replaced
      * @param pjp     JoinPoint
      * @return String string
      */
+    @Deprecated
     protected static String replaceReflectionPlaceholders(String element, JoinPoint pjp) {
         String newVal = element;
         while (newVal.contains("!{")) {

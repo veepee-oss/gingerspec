@@ -51,12 +51,4 @@ public final class ThreadProperty {
         return PROPS.get().getProperty(key);
     }
 
-    /**
-     * Return all properties.
-     *
-     * @return Properties properties
-     */
-    public static Properties getAll() {
-        return PROPS.get();
-    }
 }
