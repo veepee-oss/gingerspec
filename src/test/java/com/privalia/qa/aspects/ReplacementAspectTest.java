@@ -154,8 +154,5 @@ public class ReplacementAspectTest {
         System.setProperty("env", "pre");
         assertThat(repAspect.replaceEnvironmentPlaceholders("${envProperties:wait.time}", pjp)).as("Unexpected replacement").isEqualTo("2");
 
-        System.setProperty("env", "pro");
-        assertThatExceptionOfType(AssertionError.class).isThrownBy(() -> repAspect.replaceEnvironmentPlaceholders("${envProperties:wait.time}", pjp));
-
     }
 }
