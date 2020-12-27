@@ -18,6 +18,10 @@ package com.privalia.qa.aspects;
 
 
 import com.privalia.qa.exceptions.NonReplaceableException;
+import com.privalia.qa.lookups.DefaultLookUp;
+import com.privalia.qa.lookups.EnvPropertyLookup;
+import com.privalia.qa.lookups.LowerCaseLookup;
+import com.privalia.qa.lookups.UpperCaseLookUp;
 import com.privalia.qa.specs.CommonG;
 import com.privalia.qa.utils.ThreadProperty;
 import io.cucumber.core.backend.TestCaseState;
@@ -32,6 +36,9 @@ import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.configuration2.builder.fluent.Parameters;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.configuration2.tree.OverrideCombiner;
+import org.apache.commons.text.StringSubstitutor;
+import org.apache.commons.text.lookup.StringLookup;
+import org.apache.commons.text.lookup.StringLookupFactory;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -47,9 +54,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.*;
-import java.util.Enumeration;
-import java.util.List;
-
+import java.util.*;
 
 /**
  * Aspect to replace variables used in the feature files
@@ -60,6 +65,17 @@ import java.util.List;
 public final class ReplacementAspect {
 
     private static Logger logger = LoggerFactory.getLogger(ReplacementAspect.class.getCanonicalName());
+
+    private static Map<String, StringLookup> stringLookupMap = new HashMap<String, StringLookup>() {
+        {
+            put("envProperties", new EnvPropertyLookup());
+            put("toUpperCase", new UpperCaseLookUp());
+            put("toLowerCase", new LowerCaseLookup());
+        }
+    };
+
+    private static StringSubstitutor interpolator = new StringSubstitutor(StringLookupFactory.INSTANCE.interpolatorStringLookup(stringLookupMap, new DefaultLookUp(), true))
+            .setEnableSubstitutionInVariables(true);
 
     private Object lastEchoedStep;
 
@@ -91,7 +107,7 @@ public final class ReplacementAspect {
      * <p>
      * This method captures this event and replaces the variables with their appropriate value using reflection
      *
-     * @param jp the jp
+     * @param jp    the jp
      * @param state the state
      * @throws NoSuchFieldException    the no such field exception
      * @throws IllegalAccessException  the illegal access exception
@@ -224,7 +240,10 @@ public final class ReplacementAspect {
      * @throws URISyntaxException      URISyntaxException
      * @throws NonReplaceableException NonReplaceableException
      * @throws FileNotFoundException   FileNotFoundException
+     * @deprecated Deprecated. This same function can now be perform via {@link StringSubstitutor} with the {@link EnvPropertyLookup}
+     * (i.e. #{my.key} can be represented as ${envProperties:my.key})
      */
+    @Deprecated
     protected static String replacePropertyPlaceholders(String element, JoinPoint pjp) throws ConfigurationException, URISyntaxException, NonReplaceableException, FileNotFoundException {
 
         String newVal = element;
@@ -284,7 +303,10 @@ public final class ReplacementAspect {
      * @param pjp     JoinPoint
      * @return String
      * @throws NonReplaceableException exception
+     * @deprecated Deprecated. @{} functions can now be performed using {@link StringSubstitutor} with the ${}
+     * variable placeholder
      */
+    @Deprecated
     protected static String replaceCodePlaceholders(String element, JoinPoint pjp) throws NonReplaceableException {
         String newVal = element;
         while (newVal.contains("@{")) {
@@ -349,7 +371,9 @@ public final class ReplacementAspect {
      * @param element element to be replaced
      * @param pjp     JoinPoint
      * @return String string
+     * @deprecated Deprecated. ${} placeholder can also be used as placeholder for Thread variables
      */
+    @Deprecated
     protected static String replaceReflectionPlaceholders(String element, JoinPoint pjp) {
         String newVal = element;
         while (newVal.contains("!{")) {
@@ -383,65 +407,34 @@ public final class ReplacementAspect {
      * @throws NonReplaceableException exception
      */
     protected static String replaceEnvironmentPlaceholders(String element, JoinPoint jp) throws NonReplaceableException {
-        String newVal = element;
-        while (newVal.contains("${")) {
-            String placeholder = newVal.substring(newVal.indexOf("${"),
-                    newVal.indexOf("}", newVal.indexOf("${")) + 1);
-            String modifier = "";
-            String sysProp;
-            String defaultValue = "";
-            String prop;
-            String placeholderAux = "";
 
-            if (placeholder.contains(":-")) {
-                defaultValue = placeholder.substring(placeholder.indexOf(":-") + 2, placeholder.length() - 1);
-                placeholderAux = placeholder.substring(0, placeholder.indexOf(":-")) + "}";
-            }
+        boolean canFail = false;
 
-            if (placeholderAux.contains(".")) {
-                if (placeholder.contains(":-")) {
-                    sysProp = placeholderAux.substring(2, placeholderAux.indexOf("."));
-                    modifier = placeholderAux.substring(placeholderAux.indexOf(".") + 1, placeholderAux.length() - 1);
-                } else {
-                    sysProp = placeholder.substring(2, placeholder.indexOf("."));
-                    modifier = placeholder.substring(placeholder.indexOf(".") + 1, placeholder.length() - 1);
-                }
-            } else {
-                if (defaultValue.isEmpty()) {
-                    if (placeholder.contains(".")) {
-                        modifier = placeholder.substring(placeholder.indexOf(".") + 1, placeholder.length() - 1);
-                        sysProp = placeholder.substring(2, placeholder.indexOf("."));
-                    } else {
-                        sysProp = placeholder.substring(2, placeholder.length() - 1);
-                    }
-                } else {
-                    sysProp = placeholder.substring(2, placeholder.indexOf(":-"));
-                }
+        if (jp != null) {
+            if (!(jp.getThis().getClass().getName().matches("io.cucumber.core.gherkin.messages.GherkinMessagesPickle"))) {
+                canFail = true;
             }
-
-            if (defaultValue.isEmpty()) {
-                prop = System.getProperty(sysProp);
-            } else {
-                prop = System.getProperty(sysProp, defaultValue);
-            }
-
-            if (prop == null && (jp.getThis().getClass().getName().matches("io.cucumber.core.gherkin.messages.GherkinMessagesPickle"))) {
-                return element;
-            } else if (prop == null) {
-                Assertions.fail("%s -> %s env variable has not been defined.", element, sysProp);
-                //logger.error("{} -> {} env var has not been defined.", element, sysProp);
-                //throw new NonReplaceableException("Unreplaceable placeholder: " + placeholder);
-            }
-
-            if ("toLower".equals(modifier)) {
-                prop = prop.toLowerCase();
-            } else if ("toUpper".equals(modifier)) {
-                prop = prop.toUpperCase();
-            }
-            newVal = newVal.replace(placeholder, prop);
         }
 
-        return newVal;
+        try {
+            interpolator.setEnableUndefinedVariableException(canFail);
+            return interpolator.replace(element);
+        } catch (Exception e) {
+            if (!canFail) {
+                return element;
+            }
+            Assertions.fail(e.getMessage());
+        }
+
+        return null;
+    }
+
+    private static Properties mergeProperties(Properties... properties) {
+        Properties mergedProperties = new Properties();
+        for (Properties property : properties) {
+            mergedProperties.putAll(property);
+        }
+        return mergedProperties;
     }
 
 

@@ -58,7 +58,6 @@ abstract public class BaseGTest extends AbstractTestNGCucumberTests {
      */
     @AfterSuite(alwaysRun = true)
     public void afterGSuite(ITestContext context) {
-        logger.info("Done executing this test-run.");
     }
 
     /**

@@ -50,4 +50,5 @@ public final class ThreadProperty {
     public static String get(String key) {
         return PROPS.get().getProperty(key);
     }
+
 }
