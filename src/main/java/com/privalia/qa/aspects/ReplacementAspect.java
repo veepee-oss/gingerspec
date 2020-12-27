@@ -25,6 +25,7 @@ import com.privalia.qa.lookups.UpperCaseLookUp;
 import com.privalia.qa.specs.CommonG;
 import com.privalia.qa.utils.ThreadProperty;
 import io.cucumber.core.backend.TestCaseState;
+import io.cucumber.core.resource.Resource;
 import io.cucumber.core.stepexpression.DataTableArgument;
 import io.cucumber.core.stepexpression.DocStringArgument;
 import io.cucumber.core.stepexpression.ExpressionArgument;
@@ -40,6 +41,7 @@ import org.apache.commons.text.StringSubstitutor;
 import org.apache.commons.text.lookup.StringLookup;
 import org.apache.commons.text.lookup.StringLookupFactory;
 import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -48,8 +50,10 @@ import org.assertj.core.api.Assertions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -79,23 +83,64 @@ public final class ReplacementAspect {
 
     private Object lastEchoedStep;
 
-    @Pointcut("execution (String io.cucumber.core.gherkin.messages.GherkinMessagesPickle.getName(..)) && args()")
-    protected void replacementScenarios() {
+    /**
+     * Pointcut is executed for {@link io.cucumber.core.feature.FeatureParser#read(Resource)}
+     * @param resource     the resource
+     */
+    @Pointcut("execution (String io.cucumber.core.feature.FeatureParser.read(..)) && args(resource)")
+    protected void featureBuilderRead(Resource resource) {
     }
 
-    @Around(value = "replacementScenarios()")
-    public String aroundReplacementScenarios(JoinPoint jp) throws NoSuchFieldException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, FileNotFoundException, NonReplaceableException, ConfigurationException, URISyntaxException {
+    /**
+     * Reads the feature file and replace all variable placeholders possible: Feature title
+     * Feature description and Scenario title. Steps and comments within a scenario are ignored
+     *
+     * Doing variable replacement at this point has certain advantages, the biggest is that the
+     * text is ready from the very beginning and this allows other plugins (like Junit formatter
+     * or HTML plugin) to work problely (variables are correctly replaced in the final reports)
+     *
+     * @param pjp      the pjp
+     * @param resource resource containing feature
+     * @return String parsed feature after aspect applied
+     * @throws Throwable exception
+     */
+    @Around(value = "featureBuilderRead(resource)")
+    public String aroundAddLoopTagPointcutScenario(ProceedingJoinPoint pjp, Resource resource) throws Throwable {
 
-        Object GherkinMessage = jp.getThis();
-        Field pickleField = GherkinMessage.getClass().getDeclaredField("pickle");
-        pickleField.setAccessible(true);
-        Object pickle = pickleField.get(GherkinMessage);
-        Method m = pickle.getClass().getDeclaredMethod("getName", null);
-        m.setAccessible(true);
-        String scenarioName = (String) m.invoke(pickle, null);
-        return replacedElement(scenarioName, jp);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(resource.getInputStream()));
+        List<String> lines = new ArrayList<>();
+
+        while (reader.ready()) {
+            lines.add(reader.readLine());
+        }
+
+        /**
+         * Starts by doing variable replacement on each line of the feature file
+         * as soon as it finds a line that starts with the word "Scenario", it switches to
+         * changing only the lines with "Scenario:". This is to not do variable replacements
+         * on the steps
+         *
+         * The reason for this is because the steps may contain variables that do not yet
+         * exists (ThreadProperty variables), and this could bring unexpected replacements
+         * like ${toUpperCase:${myvar}} -> ${MYVAR}
+         */
+        boolean stop = false;
+        for (int s = 0; s < lines.size(); s++) {
+            String debug = lines.get(s);
+            if (lines.get(s).matches("\\s*Scenario:.*")) {
+                lines.set(s, replaceEnvironmentPlaceholders(lines.get(s), null));
+                stop = true;
+            }
+
+            if (!stop) {
+                lines.set(s, replaceEnvironmentPlaceholders(lines.get(s), null));
+            }
+        }
+
+        return String.join("\n", lines);
 
     }
+
 
     @Pointcut("execution (* io.cucumber.core.runner.PickleStepDefinitionMatch.runStep(..)) && args(state)")
     protected void replacementArguments(TestCaseState state) {

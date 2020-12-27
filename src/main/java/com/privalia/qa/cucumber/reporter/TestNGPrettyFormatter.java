@@ -202,9 +202,9 @@ public class TestNGPrettyFormatter implements ConcurrentEventListener, ColorAwar
         Format format = formats.get("pending_arg");
         out.println(tagsList);
 
-        out.println(feature.getKeyword() + ": " + this.getReplacedValue(feature.getName()));
+        out.println(feature.getKeyword() + ": " + feature.getName());
         if (feature.getDescription() != null) {
-            out.println(this.getReplacedValue(feature.getDescription()));
+            out.println(feature.getDescription());
         }
     }
 
