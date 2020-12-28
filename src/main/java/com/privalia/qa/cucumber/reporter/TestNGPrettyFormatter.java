@@ -1,7 +1,6 @@
 package com.privalia.qa.cucumber.reporter;
 
 import com.privalia.qa.aspects.ReplacementAspect;
-import com.privalia.qa.exceptions.NonReplaceableException;
 import com.privalia.qa.utils.ThreadProperty;
 import io.cucumber.core.exception.CucumberException;
 import io.cucumber.core.stepexpression.ExpressionArgument;
@@ -9,8 +8,6 @@ import io.cucumber.messages.Messages;
 import io.cucumber.plugin.ColorAware;
 import io.cucumber.plugin.ConcurrentEventListener;
 import io.cucumber.plugin.event.*;
-import org.apache.commons.configuration2.ex.ConfigurationException;
-import org.aspectj.lang.ProceedingJoinPoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
