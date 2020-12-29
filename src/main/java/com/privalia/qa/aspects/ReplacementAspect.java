@@ -79,66 +79,6 @@ public final class ReplacementAspect {
     private static StringSubstitutor interpolator = new StringSubstitutor(StringLookupFactory.INSTANCE.interpolatorStringLookup(stringLookupMap, new DefaultLookUp(), true))
             .setEnableSubstitutionInVariables(true);
 
-    private Object lastEchoedStep;
-
-    /**
-     * Pointcut is executed for {@link io.cucumber.core.feature.FeatureParser#read(Resource)}
-     * @param resource     the resource
-     */
-    @Pointcut("execution (String io.cucumber.core.feature.FeatureParser.read(..)) && args(resource)")
-    protected void featureBuilderRead(Resource resource) {
-    }
-
-    /**
-     * Reads the feature file and replace all variable placeholders possible: Feature title
-     * Feature description and Scenario title. Steps and comments within a scenario are ignored
-     *
-     * Doing variable replacement at this point has certain advantages, the biggest is that the
-     * text is ready from the very beginning and this allows other plugins (like Junit formatter
-     * or HTML plugin) to work problely (variables are correctly replaced in the final reports)
-     *
-     * @param pjp      the pjp
-     * @param resource resource containing feature
-     * @return String parsed feature after aspect applied
-     * @throws Throwable exception
-     */
-    @Around(value = "featureBuilderRead(resource)")
-    public String aroundAddLoopTagPointcutScenario(ProceedingJoinPoint pjp, Resource resource) throws Throwable {
-
-        BufferedReader reader = new BufferedReader(new InputStreamReader(resource.getInputStream()));
-        List<String> lines = new ArrayList<>();
-
-        while (reader.ready()) {
-            lines.add(reader.readLine());
-        }
-
-        /**
-         * Starts by doing variable replacement on each line of the feature file
-         * as soon as it finds a line that starts with the word "Scenario", it switches to
-         * changing only the lines with "Scenario:". This is to not do variable replacements
-         * on the steps
-         *
-         * The reason for this is because the steps may contain variables that do not yet
-         * exists (ThreadProperty variables), and this could bring unexpected replacements
-         * like ${toUpperCase:${myvar}} -> ${MYVAR}
-         */
-        boolean stop = false;
-        for (int s = 0; s < lines.size(); s++) {
-            String debug = lines.get(s);
-            if (lines.get(s).matches("\\s*Scenario:.*")) {
-                lines.set(s, replaceEnvironmentPlaceholders(lines.get(s), null));
-                stop = true;
-            }
-
-            if (!stop) {
-                lines.set(s, replaceEnvironmentPlaceholders(lines.get(s), null));
-            }
-        }
-
-        return String.join("\n", lines);
-
-    }
-
 
     @Pointcut("execution (* io.cucumber.core.runner.PickleStepDefinitionMatch.runStep(..)) && args(state)")
     protected void replacementArguments(TestCaseState state) {
