@@ -25,6 +25,7 @@ import com.privalia.qa.lookups.UpperCaseLookUp;
 import com.privalia.qa.specs.CommonG;
 import com.privalia.qa.utils.ThreadProperty;
 import io.cucumber.core.backend.TestCaseState;
+import io.cucumber.core.resource.Resource;
 import io.cucumber.core.stepexpression.DataTableArgument;
 import io.cucumber.core.stepexpression.DocStringArgument;
 import io.cucumber.core.stepexpression.ExpressionArgument;
@@ -40,6 +41,7 @@ import org.apache.commons.text.StringSubstitutor;
 import org.apache.commons.text.lookup.StringLookup;
 import org.apache.commons.text.lookup.StringLookupFactory;
 import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -48,11 +50,11 @@ import org.assertj.core.api.Assertions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.InputStreamReader;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.*;
 import java.util.*;
 
@@ -77,25 +79,6 @@ public final class ReplacementAspect {
     private static StringSubstitutor interpolator = new StringSubstitutor(StringLookupFactory.INSTANCE.interpolatorStringLookup(stringLookupMap, new DefaultLookUp(), true))
             .setEnableSubstitutionInVariables(true);
 
-    private Object lastEchoedStep;
-
-    @Pointcut("execution (String io.cucumber.core.gherkin.messages.GherkinMessagesPickle.getName(..)) && args()")
-    protected void replacementScenarios() {
-    }
-
-    @Around(value = "replacementScenarios()")
-    public String aroundReplacementScenarios(JoinPoint jp) throws NoSuchFieldException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, FileNotFoundException, NonReplaceableException, ConfigurationException, URISyntaxException {
-
-        Object GherkinMessage = jp.getThis();
-        Field pickleField = GherkinMessage.getClass().getDeclaredField("pickle");
-        pickleField.setAccessible(true);
-        Object pickle = pickleField.get(GherkinMessage);
-        Method m = pickle.getClass().getDeclaredMethod("getName", null);
-        m.setAccessible(true);
-        String scenarioName = (String) m.invoke(pickle, null);
-        return replacedElement(scenarioName, jp);
-
-    }
 
     @Pointcut("execution (* io.cucumber.core.runner.PickleStepDefinitionMatch.runStep(..)) && args(state)")
     protected void replacementArguments(TestCaseState state) {

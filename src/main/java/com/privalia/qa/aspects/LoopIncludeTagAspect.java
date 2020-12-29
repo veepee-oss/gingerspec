@@ -18,6 +18,7 @@ package com.privalia.qa.aspects;
 
 import com.privalia.qa.exceptions.IncludeException;
 //import cucumber.runtime.io.Resource;
+import com.privalia.qa.exceptions.NonReplaceableException;
 import io.cucumber.core.feature.FeatureParser;
 import io.cucumber.core.resource.Resource;
 import io.cucumber.testng.FeatureWrapper;
@@ -32,6 +33,8 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.privalia.qa.aspects.ReplacementAspect.replaceEnvironmentPlaceholders;
 
 /**
  * Aspect for managing the @include, @background and @loop tags. This particulars tags must be handled right
@@ -76,7 +79,6 @@ public class LoopIncludeTagAspect {
         String path = resource.getUri().getPath();
         int endIndex = path.lastIndexOf("/") + 1;
         path = path.substring(0, endIndex);
-
 
         for (int s = 0; s < lines.size(); s++) {
             String[] elems;
@@ -125,8 +127,38 @@ public class LoopIncludeTagAspect {
             }
         }
         parseLines(lines, path);
+
+        /* Perform any possible replacement to the file from the start */
+        this.initialReplacements(lines);
+
         return String.join("\n", lines);
 
+    }
+
+    /**
+     * Starts by doing variable replacement on each line of the feature file
+     * as soon as it finds a line that starts with the keyword "Scenario", "Scenario Outline:"
+     * "Background:" or "Rule", it switches to changing only the lines with that keyword.
+     * This is to not do variable replacements on the steps.
+     *
+     * The reason for this is because the steps may contain variables that do not yet
+     * exists (ThreadProperty variables), and this could bring unexpected replacements
+     * like ${toUpperCase:${myvar}} -> ${MYVAR}
+     */
+    private List<String> initialReplacements(List<String> lines) throws NonReplaceableException {
+        boolean stop = false;
+        for (int s = 0; s < lines.size(); s++) {
+            String debug = lines.get(s);
+            if (lines.get(s).matches("\\s*Scenario:.*") || lines.get(s).matches("\\s*Scenario Outline:.*") || lines.get(s).matches("\\s*Background:.*") || lines.get(s).matches("\\s*Rule:.*")) {
+                lines.set(s, replaceEnvironmentPlaceholders(lines.get(s), null));
+                stop = true;
+            }
+
+            if (!stop) {
+                lines.set(s, replaceEnvironmentPlaceholders(lines.get(s), null));
+            }
+        }
+        return lines;
     }
 
 

@@ -1,11 +1,12 @@
 
-┌──────────────────────────────────────────────────────────────────────────┐
-│ GingerSpec documentation:                                                │
-│ https://github.com/vpTechOSS/gingerspec/wiki                             │
-│                                                                          |
-| Command line options:                                                    │
-│ -DSHOW_ERRORS_STACKTRACE: Show errors full stacktrace                    |
-| -DlogLevel=DEBUG: Change logging level                                   |
-| -DSHOW_STACK_INFO: Shows step definition location and arguments          |
-| -Dmaven.failsafe.debug: Debug (Intellij IDEA)                            |
-└──────────────────────────────────────────────────────────────────────────┘
+┌───────────────────────────────────────────────────────────────────────────────────┐
+│ GingerSpec wiki:  https://github.com/vpTechOSS/gingerspec/wiki                    │
+│ Discussion/ideas: https://github.com/vpTechOSS/gingerspec/discussions             │
+│ Report a bug:     https://github.com/vpTechOSS/gingerspec/issues                  |
+|                                                                                   |
+| Command line options:                                                             │
+│ -DSHOW_ERRORS_STACKTRACE: Show errors full stacktrace                             |
+| -DlogLevel=DEBUG: Change logging level                                            |
+| -DSHOW_STACK_INFO: Shows step definition location and arguments                   |
+| -Dmaven.failsafe.debug: Debug (Intellij IDEA)                                     |
+└───────────────────────────────────────────────────────────────────────────────────┘
