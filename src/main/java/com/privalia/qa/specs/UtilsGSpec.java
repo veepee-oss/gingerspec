@@ -528,14 +528,14 @@ public class UtilsGSpec extends BaseGSpec {
         String out = "";
 
         if (type.matches("numeric")) {
-            for (int i = 0; i <= length - 1 ; i++) {
+            for (int i = 0; i <= length - 1; i++) {
                 Integer rndint = random.nextInt(9 - 0) + 0;
                 out = out.concat(rndint.toString());
             }
         } else {
             String AB = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
             StringBuilder sb = new StringBuilder(length);
-            for(int i = 0; i < length; i++) {
+            for (int i = 0; i < length; i++) {
                 sb.append(AB.charAt(random.nextInt(AB.length())));
             }
             out = sb.toString();
