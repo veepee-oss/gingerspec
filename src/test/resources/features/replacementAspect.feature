@@ -83,3 +83,12 @@ Feature: Testing variable replacements ${VERSION}
       | content                 | file    |
       | {"a":{},"1":{},"b":"1"} | empty   |
       | {"a":{},"1":{},"b":"1"} | simple0 |
+
+  Scenario: Create random numbers
+    Given I generate a random 'numeric' string of length '20' and save it in the variable 'NUMERIC'
+    #log ${NUMERIC}
+    Given I generate a random 'alphanumeric' string of length '20' and save it in the variable 'ALPHANUMERIC'
+    #log ${ALPHANUMERIC}
+    Given I generate a random number between '0' and '10' and save it in the variable 'RANDOM'
+    #log ${RANDOM}
+    And I wait '1' seconds

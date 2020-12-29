@@ -28,6 +28,7 @@ import org.hjson.JsonValue;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -468,5 +469,77 @@ public class UtilsGSpec extends BaseGSpec {
             default:
                 commonspec.getLogger().warn("default switch branch on results check");
         }
+    }
+
+    /**
+     * Creates a random integer within range
+     * <p>
+     * Creates a random number within the range provided and saves it in a variable
+     * for later use
+     * <br>
+     * <pre>
+     * Example:
+     * {@code
+     *      Given I create a random number between '0' and '10' and save it in the variable 'RANDOM'
+     *      And I wait '${RANDOM}' seconds
+     * }
+     * </pre>
+     *
+     * @see #generateRandomStrings(String, Integer, String)
+     * @param lowerLimit    lower limit in range
+     * @param upperLimit    upper limit in range
+     * @param varName       name of the variable to save the result
+     */
+    @Given("^I generate a random number between '(.*)' and '(.*)' and save it in the variable '(.*)'$")
+    public void generateRandomNumberInRange(Integer lowerLimit, Integer upperLimit, String varName) {
+        Assertions.assertThat(lowerLimit).as("").isLessThan(upperLimit);
+        Random random = new Random();
+        Integer rndint = random.nextInt(upperLimit - lowerLimit) + lowerLimit;
+        ThreadProperty.set(varName, rndint.toString());
+    }
+
+    /**
+     * Generate numeric or alphanumeric strings
+     * <p>
+     * Generates a string that can be numeric ([0-9]) or alphanumeric ([0-9][A-Z][a-z]) of a given length
+     * and saves it in a variable for furute use
+     * <br>
+     * <pre>
+     * Example: Generating a random numeric string of length 20
+     * {@code
+     *      Given I generate a random 'numeric' string of length '20' and save it in the variable 'NUMERIC'
+     * }
+     * Example: Generating a random alphanumeric string of length 20
+     * {@code
+     *      Given I generate a random 'alphanumeric' string of length '20' and save it in the variable 'ALPHANUMERIC'
+     * }
+     * </pre>
+     *
+     * @see #generateRandomNumberInRange(Integer, Integer, String)
+     * @param type      string type: numeric|alphanumeric
+     * @param length    string final length
+     * @param varName   name of the variable to save the result
+     */
+    @Given("^I generate a random '(numeric|alphanumeric)' string of length '(.*)' and save it in the variable '(.*)'$")
+    public void generateRandomStrings(String type, Integer length, String varName) {
+
+        Assertions.assertThat(length).as("Length must be greater than zero!").isGreaterThan(0);
+        SecureRandom random = new SecureRandom();
+        String out = "";
+
+        if (type.matches("numeric")) {
+            for (int i = 0; i <= length - 1 ; i++) {
+                Integer rndint = random.nextInt(9 - 0) + 0;
+                out = out.concat(rndint.toString());
+            }
+        } else {
+            String AB = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+            StringBuilder sb = new StringBuilder(length);
+            for(int i = 0; i < length; i++) {
+                sb.append(AB.charAt(random.nextInt(AB.length())));
+            }
+            out = sb.toString();
+        }
+        ThreadProperty.set(varName, out);
     }
 }
