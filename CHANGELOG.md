@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.2.0-RC3
+
+* (Partially) addressed the problem of variable replacement on final reports. The system now will try to perform as many variable replacements as possible right when the feature file is read: Feature title, Feature description, Rule, Scenario title, Scenario outline title, or Background title. Variables in regular steps are not replaced at this point since steps may contain variables that do not yet exis
+
+* Added more links to helpMessage footer
+
+* Added 2 new steps: one for creating random int within range an another one to create random strings (numeric or alphanumeric) of a given length
+
 ## 2.2.0-RC2
 
 * Uncommented method to perform variables replacement in the commonG class.
