@@ -6,5 +6,6 @@ com.privalia.qa.cucumber.reporter
 com.privalia.qa.cucumber.testng
 com.privalia.qa.data
 com.privalia.qa.exceptions
+com.privalia.qa.lookups
 com.privalia.qa.specs
 com.privalia.qa.utils
