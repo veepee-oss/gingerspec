@@ -2,6 +2,8 @@
 
 ## 2.2.0-RC3
 
+* The functionality for using variables in the gherkin file has been rewritten and now it uses StringSubstitutor (from Apache Commons) to do the variable replacement. This library is much more potent with a lot more functionality. From now own, the only valid variable placeholder will be ${}. Placeholders such as !{}, #{} and @{} are deprecated and will be removed in future releases. Check the wiki about "Gherkin variables" for more information about this. 
+
 * (Partially) addressed the problem of variable replacement on final reports. The system now will try to perform as many variable replacements as possible right when the feature file is read: Feature title, Feature description, Rule, Scenario title, Scenario outline title, or Background title. Variables in regular steps are not replaced at this point since steps may contain variables that do not yet exis
 
 * Added more links to helpMessage footer
