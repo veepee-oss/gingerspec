@@ -644,15 +644,15 @@ public class SeleniumGSpec extends BaseGSpec {
      * <pre>
      * Example:
      * {@code
-     *      When '1' elements exists with 'id:phone_9'
-     *      Then the element on index '0' has 'id' as 'phone_9'
+     *      When '1' elements exists with 'id:loginButton'
+     *      Then the element on index '0' has 'type' as 'submit'
      * }
      * </pre>
      * @param index     the index of the web element
      * @param attribute the attribute to verify
      * @param value     the value of the attribute
      */
-    @Then("^the element on index '(\\d)' has '(" + LOCATORS + ")' as '(.*)'$")
+    @Then("^the element on index '(\\d)' has '(.*?)' as '(.*)'$")
     public void assertSeleniumHasAttributeValue(Integer index, String attribute, String value) {
         Assertions.assertThat(commonspec.getPreviousWebElements().getPreviousWebElements().size()).as("Could not get webelement with index %s. Less elements were found. Allowed index: 0 to %s", index, commonspec.getPreviousWebElements().getPreviousWebElements().size() - 1)
                 .isGreaterThanOrEqualTo(index + 1);
