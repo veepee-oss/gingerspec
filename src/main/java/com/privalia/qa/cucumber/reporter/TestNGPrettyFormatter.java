@@ -529,7 +529,7 @@ public class TestNGPrettyFormatter implements ConcurrentEventListener, ColorAwar
     private String getReplacedValue(String text) {
         try {
             if (text.contains("!{") || text.contains("@{") || text.contains("#{")) {
-                logger.warn("!{}, @{} and #{} variable placeholders are deprecated. Check https://github.com/vpTechOSS/gingerspec/wiki/Gherkin-variables");
+                out.println(STEP_INDENT + formats.get("undefined").text("!{}, @{} and #{} variable placeholders are deprecated. Check https://github.com/vpTechOSS/gingerspec/wiki/Gherkin-variables"));
             }
             return replacementAspect.replacedElement(text, null);
         } catch (Exception e) {
