@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.2.0-RC4
+
+* Fixed Selenium step for getting value of given attribute. It was being restricted to only use selenium locators attributes.
+
+* Fixed problem when warning for old variable placeholders was not being printed correctly
+
 ## 2.2.0-RC3
 
 * The functionality for using variables in the gherkin file has been rewritten and now it uses StringSubstitutor (from Apache Commons) to do the variable replacement. This library is much more potent with a lot more functionality. From now own, the only valid variable placeholder will be ${}. Placeholders such as !{}, #{} and @{} are deprecated and will be removed in future releases. Check the wiki about "Gherkin variables" for more information about this. 
