@@ -761,6 +761,12 @@ public class CommonG {
         String currentBrowser = ThreadProperty.get("browser");
         String currentData = ThreadProperty.get("dataSet");
 
+        /* When running a cucumber test using Intellij IDEA
+        * this parameter can be null*/
+        if (currentBrowser == null) {
+            currentBrowser = "defaul";
+        }
+
         if (!currentData.equals("")) {
             currentData = currentData
                     .replaceAll("[\\\\|\\/|\\|\\s|:|\\*]", "_");
