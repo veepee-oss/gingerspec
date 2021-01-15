@@ -60,7 +60,7 @@ public class EnvPropertyLookup implements StringLookup {
             config.addConfiguration(config1.getConfiguration());
             return config.getString(key);
         } catch (final ConfigurationException e) {
-            throw new IllegalArgumentException(String.format("Could not find property %s in included files", key), e);
+            throw new IllegalArgumentException(String.format("Could not find property %s in included properties files (under resources/configuration/).", key), e);
         } catch (URISyntaxException e) {
             throw new IllegalArgumentException(e.getMessage(), e);
         }
