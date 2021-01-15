@@ -173,6 +173,10 @@ public final class ReplacementAspect {
 
 
     public static String replacedElement(String el, JoinPoint jp) throws NonReplaceableException, ConfigurationException, URISyntaxException, FileNotFoundException {
+
+        if (el == null) {
+            return null;
+        }
         if (el.contains("${")) {
             el = replaceEnvironmentPlaceholders(el, jp);
         }
