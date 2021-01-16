@@ -411,7 +411,7 @@ public class TestNGPrettyFormatter implements ConcurrentEventListener, ColorAwar
                     out.println(STEP_INDENT + formats.get(name).text(event.getResult().getError().getMessage().replace("\n", " ")));
                 }
             } catch (Exception e) {
-                out.println(STEP_INDENT + formats.get("failed").text("Unexpected exception retrieving error message: " + e.getMessage() + ". Check the stacktrace for more details or use -DSHOW_ERRORS_STACKTRACE"));
+                out.println(STEP_INDENT + formats.get("failed").text("Unexpected exception retrieving error message: " + e.getMessage() + ". Check the stacktrace for more details or use -DSHOW_ERRORS_STACKTRACE when running"));
             }
         }
     }
