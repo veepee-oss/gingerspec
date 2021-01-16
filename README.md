@@ -65,7 +65,7 @@ You must use the following dependency in your testng project to get access to al
 <dependency>
     <groupId>com.github.privaliatech</groupId>
     <artifactId>gingerspec</artifactId>
-    <version>2.1.5</version>
+    <version>2.2.0</version>
 </dependency>
 ``` 
 
