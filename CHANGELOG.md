@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.2.0
+
+* Fixed small bug that was preventing the screen capture to be taken when running the tests via Intellij IDEA.
+
+* Fixed small bug that was preventing to correctly replace a variable when the value was null.
+
+* Minor improvements in some debug messages.
+
 ## 2.2.0-RC4
 
 * Fixed Selenium step for getting value of given attribute. It was being restricted to only use selenium locators attributes.
