@@ -19,6 +19,7 @@ package com.privalia.qa.data;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.privalia.qa.utils.SeleniumGridHelper;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -47,6 +48,8 @@ public final class BrowsersDataProvider {
     public static final int DEFAULT_LESS_LENGTH = 4;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BrowsersDataProvider.class);
+
+    private static SeleniumGridHelper seleniumGridHelper = new SeleniumGridHelper();
 
     public BrowsersDataProvider() {
     }
@@ -154,67 +157,11 @@ public final class BrowsersDataProvider {
         String node = System.getProperty("SELENIUM_NODE");
 
         if (grid != null && !grid.matches("local")) {
-            grid = "http://" + grid + "/grid/console";
-            Document doc;
-            try {
-                doc = Jsoup.connect(grid).timeout(DEFAULT_TIMEOUT).get();
-            } catch (IOException e) {
-                LOGGER.error("Exception on connecting to Selenium grid: {}", e.getMessage());
-                return response;
-            }
 
-            Elements slaves = (Elements) doc.select("div.proxy");
+            List<String> availableNodes = seleniumGridHelper.connectToGrid(grid)
+                    .getAllAvailableNodes();
+            response.addAll(seleniumGridHelper.filterNodes(availableNodes, filter));
 
-            for (Element slave : slaves) {
-                String slaveStatus = slave.select("p.proxyname").first().text();
-                if (!slaveStatus.contains("Connection") && !slaveStatus.contains("Conexión")) {
-                    Integer iBusy = 0;
-                    Elements browserList = slave.select("div.content_detail").select("*[title]");
-                    Elements busyBrowserList = slave.select("div.content_detail").select("p > .busy");
-                    for (Element browserDetails : browserList) {
-                        if (browserDetails.attr("title").startsWith("{")) {
-                            boolean filterCheck = true;
-                            for (Map.Entry<String, String> f : filter.entrySet()) {
-                                String stringFilter = f.getKey() + "=" + f.getValue() + "[,|}]";
-                                Pattern patFilter = Pattern.compile(stringFilter);
-                                Matcher mFilter = patFilter.matcher(browserDetails.attr("title"));
-                                filterCheck = filterCheck & mFilter.find();
-                            }
-                            if (filterCheck) {
-                                String[] nodedetails = browserDetails.attr("title").replace("{", "").replace("}", "").split(",");
-                                Map<String, String> nodeDetailsMap = new HashMap<String, String>();
-                                for (String detail : nodedetails) {
-                                    try {
-                                        nodeDetailsMap.put(detail.split("=")[0].trim(), detail.split("=")[1].trim());
-                                    } catch (Exception e) {
-
-                                    }
-                                }
-
-                                response.add(objectMapper.writeValueAsString(nodeDetailsMap));
-
-                            }
-                        } else {
-                            //TODO not sure under what circunstances this path is taken
-                            String version = busyBrowserList.get(iBusy).parent().text();
-                            String browser = busyBrowserList.get(iBusy).text();
-                            version = version.substring(2);
-                            version = version.replace(browser, "");
-                            String browserSrc = busyBrowserList.get(iBusy).select("img").attr("src");
-                            if (!browserSrc.equals("")) {
-                                browser = browserSrc.substring(browserSrc.lastIndexOf('/') + 1, browserSrc.length()
-                                        - DEFAULT_LESS_LENGTH);
-                            }
-                            Map<String, String> nodeDetailsMap = new HashMap<String, String>();
-                            nodeDetailsMap.put("browserName", browser);
-                            nodeDetailsMap.put("version", version);
-                            nodeDetailsMap.put("platform", "local");
-                            response.add(objectMapper.writeValueAsString(nodeDetailsMap));
-                            iBusy++;
-                        }
-                    }
-                }
-            }
         } else if (node != null) {
 
             /*

@@ -1,5 +1,7 @@
 package com.privalia.qa.utils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
@@ -60,16 +62,16 @@ public final class SeleniumGridHelper {
      *
      * @return List of free nodes
      */
-    public List<String> getAllAvailableNodes() {
+    public List<String> getAllAvailableNodes() throws JsonProcessingException {
 
         Pattern p = Pattern.compile("title=\"(\\{.*?})\" \\/>");
         Matcher m = p.matcher(this.getPageSource());
         ArrayList<String> result = new ArrayList<String>();
 
         if (m.find()) {
-            result.add(m.group(1));
+            result.add(this.transformToJsonString(m.group(1)));
             while (m.find()) {
-                result.add(m.group(1));
+                result.add(this.transformToJsonString(m.group(1)));
             }
             LOGGER.debug("{} nodes detected", result.size());
         } else {
@@ -84,16 +86,16 @@ public final class SeleniumGridHelper {
      *
      * @return List of all nodes
      */
-    public List<String> getAllNodes() {
+    public List<String> getAllNodes() throws JsonProcessingException {
 
         Pattern p = Pattern.compile("<p>capabilities: Capabilities (.*?)<\\/p>");
         Matcher m = p.matcher(this.getPageSource());
         ArrayList<String> result = new ArrayList<String>();
 
         if (m.find()) {
-            result.add(m.group(1));
+            result.add(this.transformToJsonString(m.group(1)));
             while (m.find()) {
-                result.add(m.group(1));
+                result.add(this.transformToJsonString(m.group(1)));
             }
             LOGGER.debug("{} nodes detected", result.size());
         } else {
@@ -131,14 +133,14 @@ public final class SeleniumGridHelper {
                 String[] options = m.group(1).split("\\|");
                 for (int i = 0; i <= options.length - 1; i++) {
                     for (String node : availableNodesCopy) {
-                        if (node.contains(entry.getKey() + "=" + options[i])) {
+                        if (node.contains("\"" + entry.getKey() + "\"" + ":" + "\"" + options[i] + "\"")) {
                             hs.add(node);
                         }
                     }
                 }
             } else {
                 for (String node : availableNodesCopy) {
-                    if (node.contains(entry.getKey() + "=" + entry.getValue())) {
+                    if (node.contains("\"" + entry.getKey() + "\"" + ":" + "\"" + entry.getValue() + "\"")) {
                         hs.add(node);
                     }
                 }
@@ -147,8 +149,29 @@ public final class SeleniumGridHelper {
             availableNodesCopy.clear();
             availableNodesCopy.addAll(hs);
         }
-        result.addAll(hs);
-        return result;
+
+        return availableNodesCopy;
+    }
+
+    /**
+     * Transforms the string representation of the node's capabilities into a proper json string
+     * @param node  Capabilities string
+     * @return      Capabilities string with proper json string format
+     */
+    public String transformToJsonString(String node) throws JsonProcessingException {
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String[] nodedetails = node.replace("{", "").replace("}", "").split(",");
+        Map<String, String> nodeDetailsMap = new HashMap<String, String>();
+        for (String detail : nodedetails) {
+            try {
+                nodeDetailsMap.put(detail.split("=")[0].trim(), detail.split("=")[1].trim());
+            } catch (Exception e) {
+
+            }
+        }
+
+        return objectMapper.writeValueAsString(nodeDetailsMap);
     }
 
 }
