@@ -1,29 +1,43 @@
 package com.privalia.qa.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.io.IOException;
+
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * This class contains several functions to extract information from a remote Selenium grid
+ * This class contains several functions to extract information from a remote Selenium grid/standalone node
  * @author José Fernández
  */
-public final class SeleniumGridHelper {
+public final class SeleniumRemoteHelper {
 
     public static final int DEFAULT_TIMEOUT = 20000;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SeleniumGridHelper.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SeleniumRemoteHelper.class);
 
-    private static final Pattern p = Pattern.compile("title=\"(\\{.*?})\" \\/>");
+    public String getNodeSessions() {
+        return this.nodeSessions;
+    }
 
-    public SeleniumGridHelper setPageSource(String pageSource) {
+    public SeleniumRemoteHelper setNodeSessions(String nodeSessions) {
+        this.nodeSessions = nodeSessions;
+        return this;
+    }
+
+    private String nodeSessions;
+
+    public SeleniumRemoteHelper setPageSource(String pageSource) {
         this.pageSource = pageSource;
         return this;
     }
@@ -40,7 +54,7 @@ public final class SeleniumGridHelper {
      * @param gridBaseUrl grid ip:port
      * @return this object to allow chaining
      */
-    public SeleniumGridHelper connectToGrid(String gridBaseUrl) {
+    public SeleniumRemoteHelper connectToGrid(String gridBaseUrl) {
 
         String grid = "http://" + gridBaseUrl + "/grid/console";
         Document doc;
@@ -62,7 +76,7 @@ public final class SeleniumGridHelper {
      *
      * @return List of free nodes
      */
-    public List<String> getAllAvailableNodes() throws JsonProcessingException {
+    public List<String> getAllAvailableNodesFromGrid() throws JsonProcessingException {
 
         Pattern p = Pattern.compile("title=\"(\\{.*?})\" \\/>");
         Matcher m = p.matcher(this.getPageSource());
@@ -86,7 +100,7 @@ public final class SeleniumGridHelper {
      *
      * @return List of all nodes
      */
-    public List<String> getAllNodes() throws JsonProcessingException {
+    public List<String> getAllNodesFromGrid() throws JsonProcessingException {
 
         Pattern p = Pattern.compile("<p>capabilities: Capabilities (.*?)<\\/p>");
         Matcher m = p.matcher(this.getPageSource());
@@ -174,4 +188,54 @@ public final class SeleniumGridHelper {
         return objectMapper.writeValueAsString(nodeDetailsMap);
     }
 
+    /**
+     * Verifies the Standalone node is in the address specified and get the list
+     * of sessions
+     * @param standAloneNode    Address as ip:port (i.e: localhost:4444)
+     * @return                  This to allow chaining
+     * @throws IOException      IOException
+     */
+    public SeleniumRemoteHelper connectToStandAloneNode(String standAloneNode) throws IOException {
+
+        LOGGER.debug("Trying to connect to {}", "http://" + standAloneNode + "/wd/hub/sessions");
+        URL url = new URL("http://" + standAloneNode + "/wd/hub/sessions");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+
+        if (con.getResponseCode() != 200) {
+            LOGGER.error("Exception on connecting to node, response code {}: {}", con.getResponseCode(), con.getResponseMessage());
+            return null;
+        }
+
+        LOGGER.debug("Response code {} with message {}", con.getResponseCode(), con.getResponseMessage());
+
+        //Read the json response to get the capabilities of the active sessions
+        InputStream in = new BufferedInputStream(con.getInputStream());
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+
+        String line;
+        StringBuilder result = new StringBuilder();
+        while ((line = reader.readLine()) != null) {
+            result.append(line);
+        }
+
+        this.setNodeSessions(new String(result));
+        return this;
+    }
+
+    /**
+     * Gets the fetch list of sessions and returns them as list of capabilities
+     * @return              list of sessions capabilities
+     * @throws IOException  IOException
+     */
+    public List<String> getAllSessions() throws IOException {
+
+        ArrayList<String> response = new ArrayList<String>();
+        ObjectMapper mapper = new ObjectMapper();
+        ArrayNode sessions = (ArrayNode) mapper.readTree(this.getNodeSessions()).get("value");
+
+        for (JsonNode session: sessions) {
+            response.add(session.get("capabilities").toString());
+        }
+        return response;
+    }
 }

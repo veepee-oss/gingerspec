@@ -1,0 +1,89 @@
+{
+  "status": 0,
+  "value": [
+    {
+      "id": "3bb56e6699df8f5bde40a103505f8865",
+      "capabilities": {
+        "acceptInsecureCerts": false,
+        "browserName": "chrome",
+        "browserVersion": "75.0.3770.100",
+        "chrome": {
+          "chromedriverVersion": "75.0.3770.140 (2d9f97485c7b07dc18a74666574f19176731995c-refs\u002fbranch-heads\u002f3770@{#1155})",
+          "userDataDir": "\u002ftmp\u002f.com.google.Chrome.5TcHHB"
+        },
+        "goog:chromeOptions": {
+          "debuggerAddress": "localhost:36677"
+        },
+        "networkConnectionEnabled": false,
+        "pageLoadStrategy": "normal",
+        "platformName": "linux",
+        "proxy": {
+        },
+        "setWindowRect": true,
+        "strictFileInteractability": false,
+        "timeouts": {
+          "implicit": 0,
+          "pageLoad": 300000,
+          "script": 30000
+        },
+        "unhandledPromptBehavior": "dismiss and notify"
+      }
+    },
+    {
+      "id": "c49932f3a0cd3b74f32ded3f1cc6ee92",
+      "capabilities": {
+        "acceptInsecureCerts": false,
+        "browserName": "chrome",
+        "browserVersion": "75.0.3770.100",
+        "chrome": {
+          "chromedriverVersion": "75.0.3770.140 (2d9f97485c7b07dc18a74666574f19176731995c-refs\u002fbranch-heads\u002f3770@{#1155})",
+          "userDataDir": "\u002ftmp\u002f.com.google.Chrome.4haKEn"
+        },
+        "goog:chromeOptions": {
+          "debuggerAddress": "localhost:39623"
+        },
+        "networkConnectionEnabled": false,
+        "pageLoadStrategy": "normal",
+        "platformName": "linux",
+        "proxy": {
+        },
+        "setWindowRect": true,
+        "strictFileInteractability": false,
+        "timeouts": {
+          "implicit": 0,
+          "pageLoad": 300000,
+          "script": 30000
+        },
+        "unhandledPromptBehavior": "dismiss and notify"
+      }
+    },
+    {
+      "id": "ea2e7e770faa3da7b41e764a3d1ee616",
+      "capabilities": {
+        "acceptInsecureCerts": false,
+        "browserName": "chrome",
+        "browserVersion": "75.0.3770.100",
+        "chrome": {
+          "chromedriverVersion": "75.0.3770.140 (2d9f97485c7b07dc18a74666574f19176731995c-refs\u002fbranch-heads\u002f3770@{#1155})",
+          "userDataDir": "\u002ftmp\u002f.com.google.Chrome.tOzTIA"
+        },
+        "goog:chromeOptions": {
+          "debuggerAddress": "localhost:33021"
+        },
+        "networkConnectionEnabled": false,
+        "pageLoadStrategy": "normal",
+        "platformName": "linux",
+        "proxy": {
+        },
+        "setWindowRect": true,
+        "strictFileInteractability": false,
+        "timeouts": {
+          "implicit": 0,
+          "pageLoad": 300000,
+          "script": 30000
+        },
+        "unhandledPromptBehavior": "dismiss and notify"
+      }
+    }
+  ]
+}

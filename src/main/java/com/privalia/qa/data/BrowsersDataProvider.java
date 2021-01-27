@@ -19,11 +19,7 @@ package com.privalia.qa.data;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.privalia.qa.utils.SeleniumGridHelper;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
+import com.privalia.qa.utils.SeleniumRemoteHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.ITestContext;
@@ -34,8 +30,6 @@ import java.lang.reflect.Constructor;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Handles the connection to a Selenium Grid/Standalone Nodes to all classes
@@ -49,7 +43,7 @@ public final class BrowsersDataProvider {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BrowsersDataProvider.class);
 
-    private static SeleniumGridHelper seleniumGridHelper = new SeleniumGridHelper();
+    private static SeleniumRemoteHelper seleniumRemoteHelper = new SeleniumRemoteHelper();
 
     public BrowsersDataProvider() {
     }
@@ -158,47 +152,25 @@ public final class BrowsersDataProvider {
 
         if (grid != null && !grid.matches("local")) {
 
-            List<String> availableNodes = seleniumGridHelper.connectToGrid(grid)
-                    .getAllAvailableNodes();
-            response.addAll(seleniumGridHelper.filterNodes(availableNodes, filter));
+            List<String> availableNodes = seleniumRemoteHelper
+                    .connectToGrid(grid)
+                    .getAllAvailableNodesFromGrid();
+            response.addAll(seleniumRemoteHelper.filterNodes(availableNodes, filter));
 
         } else if (node != null) {
 
-            /*
-              Verify that the node actually exists and is online by trying a connection
-             */
-            LOGGER.debug("Trying to connect to {}", "http://" + node + "/wd/hub/sessions");
-            URL url = new URL("http://" + node + "/wd/hub/sessions");
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
-
-            if (con.getResponseCode() != 200) {
-                LOGGER.error("Exception on connecting to node, response code {}: {}", con.getResponseCode(), con.getResponseMessage());
-                return response;
-            }
-
-            LOGGER.debug("Response code {} with message {}", con.getResponseCode(), con.getResponseMessage());
-
-            //Read the json response to get the capabilities of the active sessions
-            InputStream in = new BufferedInputStream(con.getInputStream());
-            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-
-            String line;
-            StringBuilder result = new StringBuilder();
-            while ((line = reader.readLine()) != null) {
-                result.append(line);
-            }
+            List<String> sessions = seleniumRemoteHelper
+                    .connectToStandAloneNode(node)
+                    .getAllSessions();
 
             System.setProperty("SELENIUM_GRID", node);
-            ObjectMapper mapper = new ObjectMapper();
-
-            ArrayNode sessions = (ArrayNode) mapper.readTree(result.toString()).get("value");
 
             if (sessions.size() == 0) {
                 LOGGER.warn("No sessions found in the standalone node!");
 
                 /*
-                  if no sessions are found in the standalone node, the system will try to read the SELENIUM_NODE_TYPE
-                  variable to get information on what kind of session it should bootstrap
+                if no sessions are found in the standalone node, the system will try to read the SELENIUM_NODE_TYPE
+                variable to get information on what kind of session it should bootstrap
                  */
                 String nodeType = System.getProperty("SELENIUM_NODE_TYPE");
                 Map<String, String> nodeDetailsMap = new HashMap<String, String>();
@@ -212,12 +184,8 @@ public final class BrowsersDataProvider {
 
                 response.add(objectMapper.writeValueAsString(nodeDetailsMap));
             } else {
-
-                for (JsonNode session: sessions) {
-                    response.add(session.get("capabilities").toString());
-                }
+                response.addAll(sessions);
             }
-
 
         } else {
 
