@@ -19,10 +19,7 @@ package com.privalia.qa.data;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
+import com.privalia.qa.utils.SeleniumRemoteHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.ITestContext;
@@ -33,8 +30,6 @@ import java.lang.reflect.Constructor;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Handles the connection to a Selenium Grid/Standalone Nodes to all classes
@@ -47,6 +42,8 @@ public final class BrowsersDataProvider {
     public static final int DEFAULT_LESS_LENGTH = 4;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BrowsersDataProvider.class);
+
+    private static SeleniumRemoteHelper seleniumRemoteHelper = new SeleniumRemoteHelper();
 
     public BrowsersDataProvider() {
     }
@@ -154,104 +151,26 @@ public final class BrowsersDataProvider {
         String node = System.getProperty("SELENIUM_NODE");
 
         if (grid != null && !grid.matches("local")) {
-            grid = "http://" + grid + "/grid/console";
-            Document doc;
-            try {
-                doc = Jsoup.connect(grid).timeout(DEFAULT_TIMEOUT).get();
-            } catch (IOException e) {
-                LOGGER.error("Exception on connecting to Selenium grid: {}", e.getMessage());
-                return response;
-            }
 
-            Elements slaves = (Elements) doc.select("div.proxy");
+            List<String> availableNodes = seleniumRemoteHelper
+                    .connectToGrid(grid)
+                    .getAllAvailableNodesFromGrid();
+            response.addAll(seleniumRemoteHelper.filterNodes(availableNodes, filter));
 
-            for (Element slave : slaves) {
-                String slaveStatus = slave.select("p.proxyname").first().text();
-                if (!slaveStatus.contains("Connection") && !slaveStatus.contains("Conexión")) {
-                    Integer iBusy = 0;
-                    Elements browserList = slave.select("div.content_detail").select("*[title]");
-                    Elements busyBrowserList = slave.select("div.content_detail").select("p > .busy");
-                    for (Element browserDetails : browserList) {
-                        if (browserDetails.attr("title").startsWith("{")) {
-                            boolean filterCheck = true;
-                            for (Map.Entry<String, String> f : filter.entrySet()) {
-                                String stringFilter = f.getKey() + "=" + f.getValue() + "[,|}]";
-                                Pattern patFilter = Pattern.compile(stringFilter);
-                                Matcher mFilter = patFilter.matcher(browserDetails.attr("title"));
-                                filterCheck = filterCheck & mFilter.find();
-                            }
-                            if (filterCheck) {
-                                String[] nodedetails = browserDetails.attr("title").replace("{", "").replace("}", "").split(",");
-                                Map<String, String> nodeDetailsMap = new HashMap<String, String>();
-                                for (String detail : nodedetails) {
-                                    try {
-                                        nodeDetailsMap.put(detail.split("=")[0].trim(), detail.split("=")[1].trim());
-                                    } catch (Exception e) {
-
-                                    }
-                                }
-
-                                response.add(objectMapper.writeValueAsString(nodeDetailsMap));
-
-                            }
-                        } else {
-                            //TODO not sure under what circunstances this path is taken
-                            String version = busyBrowserList.get(iBusy).parent().text();
-                            String browser = busyBrowserList.get(iBusy).text();
-                            version = version.substring(2);
-                            version = version.replace(browser, "");
-                            String browserSrc = busyBrowserList.get(iBusy).select("img").attr("src");
-                            if (!browserSrc.equals("")) {
-                                browser = browserSrc.substring(browserSrc.lastIndexOf('/') + 1, browserSrc.length()
-                                        - DEFAULT_LESS_LENGTH);
-                            }
-                            Map<String, String> nodeDetailsMap = new HashMap<String, String>();
-                            nodeDetailsMap.put("browserName", browser);
-                            nodeDetailsMap.put("version", version);
-                            nodeDetailsMap.put("platform", "local");
-                            response.add(objectMapper.writeValueAsString(nodeDetailsMap));
-                            iBusy++;
-                        }
-                    }
-                }
-            }
         } else if (node != null) {
 
-            /*
-              Verify that the node actually exists and is online by trying a connection
-             */
-            LOGGER.debug("Trying to connect to {}", "http://" + node + "/wd/hub/sessions");
-            URL url = new URL("http://" + node + "/wd/hub/sessions");
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
-
-            if (con.getResponseCode() != 200) {
-                LOGGER.error("Exception on connecting to node, response code {}: {}", con.getResponseCode(), con.getResponseMessage());
-                return response;
-            }
-
-            LOGGER.debug("Response code {} with message {}", con.getResponseCode(), con.getResponseMessage());
-
-            //Read the json response to get the capabilities of the active sessions
-            InputStream in = new BufferedInputStream(con.getInputStream());
-            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-
-            String line;
-            StringBuilder result = new StringBuilder();
-            while ((line = reader.readLine()) != null) {
-                result.append(line);
-            }
+            List<String> sessions = seleniumRemoteHelper
+                    .connectToStandAloneNode(node)
+                    .getAllSessions();
 
             System.setProperty("SELENIUM_GRID", node);
-            ObjectMapper mapper = new ObjectMapper();
-
-            ArrayNode sessions = (ArrayNode) mapper.readTree(result.toString()).get("value");
 
             if (sessions.size() == 0) {
                 LOGGER.warn("No sessions found in the standalone node!");
 
                 /*
-                  if no sessions are found in the standalone node, the system will try to read the SELENIUM_NODE_TYPE
-                  variable to get information on what kind of session it should bootstrap
+                if no sessions are found in the standalone node, the system will try to read the SELENIUM_NODE_TYPE
+                variable to get information on what kind of session it should bootstrap
                  */
                 String nodeType = System.getProperty("SELENIUM_NODE_TYPE");
                 Map<String, String> nodeDetailsMap = new HashMap<String, String>();
@@ -265,12 +184,8 @@ public final class BrowsersDataProvider {
 
                 response.add(objectMapper.writeValueAsString(nodeDetailsMap));
             } else {
-
-                for (JsonNode session: sessions) {
-                    response.add(session.get("capabilities").toString());
-                }
+                response.addAll(sessions);
             }
-
 
         } else {
 

@@ -1,0 +1,173 @@
+<html>
+<head>
+    <script src="/grid/resources/org/openqa/grid/images/jquery-3.1.1.min.js"></script>
+    <script src="/grid/resources/org/openqa/grid/images/consoleservlet.js"></script>
+    <link href="/grid/resources/org/openqa/grid/images/consoleservlet.css" rel="stylesheet" type="text/css" />
+    <link href="/grid/resources/org/openqa/grid/images/favicon.ico" rel="icon" type="image/x-icon" />
+    <meta http-equiv="refresh" content="1200" />
+    <title>Grid Console</title>
+    <style>
+            .busy {opacity : 0.4; filter: alpha(opacity=40);}
+        </style>
+</head>
+<body>
+<div id="main-content">
+    <div id="header">
+        <h1> <a href="/grid/console">Selenium</a> </h1>
+        <h2>Grid Console v. 3.141.59</h2>
+        <div>
+            <a id="helplink" target="_blank" href="https://github.com/SeleniumHQ/selenium/wiki/Grid2">Help</a>
+        </div>
+    </div>
+    <div id="left-column">
+        <div class="proxy">
+            <p class="proxyname">DockerSeleniumRemoteProxy (version : 3.141.59)</p>
+            <p class="proxyid">id : http://172.17.0.4:40008, OS : LINUX</p>
+            <div class="tabs">
+                <ul>
+                    <li class="tab" type="browsers"><a title="test slots" href="#">Browsers</a></li>
+                    <li class="tab" type="config"><a title="node configuration" href="#">Configuration</a></li>
+                </ul>
+            </div>
+            <div class="content">
+                <div type="browsers" class="content_detail">
+                    <p class="protocol">WebDriver</p>
+                    <p>v:82.0.3<img src="/grid/resources/org/openqa/grid/images/firefox.png" width="16" height="16" title="{server:CONFIG_UUID=e1338830-5d89-460b-acee-c5b465ee4c6c, seleniumProtocol=WebDriver, acceptSslCerts=true, screen-resolution=1920x1080, tz=Europe/Berlin, browserName=firefox, maxInstances=1, platformName=LINUX, screenResolution=1920x1080, resolution=1920x1080, version=82.0.3, platform=LINUX}" /> </p>
+                    <p>v:87.0.4280.66<img src="/grid/resources/org/openqa/grid/images/chrome.png" width="16" height="16" title="{server:CONFIG_UUID=2f5d203a-8fdd-4147-b29e-4c877cb75f69, seleniumProtocol=WebDriver, acceptSslCerts=true, screen-resolution=1920x1080, tz=Europe/Berlin, browserName=chrome, maxInstances=1, platformName=LINUX, screenResolution=1920x1080, resolution=1920x1080, version=87.0.4280.66, platform=LINUX}" /> </p>
+                </div>
+                <div type="config" class="content_detail">
+                    <p>browserTimeout: 16000</p>
+                    <p>debug: false</p>
+                    <p>host: 172.17.0.4</p>
+                    <p>port: 40008</p>
+                    <p>role: node</p>
+                    <p>timeout: 19000</p>
+                    <p>cleanUpCycle: 5000</p>
+                    <p>maxSession: 1</p>
+                    <p>capabilities: Capabilities {acceptSslCerts: true, browserName: chrome, maxInstances: 1, platform: LINUX, platformName: LINUX, resolution: 1920x1080, screen-resolution: 1920x1080, screenResolution: 1920x1080, seleniumProtocol: WebDriver, server:CONFIG_UUID: 2f5d203a-8fdd-4147-b29e-4c8..., tz: Europe/Berlin, version: 87.0.4280.66}</p>
+                    <p>capabilities: Capabilities {acceptSslCerts: true, browserName: firefox, maxInstances: 1, platform: LINUX, platformName: LINUX, resolution: 1920x1080, screen-resolution: 1920x1080, screenResolution: 1920x1080, seleniumProtocol: WebDriver, server:CONFIG_UUID: e1338830-5d89-460b-acee-c5b..., tz: Europe/Berlin, version: 82.0.3}</p>
+                    <p>downPollingLimit: 2</p>
+                    <p>hub: http://172.17.0.2:4445/grid/register</p>
+                    <p>id: http://172.17.0.4:40008</p>
+                    <p>nodePolling: 112000</p>
+                    <p>nodeStatusCheckTimeout: 5000</p>
+                    <p>proxy: de.zalando.ep.zalenium.proxy.DockerSeleniumRemoteProxy</p>
+                    <p>register: true</p>
+                    <p>registerCycle: 88000</p>
+                    <p>remoteHost: http://172.17.0.4:40008</p>
+                    <p>unregisterIfStillDownAfter: 2500</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="right-column">
+        <div class="proxy">
+            <p class="proxyname">DockerSeleniumRemoteProxy (version : 3.141.59)</p>
+            <p class="proxyid">id : http://172.17.0.3:40009, OS : LINUX</p>
+            <div class="tabs">
+                <ul>
+                    <li class="tab" type="browsers"><a title="test slots" href="#">Browsers</a></li>
+                    <li class="tab" type="config"><a title="node configuration" href="#">Configuration</a></li>
+                </ul>
+            </div>
+            <div class="content">
+                <div type="browsers" class="content_detail">
+                    <p class="protocol">WebDriver</p>
+                    <p>v:82.0.3<img src="/grid/resources/org/openqa/grid/images/firefox.png" width="16" height="16" title="{server:CONFIG_UUID=be713c94-8f8b-4bc6-b706-5f129a940ea8, seleniumProtocol=WebDriver, acceptSslCerts=true, screen-resolution=1920x1080, tz=Europe/Berlin, browserName=firefox, maxInstances=1, platformName=LINUX, screenResolution=1920x1080, resolution=1920x1080, version=82.0.3, platform=LINUX}" /> </p>
+                    <p>v:87.0.4280.66<img src="/grid/resources/org/openqa/grid/images/chrome.png" width="16" height="16" title="{server:CONFIG_UUID=ce5b55af-e4e4-440e-90bc-4bfcace17d2c, seleniumProtocol=WebDriver, acceptSslCerts=true, screen-resolution=1920x1080, tz=Europe/Berlin, browserName=chrome, maxInstances=1, platformName=LINUX, screenResolution=1920x1080, resolution=1920x1080, version=87.0.4280.66, platform=LINUX}" /> </p>
+                </div>
+                <div type="config" class="content_detail">
+                    <p>browserTimeout: 16000</p>
+                    <p>debug: false</p>
+                    <p>host: 172.17.0.3</p>
+                    <p>port: 40009</p>
+                    <p>role: node</p>
+                    <p>timeout: 19000</p>
+                    <p>cleanUpCycle: 5000</p>
+                    <p>maxSession: 1</p>
+                    <p>capabilities: Capabilities {acceptSslCerts: true, browserName: chrome, maxInstances: 1, platform: LINUX, platformName: LINUX, resolution: 1920x1080, screen-resolution: 1920x1080, screenResolution: 1920x1080, seleniumProtocol: WebDriver, server:CONFIG_UUID: ce5b55af-e4e4-440e-90bc-4bf..., tz: Europe/Berlin, version: 87.0.4280.66}</p>
+                    <p>capabilities: Capabilities {acceptSslCerts: true, browserName: firefox, maxInstances: 1, platform: LINUX, platformName: LINUX, resolution: 1920x1080, screen-resolution: 1920x1080, screenResolution: 1920x1080, seleniumProtocol: WebDriver, server:CONFIG_UUID: be713c94-8f8b-4bc6-b706-5f1..., tz: Europe/Berlin, version: 82.0.3}</p>
+                    <p>downPollingLimit: 2</p>
+                    <p>hub: http://172.17.0.2:4445/grid/register</p>
+                    <p>id: http://172.17.0.3:40009</p>
+                    <p>nodePolling: 92000</p>
+                    <p>nodeStatusCheckTimeout: 5000</p>
+                    <p>proxy: de.zalando.ep.zalenium.proxy.DockerSeleniumRemoteProxy</p>
+                    <p>register: true</p>
+                    <p>registerCycle: 68000</p>
+                    <p>remoteHost: http://172.17.0.3:40009</p>
+                    <p>unregisterIfStillDownAfter: 2500</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="clearfix"></div>
+    <div>
+        <ul>
+        </ul>
+    </div>
+    <a href="?config=true&amp;configDebug=true">view config</a>
+    <div hidden="" id="hub-config">
+        <b>Config for the hub :</b>
+        <br />
+        <abbr title="browserTimeout">browserTimeout : </abbr>16000
+        <br />
+        <abbr title="debug">debug : </abbr>false
+        <br />
+        <abbr title="host">host : </abbr>172.17.0.2
+        <br />
+        <abbr title="port">port : </abbr>4445
+        <br />
+        <abbr title="role">role : </abbr>hub
+        <br />
+        <abbr title="timeout">timeout : </abbr>1800
+        <br />
+        <abbr title="cleanUpCycle">cleanUpCycle : </abbr>5000
+        <br />
+        <abbr title="capabilityMatcher">capabilityMatcher : </abbr>org.openqa.grid.internal.utils.DefaultCapabilityMatcher
+        <br />
+        <abbr title="newSessionWaitTimeout">newSessionWaitTimeout : </abbr>600000
+        <br />
+        <abbr title="throwOnCapabilityNotPresent">throwOnCapabilityNotPresent : </abbr>true
+        <br />
+        <abbr title="registry">registry : </abbr>de.zalando.ep.zalenium.registry.ZaleniumRegistry
+        <br />
+        <div hidden="" id="hub-config-verbose">
+            <b>Config details :</b>
+            <br />
+            <b>hub launched with :</b>
+            <abbr title="browserTimeout">browserTimeout : </abbr>16000
+            <br />
+            <abbr title="debug">debug : </abbr>false
+            <br />
+            <abbr title="host">host : </abbr>172.17.0.2
+            <br />
+            <abbr title="port">port : </abbr>4445
+            <br />
+            <abbr title="role">role : </abbr>hub
+            <br />
+            <abbr title="timeout">timeout : </abbr>1800
+            <br />
+            <abbr title="cleanUpCycle">cleanUpCycle : </abbr>5000
+            <br />
+            <abbr title="capabilityMatcher">capabilityMatcher : </abbr>org.openqa.grid.internal.utils.DefaultCapabilityMatcher
+            <br />
+            <abbr title="newSessionWaitTimeout">newSessionWaitTimeout : </abbr>600000
+            <br />
+            <abbr title="throwOnCapabilityNotPresent">throwOnCapabilityNotPresent : </abbr>true
+            <br />
+            <abbr title="registry">registry : </abbr>de.zalando.ep.zalenium.registry.ZaleniumRegistry
+            <br />
+            <br />
+            <b>the final configuration comes from :</b>
+            <br />
+            <b>the default :</b>
+            <br /> {{hubDefaultConfig}}
+            <br />
+            <b>updated with params :</b>
+            <br /> {{hubMergedConfig}}
+        </div>
+    </div>
+</div>
+</body>
+</html>
