@@ -4,6 +4,7 @@ import com.privalia.qa.cucumber.converter.ArrayListConverter;
 import com.privalia.qa.cucumber.converter.NullableStringConverter;
 import com.privalia.qa.utils.PreviousWebElements;
 import com.privalia.qa.utils.ThreadProperty;
+import io.cucumber.docstring.DocString;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -962,6 +963,7 @@ public class SeleniumGSpec extends BaseGSpec {
      *
      * @deprecated This method is deprecated, use {@link #seleniumTypeByLocator(String, String, String, Integer)} instead
      * @see #seleniumTypeByLocator(String, String, String, Integer)
+     * @see #seleniumTypeLongTextByLocator(String, String, Integer, DocString)
      * @see #assertSeleniumNElementExists(String, Integer, String, String)
      * @see #assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)
      * @see #waitWebElementWithPooling(int, int, int, String, String, String)
@@ -1292,6 +1294,7 @@ public class SeleniumGSpec extends BaseGSpec {
      * </pre>
      *
      * @see #seleniumType(String, Integer)
+     * @see #seleniumTypeLongTextByLocator(String, String, Integer, DocString)
      * @param input     text to type in the element
      * @param method    method to locate the elements (id, name, class, css, xpath, linkText, partialLinkText and tagName)
      * @param element   the relative reference to the element
@@ -1304,6 +1307,51 @@ public class SeleniumGSpec extends BaseGSpec {
             index = 0;
         }
         this.seleniumType(input, index);
+    }
+
+    /**
+     * Directly types the given large text in the element referenced by locator.
+     * <p>
+     * This step types the given large string of text in the given element. It's very similar to {@link #seleniumTypeByLocator(String, String, String, Integer)}
+     * but uses a DocString, which allows using large strings of text, suitable for typing a long address or a long comment. If the page contains
+     * several web elements with the given locator, the click action will be performed to the first element found by default,
+     * unless an index is specified (first element has index 0)
+     * <pre>
+     * Example: Typing a large piece of text
+     * {@code
+     *      And I type on the element with 'id:message' the text:
+     *       """
+     *        Good morning George!
+     *        ===============
+     *        The package of your order with number 1234886 should be about to arrive!
+     *       """
+     * }
+     * Example: Using index in case more than one element is found (first element has index 0). By the way, you can also
+     * use variables within DocStrings
+     * {@code
+     *      And I type on the element with 'id:message' index '0' the text:
+     *       """
+     *        Good morning ${USER_NAME}!
+     *        ===============
+     *        The package of your order with number ${ORDER_NUMBER} should be about to arrive!
+     *       """
+     * }
+     * </pre>
+     *
+     * @see #seleniumType(String, Integer)
+     * @see #seleniumTypeByLocator(String, String, String, Integer)
+     * @param input     text to type in the element
+     * @param method    method to locate the elements (id, name, class, css, xpath, linkText, partialLinkText and tagName)
+     * @param element   the relative reference to the element
+     * @param index     Index of the element, in case one or more elements with the given locator are found (first element starts with index 0)
+     */
+    @When("^I type on the element with '(" + LOCATORS + "):(.*?)'( index '(\\d+)')? the text:$")
+    public void seleniumTypeLongTextByLocator(String method, String element, Integer index, DocString input) {
+        this.assertSeleniumNElementExists("at least", 1, method, element);
+        if (index == null) {
+            index = 0;
+        }
+        this.seleniumType(input.getContent(), index);
     }
 
     @And("^I go back (\\d+) (?:page|pages)?$")
