@@ -14,6 +14,16 @@ Feature: Selenium steps
     Then I click on the element with 'name:checkbox_5[]' index '2'
     Then I scroll down until the element with 'name:pie_submit' is visible
     Then I scroll up until the element with 'id:name_3_firstname' is visible
+    Then I scroll down until the element with 'name:description' is visible
+    Then I save 'GingerSpec user' in variable 'NAME'
+    Then I type on the element with 'name:description' the text:
+    """
+      Hello ${NAME}!.
+
+      You can use this step to type large pieces of text into a text area,
+      which is typical when typing an address for example. Notice that you
+      can also use variables inside the text ;)
+    """
     Then I scroll down until the element with 'name:pie_submit' is visible
     Then I click on the element with 'name:pie_submit'
     Then I wait '3' seconds
