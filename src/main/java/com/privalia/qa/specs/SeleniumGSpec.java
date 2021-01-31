@@ -8,7 +8,6 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import org.apache.kafka.common.protocol.types.Field;
 import org.assertj.core.api.Assertions;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
@@ -17,15 +16,14 @@ import org.openqa.selenium.support.ui.Select;
 import javax.swing.*;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Consumer;
 
 import static com.privalia.qa.assertions.Assertions.assertThat;
 
 /**
- * Steps definitions for selenium (web application automation)
+ * Steps definitions for selenium (web application automation). Check the examples provided on
+ * each method to know how to use them in your own Feature files.
  *
  * @see <a href="https://www.selenium.dev/">https://www.selenium.dev/</a>
  * @author José Fernández
@@ -91,9 +89,9 @@ public class SeleniumGSpec extends BaseGSpec {
 
 
     /**
-     * Browse to {@code url} using the current browser.
+     * Browse to url using the current browser.
      * <p>
-     * The {@code url} is relative to the basepath configured with {@link SeleniumGSpec#setupApp(String)} method. You
+     * The url is relative to the basepath configured with {@link SeleniumGSpec#setupApp(String)} method. You
      * can also use {@link #iGoToUrl(String)} to directly navigate to the given url.
      * <pre>
      * Example:
@@ -472,7 +470,7 @@ public class SeleniumGSpec extends BaseGSpec {
     /**
      * Checks that the expected count of webelements are present in the page, within a timeout and with a location.
      * <p>
-     * Each negative lookup is followed by a wait of {@code wait} seconds. Selenium times are not accounted for the mentioned timeout.
+     * Each negative lookup is followed by a wait of wait seconds. Selenium times are not accounted for the mentioned timeout.
      * This method is similar to {@link SeleniumGSpec#waitWebElementWithPooling(int, int, int, String, String, String)}
      * but uses static wait instead of {@link org.openqa.selenium.support.ui.FluentWait} and does not assert the expected
      * condition of the elements (if elements are visible|hidden|present|clickable)
@@ -634,7 +632,7 @@ public class SeleniumGSpec extends BaseGSpec {
 
 
     /**
-     * Verifies that a webelement previously found has {@code attribute} with {@code value} (as a regexp)
+     * Verifies that a webelement previously found has attribute with value (as a regexp)
      * <p>
      * This step requires a previous operation for finding elements to have been executed, such as: <br>
      * {@link SeleniumGSpec#assertSeleniumNElementExists(String, Integer, String, String)} <br>
@@ -810,7 +808,7 @@ public class SeleniumGSpec extends BaseGSpec {
 
 
     /**
-     * Click on an numbered {@code url} previously found element.
+     * Click on an numbered url previously found element.
      * <p>
      * This step requires a previous operation for finding elements to have been executed, such as: <br>
      * {@link SeleniumGSpec#assertSeleniumNElementExists(String, Integer, String, String)} <br>
@@ -845,7 +843,7 @@ public class SeleniumGSpec extends BaseGSpec {
     }
 
     /**
-     * Double clicks on an numbered {@code url} previously found element.
+     * Double clicks on an numbered url previously found element.
      * <p>
      * This step requires a previous operation for finding elements to have been executed, such as: <br>
      * {@link SeleniumGSpec#assertSeleniumNElementExists(String, Integer, String, String)} <br>
@@ -878,7 +876,7 @@ public class SeleniumGSpec extends BaseGSpec {
     }
 
     /**
-     * Right clicks on an numbered {@code url} previously found element.
+     * Right clicks on an numbered url previously found element.
      * <p>
      * This step requires a previous operation for finding elements to have been executed, such as: <br>
      * {@link SeleniumGSpec#assertSeleniumNElementExists(String, Integer, String, String)} <br>
@@ -912,7 +910,7 @@ public class SeleniumGSpec extends BaseGSpec {
 
 
     /**
-     * Clear the text on a numbered {@code index} previously found element.
+     * Clear the text on a numbered index previously found element.
      * <p>
      * This step requires a previous operation for finding elements to have been executed, such as: <br>
      * {@link SeleniumGSpec#assertSeleniumNElementExists(String, Integer, String, String)} <br>
@@ -944,7 +942,7 @@ public class SeleniumGSpec extends BaseGSpec {
 
 
     /**
-     * Type a {@code text} on an numbered {@code index} previously found element.
+     * Type a text on an numbered index previously found element.
      * <p>
      * This step requires a previous operation for finding elements to have been executed, such as: <br>
      * {@link SeleniumGSpec#assertSeleniumNElementExists(String, Integer, String, String)} <br>
@@ -993,7 +991,7 @@ public class SeleniumGSpec extends BaseGSpec {
 
 
     /**
-     * Send a {@code strokes} list on an numbered {@code url} previously found element or to the driver.
+     * Send a strokes list on an numbered url previously found element or to the driver.
      * <p>
      * Strokes examples are "HOME, END" or "END, SHIFT + HOME, DELETE". Each element in the stroke list has to be an element from
      * {@link org.openqa.selenium.Keys} (NULL, CANCEL, HELP, BACK_SPACE, TAB, CLEAR, RETURN, ENTER, SHIFT, LEFT_SHIFT,
