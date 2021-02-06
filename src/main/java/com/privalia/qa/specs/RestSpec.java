@@ -26,11 +26,13 @@ import io.cucumber.datatable.DataTable;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
 import io.restassured.response.ResponseBody;
+import io.restassured.specification.ProxySpecification;
 import io.restassured.specification.RequestSpecification;
 import org.assertj.core.api.Assertions;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
@@ -42,7 +44,9 @@ import java.util.regex.Pattern;
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchema;
+import static io.restassured.specification.ProxySpecification.auth;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 /**
  * Steps definitions for testing REST services
@@ -946,4 +950,68 @@ public class RestSpec extends BaseGSpec {
 
         this.getCommonSpec().getRestRequest().multiPart(file);
     }
+
+    /**
+     * Sets a proxy for the rest client
+     * <p>
+     * The given URL must have a hostname, port and scheme (a correctly formed URL), for example
+     * "http://localhost:8080". If you need to use credentials for connecting to the proxy, you can
+     * use {@link #setRestProxyWithCredentials(String, String, String)}
+     * <pre>
+     * Example:
+     * {@code
+     *      Given I securely send requests to 'jsonplaceholder.typicode.com:443'
+     *      Given I set the proxy to 'http://localhost:80'
+     * }
+     * </pre>
+     *
+     * @see #setRestProxyWithCredentials(String, String, String)
+     * @param address                   Fully formed URL (schema + address + port)
+     * @throws MalformedURLException    MalformedURLException
+     */
+    @Given("I set the proxy to {string}")
+    public void setRestProxy(String address) throws MalformedURLException {
+        this.setRestProxyWithCredentials(address, null, null);
+    }
+
+    /**
+     * Sets a proxy for the rest client with credentials
+     * <p>
+     * The given URL must have a hostname, port and scheme (a correctly formed URL), for example
+     * "http://localhost:8080".
+     * <pre>
+     * Example:
+     * {@code
+     *      Given I securely send requests to 'jsonplaceholder.typicode.com:443'
+     *      Given I set the proxy to 'http://localhost:80' with username 'myusername' and password 'mypassword'
+     * }
+     * </pre>
+     *
+     * @see #setRestProxy(String)
+     * @param address                   Fully formed URL (schema + address + port)
+     * @param username                  Username
+     * @param password                  Password
+     * @throws MalformedURLException    MalformedURLException
+     */
+    @Given("I set the proxy to {string} with username {string} and password {string}")
+    public void setRestProxyWithCredentials(String address, String username, String password) throws MalformedURLException {
+
+        ProxySpecification ps;
+        int port = 80;
+        URL url = new URL(address);
+
+        if (url.getPort() != -1) {
+            port = url.getPort();
+        }
+
+        if (username == null && password == null) {
+            ps = new ProxySpecification(url.getHost(), port, url.getProtocol());
+        } else {
+            ps = new ProxySpecification(url.getHost(), port, url.getProtocol()).withAuth(username, password);
+        }
+
+        this.commonspec.getRestRequest().given().proxy(ps);
+
+    }
+
 }
