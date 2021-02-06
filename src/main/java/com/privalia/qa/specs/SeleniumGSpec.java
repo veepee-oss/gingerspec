@@ -55,13 +55,13 @@ public class SeleniumGSpec extends BaseGSpec {
      * <br>
      * You can also consider using {@link #iGoToUrl(String)} instead. This step just navigates the user to the given full
      * URL and can be easier to read in the gherkin files
-     * <pre>
+     * <pre>{@code
      * Example:
-     * {@code
-     *      Given My app is running in 'demoqa.com:80'  //Sets the base path
-     *      When I browse to '/login'                   //will navigate to http://demoqa.com:80/login
-     * }
-     * </pre>
+     *
+     * Scenario: setting http://demoqa.com:80 as basepath
+     *      Given My app is running in 'demoqa.com:80'
+     *      When I browse to '/login'
+     * }</pre>
      *
      * @deprecated This method is deprecated, use {@link #iGoToUrl(String)} instead
      * @see #seleniumBrowse(String, String)
@@ -94,19 +94,18 @@ public class SeleniumGSpec extends BaseGSpec {
      * <p>
      * The url is relative to the basepath configured with {@link SeleniumGSpec#setupApp(String)} method. You
      * can also use {@link #iGoToUrl(String)} to directly navigate to the given url.
-     * <pre>
+     * <pre>{@code
      * Example:
-     * {@code
+     *
+     * Scenario: Navigating to http://demoqa.com:80/login
      *      Given My app is running in 'demoqa.com:80'
-     *      Then I browse to '/'                        //will load http://demoqa.com:80/
-     *      Then I browse to '/login'                   //will load http://demoqa.com:80/login
-     * }
-     * Or if the site uses https
-     * {@code
+     *      Then I browse to '/'
+     *      Then I browse to '/login'
+     *
+     * Scenario: Navigating using https
      *      Given My app is running in 'mysecuresite.com:443'
-     *      Then I securely browse to '/'               //will load https://mysecuresite.com:443/
-     * }
-     * </pre>
+     *      Then I securely browse to '/'
+     * }</pre>
      *
      * @deprecated This method is deprecated, use {@link #iGoToUrl(String)} instead
      * @see #setupApp(String)
@@ -141,14 +140,15 @@ public class SeleniumGSpec extends BaseGSpec {
      * This method is similar to {@link SeleniumGSpec#assertSeleniumNElementExists(String, Integer, String, String)} <br>
      * but implements a pooling mechanism with a maximum pooling time instead of a static wait
      *
-     * <pre>
+     * <pre>{@code
      * Example:
-     * {@code
+     *
+     * Scenario: Wait until the element is clickable
      *      Given I go to 'http://mydummysite.com/login'
      *      Then I check every '1' seconds for at least '10' seconds until '1' elements exists with 'id:loginbutton' and is 'clickable'
      *      And I click on the element on index '0'
-     * }
-     * </pre>
+     * }</pre>
+     *
      * @see #seleniumBrowse(String, String)
      * @see #assertSeleniumNElementExists(String, Integer, String, String)
      * @see #seleniumClick(Integer)
@@ -171,12 +171,15 @@ public class SeleniumGSpec extends BaseGSpec {
      * <p>
      * This step stores the reference to the alert to be used in other steps such as {@link #iAcceptTheAlert()} or
      * by {@link #iDismissTheAlert()}
-     * <pre>
+     *
+     * <pre>{@code
      * Example:
-     * {@code
+     *
+     * Scenario: Wait for an alert
+     *      Given I go to 'http://mydummysite.com/login'
      *      And I check every '1' seconds for at least '5' seconds until an alert appears
-     * }
-     * </pre>
+     * }</pre>
+     *
      * @see #iAcceptTheAlert()
      * @see #iDismissTheAlert()
      * @param poolingInterval Time between consecutive condition evaluations
@@ -189,14 +192,16 @@ public class SeleniumGSpec extends BaseGSpec {
     }
 
     /**
-     * Accepts an alert message previously found
-     * <pre>
+     * Accepts an alert message previously found.
+     * <pre>{@code
      * Example:
-     * {@code
+     *
+     * Scenario: Wait for an alert and dismiss it
+     *      Given I go to 'http://mydummysite.com/login'
      *      And I check every '1' seconds for at least '5' seconds until an alert appears
      *      And I dismiss the alert
-     * }
-     * </pre>
+     * }</pre>
+     *
      * @see #waitAlertWithPooling(int, int)
      * @see #iAcceptTheAlert()
      */
@@ -206,10 +211,12 @@ public class SeleniumGSpec extends BaseGSpec {
     }
 
     /**
-     * Dismiss an alert message previously found
-     * <pre>
+     * Dismiss an alert message previously found.
+     * <pre>{@code
      * Example:
-     * {@code
+     *
+     * Scenario: Wait for an alert and accept it
+     *      Given I go to 'http://mydummysite.com/login'
      *      And I check every '1' seconds for at least '5' seconds until an alert appears
      *      And I accept the alert
      * }
@@ -231,13 +238,14 @@ public class SeleniumGSpec extends BaseGSpec {
      * {@link SeleniumGSpec#assertSeleniumNElementExists(String, Integer, String, String)} <br>
      * {@link SeleniumGSpec#assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)} <br>
      * {@link SeleniumGSpec#waitWebElementWithPooling(int, int, int, String, String, String)}
-     * <pre>
+     * <pre>{@code
      * Example:
-     * {@code
+     *
+     * Scenario: Uploading a new profile picture
+     *      Given I go to 'http://mydummysite.com/myprofile'
      *      When '1' elements exists with 'id:profile_pic_10'
      *      Then I assign the file in 'schemas/empty.json' to the element on index '0'
-     * }
-     * </pre>
+     * }</pre>
      *
      * @param fileName Name of the file relative to schemas folder (schemas/myFile.txt)
      * @param index    Index of the web element (file input)
@@ -257,12 +265,12 @@ public class SeleniumGSpec extends BaseGSpec {
 
     /**
      * Maximizes current browser window. Mind the current resolution could break a test.
-     * <pre>
+     * <pre>{@code
      * Example:
-     * {@code
+     *
+     * Scenario: maximize the browser
      *      Then I maximize the browser
-     * }
-     * </pre>
+     * }</pre>
      */
     @Given("^I maximize the browser$")
     public void seleniumMaximize() {
@@ -277,13 +285,16 @@ public class SeleniumGSpec extends BaseGSpec {
      * {@link SeleniumGSpec#assertSeleniumNElementExists(String, Integer, String, String)} <br>
      * {@link SeleniumGSpec#assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)} <br>
      * {@link SeleniumGSpec#waitWebElementWithPooling(int, int, int, String, String, String)}
-     * <pre>
+     * <pre>{@code
      * Example:
-     * {@code
+     *
+     * Scenario: switching to the iframe
+     *      Given I go to 'http://mydummysite.com/
      *      When '1' elements exists with 'id:iframeResult'
      *      Then I switch to the iframe on index '0'
-     * }
-     * </pre>
+     * }</pre>
+     *
+     * @see #seleniumIdFrame(String, String)
      * @param index the index
      */
     @Given("^I switch to the iframe on index '(\\d+)'$")
@@ -298,14 +309,16 @@ public class SeleniumGSpec extends BaseGSpec {
 
 
     /**
-     * Switch to the frame/iframe with the given locator
-     * <pre>
+     * Switch to the frame/iframe with the given locator.
+     * <pre>{@code
      * Example:
-     * {@code
-     *      Then I switch to iframe with 'id:iframeResult'
-     * }
-     * </pre>
      *
+     * Scenario: Switch to iframe by locator
+     *      Given I go to 'http://mydummysite.com/
+     *      Then I switch to iframe with 'id:iframeResult'
+     * }</pre>
+     *
+     * @see #seleniumSwitchFrame(Integer)
      * @param method  the method (id, class, name, xpath)
      * @param idframe locator
      */
@@ -324,12 +337,18 @@ public class SeleniumGSpec extends BaseGSpec {
 
     /**
      * Switches to a parent frame/iframe.
-     * <pre>
+     * <pre>{@code
      * Example:
-     * {@code
+     *
+     * Scenario: switch to a parent frame
      *      Then I switch to a parent frame
      * }
      * </pre>
+     *
+     * @see #seleniumIdFrame(String, String)
+     * @see #seleniumSwitchFrame(Integer)
+     * @see #seleniumSwitchParentFrame()
+     *
      */
     @Given("^I switch to a parent frame$")
     public void seleniumSwitchAParentFrame() {
@@ -339,12 +358,16 @@ public class SeleniumGSpec extends BaseGSpec {
 
     /**
      * Switches to the frames main container.
-     * <pre>
+     * <pre>{@code
      * Example:
-     * {@code
+     *
+     * Scenario: switch to the main frame container
      *      Then I switch to the main frame container
-     * }
-     * </pre>
+     * }</pre>
+     *
+     * @see #seleniumSwitchAParentFrame()
+     * @see #seleniumSwitchFrame(Integer)
+     * @see #seleniumIdFrame(String, String)
      */
     @Given("^I switch to the main frame container$")
     public void seleniumSwitchParentFrame() {
@@ -357,12 +380,15 @@ public class SeleniumGSpec extends BaseGSpec {
      * <p>
      * This step verifies that at least one new window is open. You can switch focus to this new window using
      * the step {@link #seleniumChangeWindow()}
-     * <pre>
+     * <pre>{@code
      * Example:
-     * {@code
+     *
+     * Scenario: Check that a new window opened
+     *      Given I go to 'http:mydummysite/index.html'
+     *      Then I click on the element with 'name:pie_submit'
      *      Then a new window is opened
-     * }
-     * </pre>
+     * }</pre>
+     *
      * @see #seleniumChangeWindow()
      */
     @Given("^a new window is opened$")
@@ -380,13 +406,14 @@ public class SeleniumGSpec extends BaseGSpec {
      * {@link SeleniumGSpec#assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)} <br>
      * {@link SeleniumGSpec#waitWebElementWithPooling(int, int, int, String, String, String)}
      *
-     * <pre>
+     * <pre>{@code
      * Example:
-     * {@code
+     *
+     * Scenario: Verify text of element
+     *      Given I go to 'http:mydummysite/index.html'
      *      When '1' elements exists with 'xpath://*[@id="pie_register"]/li[6]/div/label'
      *      And the element on index '0' has 'Phone Number' as text
-     * }
-     * </pre>
+     * }</pre>
      *
      * @param index the index of the webelement
      * @param text  the text to verify
@@ -401,15 +428,16 @@ public class SeleniumGSpec extends BaseGSpec {
 
     /**
      * Checks if a text exists in the source of an already loaded URL.
-     * <pre>
+     * <pre>{@code
      * Example:
-     * {@code
+     *
+     * Scenario: Verify text exists in page source
+     *      Given I go to 'http:mydummysite/index.html'
      *      Then this text exists:
      *      """
      *      <h1 class="entry-title">Home</h1>
      *      """
-     * }
-     * </pre>
+     * }</pre>
      *
      * @param text the text to verify
      */
@@ -423,21 +451,23 @@ public class SeleniumGSpec extends BaseGSpec {
      * Checks that the expected count of webelements are present in the page.
      * <p>
      * Elements found are internally stored to be used in subsequent steps in the same scenario
-     * <pre>
-     * Example:
-     * {@code
+     * <pre>{@code
+     * Examples:
+     *
+     * Scenario: Locating element by id
+     *      Given I go to 'http:mydummysite/index.html'
      *      When '1' elements exists with 'id:profile_pic_10'
-     * }
-     * Elements can be also located using class for example:
-     * {@code
+     *
+     * Scenario: Locating element by class
+     *      Given I go to 'http:mydummysite/index.html'
      *      When '7' elements exists with 'class:legend_txt'
-     * }
-     * To verify that the amount of elements is bigger or equal:
-     * {@code
+     *
+     * Scenario: verify that the amount of elements is bigger or equal
+     *      Given I go to 'http:mydummysite/index.html'
      *      Then at least '1' elements exists with 'class:detail-entry'
-     * }
-     * Elements are stored to be used in subsequent steps:
-     * {@code
+     *
+     * Scenario: Elements are stored to be used in subsequent steps:
+     *      Given I go to 'http:mydummysite/index.html'
      *      Given '1' elements exists with 'xpath://*[@id="myBtn"]'
      *      Then I click on the element on index '0'
      * }
@@ -475,13 +505,14 @@ public class SeleniumGSpec extends BaseGSpec {
      * This method is similar to {@link SeleniumGSpec#waitWebElementWithPooling(int, int, int, String, String, String)}
      * but uses static wait instead of {@link org.openqa.selenium.support.ui.FluentWait} and does not assert the expected
      * condition of the elements (if elements are visible|hidden|present|clickable)
-     * <pre>
+     * <pre>{@code
      * Example:
-     * {@code
+     *
+     * Scenario: Wait for element to be present
+     *      Given I go to 'http:mydummysite/index.html'
      *      Then in less than '20' seconds, checking each '2' seconds, '1' elements exists with 'id:name_3_firstname'
      *      And I click on the element on index '0'
-     * }
-     * </pre>
+     * }</pre>
      *
      * @deprecated use {@link #waitWebElementWithPooling(int, int, int, String, String, String)} instead.
      * @see #waitWebElementWithPooling(int, int, int, String, String, String)
@@ -523,18 +554,19 @@ public class SeleniumGSpec extends BaseGSpec {
      * {@link SeleniumGSpec#assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)} <br>
      * {@link SeleniumGSpec#waitWebElementWithPooling(int, int, int, String, String, String)}
      *
-     * <pre>
+     * <pre>{@code
      * Example:
-     * {@code
+     *
+     * Scenario: Checking if the element previously found is displayed
+     *      Given I go to 'http:mydummysite/index.html'
      *      When '1' elements exists with 'id:myDIV'
      *      And the element on index '0' IS displayed
-     * }
-     * Or:
-     * {@code
+     *
+     * Scenario: Checking if the element previously found is not displayed
+     *      Given I go to 'http:mydummysite/index.html'
      *      When '1' elements exists with 'id:myDIV'
      *      And the element on index '0' IS NOT displayed
-     * }
-     * </pre>
+     * }</pre>
      *
      * @see #assertSeleniumNElementExists(String, Integer, String, String)
      * @see #assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)
@@ -565,18 +597,20 @@ public class SeleniumGSpec extends BaseGSpec {
      * {@link SeleniumGSpec#assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)} <br>
      * {@link SeleniumGSpec#waitWebElementWithPooling(int, int, int, String, String, String)}
      *
-     * <pre>
+     * <pre>{@code
      * Example:
-     * {@code
+     *
+     * Scenario: Checking if the element previously found is enabled
+     *      Given I go to 'http:mydummysite/index.html'
      *      When '1' elements exists with 'xpath://*[@id="myBtn"]'
      *      And the element on index '0' IS enabled
-     * }
-     * Or:
-     * {@code
+     *
+     * Scenario: Checking if the element previously found is not enabled
+     *      Given I go to 'http:mydummysite/index.html'
      *      When '1' elements exists with 'xpath://*[@id="myBtn"]'
      *      And the element on index '0' IS NOT enabled
-     * }
-     * </pre>
+     * }</pre>
+     *
      * @param index  the index of the web element in the list
      * @param option the option (is enabled or not)
      */
@@ -602,18 +636,20 @@ public class SeleniumGSpec extends BaseGSpec {
      * {@link SeleniumGSpec#assertSeleniumNElementExists(String, Integer, String, String)} <br>
      * {@link SeleniumGSpec#assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)} <br>
      * {@link SeleniumGSpec#waitWebElementWithPooling(int, int, int, String, String, String)}
-     * <pre>
+     * <pre>{@code
      * Example:
-     * {@code
+     *
+     * Scenario: Checking if the element previously found is not selected
+     *      Given I go to 'http:mydummysite/index.html'
      *      When '3' elements exists with 'name:radio_4[]'
      *      And the element on index '0' IS NOT selected
-     * }
-     * Or:
-     * {@code
+     *
+     * Scenario: Checking if the element previously found is selected
+     *      Given I go to 'http:mydummysite/index.html'
      *      When '3' elements exists with 'name:radio_4[]'
      *      And the element on index '1' IS selected
-     * }
-     * </pre>
+     * }</pre>
+     *
      * @param index  the index of the web element in the list
      * @param option the option (if it is enabled or not)
      */
@@ -640,13 +676,15 @@ public class SeleniumGSpec extends BaseGSpec {
      * {@link SeleniumGSpec#assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)} <br>
      * {@link SeleniumGSpec#waitWebElementWithPooling(int, int, int, String, String, String)}
      *
-     * <pre>
+     * <pre>{@code
      * Example:
-     * {@code
+     *
+     * Scenario: Checking the value of attribute
+     *      Given I go to 'http:mydummysite/index.html'
      *      When '1' elements exists with 'id:loginButton'
      *      Then the element on index '0' has 'type' as 'submit'
-     * }
-     * </pre>
+     * }</pre>
+     *
      * @param index     the index of the web element
      * @param attribute the attribute to verify
      * @param value     the value of the attribute
@@ -665,12 +703,13 @@ public class SeleniumGSpec extends BaseGSpec {
      * Takes a snapshot/screenshot/screen capture of the current page.
      * <p>
      * Snapshots are stored under target/executions
-     * <pre>
+     * <pre>{@code
      * Example:
-     * {@code
+     *
+     * Scenario:
+     *      Given I go to 'http:mydummysite/index.html'
      *      Then I take a snapshot
-     * }
-     * </pre>
+     * }</pre>
      */
     @Then("^I take a snapshot$")
     public void seleniumSnapshot() {
@@ -680,14 +719,15 @@ public class SeleniumGSpec extends BaseGSpec {
 
     /**
      * Checks that we are in the URL passed
-     * <pre>
+     * <pre>{@code
      * Example:
-     * {@code
+     *
+     * Scenario: checking the current url
      *      Given I go to 'https://demoqa.com/'
      *      Then we are in page 'https://demoqa.com/'
-     * }
-     * </pre>
+     * }</pre>
      *
+     * @see #checkURLContains(String)
      * @param url the url to verify
      */
     @Then("^we are in page '(.*)'$")
@@ -697,15 +737,17 @@ public class SeleniumGSpec extends BaseGSpec {
 
 
     /**
-     * Checks if the current URL contains the specified text
-     * <pre>
+     * Checks if the current URL contains the specified text.
+     * <pre>{@code
      * Example:
-     * {@code
+     *
+     * Scenario: check if current url contains the word 'autocomplete'
      *      Given My app is running in 'demoqa.com:80'
      *      And I browse to '/autocomplete'
      *      Then the current url contains the text 'autocomplete'
-     * }
-     * </pre>
+     * }</pre>
+     *
+     * @see #checkURL(String)
      * @param text  Text to look for in the current url
      */
     @Then("^the current url contains the text '(.*)'$")
@@ -731,13 +773,14 @@ public class SeleniumGSpec extends BaseGSpec {
      * {@link SeleniumGSpec#assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)} <br>
      * {@link SeleniumGSpec#waitWebElementWithPooling(int, int, int, String, String, String)}
      *
-     * <pre>
+     * <pre>{@code
      * Example:
-     * {@code
+     *
+     * Scenario: Saving the content of element
+     *      Given I go to 'http:mydummysite/index.html'
      *      When '1' elements exists with 'id:my_text_field'
      *      I save content of element in index '0' in environment variable 'mytext'
-     * }
-     * </pre>
+     * }</pre>
      *
      * @see #assertSeleniumNElementExists(String, Integer, String, String)
      * @see #assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)
@@ -762,13 +805,15 @@ public class SeleniumGSpec extends BaseGSpec {
      * {@link SeleniumGSpec#assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)} <br>
      * {@link SeleniumGSpec#waitWebElementWithPooling(int, int, int, String, String, String)}
      *
-     * <pre>
+     * <pre>{@code
      * Example:
-     * {@code
+     *
+     * Scenario: Verify property of element
+     *      Given I go to 'http:mydummysite/index.html'
      *      And '3' elements exists with 'css:input[name='radio_4[]']'
      *      Then the element in index '1' has 'radio_4[]' in property 'name'
-     * }
-     * </pre>
+     * }</pre>
+     *
      * @see #assertSeleniumNElementExists(String, Integer, String, String)
      * @see #assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)
      * @see #waitWebElementWithPooling(int, int, int, String, String, String)
@@ -817,13 +862,14 @@ public class SeleniumGSpec extends BaseGSpec {
      * {@link SeleniumGSpec#waitWebElementWithPooling(int, int, int, String, String, String)}<br>.
      * You can also perform click action on an element using {@link #seleniumClickByLocator(String, String, Integer)}
      *
-     * <pre>
+     * <pre>{@code
      * Example:
-     * {@code
+     *
+     * Scenario: Click on previously found element
+     *      Given I go to 'http:mydummysite/index.html'
      *      When '1' elements exists with 'xpath://*[@id="name_3_lastname"]'
      *      And I click on the element on index '0'
-     * }
-     * </pre>
+     * }</pre>
      *
      * @deprecated This method is deprecated, use {@link #seleniumClickByLocator(String, String, Integer)} instead
      * @see #assertSeleniumNElementExists(String, Integer, String, String)
@@ -850,13 +896,14 @@ public class SeleniumGSpec extends BaseGSpec {
      * {@link SeleniumGSpec#assertSeleniumNElementExists(String, Integer, String, String)} <br>
      * {@link SeleniumGSpec#assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)} <br>
      * {@link SeleniumGSpec#waitWebElementWithPooling(int, int, int, String, String, String)}<br>.
-     * <pre>
+     * <pre>{@code
      * Example:
-     * {@code
+     *
+     * Scenario: Performing a double click on element previously found
+     *      Given I go to 'http:mydummysite/index.html'
      *      When '1' elements exists with 'id:doubleClickBtn'
      *      And I double click on the element on index '0'
-     * }
-     * </pre>
+     * }</pre>
      *
      * @deprecated This method is deprecated, use {@link #seleniumDoubleClickByLocator(String, String, Integer)} instead
      * @see #seleniumDoubleClickByLocator(String, String, Integer)
@@ -883,13 +930,14 @@ public class SeleniumGSpec extends BaseGSpec {
      * {@link SeleniumGSpec#assertSeleniumNElementExists(String, Integer, String, String)} <br>
      * {@link SeleniumGSpec#assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)} <br>
      * {@link SeleniumGSpec#waitWebElementWithPooling(int, int, int, String, String, String)}<br>.
-     * <pre>
+     * <pre>{@code
      * Example:
-     * {@code
+     *
+     * Scenario: Performing a right click on the element previously found
+     *      Given I go to 'http:mydummysite/index.html'
      *      When '1' elements exists with 'id:rightClickBtn'
      *      And I right click on the element on index '0'
-     * }
-     * </pre>
+     * }</pre>
      *
      * @deprecated This method is deprecated, use {@link #seleniumRightClickByLocator(String, String, Integer)} instead
      * @see #seleniumRightClickByLocator(String, String, Integer)
@@ -918,14 +966,16 @@ public class SeleniumGSpec extends BaseGSpec {
      * {@link SeleniumGSpec#assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)} <br>
      * {@link SeleniumGSpec#waitWebElementWithPooling(int, int, int, String, String, String)}
      *
-     * <pre>
+     * <pre>{@code
      * Example:
-     * {@code
-     *      Then the element on index '0' has 'id' as 'phone_9'
+     *
+     * Scenario:
+     *      Given I go to 'http:mydummysite/index.html'
+     *      When '1' elements exists with 'id:phone_9'
      *      And I type '555-555' on the element on index '0'
      *      And I clear the content on text input at index '0'
-     * }
-     * </pre>
+     * }</pre>
+     *
      * @see #assertSeleniumNElementExists(String, Integer, String, String)
      * @see #assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)
      * @see #waitWebElementWithPooling(int, int, int, String, String, String)
@@ -952,14 +1002,14 @@ public class SeleniumGSpec extends BaseGSpec {
      * You can also use the step {@link #seleniumTypeByLocator(String, String, String, Integer)} to directly type the given
      * text in the element
      *
-     * <pre>
+     * <pre>{@code
      * Example:
-     * {@code
-     *      Then the element on index '0' has 'id' as 'phone_9'
-     *      And I type '555-555' on the element on index '0'
-     *      And I clear the content on text input at index '0'
-     * }
-     * </pre>
+     *
+     * Scenario:
+     *      Given I go to 'http:mydummysite/index.html'
+     *      When '1' elements exists with 'id:phone_9'
+     *      Then I type '555-555' on the element on index '0'
+     * }</pre>
      *
      * @deprecated This method is deprecated, use {@link #seleniumTypeByLocator(String, String, String, Integer)} instead
      * @see #seleniumTypeByLocator(String, String, String, Integer)
@@ -1008,14 +1058,16 @@ public class SeleniumGSpec extends BaseGSpec {
      * {@link SeleniumGSpec#assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)} <br>
      * {@link SeleniumGSpec#waitWebElementWithPooling(int, int, int, String, String, String)}
      *
-     * <pre>
+     * <pre>{@code
      * Example:
-     * {@code
+     *
+     * Scenario: Press enter on the given element
+     *      Given I go to 'http:mydummysite/index.html'
      *      When '1' elements exists with 'id:name_3_firstname'
      *      Then I type 'testUser' on the element on index '0'
      *      Then I send 'ENTER' on the element on index '0'
-     * }
-     * </pre>
+     * }</pre>
+     *
      * @see #seleniumType(String, Integer)
      * @see #assertSeleniumNElementExists(String, Integer, String, String)
      * @see #assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)
@@ -1059,7 +1111,7 @@ public class SeleniumGSpec extends BaseGSpec {
 
 
     /**
-     * Choose an @{code option} from a select webelement found previously
+     * Choose an option from a select webelement found previously
      * <p>
      * This step requires a previous operation for finding elements to have been executed, such as: <br>
      * {@link SeleniumGSpec#assertSeleniumNElementExists(String, Integer, String, String)} <br>
@@ -1107,13 +1159,15 @@ public class SeleniumGSpec extends BaseGSpec {
      * <p>
      * All further selenium actions will be executed in this new window. You can use the step
      * {@link #seleniumGetwindows()} to assert that a new window is indeed open
-     * <pre>
+     * <pre>{@code
      * Example:
-     * {@code
+     *
+     * Scenario:
+     *      Given I go to 'http:mydummysite/index.html'
+     *      Then I click on the element with 'name:pie_submit'
      *      Given a new window is opened
      *      Then I change active window
-     * }
-     * </pre>
+     * }</pre>
      *
      * @see #seleniumGetwindows()
      */
@@ -1138,13 +1192,15 @@ public class SeleniumGSpec extends BaseGSpec {
      * {@link SeleniumGSpec#assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)} <br>
      * {@link SeleniumGSpec#waitWebElementWithPooling(int, int, int, String, String, String)}
      *
-     * <pre>
+     * <pre>{@code
      * Example:
-     * {@code
+     *
+     * Scenario: Saving the value of class in local variable for future use
+     *      Given I go to 'http:mydummysite/index.html'
      *      Then '1' elements exists with 'id:menu-item-146'
      *      Then I save the value of the property 'class' of the element in index '0' in variable 'VAR2'
-     * }
-     * </pre>
+     * }</pre>
+     *
      * @see #assertSeleniumNElementExists(String, Integer, String, String)
      * @see #assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)
      * @see #waitWebElementWithPooling(int, int, int, String, String, String)
@@ -1170,17 +1226,19 @@ public class SeleniumGSpec extends BaseGSpec {
      * {@link SeleniumGSpec#assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)} <br>
      * {@link SeleniumGSpec#waitWebElementWithPooling(int, int, int, String, String, String)}
      *
-     * <pre>
+     * <pre>{@code
      * Example:
-     * {@code
+     *
+     * Scenario: Executes a JavaScript function
+     *      Given I go to 'http:mydummysite/index.html'
      *      And I execute 'alert("This is an alert!")' as javascript
-     * }
-     * Javascript functions can be executed on previous found elements:
-     * {@code
+     *
+     * Scenario: Javascript functions can be executed on previous found elements
+     *      Given I go to 'http:mydummysite/index.html'
      *      And '1' elements exists with 'xpath://*[@id="menu-item-158"]/a'
      *      And I execute 'arguments[0].click();' as javascript on the element on index '0'
-     * }
-     * </pre>
+     * }</pre>
+     *
      * @see #assertSeleniumNElementExists(String, Integer, String, String)
      * @see #assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)
      * @see #waitWebElementWithPooling(int, int, int, String, String, String)
@@ -1208,23 +1266,23 @@ public class SeleniumGSpec extends BaseGSpec {
     }
 
     /**
-     * Directly navigate go to the specified url
+     * Directly navigate to the specified url
      * <p>
      * This step is a similar way of navigating to a web page by specifying the
      * full url directly, instead of first setting the base path with {@link #setupApp(String)}
      * and later navigate with {@link #seleniumBrowse(String, String)}
      *
-     * <pre>
-     * Example:
-     * {@code
+     * <pre>{@code
+     * Examples:
+     *
+     * Scenario: Directly navigate to the given page
      *      Given I go to 'http://www.demoqa.com/autocomplete'
-     * }
-     * You can also do it like this:
-     * {@code
+     *
+     * Scenario: Setting a base path first
      *      Given My app is running in 'demoqa.com:80'
      *      And I browse to '/autocomplete'
-     * }
-     * </pre>
+     * }</pre>
+     *
      * @see #setupApp(String)
      * @see #seleniumBrowse(String, String)
      * @param url   Url were to navigate
@@ -1248,16 +1306,18 @@ public class SeleniumGSpec extends BaseGSpec {
      * or {@link #assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)}. If the page contains
      * several web elements with the given locator, the click action will be performed to the first element found by default,
      * unless an index is specified (first element has index 0)
-     * <pre>
-     * Example: Perform click on the element with id 'username'
-     * {@code
+     * <pre>{@code
+     * Examples:
+     *
+     * Scenario: Perform click on the element with id 'username'
+     *      Given I go to 'http:mydummysite/index.html'
      *      When I click on the element with 'id:username'
-     * }
-     * Example: Using index in case more than one element is found (first element has index 0)
-     * {@code
-     *      When I click on the element with 'tagName:button' index 1  //clicks the second element with tag name 'button'
-     * }
-     * </pre>
+     *
+     * Scenario: Using index in case more than one element is found (first element has index 0)
+     *      Given I go to 'http:mydummysite/index.html'
+     *      When I click on the element with 'tagName:button' index 1
+     * }</pre>
+     *
      * @see #seleniumClick(Integer)
      * @see #assertSeleniumNElementExists(String, Integer, String, String)
      * @see #assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)
@@ -1282,13 +1342,15 @@ public class SeleniumGSpec extends BaseGSpec {
      * or {@link #assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)}. If the page contains
      * several web elements with the given locator, the click action will be performed to the first element found by default,
      * unless an index is specified (first element has index 0)
-     * <pre>
-     * Example: Type 555-555 in the input field with id:phone_number
-     * {@code
+     * <pre>{@code
+     * Examples:
+     *
+     * Scenario: Type 555-555 in the input field with id:phone_number
+     *      Given I go to 'http:mydummysite/index.html'
      *      And I type '555-555' on the element with 'id:phone_number'
-     * }
-     * Example: Using index in case more than one element is found (first element has index 0)
-     * {@code
+     *
+     * Scenario: Using index in case more than one element is found (first element has index 0)
+     *      Given I go to 'http:mydummysite/index.html'
      *      And I type '555-555' on the element with 'class:text-field' index 1
      * }
      * </pre>
@@ -1316,27 +1378,27 @@ public class SeleniumGSpec extends BaseGSpec {
      * but uses a DocString, which allows using large strings of text, suitable for typing a long address or a long comment. If the page contains
      * several web elements with the given locator, the click action will be performed to the first element found by default,
      * unless an index is specified (first element has index 0)
-     * <pre>
-     * Example: Typing a large piece of text
-     * {@code
+     * <pre>{@code
+     * Examples:
+     *
+     * Scenario: Typing a large piece of text
+     *      Given I go to 'http:mydummysite/index.html'
      *      And I type on the element with 'id:message' the text:
      *       """
      *        Good morning George!
      *        ===============
      *        The package of your order with number 1234886 should be about to arrive!
      *       """
-     * }
-     * Example: Using index in case more than one element is found (first element has index 0). By the way, you can also
-     * use variables within DocStrings
-     * {@code
+     *
+     * Scenario: Using index in case more than one element is found (first element has index 0).
+     *      Given I go to 'http:mydummysite/index.html'
      *      And I type on the element with 'id:message' index '0' the text:
      *       """
      *        Good morning ${USER_NAME}!
      *        ===============
      *        The package of your order with number ${ORDER_NUMBER} should be about to arrive!
      *       """
-     * }
-     * </pre>
+     * }</pre>
      *
      * @see #seleniumType(String, Integer)
      * @see #seleniumTypeByLocator(String, String, String, Integer)
@@ -1374,14 +1436,16 @@ public class SeleniumGSpec extends BaseGSpec {
      * This step executes a javascript function to automatically scroll the element into view. The web element is referenced
      * by its index, to  it does require a previous operation for finding elements, such as {@link #assertSeleniumNElementExists(String, Integer, String, String)}
      * or {@link #assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)} to be executed first.
-     * <pre>
-     * Example: Scroll until the submit button is visible, then, click on it
-     * {@code
+     * <pre>{@code
+     * Example:
+     *
+     * Scenario: Scroll until the submit button is visible, then, click on it
+     *      Given I go to 'http:mydummysite/index.html'
      *      And at least '1' elements exists with 'id:submit'
      *      Then I scroll down until the element on index '0' is visible
      *      Then I click on the element on index '0'
-     * }
-     * </pre>
+     * }</pre>
+     *
      * @see #scrollUntilElementVisibleByLocator(String, String, String, Integer)
      * @see #assertSeleniumNElementExists(String, Integer, String, String)
      * @see #assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)
@@ -1411,14 +1475,16 @@ public class SeleniumGSpec extends BaseGSpec {
      * <p>
      * This step executes a javascript function to automatically scroll the element into view. This step is similar to {@link #scrollUntilElementVisible(String, int)}
      * but it does not require a previous operation for finding elements to be executed, since the element is directly referenced as a locator
-     * <pre>
-     * Example: Scroll up and down the page until the referenced element is visible
-     * {@code
+     * <pre>{@code
+     * Example:
+     *
+     * Scenario: Scroll up and down the page until the referenced element is visible
+     *      Given I go to 'http:mydummysite/index.html'
      *      Then I scroll up until the element with 'id:userName' is visible
      *      Then I scroll down until the element with 'id:submit' is visible
      *      Then I click on the element with 'id:submit'
-     * }
-     * </pre>
+     * }</pre>
+     *
      * @see #scrollUntilElementVisible(String, int)
      * @param direction                 Indicates if the scroll is upwards or downwards
      * @param method                    method to locate the elements (id, name, class, css, xpath, linkText, partialLinkText and tagName)
@@ -1443,16 +1509,18 @@ public class SeleniumGSpec extends BaseGSpec {
      * or {@link #assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)}. If the page contains
      * several web elements with the given locator, the double click action will be performed to the first element found by default,
      * unless an index is specified (first element has index 0)
-     * <pre>
-     * Example: Perform double click on the element with id 'doubleClickBtn'
-     * {@code
+     * <pre>{@code
+     * Example:
+     *
+     * Scenario: Perform double click on the element with id 'doubleClickBtn'
+     *      Given I go to 'http:mydummysite/index.html'
      *      When I double click on the element with 'id:doubleClickBtn'
-     * }
-     * Example: Using index in case more than one element is found (first element has index 0)
-     * {@code
-     *      When I double click on the element with 'tagName:button' index 1  //clicks the second element with tag name 'button'
-     * }
-     * </pre>
+     *
+     * Scenario: Using index in case more than one element is found (first element has index 0)
+     *      Given I go to 'http:mydummysite/index.html'
+     *      When I double click on the element with 'tagName:button' index 1
+     * }</pre>
+     *
      * @see #seleniumDoubleClick(Integer)
      * @see #assertSeleniumNElementExists(String, Integer, String, String)
      * @see #assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)
@@ -1478,14 +1546,16 @@ public class SeleniumGSpec extends BaseGSpec {
      * or {@link #assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)}. If the page contains
      * several web elements with the given locator, the right click action will be performed to the first element found by default,
      * unless an index is specified (first element has index 0)
-     * <pre>
-     * Example: Perform right click on the element with id 'rightClickBtn'
-     * {@code
+     * <pre>{@code
+     * Example:
+     *
+     * Scenario: Perform right click on the element with id 'rightClickBtn'
+     *      Given I go to 'http:mydummysite/index.html'
      *      When I right click on the element with 'id:rightClickBtn'
-     * }
-     * Example: Using index in case more than one element is found (first element has index 0)
-     * {@code
-     *      When I right click on the element with 'tagName:button' index '1'  //clicks the second element with tag name 'button'
+     *
+     * Scenario: Using index in case more than one element is found (first element has index 0)
+     *      Given I go to 'http:mydummysite/index.html'
+     *      When I right click on the element with 'tagName:button' index '1'
      * }
      * </pre>
      * @see #seleniumRightClick(Integer)
@@ -1511,16 +1581,18 @@ public class SeleniumGSpec extends BaseGSpec {
      * This step performs the function of hovering, or, directly placing the cursor (mouse pointer)
      * on top of the specified element. This is particularly useful since in some situations, DOM elements
      * are only revealed after the mouse is directly placed on top of another element (like tooltips)
-     * <pre>
+     * <pre>{@code
      * Example:
-     * {@code
+     *
+     * Scenario: Hover on element
+     *      Given I go to 'http:mydummysite/index.html'
      *      Given I hover on the element with 'id:revelPopUpButton'
-     * }
-     * Example: Using index in case more than one element is found (first element has index 0)
-     * {@code
-     *      Given I hover on the element with 'id:revelPopUpButton' index '1'   //clicks the second element with tag name 'button'
-     * }
-     * </pre>
+     *
+     * Scenario: Using index in case more than one element is found (first element has index 0)
+     *      Given I go to 'http:mydummysite/index.html'
+     *      Given I hover on the element with 'id:revelPopUpButton' index '1'
+     * }</pre>
+     *
      * @param method        method to locate the elements (id, name, class, css, xpath, linkText, partialLinkText and tagName)
      * @param element       the relative reference to the element
      * @param index         Index of the element, in case one or more elements with the given locator are found (first element starts with index 0)
@@ -1542,14 +1614,15 @@ public class SeleniumGSpec extends BaseGSpec {
      * This step shows a dialog in the center of the screen and interrupts the execution of the rest
      * of the steps in the feature until the "Ok" button in the dialog is pressed. This comes handy when
      * debugging and the user needs to execute some manual actions before continuing
-     * <pre>
+     * <pre>{@code
      * Example:
-     * {@code
+     *
+     * Scenario: Step the execution
      *     Given I go to 'http://demoqa.com/automation-practice-form'
-     *     Then I pause                                             //This will show the pause dialog
-     *     Then I type 'Jose' on the element with 'id:firstName'    //This will only be executed when the "Ok" button in previous dialog is pressed
-     * }
-     * </pre>
+     *     Then I pause
+     *     Then I type 'Jose' on the element with 'id:firstName'
+     * }</pre>
+     *
      * @see UtilsGSpec#idleWait(Integer)
      * @see #waitWebElementWithPooling(int, int, int, String, String, String)
      * @see #waitAlertWithPooling(int, int)
