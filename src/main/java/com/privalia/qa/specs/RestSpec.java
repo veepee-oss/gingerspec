@@ -18,6 +18,7 @@ package com.privalia.qa.specs;
 
 import com.jayway.jsonpath.PathNotFoundException;
 import com.privalia.qa.utils.ThreadProperty;
+import io.cucumber.docstring.DocString;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -68,14 +69,17 @@ public class RestSpec extends BaseGSpec {
      * the {@link HookGSpec} class, so, don't forget to use the {@literal @}rest annotation at the beginning of your
      * feature for a proper initialization.
      * <pre>
-     * Example:
      * {@code
-     *      Given I send requests to 'jsonplaceholder.typicode.com'       //If no port is specified, will default to 80 -> http://jsonplaceholder.typicode.com:80
-     *      Given I send requests to 'jsonplaceholder.typicode.com:8080'  //Will use -> http:jsonplaceholder.typicode.com:8080
-     * }
-     * Or su can use the keyword 'securely' to use https
-     * {@code
-     *      Given I securely send requests to 'jsonplaceholder.typicode.com'    //If no port is specified, will default to 443 -> https//:jsonplaceholder.typicode.com:443
+     * Examples
+     *
+     * Scenario: Setting up the host. Defaults to port 80
+     *      Given I send requests to 'jsonplaceholder.typicode.com'
+     *
+     * Scenario: Setting up host and specific port
+     *      Given I send requests to 'jsonplaceholder.typicode.com:8080'
+     *
+     * Scenario: using the keyword 'securely' to use https, defaults to port 443
+     *      Given I securely send requests to 'jsonplaceholder.typicode.com'
      * }
      * </pre>
      *
@@ -129,19 +133,21 @@ public class RestSpec extends BaseGSpec {
      * <p>
      * This step is typically used to verify the response body of a request. The json to verify
      * must have been previously saved in a variable using for example
-     * {@link #saveElementEnvironment(String, String, String)}
-     * <pre>
-     * Example: Assuming that 'response' contains a json document
-     * {@code
+     * {@link #saveElementEnvironment(String, String, String)}. In the datatable, the first column represents the
+     * jsonpath of the element in the body to verify, the second column the operator operator (equal|not equal|contains|does not contain|length|exists|does not exists|size)
+     * and the third column the value to match against
+     * <pre>{@code
+     * Example
+     *
+     * Scenario: Saving result in variable 'response' and evaluating
+     *      Given I securely send requests to 'jsonplaceholder.typicode.com:443'
+     *      When I send a 'POST' request to '/posts' based on 'schemas/mytestdata.json' as 'json'
+     *      And I save element '$' in environment variable 'response'
      *      And 'response' matches the following cases:
      *       | $.title  | contains  | 2              |
      *       | $.body   | contains  | This is a test |
      *       | $.userId | not equal | 2              |
-     * }
-     * First column: jsonpath of the element in the body to verify
-     * Second column: operator (equal|not equal|contains|does not contain|length|exists|does not exists|size)
-     * Third column: Value to match against
-     * </pre>
+     * }</pre>
      * @see #saveElementEnvironment(String, String, String)
      * @param envVar        Environment variable where JSON is stored
      * @param table         Data table in which each row stores one expression
@@ -169,27 +175,28 @@ public class RestSpec extends BaseGSpec {
     /**
      * Generates a REST request of the type specified to the indicated endpoint
      * <p>
-     * The endpoint must be relative to the base path previously defined with {@link #setupApp(String, String)}
-     * <pre>
-     * Example: Executing a simple GET request
-     * {@code
+     * The endpoint must be relative to the base path previously defined with {@link #setupApp(String, String)}. If needed, you can also specify
+     * the body of the request (for POST, PUT and DELETE requests) from a local file. If you need to alter the content of the json document before
+     * sending you could use {@link #sendRequestDataTable(String, String, String, String, String, DataTable)}
+     * <pre>{@code
+     * Examples:
+     *
+     * Scenario: Executing a simple GET request
      *      Given I securely send requests to 'jsonplaceholder.typicode.com:443'
-     *      When I send a 'GET' request to '/posts'      //Executes a GET request to https://jsonplaceholder.typicode.com:443/posts
-     * }
-     * Example: Using basic authentication:
-     * {@code
+     *      When I send a 'GET' request to '/posts'
+     *
+     * Scenario: Using basic authentication
      *      Given I securely send requests to 'jsonplaceholder.typicode.com:443'
      *      When I send a 'GET' request to '/posts' with user and password 'user:password'
-     * }
-     * Example: Sending a POST request with body
-     * {@code
+     *
+     * Scenario: Sending a POST request with content of file mytestdata.json as body
      *      Given I securely send requests to 'jsonplaceholder.typicode.com:443'
-     *      When I send a 'POST' request to '/posts' based on 'schemas/mytestdata.json' as 'json' //Executes a POST request with the content of mytestdata.json as body
-     * }
-     * If you need to alter the content of the json document before sending you could use {@link #sendRequestDataTable(String, String, String, String, String, DataTable)}
-     * </pre>
+     *      When I send a 'POST' request to '/posts' based on 'schemas/mytestdata.json' as 'json'
+     * }</pre>
+     *
      * @see #setupApp(String, String)
      * @see #sendRequestDataTable(String, String, String, String, String, DataTable)
+     * @see #sendRequestInlineBody(String, String, DocString)
      * @param requestType   HTTP verb (type of request): POST, GET, PUT, PATCH, DELETE
      * @param endPoint      Endpoint (i.e /user/1). The base path used is the one indicated in a previous step
      * @param loginInfo     User and password to use if the endpoints requires basic authentication (user:password)
@@ -222,25 +229,24 @@ public class RestSpec extends BaseGSpec {
     }
 
     /**
-     * Send a request of the type specified
+     * Generates a REST request of the type specified to the indicated endpoint
      * <p>
      * This function works in the same way as {@link #sendRequestNoDataTable(String, String, String, String, String)}
      * the difference is that this one accepts a datatable with a list of modification to be applied to the json
-     * body before the request is executed
-     * <pre>
-     * Example: Send a POST request with the content of schemas/mytestdata.json as body data
-     * {@code
+     * body before the request is executed. In the datatable, the first column is the element in the json document to modify, the
+     * second column is the operation to execute (DELETE|ADD|UPDATE), and the third column is the new value
+     * <pre>{@code
+     * Example
+     *
+     * Scenario: Send a POST request with the content of schemas/mytestdata.json as body data
      *      Given I securely send requests to 'jsonplaceholder.typicode.com:443'
      *      When I send a 'POST' request to '/posts' based on 'schemas/mytestdata.json' as 'json' with:
      *          | $.title | UPDATE | This is a test 2 |
-     * }
-     * First column: Element in the json document to modify
-     * Second column: Operation to execute (DELETE|ADD|UPDATE)
-     * Third column: New value
-     * </pre>
+     * }</pre>
      *
      * @see #setupApp(String, String)
      * @see #sendRequestNoDataTable(String, String, String, String, String)
+     * @see #sendRequestInlineBody(String, String, DocString)
      * @param requestType   type of request to be sent. Possible values:
      *                      GET|DELETE|POST|PUT|PATCH
      * @param endPoint      end point to be used
@@ -336,15 +342,15 @@ public class RestSpec extends BaseGSpec {
      * Verifies the response body matches a json schema.
      * <p>
      * For this step to work, a previous request must have been executed such as {@link #sendRequestNoDataTable(String, String, String, String, String)}
-     * or {@link #sendRequestDataTable(String, String, String, String, String, DataTable)}
-     * <pre>
-     * Example: Verify that the response body matches a json schema
-     * {@code
+     * or {@link #sendRequestDataTable(String, String, String, String, String, DataTable)}. The given file must contain a valid json schema (http://json-schema.org/)
+     * <pre>{@code
+     * Example:
+     *
+     * Scenario: Verify that the response body matches a json schema
+     *     Given I securely send requests to 'jsonplaceholder.typicode.com:443'
      *     When I send a 'GET' request to '/posts'
      *     Then the service response matches the schema in 'schemas/responseSchema.json'
-     * }
-     * * The file schemas/responseSchema.json must contains a valid json schema (http://json-schema.org/)
-     * </pre>
+     * }</pre>
      * @see #sendRequestNoDataTable(String, String, String, String, String)
      * @see #sendRequestDataTable(String, String, String, String, String, DataTable)
      * @see <a href="http://json-schema.org/">http://json-schema.org/</a>
@@ -361,13 +367,14 @@ public class RestSpec extends BaseGSpec {
      * <p>
      * For this step to work, a previous request must have been executed such as {@link #sendRequestNoDataTable(String, String, String, String, String)}
      * or {@link #sendRequestDataTable(String, String, String, String, String, DataTable)}
-     * <pre>
-     * Example: Checking the response body length
-     * {@code
+     * <pre>{@code
+     * Example:
+     *
+     * Scenario: Checking the response body length
+     *     Given I securely send requests to 'jsonplaceholder.typicode.com:443'
      *     When I send a 'GET' request to '/comments/1'
      *     Then the service response length must be '268'
-     * }
-     * </pre>
+     * }</pre>
      * @see #sendRequestNoDataTable(String, String, String, String, String)
      * @see #sendRequestDataTable(String, String, String, String, String, DataTable)
      * @see <a href="http://json-schema.org/">http://json-schema.org/</a>
@@ -383,13 +390,14 @@ public class RestSpec extends BaseGSpec {
      * <p>
      * For this step to work, a previous request must have been executed such as {@link #sendRequestNoDataTable(String, String, String, String, String)}
      * or {@link #sendRequestDataTable(String, String, String, String, String, DataTable)}
-     * <pre>
-     * Example: Verify the response status code
-     * {@code
+     * <pre>{@code
+     * Example:
+     *
+     * Scenario: Verify the response status code
+     *      Given I securely send requests to 'jsonplaceholder.typicode.com:443'
      *      When I send a 'GET' request to '/posts'
      *      Then the service response status must be '200'
-     * }
-     * </pre>
+     * }</pre>
      * @see #sendRequestNoDataTable(String, String, String, String, String)
      * @see #sendRequestDataTable(String, String, String, String, String, DataTable)
      * @see <a href="http://json-schema.org/">http://json-schema.org/</a>
@@ -405,9 +413,11 @@ public class RestSpec extends BaseGSpec {
      * <p>
      * For this step to work, a previous request must have been executed such as {@link #sendRequestNoDataTable(String, String, String, String, String)}
      * or {@link #sendRequestDataTable(String, String, String, String, String, DataTable)}
-     * <pre>
+     * <pre>{@code
      * Example:
-     * {@code
+     *
+     * Scenario: checking if body contains the string 'body'
+     *     Given I securely send requests to 'jsonplaceholder.typicode.com:443'
      *     When I send a 'GET' request to '/posts'
      *     And the service response must contain the text 'body'
      * }
@@ -432,26 +442,32 @@ public class RestSpec extends BaseGSpec {
      * response or just an specific element). If this is the case, a previous HTTP request operation
      * must have been performed (with {@link #sendRequestDataTable(String, String, String, String, String, DataTable)} or with
      * {@link #sendRequestNoDataTable(String, String, String, String, String)})
-     * <pre>
+     * <pre>{@code
      * Example: If element is a jsonpath expression (i.e. $.fragments[0].id), it will be applied over the last httpResponse.
-     * {@code
+     *
+     * Scenario: Saving ALL body in variable 'response'
+     *      Given I securely send requests to 'jsonplaceholder.typicode.com:443'
      *      When I send a 'GET' request to '/posts'
-     *      And I save element '$' in environment variable 'response' //saves all body in variable response
-     *      And I save element '$.[0].userId' in environment variable 'USER_ID' //Saves only the element $.[0].userId of the response
-     * }
+     *      And I save element '$' in environment variable 'response'
+     *
+     * Scenario: Saves only the element $.[0].userId of the response
+     *      Given I securely send requests to 'jsonplaceholder.typicode.com:443'
+     *      When I send a 'GET' request to '/posts'
+     *      And I save element '$.[0].userId' in environment variable 'USER_ID'
+     *
      * Example: If element is a jsonpath expression preceded by some other string (i.e. ["a","b",,"c"].$.[0]), it will be applied over
      * this string. This will help to save the result of a jsonpath expression evaluated over previous stored variable.
-     * {@code
-     *      And I save element '["a","b","c","d"].$.[0]' in environment variable 'letter' //Will save 'a' in variable 'letter'
-     * }
-     * Or from a previous HTTP request:
-     * {@code
-     *      When I send a 'GET' request to '/users'                                             //returns an array of 'users' objects
-     *      And I save element '$.[0]' in environment variable 'first_user'                     //stores the first user object in 'first_user'
-     *      And I save element '!{first_user}.$.username' in environment variable 'username'    //get the field 'username' from 'first_user' and stores it in 'username'
-     *      Then '!{username}' matches 'Bret'                                                   //Checks variable matches given value
-     * }
-     * </pre>
+     *
+     * Scenario: Evaluating a simple string (Will save 'a' in variable 'letter')
+     *      And I save element '["a","b","c","d"].$.[0]' in environment variable 'letter'
+     *
+     * Scenario: Or from a previous HTTP request:
+     *      Given I securely send requests to 'jsonplaceholder.typicode.com:443'
+     *      When I send a 'GET' request to '/users'
+     *      And I save element '$.[0]' in environment variable 'first_user'
+     *      And I save element '!{first_user}.$.username' in environment variable 'username'
+     *      Then '!{username}' matches 'Bret'
+     * }</pre>
      * @see #sendRequestNoDataTable(String, String, String, String, String)
      * @see #sendRequestDataTable(String, String, String, String, String, DataTable)
      * @see <a href="http://json-schema.org/">http://json-schema.org/</a>
@@ -491,16 +507,16 @@ public class RestSpec extends BaseGSpec {
      * <p>
      * The headers will be applied to all following requests in the same scenario unless you clear then
      * using {@link #clearHeaders()}
-     * <pre>
-     * Example: Set headers for following requests
-     * {@code
+     * <pre>{@code
+     * Example:
+     *
+     * Scenario: Set headers for following requests. This (and following) request(s) will contain those headers
      *      Given I send requests to 'dummy-test.com:80'
      *      Given I set headers:
      *          | Authorization  | mySecretToken1234 |
      *          | Content-Type   | application/json  |
-     *      When I send a 'GET' request to '/api/v1/shipment/1' //this (and following) request(s) will contain those headers
-     * }
-     * </pre>
+     *      When I send a 'GET' request to '/api/v1/shipment/1'
+     * }</pre>
      * @see #clearHeaders()
      * @see #setCookies(DataTable)
      * @see #clearCookies()
@@ -535,15 +551,15 @@ public class RestSpec extends BaseGSpec {
      * <p>
      * Works in a similar way that {@link #setHeaders(DataTable)}. The cookies will be applied
      * to all following requests in the same scenario unless you clear then using {@link #clearCookies()}
-     * <pre>
-     * Example: Set cookies for following requests
-     * {@code
+     * <pre>{@code
+     * Example:
+     *
+     * Scenario: Set cookies for following requests
      *      Given I send requests to 'dummy-test.com:80'
      *      Given I set cookies:
      *          | myCookieName  | myCookieValue |
      *      When I send a 'GET' request to '/api/v1/shipment/1' //this (and following) request(s) will contain those cookies
-     * }
-     * </pre>
+     * }</pre>
      * @see #setHeaders(DataTable)
      * @see #clearHeaders()
      * @see #clearCookies()
@@ -580,16 +596,17 @@ public class RestSpec extends BaseGSpec {
      * Clears the headers set by any previous request.
      * <p>
      * A request will reuse the headers/cookies that were set in any previous call within the same scenario
-     * <pre>
+     * <pre>{@code
      * Example:
-     * {@code
+     *
+     * Scenario: The first GET will contain the headers, the second wont
      *      Given I send requests to 'dummy-test.com:80'
      *      Given I set headers:
      *          | Authorization  | mySecretToken1234 |
      *          | Content-Type   | application/json  |
-     *      When I send a 'GET' request to '/api/v1/shipment/1' //this (and following) request(s) will contain those headers
+     *      When I send a 'GET' request to '/api/v1/shipment/1'
      *      Then I clear headers from previous request
-     *      When I send a 'GET' request to '/api/v1/settings'   //This request will not contains previous set headers
+     *      When I send a 'GET' request to '/api/v1/settings'
      * }
      * </pre>
      * @see #setHeaders(DataTable)
@@ -620,17 +637,17 @@ public class RestSpec extends BaseGSpec {
      * Clears the cookies set by any previous request.
      * <p>
      * A request will reuse the headers/cookies that were set in any previous call within the same scenario
-     * <pre>
+     * <pre>{@code
      * Example:
-     * {@code
+     *
+     * Scenario: The first GET will contain the cookies, the second wont
      *      Given I send requests to 'dummy-test.com:80'
      *      Given I set cookies:
      *          | myCookieName  | myCookieValue |
-     *      When I send a 'GET' request to '/api/v1/shipment/1' //this (and following) request(s) will contain those cookies
+     *      When I send a 'GET' request to '/api/v1/shipment/1'
      *      Then I clear cookies from previous request
-     *      When I send a 'GET' request to '/api/v1/shipment/1' //this request will not contain the cookies
-     * }
-     * </pre>
+     *      When I send a 'GET' request to '/api/v1/shipment/1'
+     * }</pre>
      * @see #setCookies(DataTable)
      * @see #setHeaders(DataTable)
      * @see #clearHeaders()
@@ -731,16 +748,17 @@ public class RestSpec extends BaseGSpec {
      * <p>
      * A previous HTTP request operation must have been executed, such as {@link #sendRequestNoDataTable(String, String, String, String, String)}
      * or {@link #sendRequestDataTable(String, String, String, String, String, DataTable)}
-     * <pre>
+     * <pre>{@code
      * Example:
-     * {@code
+     *
+     * Scenario: Check value of response headers
+     *     Given I send requests to 'dummy-test.com:80'
      *     When I send a 'GET' request to '/api/v1/shipment/1' as 'json'
      *     Then the service response status must be '200'
      *     And the service response headers match the following cases:
      *       | Server           | equal           | nginx |
      *       | Content-Encoding | equal           | gzip  |
-     * }
-     * </pre>
+     * }</pre>
      *
      * @see #sendRequestDataTable(String, String, String, String, String, DataTable)
      * @see #sendRequestNoDataTable(String, String, String, String, String)
@@ -812,15 +830,15 @@ public class RestSpec extends BaseGSpec {
 
     /**
      * Saves the header value for future use
-     * <pre>
+     * <pre>{@code
      * Example:
-     * {@code
+     *
+     * Scenario: Save Content-Type header from response in variable
      *      Given I securely send requests to 'jsonplaceholder.typicode.com:443'
      *      When I send a 'GET' request to '/users'
      *      And I save the response header 'Content-Type' in environment variable 'content-type'
      *      Then '!{content-type}' matches 'application/json; charset=utf-8'
-     * }
-     * </pre>
+     * }</pre>
      * @see #sendRequestDataTable(String, String, String, String, String, DataTable)
      * @see #sendRequestNoDataTable(String, String, String, String, String)
      * @param headerName    Header name
@@ -852,15 +870,15 @@ public class RestSpec extends BaseGSpec {
 
     /**
      * Specify a custom map of url query parameters to be added to future requests
-     * <pre>
+     * <pre>{@code
      * Example:
-     * {@code
+     *
+     * Scenario: Add ?userId=3 to the url query parameters
      *      Given I securely send requests to 'jsonplaceholder.typicode.com:443'
      *      Given I set url parameters:
      *           | userId | 3 |
-     *      When I send a 'GET' request to '/posts'     //will execute https://jsonplaceholder.typicode.com:443/posts?userId=3
-     * }
-     * </pre>
+     *      When I send a 'GET' request to '/posts'
+     * }</pre>
      * @see #setupApp(String, String)
      * @see #sendRequestDataTable(String, String, String, String, String, DataTable)
      * @see #sendRequestNoDataTable(String, String, String, String, String)
@@ -902,19 +920,19 @@ public class RestSpec extends BaseGSpec {
      * the parameters are automatically added to all future requests in the same scenario. This
      * step allows to delete this parameters from the system, so new requests are created without
      * any url query parameters
-     * <pre>
+     * <pre>{@code
      * Example:
-     * {@code
+     *
+     * Scenario: First GET will have userId=3, second one will have userId=4
      *      Given I securely send requests to 'jsonplaceholder.typicode.com:443'
      *      Given I set url parameters:
      *           | userId | 3 |
-     *      When I send a 'GET' request to '/posts'                 //will execute https://jsonplaceholder.typicode.com:443/posts?userId=3
+     *      When I send a 'GET' request to '/posts'
      *      Then I clear the url parameters from previous request
      *      Given I set url parameters:
      *       | userId | 4 |
-     *     When I send a 'GET' request to '/posts'                  //will execute https://jsonplaceholder.typicode.com:443/posts?userId=4
-     * }
-     * </pre>
+     *     When I send a 'GET' request to '/posts'
+     * }</pre>
      *
      * @see #iSetUrlQueryParameters(DataTable)
      */
@@ -957,9 +975,10 @@ public class RestSpec extends BaseGSpec {
      * The given URL must have a hostname, port and scheme (a correctly formed URL), for example
      * "http://localhost:8080". If you need to use credentials for connecting to the proxy, you can
      * use {@link #setRestProxyWithCredentials(String, String, String)}
-     * <pre>
+     * <pre>{@code
      * Example:
-     * {@code
+     *
+     * Scenario Setting a proxy
      *      Given I securely send requests to 'jsonplaceholder.typicode.com:443'
      *      Given I set the proxy to 'http://localhost:80'
      * }
@@ -979,9 +998,10 @@ public class RestSpec extends BaseGSpec {
      * <p>
      * The given URL must have a hostname, port and scheme (a correctly formed URL), for example
      * "http://localhost:8080".
-     * <pre>
+     * <pre>{@code
      * Example:
-     * {@code
+     *
+     * Scenario: Setting a proxy with credentials
      *      Given I securely send requests to 'jsonplaceholder.typicode.com:443'
      *      Given I set the proxy to 'http://localhost:80' with username 'myusername' and password 'mypassword'
      * }
@@ -1014,4 +1034,41 @@ public class RestSpec extends BaseGSpec {
 
     }
 
+    /**
+     * Generates a REST request of the type specified to the indicated endpoint
+     * <p>
+     * This step works in the same way as {@link #sendRequestDataTable(String, String, String, String, String, DataTable)} or to
+     * {@link #sendRequestNoDataTable(String, String, String, String, String)}, but in this case, you can pass directly the body to
+     * send as parameter. This could be useful if you want to give visibility of the data you are sending, although, if the body
+     * you want to send is too large, it might be better to store it in a file and use any of the other two steps.
+     * <pre>{@code
+     * Example:
+     *
+     * Scenario: Add the body to be sent directly
+     *     Given I securely send requests to 'jsonplaceholder.typicode.com:443'
+     *     When I send a 'POST' request to '/posts' with body
+     *     """
+     *       {
+     *         "userId": 1,
+     *         "title": "This is a test",
+     *         "body": "This is a test"
+     *       }
+     *     """
+     *     Then the service response status must be '201'
+     *
+     * }
+     * </pre>
+     *
+     * @see #sendRequestNoDataTable(String, String, String, String, String)
+     * @see #sendRequestDataTable(String, String, String, String, String, DataTable)
+     * @param requestType   HTTP verb (type of request): POST, GET, PUT, PATCH, DELETE
+     * @param endPoint      end point to be used
+     * @param body          Inline body
+     */
+    @When("I send a {string} request to {string} with body")
+    public void sendRequestInlineBody(String requestType, String endPoint, DocString body) {
+        commonspec.getRestRequest().given().body(body);
+        commonspec.generateRestRequest(requestType, endPoint);
+        commonspec.getLogger().debug("Saving response");
+    }
 }
