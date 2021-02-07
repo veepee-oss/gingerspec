@@ -26,7 +26,7 @@ public class ElementCountByMethod implements ExpectedCondition<List<WebElement>>
 
     private Integer expectedCount;
 
-    private final Logger logger = LoggerFactory.getLogger(ThreadProperty.get("class"));
+    private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
     public ElementCountByMethod(String method, String element, Integer expectedCount) {
         this.element = element;

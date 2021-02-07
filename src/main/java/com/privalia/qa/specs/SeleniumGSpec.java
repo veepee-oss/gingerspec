@@ -166,6 +166,62 @@ public class SeleniumGSpec extends BaseGSpec {
         commonspec.setPreviousWebElements(pwel);
     }
 
+
+    /**
+     * Waits for the given element to be present on the page
+     * <p>
+     * This step can be seen as a shorter and more compact version than {@link #waitWebElementWithPooling(int, int, int, String, String, String)}.
+     * It is useful in cases where a given element may take time to appear (like when loading a new page). This step will check every second
+     * for a max of 10 seconds. If the element is not found before 10 secs, the step fails. If you need to wait more time than 10 seconds
+     * you can try using {@link #waitWebElementWithTime(int, String, String)}
+     * <pre>{@code
+     * Example:
+     *
+     * Scenario: Wait until the element is present
+     *      Given I go to 'http://demoqa.com/text-box'
+     *      And I wait until element with 'id:userName' is present
+     *      And I type 'John' on the element with 'id:userName'
+     * }</pre>
+     *
+     * @see #waitWebElementWithPooling(int, int, int, String, String, String)
+     * @see #waitWebElementWithTime(int, String, String)
+     * @param method        Method to locate the element (id, name, class, css, xpath, linkText, partialLinkText, tagName)
+     * @param element       locator
+     */
+    @Then("^I wait until element with '(" + LOCATORS + "):(.*)' is present")
+    public void waitWebElement(String method, String element) {
+        List<WebElement> wel = commonspec.locateElementWithPooling(1, 10, method, element, 1, "present");
+        PreviousWebElements pwel = new PreviousWebElements(wel);
+        commonspec.setPreviousWebElements(pwel);
+    }
+
+
+    /**
+     * Waits for the given element to be present on the page
+     * <p>
+     * Similar to {@link #waitWebElement(String, String)} but with the ability for configuring the time to wait.
+     * <pre>{@code
+     * Example:
+     *
+     * Scenario: Wait until the element is present
+     *      Given I go to 'http://demoqa.com/text-box'
+     *      Then I wait '10' seconds until element with 'id:userName' is present
+     *      And I type 'John' on the element with 'id:userName'
+     * }</pre>
+     *
+     * @see #waitWebElementWithPooling(int, int, int, String, String, String)
+     * @see #waitWebElement(String, String)
+     * @param maxTime       Max time to wait
+     * @param method        Method to locate the element (id, name, class, css, xpath, linkText, partialLinkText, tagName)
+     * @param element       locator
+     */
+    @Then("^I wait '(.*)' seconds until element with '(" + LOCATORS + "):(.*)' is present")
+    public void waitWebElementWithTime(int maxTime, String method, String element) {
+        List<WebElement> wel = commonspec.locateElementWithPooling(1, maxTime, method, element, 1, "present");
+        PreviousWebElements pwel = new PreviousWebElements(wel);
+        commonspec.setPreviousWebElements(pwel);
+    }
+
     /**
      * Checks if an alert message is open in the current page. The function implements a pooling interval to check if the condition is true
      * <p>
