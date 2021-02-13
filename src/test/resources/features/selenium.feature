@@ -7,16 +7,17 @@ Feature: Selenium steps
 
   Scenario: Testing direct steps and new locators
     Given I go to 'http://${DEMO_SITE_HOST}/index.html@p=49.html'
-    When I type 'Jose' on the element with 'id:name_3_firstname'
-    Then I type 'Fernandez' on the element with 'id:name_3_lastname' index '0'
-    Then I click on the element with 'name:radio_4[]' index '0'
-    Then I click on the element with 'name:checkbox_5[]' index '1'
-    Then I click on the element with 'name:checkbox_5[]' index '2'
-    Then I scroll down until the element with 'name:pie_submit' is visible
-    Then I scroll up until the element with 'id:name_3_firstname' is visible
-    Then I scroll down until the element with 'name:description' is visible
-    Then I save 'GingerSpec user' in variable 'NAME'
-    Then I type on the element with 'name:description' the text:
+    And I wait until element with 'id:name_3_firstname' is present
+    Then I type 'Jose' on the element with 'id:name_3_firstname'
+    And I type 'Fernandez' on the element with 'id:name_3_lastname' index '0'
+    And I click on the element with 'name:radio_4[]' index '0'
+    And I click on the element with 'name:checkbox_5[]' index '1'
+    And I click on the element with 'name:checkbox_5[]' index '2'
+    And I scroll down until the element with 'name:pie_submit' is visible
+    And I scroll up until the element with 'id:name_3_firstname' is visible
+    And I scroll down until the element with 'name:description' is visible
+    And I save 'GingerSpec user' in variable 'NAME'
+    And I type on the element with 'name:description' the text:
     """
       Hello ${NAME}!.
 
@@ -24,8 +25,8 @@ Feature: Selenium steps
       which is typical when typing an address for example. Notice that you
       can also use variables inside the text ;)
     """
-    Then I scroll down until the element with 'name:pie_submit' is visible
-    Then I click on the element with 'name:pie_submit'
+    And I scroll down until the element with 'name:pie_submit' is visible
+    When I click on the element with 'name:pie_submit'
     Then I wait '3' seconds
 
 
