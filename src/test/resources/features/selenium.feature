@@ -7,16 +7,17 @@ Feature: Selenium steps
 
   Scenario: Testing direct steps and new locators
     Given I go to 'http://${DEMO_SITE_HOST}/index.html@p=49.html'
-    When I type 'Jose' on the element with 'id:name_3_firstname'
-    Then I type 'Fernandez' on the element with 'id:name_3_lastname' index '0'
-    Then I click on the element with 'name:radio_4[]' index '0'
-    Then I click on the element with 'name:checkbox_5[]' index '1'
-    Then I click on the element with 'name:checkbox_5[]' index '2'
-    Then I scroll down until the element with 'name:pie_submit' is visible
-    Then I scroll up until the element with 'id:name_3_firstname' is visible
-    Then I scroll down until the element with 'name:description' is visible
-    Then I save 'GingerSpec user' in variable 'NAME'
-    Then I type on the element with 'name:description' the text:
+    And I wait until element with 'id:name_3_firstname' is present
+    Then I type 'Jose' on the element with 'id:name_3_firstname'
+    And I type 'Fernandez' on the element with 'id:name_3_lastname' index '0'
+    And I click on the element with 'name:radio_4[]' index '0'
+    And I click on the element with 'name:checkbox_5[]' index '1'
+    And I click on the element with 'name:checkbox_5[]' index '2'
+    And I scroll down until the element with 'name:pie_submit' is visible
+    And I scroll up until the element with 'id:name_3_firstname' is visible
+    And I scroll down until the element with 'name:description' is visible
+    And I save 'GingerSpec user' in variable 'NAME'
+    And I type on the element with 'name:description' the text:
     """
       Hello ${NAME}!.
 
@@ -24,8 +25,8 @@ Feature: Selenium steps
       which is typical when typing an address for example. Notice that you
       can also use variables inside the text ;)
     """
-    Then I scroll down until the element with 'name:pie_submit' is visible
-    Then I click on the element with 'name:pie_submit'
+    And I scroll down until the element with 'name:pie_submit' is visible
+    When I click on the element with 'name:pie_submit'
     Then I wait '3' seconds
 
 
@@ -41,7 +42,7 @@ Feature: Selenium steps
     Then I save 'Home' in variable 'var'
     Then this text exists:
     """
-    <h1 class="entry-title">!{var}</h1>
+    <h1 class="entry-title">${var}</h1>
     """
     And I wait '1' seconds
 
@@ -108,10 +109,10 @@ Feature: Selenium steps
     When I browse to '/'
     Then at least '1' elements exists with 'xpath://*[@id="post-9"]/div/div[1]/div/p[1]/a'
     Then I save the value of the property 'href' of the element in index '0' in variable 'VAR'
-    And '!{VAR}' contains '/wp-content/uploads/2014/08/pattern-14.png'
+    And '${VAR}' contains '/wp-content/uploads/2014/08/pattern-14.png'
     Then '1' elements exists with 'id:menu-item-146'
     Then I save the value of the property 'class' of the element in index '0' in variable 'VAR2'
-    And '!{VAR2}' matches 'menu-item menu-item-type-post_type menu-item-object-page menu-item-146'
+    And '${VAR2}' matches 'menu-item menu-item-type-post_type menu-item-object-page menu-item-146'
 
 
   Scenario: Testing radio buttons and checkboxes
@@ -184,4 +185,4 @@ Feature: Selenium steps
     And I execute 'arguments[0].click();' as javascript on the element on index '0'
     And I wait '3' seconds
     And I execute 'return document.URL;' as javascript and save the result in the environment variable 'PAGE'
-    And '!{PAGE}' contains 'index.html'
+    And '${PAGE}' contains 'index.html'

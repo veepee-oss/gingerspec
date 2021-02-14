@@ -68,7 +68,7 @@ Feature: SQL Database Steps
       | San Francisco | 15      | 43      | 0.0  | 2004-11-29 |
       | Kyiv          | 5       | 37      | 0.4  | 2014-11-29 |
       | Paris         | 8       | 37      | 0.4  | 2016-11-30 |
-    Then I check that table 'weather1' is iqual to
+    Then I check that table 'weather1' is equal to
       | city          | temp_lo | temp_hi | prcp | date       |
       | San Francisco | 15      | 43      | 0.0  | 2004-11-29 |
       | Kyiv          | 5       | 37      | 0.4  | 2014-11-29 |
@@ -88,7 +88,7 @@ Feature: SQL Database Steps
       | Caracas   | 15      | 43      | 0.0  | 2004-11-29 |
       | Barcelona | 5       | 37      | 0.4  | 2014-11-29 |
       | Madrid    | 8       | 37      | 0.4  | 2016-11-30 |
-    Then I check that table 'weather1' is iqual to
+    Then I check that table 'weather1' is equal to
       | city      | temp_lo | temp_hi | prcp | date       |
       | Caracas   | 15      | 43      | 0.0  | 2004-11-29 |
       | Barcelona | 5       | 37      | 0.4  | 2014-11-29 |
@@ -128,13 +128,13 @@ Feature: SQL Database Steps
   Scenario: Execute a query from a file in a MySQL database
     Given I connect with JDBC to database 'mysql' type 'mysql' on host '${MYSQL_HOST}' and port '3306' with user 'root' and password 'mysql'
     When I execute query from 'sql/createWeather.sql'
-    Then I check that table 'weather1' is iqual to
+    Then I check that table 'weather1' is equal to
       | city      | temp_lo | temp_hi | prcp | date       |
       | Caracas   | 15      | 43      | 0.0  | 2004-11-29 |
       | Barcelona | 5       | 37      | 0.4  | 2014-11-29 |
       | Madrid    | 8       | 37      | 0.4  | 2016-11-30 |
     And I execute query 'DELETE FROM weather1 WHERE city = 'Madrid''
-    Then I check that table 'weather1' is iqual to
+    Then I check that table 'weather1' is equal to
       | city      | temp_lo | temp_hi | prcp | date       |
       | Caracas   | 15      | 43      | 0.0  | 2004-11-29 |
       | Barcelona | 5       | 37      | 0.4  | 2014-11-29 |
@@ -143,13 +143,13 @@ Feature: SQL Database Steps
   Scenario: Execute a query from a file in a PostgreSQL database
     Given I connect with JDBC to database 'postgres' type 'postgresql' on host '${POSTGRES_HOST}' and port '5432' with user 'postgres' and password 'postgres'
     When I execute query from 'sql/createWeather.sql'
-    Then I check that table 'weather1' is iqual to
+    Then I check that table 'weather1' is equal to
       | city      | temp_lo | temp_hi | prcp | date       |
       | Caracas   | 15      | 43      | 0.0  | 2004-11-29 |
       | Barcelona | 5       | 37      | 0.4  | 2014-11-29 |
       | Madrid    | 8       | 37      | 0.4  | 2016-11-30 |
     And I execute query 'DELETE FROM weather1 WHERE city = 'Madrid''
-    Then I check that table 'weather1' is iqual to
+    Then I check that table 'weather1' is equal to
       | city      | temp_lo | temp_hi | prcp | date       |
       | Caracas   | 15      | 43      | 0.0  | 2004-11-29 |
       | Barcelona | 5       | 37      | 0.4  | 2014-11-29 |
@@ -161,8 +161,8 @@ Feature: SQL Database Steps
     When I execute query from 'sql/selectWeather.sql'
     Then I save the value of the row number '1' and the column with name 'city' in environment variable 'CITY'
     Then I save the value of the row number '2' and the column with name 'temp_hi' in environment variable 'TEMP_BARCELONA'
-    Then '!{CITY}' matches 'Caracas'
-    Then '!{TEMP_BARCELONA}' matches '37'
+    Then '${CITY}' matches 'Caracas'
+    Then '${TEMP_BARCELONA}' matches '37'
 
 
   Scenario: Store the value returned by a query in an environment variable
@@ -171,5 +171,5 @@ Feature: SQL Database Steps
     When I execute query from 'sql/selectWeather.sql'
     Then I save the value of the row number '1' and the column with name 'city' in environment variable 'CITY'
     Then I save the value of the row number '2' and the column with name 'temp_hi' in environment variable 'TEMP_BARCELONA'
-    Then '!{CITY}' matches 'Caracas'
-    Then '!{TEMP_BARCELONA}' matches '37'
+    Then '${CITY}' matches 'Caracas'
+    Then '${TEMP_BARCELONA}' matches '37'
