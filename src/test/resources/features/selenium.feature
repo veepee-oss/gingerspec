@@ -42,7 +42,7 @@ Feature: Selenium steps
     Then I save 'Home' in variable 'var'
     Then this text exists:
     """
-    <h1 class="entry-title">!{var}</h1>
+    <h1 class="entry-title">${var}</h1>
     """
     And I wait '1' seconds
 
@@ -109,10 +109,10 @@ Feature: Selenium steps
     When I browse to '/'
     Then at least '1' elements exists with 'xpath://*[@id="post-9"]/div/div[1]/div/p[1]/a'
     Then I save the value of the property 'href' of the element in index '0' in variable 'VAR'
-    And '!{VAR}' contains '/wp-content/uploads/2014/08/pattern-14.png'
+    And '${VAR}' contains '/wp-content/uploads/2014/08/pattern-14.png'
     Then '1' elements exists with 'id:menu-item-146'
     Then I save the value of the property 'class' of the element in index '0' in variable 'VAR2'
-    And '!{VAR2}' matches 'menu-item menu-item-type-post_type menu-item-object-page menu-item-146'
+    And '${VAR2}' matches 'menu-item menu-item-type-post_type menu-item-object-page menu-item-146'
 
 
   Scenario: Testing radio buttons and checkboxes
@@ -185,4 +185,4 @@ Feature: Selenium steps
     And I execute 'arguments[0].click();' as javascript on the element on index '0'
     And I wait '3' seconds
     And I execute 'return document.URL;' as javascript and save the result in the environment variable 'PAGE'
-    And '!{PAGE}' contains 'index.html'
+    And '${PAGE}' contains 'index.html'

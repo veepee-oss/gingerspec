@@ -23,7 +23,7 @@ Feature: Rest Assured Feature
     When I send a 'POST' request to '/posts' based on 'schemas/mytestdata.json' as 'json'
     Then the service response status must be '201'
     And I save element '$.title' in environment variable 'TITLE'
-    Then '!{TITLE}' matches 'This is a test'
+    Then '${TITLE}' matches 'This is a test'
 
 
   Scenario: Data in local file is altered using a datatable before sending
