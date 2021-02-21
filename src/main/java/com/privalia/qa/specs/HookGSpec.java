@@ -224,16 +224,19 @@ public class HookGSpec extends BaseGSpec {
             capabilitiesMap = mapper.readValue(capabilities, Map.class);
         }
 
+        String platformName = capabilitiesMap.getOrDefault("platformName", "LINUX");
+        commonspec.getLogger().debug("Using platformName: {}", platformName);
+
         switch (capabilitiesMap.get("browserName").toLowerCase()) {
             case "chrome":
 
-                commonspec.getLogger().debug("Setting up selenium for chrome in {}", capabilitiesMap.get("platformName"));
+                commonspec.getLogger().debug("Setting up selenium for chrome in {}", platformName);
 
-                if ("android".matches(capabilitiesMap.get("platformName").toLowerCase())) {
+                if ("android".matches(platformName.toLowerCase())) {
                     //Testing in chrome for android
                     mutableCapabilities = DesiredCapabilities.android();
 
-                } else if ("ios".matches(capabilitiesMap.get("platformName").toLowerCase())) {
+                } else if ("ios".matches(platformName.toLowerCase())) {
                     //Testing in chrome for iphone
                     mutableCapabilities = DesiredCapabilities.iphone();
 
@@ -268,9 +271,9 @@ public class HookGSpec extends BaseGSpec {
 
             case "safari":
 
-                commonspec.getLogger().debug("Setting up selenium for chrome in {}", capabilitiesMap.get("platformName"));
+                commonspec.getLogger().debug("Setting up selenium for chrome in {}", platformName);
 
-                if ("ios".matches(capabilitiesMap.get("platformName").toLowerCase())) {
+                if ("ios".matches(platformName.toLowerCase())) {
                     //Testing in safari for iphone
                     mutableCapabilities = DesiredCapabilities.iphone();
 
@@ -292,7 +295,7 @@ public class HookGSpec extends BaseGSpec {
         }
 
         commonspec.setDriver(new RemoteWebDriver(new URL(grid), mutableCapabilities));
-        this.configureWebDriver(mutableCapabilities, capabilitiesMap.get("platformName"));
+        this.configureWebDriver(mutableCapabilities, platformName);
 
     }
 
