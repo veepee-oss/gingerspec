@@ -16,19 +16,15 @@
 
 package com.privalia.qa.data;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.privalia.qa.utils.SeleniumRemoteHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.ITestContext;
 import org.testng.annotations.DataProvider;
 
-import java.io.*;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.*;
 
 /**
@@ -36,10 +32,6 @@ import java.util.*;
  * with the {@link org.testng.annotations.Factory} annotation in the constructor
  */
 public final class BrowsersDataProvider {
-
-    public static final int DEFAULT_TIMEOUT = 20000;
-
-    public static final int DEFAULT_LESS_LENGTH = 4;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BrowsersDataProvider.class);
 
