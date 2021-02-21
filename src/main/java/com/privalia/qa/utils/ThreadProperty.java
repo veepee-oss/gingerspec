@@ -38,7 +38,9 @@ public final class ThreadProperty {
      * @param value the value
      */
     public static void set(String key, String value) {
-        PROPS.get().setProperty(key, value);
+        if (value != null) {
+            PROPS.get().setProperty(key, value);
+        }
     }
 
     /**
