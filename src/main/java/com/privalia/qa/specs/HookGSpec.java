@@ -376,9 +376,9 @@ public class HookGSpec extends BaseGSpec {
         }
 
         //Doing a window.maximize in mobile browser could cause the test to fail
-        if ((!(platformName.toLowerCase().matches("android") || platformName.toLowerCase().matches("ios")))) {
-            //commonspec.getDriver().manage().window().maximize();
-        }
+//        if ((!(platformName.toLowerCase().matches("android") || platformName.toLowerCase().matches("ios")))) {
+//            commonspec.getDriver().manage().window().maximize();
+//        }
 
     }
 
