@@ -16,12 +16,10 @@
 
 package com.privalia.qa.specs;
 
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
-import com.privalia.qa.data.BrowsersDataProvider;
 import com.privalia.qa.utils.ThreadProperty;
 import io.appium.java_client.MobileDriver;
 import io.appium.java_client.android.AndroidDriver;
@@ -42,18 +40,10 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.safari.SafariOptions;
 import org.slf4j.LoggerFactory;
-import ru.yandex.qatools.ashot.AShot;
-import ru.yandex.qatools.ashot.Screenshot;
-import ru.yandex.qatools.ashot.shooting.ShootingStrategies;
 
-import javax.imageio.ImageIO;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -227,7 +217,7 @@ public class HookGSpec extends BaseGSpec {
         String platformName = capabilitiesMap.getOrDefault("platformName", "LINUX");
         commonspec.getLogger().debug("Using platformName: {}", platformName);
 
-        switch (capabilitiesMap.get("browserName").toLowerCase()) {
+        switch (capabilitiesMap.getOrDefault("browserName", "Chrome").toLowerCase()) {
             case "chrome":
 
                 commonspec.getLogger().debug("Setting up selenium for chrome in {}", platformName);
@@ -313,7 +303,7 @@ public class HookGSpec extends BaseGSpec {
         ObjectMapper mapper = new ObjectMapper();
         capabilitiesMap = mapper.readValue(capabilities, Map.class);
 
-        switch (capabilitiesMap.get("browserName").toLowerCase()) {
+        switch (capabilitiesMap.getOrDefault("browserName", "Chrome").toLowerCase()) {
             case "chrome":
                 ChromeOptions chromeOptions = new ChromeOptions();
 
