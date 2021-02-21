@@ -153,7 +153,18 @@ public final class BrowsersDataProvider {
             List<String> availableNodes = seleniumRemoteHelper
                     .connectToGrid(grid)
                     .getAllAvailableNodesFromGrid();
-            response.addAll(seleniumRemoteHelper.filterNodes(availableNodes, filter));
+
+            /**
+             * if SELENIUM_CAPABILITIES is found, use those capabilities as filter
+             */
+            if (System.getProperty("SELENIUM_CAPABILITIES") != null) {
+                ObjectMapper mapper = new ObjectMapper();
+                Map<String, String> capabilitiesMap = mapper.readValue(System.getProperty("SELENIUM_CAPABILITIES"), Map.class);
+                response.addAll(seleniumRemoteHelper.filterNodes(availableNodes, capabilitiesMap));
+            } else {
+                response.addAll(seleniumRemoteHelper.filterNodes(availableNodes, filter));
+            }
+
         } else {
             LOGGER.warn("No Selenium grid detected, using local driver");
             response.add(null);
