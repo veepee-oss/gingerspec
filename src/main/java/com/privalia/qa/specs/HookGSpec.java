@@ -119,18 +119,11 @@ public class HookGSpec extends BaseGSpec {
     public void seleniumSetup() throws Exception {
 
         String grid = System.getProperty("SELENIUM_GRID");
-        String b = ThreadProperty.get("browser");
-        Map<String, String> capabilitiesMap = null;
-
-        if (b != null) {
-            ObjectMapper mapper = new ObjectMapper();
-            capabilitiesMap = mapper.readValue(b, Map.class);
-        }
 
         if (grid == null) {
             this.useLocalDriver();
         } else {
-            this.useRemoteGrid(grid, capabilitiesMap);
+            this.useRemoteGrid(grid);
         }
     }
 
@@ -213,42 +206,36 @@ public class HookGSpec extends BaseGSpec {
      * Connects to a remote selenium grid to execute the tests
      *
      * @param grid            Address of the remote selenium grid
-     * @param capabilitiesMap Capabilities of the node
      * @throws MalformedURLException MalformedURLException
      */
-    private void useRemoteGrid(String grid, Map<String, String> capabilitiesMap) throws MalformedURLException {
+    private void useRemoteGrid(String grid) throws MalformedURLException, JsonProcessingException {
 
-        MutableCapabilities capabilities = null;
-
+        MutableCapabilities mutableCapabilities = null;
+        Map<String, String> capabilitiesMap = null;
+        ObjectMapper mapper = new ObjectMapper();
         String[] arguments = System.getProperty("SELENIUM_ARGUMENTS", "--ignore-certificate-errors;--no-sandbox").split(";");
-        String platformName;
         grid = "http://" + grid + "/wd/hub";
 
-        //If no capabilities found, we assume chrome and desktop
-        if (capabilitiesMap == null) {
-            capabilitiesMap = new HashMap<String, String>();
-            capabilitiesMap.put("browserName", System.getProperty("browserName", "chrome"));
-            capabilitiesMap.put("platformName", System.getProperty("platformName", "LINUX"));
-        }
 
-        //If capabilities do not contain info on the platform, we assume desktop
-        platformName = capabilitiesMap.get("platformName");
-        if (platformName == null) {
-            platformName = "LINUX";
+        if (ThreadProperty.get("browser") != null) {
+            capabilitiesMap = mapper.readValue(ThreadProperty.get("browser"), Map.class);
+        } else {
+            String capabilities = System.getProperty("SELENIUM_CAPABILITIES", "{ \"browserName\": \"chrome\", \"platformName\": \"LINUX\" }");
+            capabilitiesMap = mapper.readValue(capabilities, Map.class);
         }
 
         switch (capabilitiesMap.get("browserName").toLowerCase()) {
             case "chrome":
 
-                commonspec.getLogger().debug("Setting up selenium for chrome in {}", platformName);
+                commonspec.getLogger().debug("Setting up selenium for chrome in {}", capabilitiesMap.get("platformName"));
 
-                if ("android".matches(platformName.toLowerCase())) {
+                if ("android".matches(capabilitiesMap.get("platformName").toLowerCase())) {
                     //Testing in chrome for android
-                    capabilities = DesiredCapabilities.android();
+                    mutableCapabilities = DesiredCapabilities.android();
 
-                } else if ("ios".matches(platformName.toLowerCase())) {
+                } else if ("ios".matches(capabilitiesMap.get("platformName").toLowerCase())) {
                     //Testing in chrome for iphone
-                    capabilities = DesiredCapabilities.iphone();
+                    mutableCapabilities = DesiredCapabilities.iphone();
 
                 } else {
                     //Testing in desktop version of chrome
@@ -258,8 +245,8 @@ public class HookGSpec extends BaseGSpec {
                     for (String argument: arguments) {
                         chromeOptions.addArguments(argument);
                     }
-                    capabilities = new ChromeOptions();
-                    capabilities.setCapability(ChromeOptions.CAPABILITY, chromeOptions);
+                    mutableCapabilities = new ChromeOptions();
+                    mutableCapabilities.setCapability(ChromeOptions.CAPABILITY, chromeOptions);
                 }
 
                 break;
@@ -271,25 +258,25 @@ public class HookGSpec extends BaseGSpec {
                 for (String argument: arguments) {
                     firefoxOptions.addArguments(argument);
                 }
-                capabilities = new FirefoxOptions();
-                capabilities.setCapability(FirefoxOptions.FIREFOX_OPTIONS, firefoxOptions);
+                mutableCapabilities = new FirefoxOptions();
+                mutableCapabilities.setCapability(FirefoxOptions.FIREFOX_OPTIONS, firefoxOptions);
                 break;
 
             case "phantomjs":
-                capabilities = DesiredCapabilities.phantomjs();
+                mutableCapabilities = DesiredCapabilities.phantomjs();
                 break;
 
             case "safari":
 
-                commonspec.getLogger().debug("Setting up selenium for chrome in {}", platformName);
+                commonspec.getLogger().debug("Setting up selenium for chrome in {}", capabilitiesMap.get("platformName"));
 
-                if ("ios".matches(platformName.toLowerCase())) {
+                if ("ios".matches(capabilitiesMap.get("platformName").toLowerCase())) {
                     //Testing in safari for iphone
-                    capabilities = DesiredCapabilities.iphone();
+                    mutableCapabilities = DesiredCapabilities.iphone();
 
                 } else {
                     //Testing in Safari desktop browser
-                    capabilities = new SafariOptions();
+                    mutableCapabilities = new SafariOptions();
                 }
 
                 break;
@@ -301,11 +288,11 @@ public class HookGSpec extends BaseGSpec {
 
         //Assign all found capabilities found returned by the selenium node
         for (Map.Entry<String, String> entry : capabilitiesMap.entrySet()) {
-            capabilities.setCapability(entry.getKey(), (Object) entry.getValue());
+            mutableCapabilities.setCapability(entry.getKey(), (Object) entry.getValue());
         }
 
-        commonspec.setDriver(new RemoteWebDriver(new URL(grid), capabilities));
-        this.configureWebDriver(capabilities, platformName);
+        commonspec.setDriver(new RemoteWebDriver(new URL(grid), mutableCapabilities));
+        this.configureWebDriver(mutableCapabilities, capabilitiesMap.get("platformName"));
 
     }
 
@@ -322,7 +309,6 @@ public class HookGSpec extends BaseGSpec {
         Map<String, String> capabilitiesMap = null;
         ObjectMapper mapper = new ObjectMapper();
         capabilitiesMap = mapper.readValue(capabilities, Map.class);
-
 
         switch (capabilitiesMap.get("browserName").toLowerCase()) {
             case "chrome":
@@ -369,8 +355,8 @@ public class HookGSpec extends BaseGSpec {
                 break;
 
             default:
-                commonspec.getLogger().error("Unknown browser: " + capabilitiesMap.get("browserName") + ". For using local browser, only chrome/firefox/opera are supported");
-                throw new WebDriverException("Unknown browser: " + capabilitiesMap.get("browserName") + ". For using local browser, only chrome/firefox/opera are supported");
+                commonspec.getLogger().error("Unknown browser: " + capabilitiesMap.get("browserName") + ". For using local browser, only Chrome/Firefox/Opera are supported");
+                throw new WebDriverException("Unknown browser: " + capabilitiesMap.get("browserName") + ". For using local browser, only Chrome/Firefox/Opera are supported");
         }
 
         commonspec.setDriver(driver);
