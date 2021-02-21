@@ -17,6 +17,7 @@
 package com.privalia.qa.specs;
 
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
@@ -35,6 +36,8 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.opera.OperaDriver;
+import org.openqa.selenium.opera.OperaOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.safari.SafariOptions;
@@ -50,6 +53,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -116,32 +120,18 @@ public class HookGSpec extends BaseGSpec {
 
         String grid = System.getProperty("SELENIUM_GRID");
         String b = ThreadProperty.get("browser");
-        ObjectMapper mapper = new ObjectMapper();
+        Map<String, String> capabilitiesMap = null;
 
-        if (grid == null) {
-            Object[] browsersObjects = BrowsersDataProvider.availableUniqueBrowsers(null, null);
-            String[] browserStrings = Arrays.stream(browsersObjects).toArray(String[]::new);
-            Map<String, String> capabilitiesMap = mapper.readValue(browserStrings[0], Map.class);
-            this.useLocalDriver(capabilitiesMap.get("browserName"));
-
-        } else {
-            if ("".equals(b)) {
-                fail("Non available browsers");
-            }
-
-            Map<String, String> capabilitiesMap = mapper.readValue(b, Map.class);
-
-            commonspec.setBrowserName(capabilitiesMap.get("browserName"));
-            commonspec.getLogger().debug("Setting up selenium for {}", capabilitiesMap.get("browserName"));
-
-            if (grid.matches("local")) {
-                this.useLocalDriver(capabilitiesMap.get("browserName"));
-            } else {
-                this.useRemoteGrid(grid, capabilitiesMap);
-            }
-
+        if (b != null) {
+            ObjectMapper mapper = new ObjectMapper();
+            capabilitiesMap = mapper.readValue(b, Map.class);
         }
 
+        if (grid == null) {
+            this.useLocalDriver();
+        } else {
+            this.useRemoteGrid(grid, capabilitiesMap);
+        }
     }
 
     /**
@@ -231,13 +221,20 @@ public class HookGSpec extends BaseGSpec {
         MutableCapabilities capabilities = null;
 
         String[] arguments = System.getProperty("SELENIUM_ARGUMENTS", "--ignore-certificate-errors;--no-sandbox").split(";");
-
+        String platformName;
         grid = "http://" + grid + "/wd/hub";
 
+        //If no capabilities found, we assume chrome and desktop
+        if (capabilitiesMap == null) {
+            capabilitiesMap = new HashMap<String, String>();
+            capabilitiesMap.put("browserName", System.getProperty("browserName", "chrome"));
+            capabilitiesMap.put("platformName", System.getProperty("platformName", "LINUX"));
+        }
+
         //If capabilities do not contain info on the platform, we assume desktop
-        String platformName = capabilitiesMap.get("platformName");
+        platformName = capabilitiesMap.get("platformName");
         if (platformName == null) {
-            platformName = "desktop";
+            platformName = "LINUX";
         }
 
         switch (capabilitiesMap.get("browserName").toLowerCase()) {
@@ -297,12 +294,10 @@ public class HookGSpec extends BaseGSpec {
 
                 break;
 
-
             default:
                 commonspec.getLogger().error("Unknown browser: " + capabilitiesMap.get("browserName"));
                 throw new WebDriverException("Unknown browser: " + capabilitiesMap.get("browserName"));
         }
-
 
         //Assign all found capabilities found returned by the selenium node
         for (Map.Entry<String, String> entry : capabilitiesMap.entrySet()) {
@@ -312,20 +307,24 @@ public class HookGSpec extends BaseGSpec {
         commonspec.setDriver(new RemoteWebDriver(new URL(grid), capabilities));
         this.configureWebDriver(capabilities, platformName);
 
-
     }
 
     /**
      * Makes use of WebDriverManager to automatically download the appropriate local driver
-     *
-     * @param browser Browser type to use (chrome/firefox)
      */
-    private void useLocalDriver(String browser) {
+    private void useLocalDriver() throws JsonProcessingException {
 
-        MutableCapabilities capabilities = null;
+        MutableCapabilities mutableCapabilities = null;
+
         String[] arguments = System.getProperty("SELENIUM_ARGUMENTS", "--ignore-certificate-errors;--no-sandbox").split(";");
+        String capabilities = System.getProperty("SELENIUM_CAPABILITIES", "{ \"browserName\": \"chrome\" }");
 
-        switch (browser.toLowerCase()) {
+        Map<String, String> capabilitiesMap = null;
+        ObjectMapper mapper = new ObjectMapper();
+        capabilitiesMap = mapper.readValue(capabilities, Map.class);
+
+
+        switch (capabilitiesMap.get("browserName").toLowerCase()) {
             case "chrome":
                 ChromeOptions chromeOptions = new ChromeOptions();
 
@@ -333,11 +332,25 @@ public class HookGSpec extends BaseGSpec {
                 for (String argument: arguments) {
                     chromeOptions.addArguments(argument);
                 }
-                capabilities = new ChromeOptions();
-                capabilities.setCapability(ChromeOptions.CAPABILITY, chromeOptions);
+                mutableCapabilities = new ChromeOptions();
+                mutableCapabilities.setCapability(ChromeOptions.CAPABILITY, chromeOptions);
                 System.setProperty("webdriver.chrome.silentOutput", "true"); //removes logging messages
                 WebDriverManager.chromedriver().setup();
                 driver = new ChromeDriver(chromeOptions);
+                break;
+
+            case "opera":
+                OperaOptions operaOptions = new OperaOptions();
+
+                commonspec.getLogger().debug("Configuring chrome desktop with arguments {} ", String.join(";", arguments));
+                for (String argument: arguments) {
+                    operaOptions.addArguments(argument);
+                }
+                mutableCapabilities = new OperaOptions();
+                mutableCapabilities.setCapability(OperaOptions.CAPABILITY, operaOptions);
+                System.setProperty("webdriver.opera.silentOutput", "true"); //removes logging messages
+                WebDriverManager.operadriver().setup();
+                driver = new OperaDriver(operaOptions);
                 break;
 
             case "firefox":
@@ -347,21 +360,21 @@ public class HookGSpec extends BaseGSpec {
                 for (String argument: arguments) {
                     firefoxOptions.addArguments(argument);
                 }
-                capabilities = new FirefoxOptions();
-                capabilities.setCapability(FirefoxOptions.FIREFOX_OPTIONS, firefoxOptions);
+                mutableCapabilities = new FirefoxOptions();
+                mutableCapabilities.setCapability(FirefoxOptions.FIREFOX_OPTIONS, firefoxOptions);
                 System.setProperty(FirefoxDriver.SystemProperty.DRIVER_USE_MARIONETTE, "true"); //removes logging messages
                 System.setProperty(FirefoxDriver.SystemProperty.BROWSER_LOGFILE, "/dev/null");  //removes logging messages
                 WebDriverManager.firefoxdriver().setup();
-                driver = new FirefoxDriver(capabilities);
+                driver = new FirefoxDriver(mutableCapabilities);
                 break;
 
             default:
-                commonspec.getLogger().error("Unknown browser: " + browser + ". For using local browser, only chrome/firefox are supported");
-                throw new WebDriverException("Unknown browser: " + browser + ". For using local browser, only chrome/firefox are supported");
+                commonspec.getLogger().error("Unknown browser: " + capabilitiesMap.get("browserName") + ". For using local browser, only chrome/firefox/opera are supported");
+                throw new WebDriverException("Unknown browser: " + capabilitiesMap.get("browserName") + ". For using local browser, only chrome/firefox/opera are supported");
         }
 
         commonspec.setDriver(driver);
-        this.configureWebDriver(capabilities, "desktop");
+        this.configureWebDriver(mutableCapabilities, "desktop");
 
     }
 
@@ -373,12 +386,12 @@ public class HookGSpec extends BaseGSpec {
 
         commonspec.getDriver().manage().deleteAllCookies();
         if (capabilities.getCapability("deviceName") == null) {
-            commonspec.getDriver().manage().window().setSize(new Dimension(1440, 900));
+            //commonspec.getDriver().manage().window().setSize(new Dimension(1440, 900));
         }
 
         //Doing a window.maximize in mobile browser could cause the test to fail
         if ((!(platformName.toLowerCase().matches("android") || platformName.toLowerCase().matches("ios")))) {
-            commonspec.getDriver().manage().window().maximize();
+            //commonspec.getDriver().manage().window().maximize();
         }
 
     }
