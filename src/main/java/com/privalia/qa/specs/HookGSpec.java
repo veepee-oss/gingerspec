@@ -32,8 +32,12 @@ import io.restassured.http.ContentType;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.ie.InternetExplorerDriver;
+import org.openqa.selenium.ie.InternetExplorerOptions;
 import org.openqa.selenium.opera.OperaDriver;
 import org.openqa.selenium.opera.OperaOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -332,6 +336,23 @@ public class HookGSpec extends BaseGSpec {
                 driver = new OperaDriver(operaOptions);
                 break;
 
+            case "edge":
+                EdgeOptions edgeOptions = new EdgeOptions();
+                commonspec.getLogger().debug("Configuring edge desktop with arguments {} ", String.join(";", arguments));
+                System.setProperty("webdriver.edge.silentOutput", "true"); //removes logging messages
+                WebDriverManager.edgedriver().setup();
+                driver = new EdgeDriver(edgeOptions);
+                break;
+
+            case "ie":
+                InternetExplorerOptions ieOptions = new InternetExplorerOptions();
+                commonspec.getLogger().debug("Configuring Internet Explorer desktop with arguments {} ", String.join(";", arguments));
+                System.setProperty("webdriver.edge.silentOutput", "true"); //removes logging messages
+                ieOptions.setCapability("ignoreZoomSetting", true);
+                WebDriverManager.iedriver().setup();
+                driver = new InternetExplorerDriver(ieOptions);
+                break;
+
             case "firefox":
                 FirefoxOptions firefoxOptions = new FirefoxOptions();
 
@@ -363,10 +384,10 @@ public class HookGSpec extends BaseGSpec {
         commonspec.getDriver().manage().timeouts().implicitlyWait(IMPLICITLY_WAIT, TimeUnit.SECONDS);
         commonspec.getDriver().manage().timeouts().setScriptTimeout(SCRIPT_TIMEOUT, TimeUnit.SECONDS);
 
-        commonspec.getDriver().manage().deleteAllCookies();
-        if (capabilities.getCapability("deviceName") == null) {
-            //commonspec.getDriver().manage().window().setSize(new Dimension(1440, 900));
-        }
+//        commonspec.getDriver().manage().deleteAllCookies();
+//        if (capabilities.getCapability("deviceName") == null) {
+//            commonspec.getDriver().manage().window().setSize(new Dimension(1440, 900));
+//        }
 
         //Doing a window.maximize in mobile browser could cause the test to fail
 //        if ((!(platformName.toLowerCase().matches("android") || platformName.toLowerCase().matches("ios")))) {
