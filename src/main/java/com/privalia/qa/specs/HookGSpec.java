@@ -288,8 +288,11 @@ public class HookGSpec extends BaseGSpec {
             mutableCapabilities.setCapability(entry.getKey(), (Object) entry.getValue());
         }
 
+        this.getCommonSpec().getLogger().debug("Setting RemoteWebDriver with capabilities %s", mutableCapabilities.toJson().toString());
         commonspec.setDriver(new RemoteWebDriver(new URL(grid), mutableCapabilities));
-        this.configureWebDriver(mutableCapabilities, platformName);
+        commonspec.getDriver().manage().timeouts().pageLoadTimeout(PAGE_LOAD_TIMEOUT, TimeUnit.SECONDS);
+        commonspec.getDriver().manage().timeouts().implicitlyWait(IMPLICITLY_WAIT, TimeUnit.SECONDS);
+        commonspec.getDriver().manage().timeouts().setScriptTimeout(SCRIPT_TIMEOUT, TimeUnit.SECONDS);
 
     }
 
@@ -365,7 +368,7 @@ public class HookGSpec extends BaseGSpec {
                 System.setProperty(FirefoxDriver.SystemProperty.DRIVER_USE_MARIONETTE, "true"); //removes logging messages
                 System.setProperty(FirefoxDriver.SystemProperty.BROWSER_LOGFILE, "/dev/null");  //removes logging messages
                 WebDriverManager.firefoxdriver().setup();
-                driver = new FirefoxDriver(mutableCapabilities);
+                driver = new FirefoxDriver(firefoxOptions);
                 break;
 
             default:
@@ -373,26 +376,11 @@ public class HookGSpec extends BaseGSpec {
                 throw new WebDriverException("Unknown browser: " + capabilitiesMap.get("browserName") + ". For using local browser, only Chrome/Firefox/Opera are supported");
         }
 
+        this.getCommonSpec().getLogger().debug("Setting local driver with capabilities %s", mutableCapabilities.toJson().toString());
         commonspec.setDriver(driver);
-        this.configureWebDriver(mutableCapabilities, "desktop");
-
-    }
-
-    private void configureWebDriver(MutableCapabilities capabilities, String platformName) {
-
         commonspec.getDriver().manage().timeouts().pageLoadTimeout(PAGE_LOAD_TIMEOUT, TimeUnit.SECONDS);
         commonspec.getDriver().manage().timeouts().implicitlyWait(IMPLICITLY_WAIT, TimeUnit.SECONDS);
         commonspec.getDriver().manage().timeouts().setScriptTimeout(SCRIPT_TIMEOUT, TimeUnit.SECONDS);
-
-//        commonspec.getDriver().manage().deleteAllCookies();
-//        if (capabilities.getCapability("deviceName") == null) {
-//            commonspec.getDriver().manage().window().setSize(new Dimension(1440, 900));
-//        }
-
-        //Doing a window.maximize in mobile browser could cause the test to fail
-//        if ((!(platformName.toLowerCase().matches("android") || platformName.toLowerCase().matches("ios")))) {
-//            commonspec.getDriver().manage().window().maximize();
-//        }
 
     }
 
