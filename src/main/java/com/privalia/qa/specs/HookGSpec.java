@@ -214,14 +214,17 @@ public class HookGSpec extends BaseGSpec {
         if (ThreadProperty.get("browser") != null) {
             capabilitiesMap = mapper.readValue(ThreadProperty.get("browser"), Map.class);
         } else {
-            String capabilities = System.getProperty("SELENIUM_CAPABILITIES", "{ \"browserName\": \"chrome\", \"platformName\": \"LINUX\" }");
-            capabilitiesMap = mapper.readValue(capabilities, Map.class);
+            capabilitiesMap.put("browserName", System.getProperty("browserName", "chrome"));
+            capabilitiesMap.put("platform", System.getProperty("platform", "LINUX"));
+            if (System.getProperty("version") != null) {
+                capabilitiesMap.put("version", System.getProperty("version"));
+            }
         }
 
         String platformName = capabilitiesMap.getOrDefault("platformName", "LINUX");
         commonspec.getLogger().debug("Using platformName: {}", platformName);
 
-        switch (capabilitiesMap.getOrDefault("browserName", "Chrome").toLowerCase()) {
+        switch (capabilitiesMap.get("browserName").toLowerCase()) {
             case "chrome":
 
                 commonspec.getLogger().debug("Setting up selenium for chrome in {}", platformName);
@@ -304,13 +307,19 @@ public class HookGSpec extends BaseGSpec {
         MutableCapabilities mutableCapabilities = null;
 
         String[] arguments = System.getProperty("SELENIUM_ARGUMENTS", "--ignore-certificate-errors;--no-sandbox").split(";");
-        String capabilities = System.getProperty("SELENIUM_CAPABILITIES", "{ \"browserName\": \"chrome\" }");
 
         Map<String, String> capabilitiesMap = null;
         ObjectMapper mapper = new ObjectMapper();
-        capabilitiesMap = mapper.readValue(capabilities, Map.class);
+        capabilitiesMap.put("browserName", System.getProperty("browserName", "chrome"));
 
-        switch (capabilitiesMap.getOrDefault("browserName", "Chrome").toLowerCase()) {
+        if (System.getProperty("version") != null) {
+            capabilitiesMap.put("version", System.getProperty("version"));
+        }
+        if (System.getProperty("platformName") != null) {
+            capabilitiesMap.put("platform", System.getProperty("platform"));
+        }
+
+        switch (capabilitiesMap.get("browserName").toLowerCase()) {
             case "chrome":
                 ChromeOptions chromeOptions = new ChromeOptions();
 
