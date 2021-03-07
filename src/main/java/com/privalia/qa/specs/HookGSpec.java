@@ -48,6 +48,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -112,13 +113,164 @@ public class HookGSpec extends BaseGSpec {
     @Before(order = 10, value = "@web")
     public void seleniumSetup() throws Exception {
 
-        String grid = System.getProperty("SELENIUM_GRID");
+        MutableCapabilities mutableCapabilities = null;
+        Map<String, String> capabilities = new HashMap<String, String>();
+        ObjectMapper mapper = new ObjectMapper();
+        boolean isLocal = ((System.getProperty("SELENIUM_GRID") != null) ? false : true);
+        String[] arguments = System.getProperty("SELENIUM_ARGUMENTS", "--ignore-certificate-errors;--no-sandbox").split(";");
 
-        if (grid == null) {
-            this.useLocalDriver();
-        } else {
-            this.useRemoteGrid(grid);
+
+        switch (System.getProperty("browserName", "chrome").toLowerCase()) {
+            case "chrome":
+
+                if ("android".matches(System.getProperty("platformName", "").toLowerCase())) {
+                    mutableCapabilities = DesiredCapabilities.android(); //Testing in chrome for android
+                } else if ("ios".matches(System.getProperty("platformName", "").toLowerCase())) {
+                    mutableCapabilities = DesiredCapabilities.iphone(); //Testing in chrome for iphone
+                } else {
+                    mutableCapabilities = DesiredCapabilities.chrome(); //Testing in desktop version of chrome
+                }
+
+                ChromeOptions chromeOptions = new ChromeOptions();
+                for (String argument : arguments) {
+                    chromeOptions.addArguments(argument);
+                }
+
+                mutableCapabilities.setCapability(ChromeOptions.CAPABILITY, chromeOptions);
+
+                if (isLocal) {
+                    System.setProperty("webdriver.chrome.silentOutput", "true"); //removes logging messages
+                    WebDriverManager.chromedriver().setup();
+                    driver = new ChromeDriver(chromeOptions);
+                }
+
+                break;
+
+            case "opera":
+                mutableCapabilities = DesiredCapabilities.operaBlink();
+
+                OperaOptions operaOptions = new OperaOptions();
+                for (String argument : arguments) {
+                    operaOptions.addArguments(argument);
+                }
+
+                mutableCapabilities.setCapability(OperaOptions.CAPABILITY, operaOptions);
+
+                if (isLocal) {
+                    System.setProperty("webdriver.opera.silentOutput", "true"); //removes logging messages
+                    WebDriverManager.operadriver().setup();
+                    driver = new OperaDriver(operaOptions);
+                }
+
+                break;
+
+            case "edge":
+                mutableCapabilities = DesiredCapabilities.edge();
+                mutableCapabilities.setCapability("platform", "ANY");
+
+                if (isLocal) {
+                    EdgeOptions edgeOptions = new EdgeOptions();
+                    System.setProperty("webdriver.edge.silentOutput", "true"); //removes logging messages
+                    WebDriverManager.edgedriver().setup();
+                    driver = new EdgeDriver(edgeOptions);
+                }
+                break;
+
+            case "ie":
+                mutableCapabilities = DesiredCapabilities.edge();
+
+                if (isLocal) {
+                    InternetExplorerOptions ieOptions = new InternetExplorerOptions();
+                    System.setProperty("webdriver.edge.silentOutput", "true"); //removes logging messages
+                    ieOptions.setCapability("ignoreZoomSetting", true);
+                    WebDriverManager.iedriver().setup();
+                    driver = new InternetExplorerDriver(ieOptions);
+                }
+                break;
+
+            case "firefox":
+                mutableCapabilities = DesiredCapabilities.firefox();
+
+                FirefoxOptions firefoxOptions = new FirefoxOptions();
+                for (String argument : arguments) {
+                    firefoxOptions.addArguments(argument);
+                }
+
+                mutableCapabilities.setCapability(FirefoxOptions.FIREFOX_OPTIONS, firefoxOptions);
+
+                if (isLocal) {
+                    System.setProperty(FirefoxDriver.SystemProperty.DRIVER_USE_MARIONETTE, "true"); //removes logging messages
+                    System.setProperty(FirefoxDriver.SystemProperty.BROWSER_LOGFILE, "/dev/null");  //removes logging messages
+                    WebDriverManager.firefoxdriver().setup();
+                    driver = new FirefoxDriver(firefoxOptions);
+                }
+
+                break;
+
+            case "phantomjs":
+                mutableCapabilities = DesiredCapabilities.phantomjs();
+
+                if (isLocal) {
+                    throw new WebDriverException("phantomjs is not supported for local execution");
+                }
+                break;
+
+            case "safari":
+
+                if ("ios".matches(System.getProperty("platformName", "").toLowerCase())) {
+                    mutableCapabilities = DesiredCapabilities.iphone(); //Testing in safari for iphone
+                } else {
+                    mutableCapabilities = new SafariOptions();          //Testing in Safari desktop browser
+                }
+
+                if (isLocal) {
+                    throw new WebDriverException("Safari is not supported for local execution");
+                }
+
+                break;
+
+            default:
+                commonspec.getLogger().error("Unknown browser: " + System.getProperty("browserName") + ". For using local browser, only Chrome/Opera/Edge/IE/Firefox are supported");
+                throw new WebDriverException("Unknown browser: " + System.getProperty("browserName") + ". For using local browser, only Chrome/Opera/Edge/IE/Firefox are supported");
         }
+
+        if (isLocal) {
+            /**
+             * Execute the tests using a local browser
+             */
+            this.getCommonSpec().getLogger().debug("Setting local driver with capabilities %s", mutableCapabilities.toJson().toString());
+            commonspec.setDriver(driver);
+        } else {
+            /**
+             * When using the special constructor in the runner class, the variable "browser" contains a json string of the capabilities
+             * of the remote node to use. If the variable is present, is forced to use those values
+             */
+            if (ThreadProperty.get("browser") != null) {
+                capabilities = mapper.readValue(ThreadProperty.get("browser"), Map.class);
+                mutableCapabilities.setCapability("browserName", capabilities.get("browserName"));
+                mutableCapabilities.setCapability("version", capabilities.getOrDefault("version", ""));
+                mutableCapabilities.setCapability("platform", capabilities.getOrDefault("platform", "ANY"));
+                mutableCapabilities.setCapability("platformName", capabilities.getOrDefault("platformName", "ANY"));
+            } else {
+                /**
+                 * The user can provide the variables "platform", "version" and "platformName" in case the default capabilities need to be changed
+                 */
+                if (System.getProperty("platform") != null)
+                    mutableCapabilities.setCapability("platform", System.getProperty("platform"));
+                if (System.getProperty("version") != null)
+                    mutableCapabilities.setCapability("version", System.getProperty("version"));
+                if (System.getProperty("platformName") != null)
+                    mutableCapabilities.setCapability("platformName", System.getProperty("platformName"));
+            }
+
+            this.getCommonSpec().getLogger().debug("Setting RemoteWebDriver with capabilities %s", mutableCapabilities.toJson().toString());
+            commonspec.setDriver(new RemoteWebDriver(new URL("http://" + System.getProperty("SELENIUM_GRID") + "/wd/hub"), mutableCapabilities));
+        }
+
+        commonspec.getDriver().manage().timeouts().pageLoadTimeout(PAGE_LOAD_TIMEOUT, TimeUnit.SECONDS);
+        commonspec.getDriver().manage().timeouts().implicitlyWait(IMPLICITLY_WAIT, TimeUnit.SECONDS);
+        commonspec.getDriver().manage().timeouts().setScriptTimeout(SCRIPT_TIMEOUT, TimeUnit.SECONDS);
+
     }
 
     /**
@@ -197,206 +349,10 @@ public class HookGSpec extends BaseGSpec {
     }
 
     /**
-     * Connects to a remote selenium grid to execute the tests
-     *
-     * @param grid            Address of the remote selenium grid
-     * @throws MalformedURLException MalformedURLException
-     */
-    private void useRemoteGrid(String grid) throws MalformedURLException, JsonProcessingException {
-
-        MutableCapabilities mutableCapabilities = null;
-        Map<String, String> capabilitiesMap = null;
-        ObjectMapper mapper = new ObjectMapper();
-        String[] arguments = System.getProperty("SELENIUM_ARGUMENTS", "--ignore-certificate-errors;--no-sandbox").split(";");
-        grid = "http://" + grid + "/wd/hub";
-
-
-        if (ThreadProperty.get("browser") != null) {
-            capabilitiesMap = mapper.readValue(ThreadProperty.get("browser"), Map.class);
-        } else {
-            capabilitiesMap.put("browserName", System.getProperty("browserName", "chrome"));
-            capabilitiesMap.put("platform", System.getProperty("platform", "LINUX"));
-            if (System.getProperty("version") != null) {
-                capabilitiesMap.put("version", System.getProperty("version"));
-            }
-        }
-
-        String platformName = capabilitiesMap.getOrDefault("platformName", "LINUX");
-        commonspec.getLogger().debug("Using platformName: {}", platformName);
-
-        switch (capabilitiesMap.get("browserName").toLowerCase()) {
-            case "chrome":
-
-                commonspec.getLogger().debug("Setting up selenium for chrome in {}", platformName);
-
-                if ("android".matches(platformName.toLowerCase())) {
-                    //Testing in chrome for android
-                    mutableCapabilities = DesiredCapabilities.android();
-
-                } else if ("ios".matches(platformName.toLowerCase())) {
-                    //Testing in chrome for iphone
-                    mutableCapabilities = DesiredCapabilities.iphone();
-
-                } else {
-                    //Testing in desktop version of chrome
-                    ChromeOptions chromeOptions = new ChromeOptions();
-
-                    commonspec.getLogger().debug("Configuring chrome desktop with arguments {} ", String.join(";", arguments));
-                    for (String argument: arguments) {
-                        chromeOptions.addArguments(argument);
-                    }
-                    mutableCapabilities = new ChromeOptions();
-                    mutableCapabilities.setCapability(ChromeOptions.CAPABILITY, chromeOptions);
-                }
-
-                break;
-
-            case "firefox":
-                FirefoxOptions firefoxOptions = new FirefoxOptions();
-
-                commonspec.getLogger().debug("Configuring firefox desktop with arguments {} ", String.join(";", arguments));
-                for (String argument: arguments) {
-                    firefoxOptions.addArguments(argument);
-                }
-                mutableCapabilities = new FirefoxOptions();
-                mutableCapabilities.setCapability(FirefoxOptions.FIREFOX_OPTIONS, firefoxOptions);
-                break;
-
-            case "phantomjs":
-                mutableCapabilities = DesiredCapabilities.phantomjs();
-                break;
-
-            case "safari":
-
-                commonspec.getLogger().debug("Setting up selenium for chrome in {}", platformName);
-
-                if ("ios".matches(platformName.toLowerCase())) {
-                    //Testing in safari for iphone
-                    mutableCapabilities = DesiredCapabilities.iphone();
-
-                } else {
-                    //Testing in Safari desktop browser
-                    mutableCapabilities = new SafariOptions();
-                }
-
-                break;
-
-            default:
-                commonspec.getLogger().error("Unknown browser: " + capabilitiesMap.get("browserName"));
-                throw new WebDriverException("Unknown browser: " + capabilitiesMap.get("browserName"));
-        }
-
-        //Assign all found capabilities found returned by the selenium node
-        for (Map.Entry<String, String> entry : capabilitiesMap.entrySet()) {
-            mutableCapabilities.setCapability(entry.getKey(), (Object) entry.getValue());
-        }
-
-        this.getCommonSpec().getLogger().debug("Setting RemoteWebDriver with capabilities %s", mutableCapabilities.toJson().toString());
-        commonspec.setDriver(new RemoteWebDriver(new URL(grid), mutableCapabilities));
-        commonspec.getDriver().manage().timeouts().pageLoadTimeout(PAGE_LOAD_TIMEOUT, TimeUnit.SECONDS);
-        commonspec.getDriver().manage().timeouts().implicitlyWait(IMPLICITLY_WAIT, TimeUnit.SECONDS);
-        commonspec.getDriver().manage().timeouts().setScriptTimeout(SCRIPT_TIMEOUT, TimeUnit.SECONDS);
-
-    }
-
-    /**
-     * Makes use of WebDriverManager to automatically download the appropriate local driver
-     */
-    private void useLocalDriver() throws JsonProcessingException {
-
-        MutableCapabilities mutableCapabilities = null;
-
-        String[] arguments = System.getProperty("SELENIUM_ARGUMENTS", "--ignore-certificate-errors;--no-sandbox").split(";");
-
-        Map<String, String> capabilitiesMap = null;
-        ObjectMapper mapper = new ObjectMapper();
-        capabilitiesMap.put("browserName", System.getProperty("browserName", "chrome"));
-
-        if (System.getProperty("version") != null) {
-            capabilitiesMap.put("version", System.getProperty("version"));
-        }
-        if (System.getProperty("platformName") != null) {
-            capabilitiesMap.put("platform", System.getProperty("platform"));
-        }
-
-        switch (capabilitiesMap.get("browserName").toLowerCase()) {
-            case "chrome":
-                ChromeOptions chromeOptions = new ChromeOptions();
-
-                commonspec.getLogger().debug("Configuring chrome desktop with arguments {} ", String.join(";", arguments));
-                for (String argument: arguments) {
-                    chromeOptions.addArguments(argument);
-                }
-                mutableCapabilities = new ChromeOptions();
-                mutableCapabilities.setCapability(ChromeOptions.CAPABILITY, chromeOptions);
-                System.setProperty("webdriver.chrome.silentOutput", "true"); //removes logging messages
-                WebDriverManager.chromedriver().setup();
-                driver = new ChromeDriver(chromeOptions);
-                break;
-
-            case "opera":
-                OperaOptions operaOptions = new OperaOptions();
-
-                commonspec.getLogger().debug("Configuring chrome desktop with arguments {} ", String.join(";", arguments));
-                for (String argument: arguments) {
-                    operaOptions.addArguments(argument);
-                }
-                mutableCapabilities = new OperaOptions();
-                mutableCapabilities.setCapability(OperaOptions.CAPABILITY, operaOptions);
-                System.setProperty("webdriver.opera.silentOutput", "true"); //removes logging messages
-                WebDriverManager.operadriver().setup();
-                driver = new OperaDriver(operaOptions);
-                break;
-
-            case "edge":
-                EdgeOptions edgeOptions = new EdgeOptions();
-                commonspec.getLogger().debug("Configuring edge desktop with arguments {} ", String.join(";", arguments));
-                System.setProperty("webdriver.edge.silentOutput", "true"); //removes logging messages
-                WebDriverManager.edgedriver().setup();
-                driver = new EdgeDriver(edgeOptions);
-                break;
-
-            case "ie":
-                InternetExplorerOptions ieOptions = new InternetExplorerOptions();
-                commonspec.getLogger().debug("Configuring Internet Explorer desktop with arguments {} ", String.join(";", arguments));
-                System.setProperty("webdriver.edge.silentOutput", "true"); //removes logging messages
-                ieOptions.setCapability("ignoreZoomSetting", true);
-                WebDriverManager.iedriver().setup();
-                driver = new InternetExplorerDriver(ieOptions);
-                break;
-
-            case "firefox":
-                FirefoxOptions firefoxOptions = new FirefoxOptions();
-
-                commonspec.getLogger().debug("Configuring firefox desktop with arguments {} ", String.join(";", arguments));
-                for (String argument: arguments) {
-                    firefoxOptions.addArguments(argument);
-                }
-                mutableCapabilities = new FirefoxOptions();
-                mutableCapabilities.setCapability(FirefoxOptions.FIREFOX_OPTIONS, firefoxOptions);
-                System.setProperty(FirefoxDriver.SystemProperty.DRIVER_USE_MARIONETTE, "true"); //removes logging messages
-                System.setProperty(FirefoxDriver.SystemProperty.BROWSER_LOGFILE, "/dev/null");  //removes logging messages
-                WebDriverManager.firefoxdriver().setup();
-                driver = new FirefoxDriver(firefoxOptions);
-                break;
-
-            default:
-                commonspec.getLogger().error("Unknown browser: " + capabilitiesMap.get("browserName") + ". For using local browser, only Chrome/Firefox/Opera are supported");
-                throw new WebDriverException("Unknown browser: " + capabilitiesMap.get("browserName") + ". For using local browser, only Chrome/Firefox/Opera are supported");
-        }
-
-        this.getCommonSpec().getLogger().debug("Setting local driver with capabilities %s", mutableCapabilities.toJson().toString());
-        commonspec.setDriver(driver);
-        commonspec.getDriver().manage().timeouts().pageLoadTimeout(PAGE_LOAD_TIMEOUT, TimeUnit.SECONDS);
-        commonspec.getDriver().manage().timeouts().implicitlyWait(IMPLICITLY_WAIT, TimeUnit.SECONDS);
-        commonspec.getDriver().manage().timeouts().setScriptTimeout(SCRIPT_TIMEOUT, TimeUnit.SECONDS);
-
-    }
-
-    /**
      * If the feature has the @web or @mobile annotation, closes selenium web driver after each scenario is completed.
-     * @param scenario      Instance of the scenario just executed
-     * @throws IOException  The IOException
+     *
+     * @param scenario Instance of the scenario just executed
+     * @throws IOException The IOException
      */
     @After(order = 20, value = "@web or @mobile")
     public void seleniumTeardown(Scenario scenario) throws IOException {
@@ -459,7 +415,7 @@ public class HookGSpec extends BaseGSpec {
 
     /**
      * Disconnect any remaining open SSH connection after each scenario is completed
-     * */
+     */
     @After(order = 10)
     public void remoteSSHConnectionTeardown() {
         if (commonspec.getRemoteSSHConnection() != null) {
