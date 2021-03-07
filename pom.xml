@@ -118,7 +118,7 @@
         <mysql-connector-java.version>8.0.20</mysql-connector-java.version>
         <postgresql.version>42.2.12</postgresql.version>
         <rest-assured.version>4.3.0</rest-assured.version>
-        <webdrivermanager.version>3.8.1</webdrivermanager.version>
+        <webdrivermanager.version>4.3.1</webdrivermanager.version>
         <appium.version>7.3.0</appium.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

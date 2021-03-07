@@ -16,19 +16,15 @@
 
 package com.privalia.qa.data;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.privalia.qa.utils.SeleniumRemoteHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.ITestContext;
 import org.testng.annotations.DataProvider;
 
-import java.io.*;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.*;
 
 /**
@@ -36,10 +32,6 @@ import java.util.*;
  * with the {@link org.testng.annotations.Factory} annotation in the constructor
  */
 public final class BrowsersDataProvider {
-
-    public static final int DEFAULT_TIMEOUT = 20000;
-
-    public static final int DEFAULT_LESS_LENGTH = 4;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BrowsersDataProvider.class);
 
@@ -142,78 +134,38 @@ public final class BrowsersDataProvider {
      */
     private static List<String> gridBrowsers(Map<String, String> filter) throws IOException {
 
-        ArrayList<String> response = new ArrayList<String>();
-        ObjectMapper objectMapper = new ObjectMapper();
+        ArrayList<String> response = new ArrayList<>();
 
         LOGGER.debug("Trying to get a list of Selenium-available browsers");
 
         String grid = System.getProperty("SELENIUM_GRID");
-        String node = System.getProperty("SELENIUM_NODE");
 
-        if (grid != null && !grid.matches("local")) {
+        if (grid != null) {
 
             List<String> availableNodes = seleniumRemoteHelper
                     .connectToGrid(grid)
                     .getAllAvailableNodesFromGrid();
+
+            /**
+             * if browserName, platform, platformName or version (typical capabilities fot browser selection) are found,
+             * use those capabilities as filter
+             */
+            if (System.getProperty("browserName") != null) filter.put("browserName", System.getProperty("browserName"));
+            if (System.getProperty("platform") != null) filter.put("platform", System.getProperty("platform"));
+            if (System.getProperty("version") != null) filter.put("version", System.getProperty("version"));
+            if (System.getProperty("platformName") != null) filter.put("platformName", System.getProperty("platformName"));
+
             response.addAll(seleniumRemoteHelper.filterNodes(availableNodes, filter));
 
-        } else if (node != null) {
-
-            List<String> sessions = seleniumRemoteHelper
-                    .connectToStandAloneNode(node)
-                    .getAllSessions();
-
-            System.setProperty("SELENIUM_GRID", node);
-
-            if (sessions.size() == 0) {
-                LOGGER.warn("No sessions found in the standalone node!");
-
-                /*
-                if no sessions are found in the standalone node, the system will try to read the SELENIUM_NODE_TYPE
-                variable to get information on what kind of session it should bootstrap
-                 */
-                String nodeType = System.getProperty("SELENIUM_NODE_TYPE");
-                Map<String, String> nodeDetailsMap = new HashMap<String, String>();
-
-                if (nodeType == null) {
-                    LOGGER.warn("No Selenium Node browser type specified!. Using 'chrome' as default (Override this by using -DSELENIUM_NODE_TYPE=(chrome|firefox))");
-                    nodeDetailsMap.put("browserName", "chrome");
-                } else {
-                    nodeDetailsMap.put("browserName", nodeType);
-                }
-
-                response.add(objectMapper.writeValueAsString(nodeDetailsMap));
-            } else {
-                response.addAll(sessions);
+            if (response.size() == 0) {
+                LOGGER.warn("No nodes match the given filter: " + filter.toString());
             }
 
         } else {
-
-            /*
-              If neither SELENIUM_GRID nor SELENIUM_NODE variables are found, the system will automatically try to use a
-              local driver. For this, SELENIUM_GRID is set to "local" and if no browser found, chrome is used as default.
-              Check {@link com.privalia.qa.specs.HookGSpec} for more info
-             */
-
-            LOGGER.warn("No Selenium Grid or Node address specified!. Trying to use local webdriver....");
-            System.setProperty("SELENIUM_GRID", "local");
-            String browser = System.getProperty("browser");
-            Map<String, String> nodeDetailsMap = new HashMap<String, String>();
-
-            if (browser == null) {
-                LOGGER.warn("No browser specified, using chrome as default");
-                nodeDetailsMap.put("browserName", "chrome");
-            } else {
-                nodeDetailsMap.put("browserName", browser);
-            }
-
-            nodeDetailsMap.put("version", "1.0");
-            nodeDetailsMap.put("platform", "local");
-            response.add(objectMapper.writeValueAsString(nodeDetailsMap));
-
+            LOGGER.warn("No Selenium grid detected, using local driver");
+            response.add(null);
         }
 
-        // Sort response
         Collections.sort(response);
         return response;
     }
