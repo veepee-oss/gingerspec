@@ -147,15 +147,19 @@ public final class BrowsersDataProvider {
                     .getAllAvailableNodesFromGrid();
 
             /**
-             * if browserName, platformName or version (typical capabilities fot browser selection) are found,
+             * if browserName, platform, platformName or version (typical capabilities fot browser selection) are found,
              * use those capabilities as filter
              */
             if (System.getProperty("browserName") != null) filter.put("browserName", System.getProperty("browserName"));
             if (System.getProperty("platform") != null) filter.put("platform", System.getProperty("platform"));
             if (System.getProperty("version") != null) filter.put("version", System.getProperty("version"));
+            if (System.getProperty("platformName") != null) filter.put("platformName", System.getProperty("platformName"));
 
             response.addAll(seleniumRemoteHelper.filterNodes(availableNodes, filter));
 
+            if (response.size() == 0) {
+                LOGGER.warn("No nodes match the given filter: " + filter.toString());
+            }
 
         } else {
             LOGGER.warn("No Selenium grid detected, using local driver");
