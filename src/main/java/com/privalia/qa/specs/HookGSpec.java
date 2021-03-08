@@ -42,6 +42,7 @@ import org.openqa.selenium.opera.OperaDriver;
 import org.openqa.selenium.opera.OperaOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.safari.SafariDriver;
 import org.openqa.selenium.safari.SafariOptions;
 import org.slf4j.LoggerFactory;
 
@@ -168,6 +169,10 @@ public class HookGSpec extends BaseGSpec {
                 mutableCapabilities = DesiredCapabilities.edge();
                 mutableCapabilities.setCapability("platform", "ANY");
 
+                if (System.getProperty("SELENIUM_ARGUMENTS") != null) {
+                    LOGGER.warn("Use of -DSELENIUM_ARGUMENTS not supported for edge browser. Continuing....");
+                }
+
                 if (isLocal) {
                     EdgeOptions edgeOptions = new EdgeOptions();
                     System.setProperty("webdriver.edge.silentOutput", "true"); //removes logging messages
@@ -178,6 +183,10 @@ public class HookGSpec extends BaseGSpec {
 
             case "ie":
                 mutableCapabilities = DesiredCapabilities.edge();
+
+                if (System.getProperty("SELENIUM_ARGUMENTS") != null) {
+                    LOGGER.warn("Use of -DSELENIUM_ARGUMENTS not supported for Internet Explorer browser. Continuing....");
+                }
 
                 if (isLocal) {
                     InternetExplorerOptions ieOptions = new InternetExplorerOptions();
@@ -210,6 +219,10 @@ public class HookGSpec extends BaseGSpec {
             case "phantomjs":
                 mutableCapabilities = DesiredCapabilities.phantomjs();
 
+                if (System.getProperty("SELENIUM_ARGUMENTS") != null) {
+                    LOGGER.warn("Use of -DSELENIUM_ARGUMENTS not supported for Phantomjs browser. Continuing....");
+                }
+
                 if (isLocal) {
                     throw new WebDriverException("phantomjs is not supported for local execution");
                 }
@@ -223,8 +236,13 @@ public class HookGSpec extends BaseGSpec {
                     mutableCapabilities = new SafariOptions();          //Testing in Safari desktop browser
                 }
 
+                if (System.getProperty("SELENIUM_ARGUMENTS") != null) {
+                    LOGGER.warn("Use of -DSELENIUM_ARGUMENTS not supported for Safari browser. Continuing....");
+                }
+
                 if (isLocal) {
-                    throw new WebDriverException("Safari is not supported for local execution");
+                    SafariOptions safariOptions = new SafariOptions();
+                    driver = new SafariDriver(safariOptions);
                 }
 
                 break;
@@ -233,6 +251,8 @@ public class HookGSpec extends BaseGSpec {
                 commonspec.getLogger().error("Unknown browser: " + System.getProperty("browserName") + ". For using local browser, only Chrome/Opera/Edge/IE/Firefox are supported");
                 throw new WebDriverException("Unknown browser: " + System.getProperty("browserName") + ". For using local browser, only Chrome/Opera/Edge/IE/Firefox are supported");
         }
+
+
 
         if (isLocal) {
             /**
