@@ -11,9 +11,9 @@ import org.testng.annotations.Factory;
 )
 public class MobileGIT extends BaseGTest {
 
-//    @Factory(dataProviderClass = BrowsersDataProvider.class, dataProvider = "availableMobileBrowsers")
-//    public MobileGIT(String browser) {
-//        this.browser = browser;
-//    }
+    @Factory(dataProviderClass = BrowsersDataProvider.class, dataProvider = "availableMobileBrowsers")
+    public MobileGIT(String browser) {
+        this.browser = browser;
+    }
 
 }
