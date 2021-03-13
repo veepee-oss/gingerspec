@@ -24,6 +24,7 @@ import com.privalia.qa.utils.ThreadProperty;
 import io.appium.java_client.MobileDriver;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
+import io.appium.java_client.remote.MobileCapabilityType;
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
@@ -303,67 +304,82 @@ public class HookGSpec extends BaseGSpec {
     public void AppiumSetup() throws IOException {
 
         ObjectMapper mapper = new ObjectMapper();
+        MutableCapabilities capabilities = new DesiredCapabilities();
+
         String grid = System.getProperty("SELENIUM_GRID");
         String b = ThreadProperty.get("browser");
 
         if (grid == null) {
-            fail("Selenium grid not available");
+            fail("Selenium grid not available. You must use -DSELENIUM_GRID");
         }
 
-        if ("".equals(b)) {
-            fail("No available nodes connected");
+        if (ThreadProperty.get("browser") != null) {
+            Map<String, String> capabilitiesMap = mapper.readValue(b, Map.class);
+
+            //This capabilities are removed since they can cause problems when testing mobile apps
+            capabilitiesMap.remove("platform");
+            capabilitiesMap.remove("maxInstances");
+            capabilitiesMap.remove("seleniumProtocol");
+
+            //Assign all found capabilities found returned by the selenium node
+            for (Map.Entry<String, String> entry : capabilitiesMap.entrySet()) {
+                capabilities.setCapability(entry.getKey(), (Object) entry.getValue());
+            }
+        } else {
+            if (System.getProperty("app") != null)
+                capabilities.setCapability(MobileCapabilityType.APP, System.getProperty("app"));
+            if (System.getProperty("platformName") != null)
+                capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, System.getProperty("platformName"));
+            if (System.getProperty("udid") != null)
+                capabilities.setCapability(MobileCapabilityType.UDID, System.getProperty("udid"));
+            if (System.getProperty("deviceName") != null)
+                capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, System.getProperty("deviceName"));
+            if (System.getProperty("platformVersion") != null)
+                capabilities.setCapability(MobileCapabilityType.PLATFORM_VERSION, System.getProperty("platformVersion"));
+            if (System.getProperty("browserName") != null)
+                capabilities.setCapability(MobileCapabilityType.BROWSER_NAME, System.getProperty("browserName"));
         }
 
-        Map<String, String> capabilitiesMap = mapper.readValue(b, Map.class);
-
-        commonspec.setBrowserName(capabilitiesMap.get("automationName"));
-        commonspec.getLogger().debug("Setting up selenium for {}", capabilitiesMap.get("automationName"));
-
-        grid = "http://" + grid + "/wd/hub";
-        MutableCapabilities capabilities = null;
-        capabilities = new DesiredCapabilities();
-
-        //This capabilities are removed since they can cause problems when testing mobile apps
-        capabilitiesMap.remove("platform");
-        capabilitiesMap.remove("maxInstances");
-        capabilitiesMap.remove("seleniumProtocol");
-
-        //Assign all found capabilities found returned by the selenium node
-        for (Map.Entry<String, String> entry : capabilitiesMap.entrySet()) {
-            capabilities.setCapability(entry.getKey(), (Object) entry.getValue());
+        if (capabilities.getCapability("platformName") == null){
+            commonspec.getLogger().warn("No platformName capability found, using Android......");
+            capabilities.setCapability("platformName", "Android");
         }
 
-        /*
-          When testing mobile apps, the "app" capability is necessary to indicate the app under test
-          This variable can also be provided using the maven variable -DAPP=/full/path/to/file.
-          If both, an app capability and -DAPP variable are provided, the -DAPP will take precedence
-         */
+        this.getCommonSpec().getLogger().debug("Setting MobileWebDriver with capabilities %s", capabilities.toJson().toString());
 
-        String app = capabilitiesMap.get("app");
-
-        if (System.getProperty("APP") != null) {
-            app = System.getProperty("APP");
-        }
-
-        if (app == null) {
-            fail("No app specified (The absolute local path or remote http URL of an .apk or .ipa file). You can specify this in the node capabilities or using -DAPP=/full/path/to/file");
-        }
-
-        capabilities.setCapability("app", app);
-
-        switch (capabilitiesMap.get("platformName").toLowerCase()) {
+        switch (capabilities.getCapability("platformName").toString().toLowerCase()) {
 
             case "android":
-                commonspec.setDriver(new AndroidDriver(new URL(grid), capabilities));
+                if (System.getProperty("automationName") != null)
+                    capabilities.setCapability(MobileCapabilityType.AUTOMATION_NAME, System.getProperty("automationName", "Appium"));
+                if (System.getProperty("deviceName") != null)
+                    capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, System.getProperty("deviceName"));
+
+                commonspec.getLogger().debug("Building AndroidDriver with capabilities %s", capabilities.toJson().toString());
+                commonspec.setDriver(new AndroidDriver(new URL("http://" + grid + "/wd/hub"), capabilities));
                 break;
 
             case "ios":
-                commonspec.setDriver(new IOSDriver(new URL(grid), capabilities));
+                if (System.getProperty("automationName") != null) {
+                    capabilities.setCapability(MobileCapabilityType.AUTOMATION_NAME, System.getProperty("automationName"));
+                } else {
+                    commonspec.getLogger().warn("Using default automationName=XCUITest for ios. Change this by using -DautomationName='<name>'");
+                    capabilities.setCapability(MobileCapabilityType.AUTOMATION_NAME, "XCUITest");
+                }
+                if (System.getProperty("deviceName") != null) {
+                    capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, System.getProperty("deviceName"));
+                } else {
+                    commonspec.getLogger().warn("deviceName capability is required for ios!! trying to use deviceName='My iphone'. Change this by using -DdeviceName='<name>'");
+                    capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, "My iphone");
+                }
+
+                commonspec.getLogger().debug("Building IOSDriver with capabilities %s", capabilities.toJson().toString());
+                commonspec.setDriver(new IOSDriver(new URL("http://" + grid + "/wd/hub"), capabilities));
                 break;
 
             default:
-                commonspec.getLogger().error("Unknown platform: " + capabilitiesMap.get("platformName"));
-                throw new WebDriverException("Unknown platform: " + capabilitiesMap.get("platformName"));
+                commonspec.getLogger().error("Unknown platformName: %s, only android/ios is allowed", capabilities.getCapability("platformName").toString());
+                throw new WebDriverException("Unknown platformName: " + capabilities.getCapability("platformName").toString() + ", only android/ios is allowed");
         }
 
     }
