@@ -325,7 +325,6 @@ public class HookGSpec extends BaseGSpec {
             for (Map.Entry<String, String> entry : capabilitiesMap.entrySet()) {
                 capabilities.setCapability(entry.getKey(), (Object) entry.getValue());
             }
-
         } else {
             if (System.getProperty("app") != null)
                 capabilities.setCapability(MobileCapabilityType.APP, System.getProperty("app"));
@@ -337,6 +336,8 @@ public class HookGSpec extends BaseGSpec {
                 capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, System.getProperty("deviceName"));
             if (System.getProperty("platformVersion") != null)
                 capabilities.setCapability(MobileCapabilityType.PLATFORM_VERSION, System.getProperty("platformVersion"));
+            if (System.getProperty("browserName") != null)
+                capabilities.setCapability(MobileCapabilityType.BROWSER_NAME, System.getProperty("browserName"));
         }
 
         if (capabilities.getCapability("platformName") == null){
