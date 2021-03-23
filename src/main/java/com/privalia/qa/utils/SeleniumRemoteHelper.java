@@ -75,6 +75,7 @@ public final class SeleniumRemoteHelper {
      * list if represented by a json string with the capabilities of the node
      *
      * @return List of free nodes
+     * @throws JsonProcessingException the json processing exception
      */
     public List<String> getAllAvailableNodesFromGrid() throws JsonProcessingException {
 
@@ -99,6 +100,7 @@ public final class SeleniumRemoteHelper {
      * list if represented by a json string with the capabilities of the node
      *
      * @return List of all nodes
+     * @throws JsonProcessingException the json processing exception
      */
     public List<String> getAllNodesFromGrid() throws JsonProcessingException {
 
@@ -169,8 +171,10 @@ public final class SeleniumRemoteHelper {
 
     /**
      * Transforms the string representation of the node's capabilities into a proper json string
-     * @param node  Capabilities string
-     * @return      Capabilities string with proper json string format
+     *
+     * @param node Capabilities string
+     * @return Capabilities string with proper json string format
+     * @throws JsonProcessingException the json processing exception
      */
     public String transformToJsonString(String node) throws JsonProcessingException {
 

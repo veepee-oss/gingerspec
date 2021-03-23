@@ -150,10 +150,18 @@ public final class BrowsersDataProvider {
              * if browserName, platform, platformName or version (typical capabilities fot browser selection) are found,
              * use those capabilities as filter
              */
-            if (System.getProperty("browserName") != null) filter.put("browserName", System.getProperty("browserName"));
-            if (System.getProperty("platform") != null) filter.put("platform", System.getProperty("platform"));
-            if (System.getProperty("version") != null) filter.put("version", System.getProperty("version"));
-            if (System.getProperty("platformName") != null) filter.put("platformName", System.getProperty("platformName"));
+            if (System.getProperty("browserName") != null) {
+                filter.put("browserName", System.getProperty("browserName"));
+            }
+            if (System.getProperty("platform") != null) {
+                filter.put("platform", System.getProperty("platform"));
+            }
+            if (System.getProperty("version") != null) {
+                filter.put("version", System.getProperty("version"));
+            }
+            if (System.getProperty("platformName") != null) {
+                filter.put("platformName", System.getProperty("platformName"));
+            }
 
             response.addAll(seleniumRemoteHelper.filterNodes(availableNodes, filter));
 

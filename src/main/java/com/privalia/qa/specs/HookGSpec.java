@@ -276,12 +276,15 @@ public class HookGSpec extends BaseGSpec {
                 /**
                  * The user can provide the variables "platform", "version" and "platformName" in case the default capabilities need to be changed
                  */
-                if (System.getProperty("platform") != null)
+                if (System.getProperty("platform") != null) {
                     mutableCapabilities.setCapability("platform", System.getProperty("platform"));
-                if (System.getProperty("version") != null)
+                }
+                if (System.getProperty("version") != null) {
                     mutableCapabilities.setCapability("version", System.getProperty("version"));
-                if (System.getProperty("platformName") != null)
+                }
+                if (System.getProperty("platformName") != null) {
                     mutableCapabilities.setCapability("platformName", System.getProperty("platformName"));
+                }
             }
 
             this.getCommonSpec().getLogger().debug("Setting RemoteWebDriver with capabilities %s", mutableCapabilities.toJson().toString());
@@ -326,21 +329,27 @@ public class HookGSpec extends BaseGSpec {
                 capabilities.setCapability(entry.getKey(), (Object) entry.getValue());
             }
         } else {
-            if (System.getProperty("app") != null)
+            if (System.getProperty("app") != null) {
                 capabilities.setCapability(MobileCapabilityType.APP, System.getProperty("app"));
-            if (System.getProperty("platformName") != null)
+            }
+            if (System.getProperty("platformName") != null) {
                 capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, System.getProperty("platformName"));
-            if (System.getProperty("udid") != null)
+            }
+            if (System.getProperty("udid") != null) {
                 capabilities.setCapability(MobileCapabilityType.UDID, System.getProperty("udid"));
-            if (System.getProperty("deviceName") != null)
+            }
+            if (System.getProperty("deviceName") != null) {
                 capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, System.getProperty("deviceName"));
-            if (System.getProperty("platformVersion") != null)
+            }
+            if (System.getProperty("platformVersion") != null) {
                 capabilities.setCapability(MobileCapabilityType.PLATFORM_VERSION, System.getProperty("platformVersion"));
-            if (System.getProperty("browserName") != null)
+            }
+            if (System.getProperty("browserName") != null) {
                 capabilities.setCapability(MobileCapabilityType.BROWSER_NAME, System.getProperty("browserName"));
+            }
         }
 
-        if (capabilities.getCapability("platformName") == null){
+        if (capabilities.getCapability("platformName") == null) {
             commonspec.getLogger().warn("No platformName capability found, using Android......");
             capabilities.setCapability("platformName", "Android");
         }
@@ -350,10 +359,12 @@ public class HookGSpec extends BaseGSpec {
         switch (capabilities.getCapability("platformName").toString().toLowerCase()) {
 
             case "android":
-                if (System.getProperty("automationName") != null)
+                if (System.getProperty("automationName") != null) {
                     capabilities.setCapability(MobileCapabilityType.AUTOMATION_NAME, System.getProperty("automationName", "Appium"));
-                if (System.getProperty("deviceName") != null)
+                }
+                if (System.getProperty("deviceName") != null) {
                     capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, System.getProperty("deviceName"));
+                }
 
                 commonspec.getLogger().debug("Building AndroidDriver with capabilities %s", capabilities.toJson().toString());
                 commonspec.setDriver(new AndroidDriver(new URL("http://" + grid + "/wd/hub"), capabilities));
