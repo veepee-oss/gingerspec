@@ -16,56 +16,12 @@ jobs:
       matrix:
         java: [8, 11, 12]
     services:
-			mysql:
-				image: 'mysql:5.6'
-				environment:
-					MYSQL_ROOT_PASSWORD: "mysql"
-				ports:
-					- "3306:3306"
-			postgres:
-				image: 'postgres:9.6.8'
-				environment:
-					POSTGRES_PASSWORD: 'postgres'
-				ports:
-					- "5432:5432"
-			rest-server:
-				image: 'privaliatech/privalia-rest-server:0.1.0'
-				ports:
-					- "3000:3000"
-			demo-site:
-				image: 'privaliatech/privalia-front-image:0.1.0'
-				ports:
-					- "80:80"
-			selenium-grid:
-				image: 'privaliatech/privalia-selenium-hub:3.9.1'
-				ports:
-					- "4444:4444"
-			selenium-chrome:
-				image: 'privaliatech/privalia-selenium-chrome:64'
-				environment:
-					ID: 'myBrowser'
-					SELENIUM_GRID: 'selenium-grid:4444'
-				ports:
-					- "5900:5900"
-			selenium-firefox:
-				image: 'privaliatech/privalia-selenium-firefox:60'
-				environment:
-					ID: 'myBrowser'
-					SELENIUM_GRID: 'selenium-grid:4444'
-				ports:
-					- "5901:5900"
-			kafka:
-				image: 'landoop/fast-data-dev:1.0.1'
-				ports:
-				 - "2181:2181"
-				 - "3030:3030"
-				 - "8081:8081"
-				 - "8082:8082"
-				 - "8083:8083"
-				 - "9092:9092"
-				environment:
-				 - ADV_HOST=localhost
-
+      mysql:
+        image: mysql:5.6
+	env:
+	  MYSQL_ROOT_PASSWORD: mysql
+	ports:
+	- 3306:3306
     steps:
     - uses: actions/checkout@v2
     - name: Setting up Java ${{ matrix.java }}
