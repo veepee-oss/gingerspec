@@ -14,11 +14,11 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        java: [1.8]
+        java: [8, 11, 12]
     steps:
     - uses: actions/checkout@v2
     - name: Setting up Java ${{ matrix.java }}
-      uses: actions/setup-java@v1
+      uses: joschi/setup-jdk@v2
       with:
         java-version: ${{ matrix.java }}
     - name: Building with Maven
