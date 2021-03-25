@@ -13,10 +13,11 @@
                          \______/                               |__/ 
 ```
 
-[![Build Status](https://travis-ci.com/vpTechOSS/gingerspec.svg)](https://travis-ci.com/github/vpTechOSS/gingerspec)
+[![GingerSpec pipeline](https://github.com/veepee-oss/gingerspec/actions/workflows/maven-build.yml/badge.svg)](https://github.com/veepee-oss/gingerspec/actions/workflows/maven-build.yml)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.privaliatech/gingerspec/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.privaliatech/gingerspec)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-![GitHub Release Date](https://img.shields.io/github/release-date/PrivaliaTech/gingerspec)
+![GitHub Release Date](https://img.shields.io/github/release-date/veepee-oss/gingerspec)
+[![javadoc](https://javadoc.io/badge2/com.github.privaliatech/gingerspec/javadoc.svg)](https://javadoc.io/doc/com.github.privaliatech/gingerspec)
 
 Acceptance Test library. General purpose automation framework.
 
@@ -26,8 +27,8 @@ The purpose of this project is to provide a generic BDT (behaviour driven testin
 GingerSpec provides common functionality that can be reused by different test projects, It encourages code reusability, as we test (in most of the cases) the same, it will help our QA Community to get our objectives much faster. It focuses on the reuse of actions (also steps or key tabs) that implement low level functionality and that can be organized to create much more complex features.
 
 ## Documentation
-* [Project wiki](https://github.com/PrivaliaTech/gingerspec/wiki)
-* [Javadoc](https://vptechoss.github.io/gingerspec/)  
+* [Project wiki](https://github.com/veepee-oss/gingerspec/wiki)
+* [Javadoc](https://javadoc.io/doc/com.github.privaliatech/gingerspec/latest/index.html)  
 
 ### Requirements
 * Java 8+
@@ -53,9 +54,9 @@ GingerSpec provides common functionality that can be reused by different test pr
 
 Check the following articles to get more information about how to use GingerSpec:
 
-* [Technical documentation](https://github.com/vpTechOSS/gingerspec/wiki/Technical-documentation)
-* [Getting started](https://github.com/vpTechOSS/gingerspec/wiki/Getting-started)  
-* [Running your tests](https://github.com/vpTechOSS/gingerspec/wiki/Running-your-tests)
+* [Technical documentation](https://github.com/veepee-oss/gingerspec/wiki/Technical-documentation)
+* [Getting started](https://github.com/veepee-oss/gingerspec/wiki/Getting-started)  
+* [Running your tests](https://github.com/veepee-oss/gingerspec/wiki/Running-your-tests)
 
 ## Using the library
 
@@ -83,19 +84,19 @@ This will create a ready-to-use project based on a template with best practices 
   
 As part of GingerSpec implementation, there are a couple of AspectJ aspects which may be useful for your scenarios:  
   
-- [RunOnTagAspect](https://github.com/vpTechOSS/gingerspec/wiki/Gherkin-tags#runonenv-tag):  Allow the conditional execution of scenarios based on a given environment variable
+- [RunOnTagAspect](https://github.com/veepee-oss/gingerspec/wiki/Gherkin-tags#runonenv-tag):  Allow the conditional execution of scenarios based on a given environment variable
   
-- [IgnoreTagAspect](https://github.com/vpTechOSS/gingerspec/wiki/Gherkin-tags#ignore-tag): An AspectJ aspect that allows to skip an scenario or a whole feature. To do so, a tag must be used before the scenario or the feature keyword. Additionally, an ignored reason can be set.  
+- [IgnoreTagAspect](https://github.com/veepee-oss/gingerspec/wiki/Gherkin-tags#ignore-tag): An AspectJ aspect that allows to skip an scenario or a whole feature. To do so, a tag must be used before the scenario or the feature keyword. Additionally, an ignored reason can be set.  
   
-- [IncludeTagAspect](https://github.com/vpTechOSS/gingerspec/wiki/Gherkin-tags#include-tag): An AspectJ aspect that includes an scenario before the tagged one. It manages parameters as well. Scenario name of the included feature cannot contain spaces. Parameters should be wrapped in []  
+- [IncludeTagAspect](https://github.com/veepee-oss/gingerspec/wiki/Gherkin-tags#include-tag): An AspectJ aspect that includes an scenario before the tagged one. It manages parameters as well. Scenario name of the included feature cannot contain spaces. Parameters should be wrapped in []  
 
-- [LoopTagAspect](https://github.com/vpTechOSS/gingerspec/wiki/Gherkin-tags#loop-tag): An AspectJ aspect that allows looping over scenarios. Using this tag before an scenario will convert this scenario into a scenario outline.
+- [LoopTagAspect](https://github.com/veepee-oss/gingerspec/wiki/Gherkin-tags#loop-tag): An AspectJ aspect that allows looping over scenarios. Using this tag before an scenario will convert this scenario into a scenario outline.
   
-- [BackgroundTagAspect](https://github.com/vpTechOSS/gingerspec/wiki/Gherkin-tags#background-tag): An AspectJ aspect included in loopTagAspect that allows conditional backgrounds, or conditional executions of group of steps based in a environmental variable.
+- [BackgroundTagAspect](https://github.com/veepee-oss/gingerspec/wiki/Gherkin-tags#background-tag): An AspectJ aspect included in loopTagAspect that allows conditional backgrounds, or conditional executions of group of steps based in a environmental variable.
 
-- [ReplacementAspect](https://github.com/vpTechOSS/gingerspec/wiki/Gherkin-variables): Allows the use of variables in the Feature file. Variables are enclosed in #{}, ${}, @{} and !{} symbols and could be global (feature level) or local (scenario level)
+- [ReplacementAspect](https://github.com/veepee-oss/gingerspec/wiki/Gherkin-variables): Allows the use of variables in the Feature file. Variables are enclosed in #{}, ${}, @{} and !{} symbols and could be global (feature level) or local (scenario level)
   
-- [LogTagAspect](https://github.com/vpTechOSS/gingerspec/wiki/Gherkin-tags#log-tag): Allows comments in the feature file to be printed in console when tests are executed.
+- [LogTagAspect](https://github.com/veepee-oss/gingerspec/wiki/Gherkin-tags#log-tag): Allows comments in the feature file to be printed in console when tests are executed.
   
   
 ## Steps
