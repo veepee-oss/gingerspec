@@ -4,4 +4,4 @@
 / /_/ / / / / / /_/ /  __/ /   ___/ / /_/ /  __/ /__
 \____/_/_/ /_/\__, /\___/_/   /____/ .___/\___/\___/
              /____/               /_/
-Acceptance test library (https://github.com/vpTechOSS/gingerspec)
+Acceptance test library (https://github.com/veepee-oss/gingerspec)
