@@ -1,5 +1,5 @@
-# This workflow will build a package using Maven and then publish it to GitHub packages when a release is created
-# For more information see: https://github.com/actions/setup-java#apache-maven-with-a-settings-path
+# This workflow will build GingerSpec using Maven and then publish it to Maven central when a release is created
+# For more information see: https://github.com/actions/setup-java#publishing-using-apache-maven
 
 name: Maven Package
 
@@ -18,7 +18,7 @@ jobs:
       uses: joschi/setup-jdk@v2
       with:
         java-version: 11
-        server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
+        server-id: ossrh # Value of the distributionManagement/repository/id field of the pom.xml
         settings-path: ${{ github.workspace }} # location for the settings.xml file
         
     - name: Cache local Maven repository
