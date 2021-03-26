@@ -1,5 +1,29 @@
 # Changelog
 
+## 2.2.1-RC1
+
+* The behavior of the @web and @mobile tags was redesigned. There is no longer a need to use a special constructor in the runner class
+and scenarios can be executed directly as cucumber scenarios. Variables -DSELENIUM_NODE, -DSELENIUM_NODE_TYPE, -Dbrowser were removed, and now just using -DSELENIUM_GRID is enough
+
+* Capabilities for browser selection are now passed via CLI (-DbrowserName, -Dplatform, -Dversion)
+
+* Opera, Internet explorer, Edge and Safari 
+
+* Improvements in javadoc for sql, rest and selenium steps
+
+* Added two new steps to wait for elements
+
+* Added a new step to pass the body of the request as a DocString.
+
+* Added new functionality to specify a proxy for rest requests
+
+* Added step to type large pieces of text into a web element
+
+* Function to calculate connected nodes to a grid was rewritten and is now more decoupled and unit tested (the functionality
+for running the same selenium test in all connected nodes could be removed in future versions)
+
+* When using a selenium grid, if capabilities are passed as VM arguments, these will be used as filters.
+
 ## 2.2.0
 
 * Fixed small bug that was preventing the screen capture to be taken when running the tests via Intellij IDEA.
