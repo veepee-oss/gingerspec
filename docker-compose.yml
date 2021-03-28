@@ -23,7 +23,7 @@
 # So, make sure this ports are available in the host machine. To Execute all tests:
 #
 # $ mvn clean install -DVERSION=1.0 -DSLEEPTEST=3 -DAGENT_LIST=1,2 -DVARNAME=foo -DWAIT=1 -DPOSTGRES_HOST=localhost
-#        -DMYSQL_HOST=localhost -DREST_SERVER_HOST=localhost -DDEMO_SITE_HOST=demo-site -DSELENIUM_GRID=localhost:4444
+#        -DMYSQL_HOST=localhost -DREST_SERVER_HOST=localhost -DDEMO_SITE_HOST=demo-site -DSELENIUM_GRID=http://localhost:4444/wd/hub
 #        -DZOOKEEPER_HOST=localhost -DSCHEMA_REGISTRY_HOST=localhost
 #
 # Notice how DEMO_SITE_HOST does not use localhost but "demo-site" instead, since from within the docker net (from

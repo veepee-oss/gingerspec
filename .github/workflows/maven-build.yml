@@ -78,4 +78,4 @@ jobs:
         restore-keys: |
             ${{ runner.os }}-maven-
     - name: Building with Maven
-      run: mvn clean install -DVERSION=1.0 -DSLEEPTEST=3 -DAGENT_LIST=1,2 -DVARNAME=foo -DWAIT=1 -DPOSTGRES_HOST=localhost -DMYSQL_HOST=localhost -DREST_SERVER_HOST=localhost -DDEMO_SITE_HOST=demo-site -DSELENIUM_GRID=localhost:4444 -DZOOKEEPER_HOST=localhost -DSCHEMA_REGISTRY_HOST=localhost
+      run: mvn clean install -DVERSION=1.0 -DSLEEPTEST=3 -DAGENT_LIST=1,2 -DVARNAME=foo -DWAIT=1 -DPOSTGRES_HOST=localhost -DMYSQL_HOST=localhost -DREST_SERVER_HOST=localhost -DDEMO_SITE_HOST=demo-site -DSELENIUM_GRID=http://localhost:4444/we/hub -DZOOKEEPER_HOST=localhost -DSCHEMA_REGISTRY_HOST=localhost
