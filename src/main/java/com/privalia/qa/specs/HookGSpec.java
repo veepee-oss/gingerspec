@@ -265,7 +265,7 @@ public class HookGSpec extends BaseGSpec {
             }
 
             this.getCommonSpec().getLogger().debug("Setting RemoteWebDriver with capabilities %s", mutableCapabilities.toJson().toString());
-            commonspec.setDriver(new RemoteWebDriver(new URL("http://" + System.getProperty("SELENIUM_GRID") + "/wd/hub"), mutableCapabilities));
+            commonspec.setDriver(new RemoteWebDriver(new URL(System.getProperty("SELENIUM_GRID")), mutableCapabilities));
         }
 
         commonspec.getDriver().manage().timeouts().pageLoadTimeout(PAGE_LOAD_TIMEOUT, TimeUnit.SECONDS);
