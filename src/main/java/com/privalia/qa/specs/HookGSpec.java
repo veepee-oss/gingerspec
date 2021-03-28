@@ -289,7 +289,9 @@ public class HookGSpec extends BaseGSpec {
         String b = ThreadProperty.get("browser");
 
         if (grid == null) {
-            fail("Selenium grid not available. You must use -DSELENIUM_GRID");
+            this.getCommonSpec().getLogger().warn("Appium server not specified!");
+            this.getCommonSpec().getLogger().warn("Using SELENIUN_GRID=. Use VM argument -DSELENIUN_GRID=<url> to set the appium server");
+            grid = "http://127.0.0.1:4723";
         }
 
         if (ThreadProperty.get("browser") != null) {
@@ -361,7 +363,7 @@ public class HookGSpec extends BaseGSpec {
                 }
 
                 commonspec.getLogger().debug("Building IOSDriver with capabilities %s", capabilities.toJson().toString());
-                commonspec.setDriver(new IOSDriver(new URL("http://" + grid + "/wd/hub"), capabilities));
+                commonspec.setDriver(new IOSDriver(new URL(grid), capabilities));
                 break;
 
             default:
