@@ -58,31 +58,43 @@ services:
     ports:
       - "80:80"
   selenium-grid:
-    image: 'privaliatech/privalia-selenium-hub:3.9.1'
+    image: 'selenium/hub:4.0.0-beta-3-prerelease-20210321'
     ports:
+      - "4442:4442"
+      - "4443:4443"
       - "4444:4444"
   selenium-chrome:
-    image: 'privaliatech/privalia-selenium-chrome:64'
+    image: 'selenium/node-chrome:4.0.0-beta-3-prerelease-20210321'
+    volumes:
+      - /dev/shm:/dev/shm
+    depends_on:
+      - selenium-grid
     environment:
-      ID: 'myBrowser'
-      SELENIUM_GRID: 'selenium-grid:4444'
+      - SE_EVENT_BUS_HOST=selenium-grid
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
     ports:
-      - "5900:5900"
+      - "6900:5900"
   selenium-firefox:
-    image: 'privaliatech/privalia-selenium-firefox:60'
+    image: 'selenium/node-firefox:4.0.0-beta-3-prerelease-20210321'
+    volumes:
+      - /dev/shm:/dev/shm
+    depends_on:
+      - selenium-grid
     environment:
-      ID: 'myBrowser'
-      SELENIUM_GRID: 'selenium-grid:4444'
+      - SE_EVENT_BUS_HOST=selenium-grid
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
     ports:
-      - "5901:5900"
+      - "6902:5900"
   kafka:
     image: 'landoop/fast-data-dev:1.0.1'
     ports:
-     - "2181:2181"
-     - "3030:3030"
-     - "8081:8081"
-     - "8082:8082"
-     - "8083:8083"
-     - "9092:9092"
+      - "2181:2181"
+      - "3030:3030"
+      - "8081:8081"
+      - "8082:8082"
+      - "8083:8083"
+      - "9092:9092"
     environment:
-     - ADV_HOST=localhost
+      - ADV_HOST=localhost
