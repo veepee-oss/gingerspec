@@ -294,38 +294,25 @@ public class HookGSpec extends BaseGSpec {
             grid = "http://127.0.0.1:4723";
         }
 
-        if (ThreadProperty.get("browser") != null) {
-            Map<String, String> capabilitiesMap = mapper.readValue(b, Map.class);
-
-            //This capabilities are removed since they can cause problems when testing mobile apps
-            capabilitiesMap.remove("platform");
-            capabilitiesMap.remove("maxInstances");
-            capabilitiesMap.remove("seleniumProtocol");
-
-            //Assign all found capabilities found returned by the selenium node
-            for (Map.Entry<String, String> entry : capabilitiesMap.entrySet()) {
-                capabilities.setCapability(entry.getKey(), (Object) entry.getValue());
-            }
-        } else {
-            if (System.getProperty("app") != null) {
-                capabilities.setCapability(MobileCapabilityType.APP, System.getProperty("app"));
-            }
-            if (System.getProperty("platformName") != null) {
-                capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, System.getProperty("platformName"));
-            }
-            if (System.getProperty("udid") != null) {
-                capabilities.setCapability(MobileCapabilityType.UDID, System.getProperty("udid"));
-            }
-            if (System.getProperty("deviceName") != null) {
-                capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, System.getProperty("deviceName"));
-            }
-            if (System.getProperty("platformVersion") != null) {
-                capabilities.setCapability(MobileCapabilityType.PLATFORM_VERSION, System.getProperty("platformVersion"));
-            }
-            if (System.getProperty("browserName") != null) {
-                capabilities.setCapability(MobileCapabilityType.BROWSER_NAME, System.getProperty("browserName"));
-            }
+        if (System.getProperty("app") != null) {
+            capabilities.setCapability(MobileCapabilityType.APP, System.getProperty("app"));
         }
+        if (System.getProperty("platformName") != null) {
+            capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, System.getProperty("platformName"));
+        }
+        if (System.getProperty("udid") != null) {
+            capabilities.setCapability(MobileCapabilityType.UDID, System.getProperty("udid"));
+        }
+        if (System.getProperty("deviceName") != null) {
+            capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, System.getProperty("deviceName"));
+        }
+        if (System.getProperty("platformVersion") != null) {
+            capabilities.setCapability(MobileCapabilityType.PLATFORM_VERSION, System.getProperty("platformVersion"));
+        }
+        if (System.getProperty("browserName") != null) {
+            capabilities.setCapability(MobileCapabilityType.BROWSER_NAME, System.getProperty("browserName"));
+        }
+
 
         if (capabilities.getCapability("platformName") == null) {
             commonspec.getLogger().warn("No platformName capability found, using Android......");
