@@ -44,9 +44,6 @@ abstract public class BaseGTest extends AbstractTestNGCucumberTests {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
 
-    protected String browser = null;
-
-
     @BeforeSuite(alwaysRun = true)
     public void beforeGSuite(ITestContext context) {
     }
@@ -126,7 +123,6 @@ abstract public class BaseGTest extends AbstractTestNGCucumberTests {
      */
     @BeforeMethod(alwaysRun = true)
     public void beforeGMethod(Method method) {
-        ThreadProperty.set("browser", this.browser);
     }
 
     /**

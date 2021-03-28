@@ -74,9 +74,11 @@ public final class SeleniumRemoteHelper {
      * Returns the list of the nodes that are available (not busy). Each node in the
      * list if represented by a json string with the capabilities of the node
      *
+     * @deprecated This method may not work with newer version of selenium grid since the UI has changed completely!
      * @return List of free nodes
      * @throws JsonProcessingException the json processing exception
      */
+    @Deprecated
     public List<String> getAllAvailableNodesFromGrid() throws JsonProcessingException {
 
         Pattern p = Pattern.compile("title=\"(\\{.*?})\" \\/>");

@@ -125,13 +125,7 @@ public class HookGSpec extends BaseGSpec {
         switch (System.getProperty("browserName", "chrome").toLowerCase()) {
             case "chrome":
 
-                if ("android".matches(System.getProperty("platformName", "").toLowerCase())) {
-                    mutableCapabilities = DesiredCapabilities.android(); //Testing in chrome for android
-                } else if ("ios".matches(System.getProperty("platformName", "").toLowerCase())) {
-                    mutableCapabilities = DesiredCapabilities.iphone(); //Testing in chrome for iphone
-                } else {
-                    mutableCapabilities = DesiredCapabilities.chrome(); //Testing in desktop version of chrome
-                }
+                mutableCapabilities = DesiredCapabilities.chrome();
 
                 ChromeOptions chromeOptions = new ChromeOptions();
                 for (String argument : arguments) {
@@ -253,8 +247,6 @@ public class HookGSpec extends BaseGSpec {
                 throw new WebDriverException("Unknown browser: " + System.getProperty("browserName") + ". For using local browser, only Chrome/Opera/Edge/IE/Firefox are supported");
         }
 
-
-
         if (isLocal) {
             /**
              * Execute the tests using a local browser
@@ -263,38 +255,22 @@ public class HookGSpec extends BaseGSpec {
             commonspec.setDriver(driver);
         } else {
             /**
-             * When using the special constructor in the runner class, the variable "browser" contains a json string of the capabilities
-             * of the remote node to use. If the variable is present, is forced to use those values
+             * The user can provide the variables "platform", "version" and "platformName" in case the default capabilities need to be changed
              */
-            if (ThreadProperty.get("browser") != null) {
-                capabilities = mapper.readValue(ThreadProperty.get("browser"), Map.class);
-                mutableCapabilities.setCapability("browserName", capabilities.get("browserName"));
-                mutableCapabilities.setCapability("version", capabilities.getOrDefault("version", ""));
-                mutableCapabilities.setCapability("platform", capabilities.getOrDefault("platform", "ANY"));
-                mutableCapabilities.setCapability("platformName", capabilities.getOrDefault("platformName", "ANY"));
-            } else {
-                /**
-                 * The user can provide the variables "platform", "version" and "platformName" in case the default capabilities need to be changed
-                 */
-                if (System.getProperty("platform") != null) {
-                    mutableCapabilities.setCapability("platform", System.getProperty("platform"));
-                }
-                if (System.getProperty("version") != null) {
-                    mutableCapabilities.setCapability("version", System.getProperty("version"));
-                }
-                if (System.getProperty("platformName") != null) {
-                    mutableCapabilities.setCapability("platformName", System.getProperty("platformName"));
-                }
+            if (System.getProperty("platform") != null) {
+                mutableCapabilities.setCapability("platform", System.getProperty("platform"));
+            }
+            if (System.getProperty("version") != null) {
+                mutableCapabilities.setCapability("version", System.getProperty("version"));
             }
 
             this.getCommonSpec().getLogger().debug("Setting RemoteWebDriver with capabilities %s", mutableCapabilities.toJson().toString());
-            commonspec.setDriver(new RemoteWebDriver(new URL("http://" + System.getProperty("SELENIUM_GRID") + "/wd/hub"), mutableCapabilities));
+            commonspec.setDriver(new RemoteWebDriver(new URL(System.getProperty("SELENIUM_GRID")), mutableCapabilities));
         }
 
         commonspec.getDriver().manage().timeouts().pageLoadTimeout(PAGE_LOAD_TIMEOUT, TimeUnit.SECONDS);
         commonspec.getDriver().manage().timeouts().implicitlyWait(IMPLICITLY_WAIT, TimeUnit.SECONDS);
         commonspec.getDriver().manage().timeouts().setScriptTimeout(SCRIPT_TIMEOUT, TimeUnit.SECONDS);
-
     }
 
     /**
