@@ -1,8 +1,8 @@
 
 ┌───────────────────────────────────────────────────────────────────────────────────┐
-│ GingerSpec wiki:  https://github.com/veepee-oss/gingerspec/wiki                    │
-│ Discussion/ideas: https://github.com/veepee-oss/gingerspec/discussions             │
-│ Report a bug:     https://github.com/veepee-oss/gingerspec/issues                  |
+│ GingerSpec wiki:  https://github.com/veepee-oss/gingerspec/wiki                   │
+│ Discussion/ideas: https://github.com/veepee-oss/gingerspec/discussions            │
+│ Report a bug:     https://github.com/veepee-oss/gingerspec/issues                 |
 |                                                                                   |
 | Command line options:                                                             │
 │ -DSHOW_ERRORS_STACKTRACE: Show errors full stacktrace                             |
