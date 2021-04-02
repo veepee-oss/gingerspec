@@ -46,10 +46,14 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.safari.SafariDriver;
 import org.openqa.selenium.safari.SafariOptions;
 import org.slf4j.LoggerFactory;
+import org.testng.Assert;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -58,7 +62,6 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 import static io.restassured.RestAssured.given;
-import static org.testng.Assert.fail;
 
 
 /**
@@ -116,7 +119,6 @@ public class HookGSpec extends BaseGSpec {
     public void seleniumSetup() throws Exception {
 
         MutableCapabilities mutableCapabilities = null;
-        Map<String, String> capabilities = new HashMap<String, String>();
         ObjectMapper mapper = new ObjectMapper();
         boolean isLocal = ((System.getProperty("SELENIUM_GRID") != null) ? false : true);
         String[] arguments = System.getProperty("SELENIUM_ARGUMENTS", "--ignore-certificate-errors;--no-sandbox").split(";");
@@ -289,30 +291,20 @@ public class HookGSpec extends BaseGSpec {
         String b = ThreadProperty.get("browser");
 
         if (grid == null) {
+            grid = "http://127.0.0.1:4723/wd/hub";
             this.getCommonSpec().getLogger().warn("Appium server not specified!");
-            this.getCommonSpec().getLogger().warn("Using SELENIUN_GRID=. Use VM argument -DSELENIUN_GRID=<url> to set the appium server");
-            grid = "http://127.0.0.1:4723";
+            this.getCommonSpec().getLogger().warn("Use VM argument -DSELENIUN_GRID=<url> to set the appium server. Using SELENIUN_GRID=" + grid);
         }
 
-        if (System.getProperty("app") != null) {
-            capabilities.setCapability(MobileCapabilityType.APP, System.getProperty("app"));
+        /* These Capabilities span multiple drivers */
+        String[] generalCaps = {"app", "platformName", "udid", "deviceName", "platformVersion", "browserName", "otherApps", "newCommandTimeout",
+                "language", "locale", "orientation", "autoWebview", "noReset", "fullReset", "eventTimings", "enablePerformanceLogging", "printPageSourceOnFindFailure",
+                "clearSystemFiles", "appActivity", "appPackage"};
+        for (String cap : generalCaps) {
+            if (System.getProperty(cap) != null) {
+                capabilities.setCapability(cap, System.getProperty(cap));
+            }
         }
-        if (System.getProperty("platformName") != null) {
-            capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, System.getProperty("platformName"));
-        }
-        if (System.getProperty("udid") != null) {
-            capabilities.setCapability(MobileCapabilityType.UDID, System.getProperty("udid"));
-        }
-        if (System.getProperty("deviceName") != null) {
-            capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, System.getProperty("deviceName"));
-        }
-        if (System.getProperty("platformVersion") != null) {
-            capabilities.setCapability(MobileCapabilityType.PLATFORM_VERSION, System.getProperty("platformVersion"));
-        }
-        if (System.getProperty("browserName") != null) {
-            capabilities.setCapability(MobileCapabilityType.BROWSER_NAME, System.getProperty("browserName"));
-        }
-
 
         if (capabilities.getCapability("platformName") == null) {
             commonspec.getLogger().warn("No platformName capability found, using Android......");
@@ -325,14 +317,17 @@ public class HookGSpec extends BaseGSpec {
 
             case "android":
                 if (System.getProperty("automationName") != null) {
-                    capabilities.setCapability(MobileCapabilityType.AUTOMATION_NAME, System.getProperty("automationName", "Appium"));
+                    capabilities.setCapability(MobileCapabilityType.AUTOMATION_NAME, System.getProperty("automationName"));
+                } else {
+                    commonspec.getLogger().warn("Using default automationName=UiAutomator2 for Android. Change this by using -DautomationName='<name>'");
+                    capabilities.setCapability(MobileCapabilityType.AUTOMATION_NAME, "UiAutomator2");
                 }
                 if (System.getProperty("deviceName") != null) {
                     capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, System.getProperty("deviceName"));
                 }
 
                 commonspec.getLogger().debug("Building AndroidDriver with capabilities %s", capabilities.toJson().toString());
-                commonspec.setDriver(new AndroidDriver(new URL("http://" + grid + "/wd/hub"), capabilities));
+                commonspec.setDriver(new AndroidDriver(new URL(grid), capabilities));
                 break;
 
             case "ios":
@@ -358,6 +353,17 @@ public class HookGSpec extends BaseGSpec {
                 throw new WebDriverException("Unknown platformName: " + capabilities.getCapability("platformName").toString() + ", only android/ios is allowed");
         }
 
+    }
+
+    public void addCapabilitiesFromFile(String filePath, MutableCapabilities capabilities) throws IOException {
+
+        Map<String, Object> capsMap;
+        ObjectMapper mapper = new ObjectMapper();
+        capsMap = mapper.readValue(Files.readAllBytes(Paths.get(filePath)), Map.class);
+
+        for (Map.Entry<String,Object> entry : capsMap.entrySet()) {
+            capabilities.setCapability(entry.getKey(), entry.getValue());
+        }
     }
 
     /**
