@@ -323,7 +323,7 @@ public class HookGSpec extends BaseGSpec {
          * If you need to pass more or more specific capabilities, use -DCAPABILITIES=/path/to/capabilities.json
          */
         String[] generalCaps = {"automationName", "platformName", "platformVersion", "deviceName", "app", "otherApps", "browserName", "newCommandTimeout", "language",
-        "locale", "udid", "orientation", "autoWebview", "noReset", "fullReset", "eventTimings", "enablePerformanceLogging", "printPageSourceOnFindFailure", "clearSystemFiles"};
+            "locale", "udid", "orientation", "autoWebview", "noReset", "fullReset", "eventTimings", "enablePerformanceLogging", "printPageSourceOnFindFailure", "clearSystemFiles"};
         for (String cap : generalCaps) {
             if (System.getProperty(cap) != null) {
                 capabilities.setCapability(cap, System.getProperty(cap));
@@ -405,7 +405,7 @@ public class HookGSpec extends BaseGSpec {
         ObjectMapper mapper = new ObjectMapper();
         capsMap = mapper.readValue(Files.readAllBytes(Paths.get(filePath)), Map.class);
 
-        for (Map.Entry<String,Object> entry : capsMap.entrySet()) {
+        for (Map.Entry<String, Object> entry : capsMap.entrySet()) {
             capabilities.setCapability(entry.getKey(), entry.getValue());
         }
     }
