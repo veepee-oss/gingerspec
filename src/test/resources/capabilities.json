@@ -1,6 +1,6 @@
 {
   "platform": "ANY",
-  "acceptSslCerts": true,
+  "browserName": "chrome",
   "chromeOptions": {
     "args": ["start-fullscreen", "incognito", "disable-extensions", "test-type"],
     "w3c": false

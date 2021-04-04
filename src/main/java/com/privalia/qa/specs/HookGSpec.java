@@ -111,7 +111,14 @@ public class HookGSpec extends BaseGSpec {
 
     /**
      * If the feature has the @web annotation, creates a new selenium web driver
-     * before each scenario
+     * before each scenario. This method allows the configuration of certain capabilities
+     * for the initialization of the driver, specifically, the ones used by selenium for
+     * browser selection: browserName, platform, version. These variables should be passed
+     * as VM arguments (-DbrowserName, -Dplatform, -Dversion).
+     *
+     * Additionally, then using a selenium grid (-DSELENIUM_GRID), the user can use the
+     * VM argument -DCAPABILITIES=/path/to/capabilities.json, to override the default capabilities
+     * with the ones from the json file
      *
      * @throws MalformedURLException MalformedURLException
      */
@@ -122,7 +129,6 @@ public class HookGSpec extends BaseGSpec {
         ObjectMapper mapper = new ObjectMapper();
         boolean isLocal = ((System.getProperty("SELENIUM_GRID") != null) ? false : true);
         String[] arguments = System.getProperty("SELENIUM_ARGUMENTS", "--ignore-certificate-errors;--no-sandbox").split(";");
-
 
         switch (System.getProperty("browserName", "chrome").toLowerCase()) {
             case "chrome":
@@ -162,7 +168,7 @@ public class HookGSpec extends BaseGSpec {
 
                 break;
 
-            case "edge":
+            case "microsoftedge":
                 mutableCapabilities = DesiredCapabilities.edge();
                 mutableCapabilities.setCapability("platform", "ANY");
 
@@ -245,8 +251,8 @@ public class HookGSpec extends BaseGSpec {
                 break;
 
             default:
-                commonspec.getLogger().error("Unknown browser: " + System.getProperty("browserName") + ". For using local browser, only Chrome/Opera/Edge/IE/Firefox are supported");
-                throw new WebDriverException("Unknown browser: " + System.getProperty("browserName") + ". For using local browser, only Chrome/Opera/Edge/IE/Firefox are supported");
+                commonspec.getLogger().error("Unknown browser: " + System.getProperty("browserName") + ". For using local browser, only Chrome/Opera/MicrosoftEdge/IE/Firefox/Safari are supported");
+                throw new WebDriverException("Unknown browser: " + System.getProperty("browserName") + ". For using local browser, only Chrome/Opera/MicrosoftEdge/IE/Firefox/Safari are supported");
         }
 
         if (isLocal) {
@@ -266,6 +272,16 @@ public class HookGSpec extends BaseGSpec {
                 mutableCapabilities.setCapability("version", System.getProperty("version"));
             }
 
+            /*
+            If the user includes the VM argument -DCAPABILITIES=/path/to/capabilities.json, the capabilities
+            from that file will be used instead of the default ones
+             */
+            if (System.getProperty("CAPABILITIES") != null) {
+                this.commonspec.getLogger().debug("Using capabilities from file: " + System.getProperty("CAPABILITIES"));
+                mutableCapabilities = new MutableCapabilities();
+                this.addCapabilitiesFromFile(System.getProperty("CAPABILITIES"), mutableCapabilities);
+            }
+
             this.getCommonSpec().getLogger().debug("Setting RemoteWebDriver with capabilities %s", mutableCapabilities.toJson().toString());
             commonspec.setDriver(new RemoteWebDriver(new URL(System.getProperty("SELENIUM_GRID")), mutableCapabilities));
         }
@@ -277,7 +293,13 @@ public class HookGSpec extends BaseGSpec {
 
     /**
      * If the feature has the @mobile annotation, creates a new Appium driver
-     * before each scenario
+     * before each scenario. By default, the system will try to create a set of default
+     * capabilities for the driver. However, the user can set any of the
+     * <a href="https://appium.io/docs/en/writing-running-appium/caps/">general capabilities</a> of Appium
+     * (i.e. -Dapp=/path/to/app, -DplatformName=android, etc).
+     *
+     * The user can use the VM argument -DCAPABILITIES=/path/to/capabilities.json, to
+     * override the default capabilities with the ones from the json file
      *
      * @throws MalformedURLException MalformedURLException
      */
@@ -296,10 +318,12 @@ public class HookGSpec extends BaseGSpec {
             this.getCommonSpec().getLogger().warn("Use VM argument -DSELENIUN_GRID=<url> to set the appium server. Using SELENIUN_GRID=" + grid);
         }
 
-        /* These Capabilities span multiple drivers */
-        String[] generalCaps = {"app", "platformName", "udid", "deviceName", "platformVersion", "browserName", "otherApps", "newCommandTimeout",
-                "language", "locale", "orientation", "autoWebview", "noReset", "fullReset", "eventTimings", "enablePerformanceLogging", "printPageSourceOnFindFailure",
-                "clearSystemFiles", "appActivity", "appPackage"};
+        /**
+         * These Capabilities span multiple drivers.
+         * If you need to pass more or more specific capabilities, use -DCAPABILITIES=/path/to/capabilities.json
+         */
+        String[] generalCaps = {"automationName", "platformName", "platformVersion", "deviceName", "app", "otherApps", "browserName", "newCommandTimeout", "language",
+        "locale", "udid", "orientation", "autoWebview", "noReset", "fullReset", "eventTimings", "enablePerformanceLogging", "printPageSourceOnFindFailure", "clearSystemFiles"};
         for (String cap : generalCaps) {
             if (System.getProperty(cap) != null) {
                 capabilities.setCapability(cap, System.getProperty(cap));
@@ -326,6 +350,16 @@ public class HookGSpec extends BaseGSpec {
                     capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, System.getProperty("deviceName"));
                 }
 
+                /*
+                If the user includes the VM argument -DCAPABILITIES=/path/to/capabilities.json, the capabilities
+                from that file will be used instead of the default ones
+                */
+                if (System.getProperty("CAPABILITIES") != null) {
+                    this.commonspec.getLogger().debug("Using capabilities from file: " + System.getProperty("CAPABILITIES"));
+                    capabilities = new MutableCapabilities();
+                    this.addCapabilitiesFromFile(System.getProperty("CAPABILITIES"), capabilities);
+                }
+
                 commonspec.getLogger().debug("Building AndroidDriver with capabilities %s", capabilities.toJson().toString());
                 commonspec.setDriver(new AndroidDriver(new URL(grid), capabilities));
                 break;
@@ -342,6 +376,16 @@ public class HookGSpec extends BaseGSpec {
                 } else {
                     commonspec.getLogger().warn("deviceName capability is required for ios!! trying to use deviceName='My iphone'. Change this by using -DdeviceName='<name>'");
                     capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, "My iphone");
+                }
+
+                /*
+                If the user includes the VM argument -DCAPABILITIES=/path/to/capabilities.json, the capabilities
+                from that file will be used instead of the default ones
+                */
+                if (System.getProperty("CAPABILITIES") != null) {
+                    this.commonspec.getLogger().debug("Using capabilities from file: " + System.getProperty("CAPABILITIES"));
+                    capabilities = new MutableCapabilities();
+                    this.addCapabilitiesFromFile(System.getProperty("CAPABILITIES"), capabilities);
                 }
 
                 commonspec.getLogger().debug("Building IOSDriver with capabilities %s", capabilities.toJson().toString());
