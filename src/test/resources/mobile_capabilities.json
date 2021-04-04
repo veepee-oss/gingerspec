@@ -1,0 +1,6 @@
+{
+  "app": "https://github.com/appium/appium/raw/master/sample-code/apps/ApiDemos-debug.apk",
+  "platformName": "Android",
+  "automationName": "UiAutomator2",
+  "deviceName": "My android phone"
+}
