@@ -125,6 +125,7 @@ public class RestSpec extends BaseGSpec {
             commonspec.getRestRequest().relaxedHTTPSValidation();
         }
 
+        this.getCommonSpec().getLogger().debug("Setting base URL to {} with port {}", restProtocol + restHost, Integer.parseInt(restPort));
         commonspec.getRestRequest().baseUri(restProtocol + restHost).port(Integer.parseInt(restPort));
     }
 
@@ -177,7 +178,9 @@ public class RestSpec extends BaseGSpec {
      * <p>
      * The endpoint must be relative to the base path previously defined with {@link #setupApp(String, String)}. If needed, you can also specify
      * the body of the request (for POST, PUT and DELETE requests) from a local file. If you need to alter the content of the json document before
-     * sending you could use {@link #sendRequestDataTable(String, String, String, String, String, DataTable)}
+     * sending you could use {@link #sendRequestDataTable(String, String, String, String, String, DataTable)}. As soon as the request is completed, the
+     * request object is re-initialized with the same base URI and port as configured in {@link #setupApp(String, String)}. This is to avoid future requests
+     * from re-using the same cookies/headers/url parameters that the user may have configured.
      * <pre>{@code
      * Examples:
      *
@@ -225,6 +228,7 @@ public class RestSpec extends BaseGSpec {
         // Save response
         commonspec.generateRestRequest(requestType, endPoint);
         commonspec.getLogger().debug("Saving response");
+        this.initializeRestClient();
 
     }
 
@@ -234,7 +238,9 @@ public class RestSpec extends BaseGSpec {
      * This function works in the same way as {@link #sendRequestNoDataTable(String, String, String, String, String)}
      * the difference is that this one accepts a datatable with a list of modification to be applied to the json
      * body before the request is executed. In the datatable, the first column is the element in the json document to modify, the
-     * second column is the operation to execute (DELETE|ADD|UPDATE), and the third column is the new value
+     * second column is the operation to execute (DELETE|ADD|UPDATE), and the third column is the new value. . As soon as the request
+     * is completed, the request object is re-initialized with the same base URI and port as configured in {@link #setupApp(String, String)}.
+     * This is to avoid future requests from re-using the same cookies/headers/url parameters that the user may have configured.
      * <pre>{@code
      * Example
      *
@@ -294,6 +300,7 @@ public class RestSpec extends BaseGSpec {
         // Save response
         commonspec.generateRestRequest(requestType, endPoint);
         commonspec.getLogger().debug("Saving response");
+        this.initializeRestClient();
 
     }
 
@@ -499,14 +506,14 @@ public class RestSpec extends BaseGSpec {
         }
 
         Assertions.assertThat(value).as("json result is empty").isNotEmpty();
+        this.getCommonSpec().getLogger().debug("Element {} found. Equal to {}. Saving in variable '{}'", element, value, envVar);
         ThreadProperty.set(envVar, value);
     }
 
     /**
      * Specify a custom map of headers to be added to future requests
      * <p>
-     * The headers will be applied to all following requests in the same scenario unless you clear then
-     * using {@link #clearHeaders()}
+     * The headers will be applied the following request
      * <pre>{@code
      * Example:
      *
@@ -517,9 +524,7 @@ public class RestSpec extends BaseGSpec {
      *          | Content-Type   | application/json  |
      *      When I send a 'GET' request to '/api/v1/shipment/1'
      * }</pre>
-     * @see #clearHeaders()
      * @see #setCookies(DataTable)
-     * @see #clearCookies()
      * @param modifications DataTable containing the custom set of headers to be
      *                      added to the requests. Syntax will be:
      *                      {@code
@@ -542,15 +547,17 @@ public class RestSpec extends BaseGSpec {
             String key = row.get(0);
             String value = row.get(1);
             headers.put(key, value);
+            this.getCommonSpec().getLogger().debug("Setting header '{}' with value '{}'", key, value);
             commonspec.getRestRequest().header(key, value);
         }
+
     }
 
     /**
      * Specify a custom map of cookies to be added to future requests
      * <p>
      * Works in a similar way that {@link #setHeaders(DataTable)}. The cookies will be applied
-     * to all following requests in the same scenario unless you clear then using {@link #clearCookies()}
+     * to the following request in the same scenario
      * <pre>{@code
      * Example:
      *
@@ -561,8 +568,6 @@ public class RestSpec extends BaseGSpec {
      *      When I send a 'GET' request to '/api/v1/shipment/1' //this (and following) request(s) will contain those cookies
      * }</pre>
      * @see #setHeaders(DataTable)
-     * @see #clearHeaders()
-     * @see #clearCookies()
      * @param modifications DataTable containing the custom set of cookies to be
      *                      added to the requests. Syntax will be:
      *                      {@code
@@ -585,92 +590,11 @@ public class RestSpec extends BaseGSpec {
             String key = row.get(0);
             String value = row.get(1);
             cookies.put(key, value);
+            this.getCommonSpec().getLogger().debug("Setting cookie '{}' with value '{}'", key, value);
             commonspec.getRestRequest().cookie(key, value);
         }
 
-        commonspec.setRestCookies(cookies);
-
     }
-
-    /**
-     * Clears the headers set by any previous request.
-     * <p>
-     * A request will reuse the headers/cookies that were set in any previous call within the same scenario
-     * <pre>{@code
-     * Example:
-     *
-     * Scenario: The first GET will contain the headers, the second wont
-     *      Given I send requests to 'dummy-test.com:80'
-     *      Given I set headers:
-     *          | Authorization  | mySecretToken1234 |
-     *          | Content-Type   | application/json  |
-     *      When I send a 'GET' request to '/api/v1/shipment/1'
-     *      Then I clear headers from previous request
-     *      When I send a 'GET' request to '/api/v1/settings'
-     * }
-     * </pre>
-     * @see #setHeaders(DataTable)
-     * @see #setCookies(DataTable)
-     * @see #clearCookies()
-     */
-    @Then("^I clear headers from previous request$")
-    public void clearHeaders() {
-
-        /*
-          Since there is no easy way to remove all headers from the request,
-          a new request object is created with the same configuration
-          */
-
-        commonspec.getHeaders().clear();
-        RequestSpecification spec = new RequestSpecBuilder().setContentType(ContentType.JSON).build();
-        commonspec.setRestRequest(given().header("Content-Type", "application/json").cookies(commonspec.getRestCookies()).spec(spec));
-
-        if (commonspec.getRestProtocol().matches("https://")) {
-            this.setupApp("https://", commonspec.getRestHost() + ":" + commonspec.getRestPort());
-        } else {
-            this.setupApp(null, commonspec.getRestHost() + ":" + commonspec.getRestPort());
-        }
-
-    }
-
-    /**
-     * Clears the cookies set by any previous request.
-     * <p>
-     * A request will reuse the headers/cookies that were set in any previous call within the same scenario
-     * <pre>{@code
-     * Example:
-     *
-     * Scenario: The first GET will contain the cookies, the second wont
-     *      Given I send requests to 'dummy-test.com:80'
-     *      Given I set cookies:
-     *          | myCookieName  | myCookieValue |
-     *      When I send a 'GET' request to '/api/v1/shipment/1'
-     *      Then I clear cookies from previous request
-     *      When I send a 'GET' request to '/api/v1/shipment/1'
-     * }</pre>
-     * @see #setCookies(DataTable)
-     * @see #setHeaders(DataTable)
-     * @see #clearHeaders()
-     */
-    @Then("^I clear cookies from previous request$")
-    public void clearCookies() {
-
-        /*
-          Since there is no easy way to remove all cookies from the request,
-          a new request object is created with the same configuration
-          */
-        commonspec.getRestCookies().clear();
-        RequestSpecification spec = new RequestSpecBuilder().setContentType(ContentType.JSON).build();
-        commonspec.setRestRequest(given().header("Content-Type", "application/json").headers(commonspec.getHeaders()).spec(spec));
-
-        if (commonspec.getRestProtocol().matches("https://")) {
-            this.setupApp("https://", commonspec.getRestHost() + ":" + commonspec.getRestPort());
-        } else {
-            this.setupApp(null, commonspec.getRestHost() + ":" + commonspec.getRestPort());
-        }
-
-    }
-
 
     /**
      * Executes the given request to the REST endpont for the specified amount of time in regular intervals, until the response body contains
@@ -785,6 +709,7 @@ public class RestSpec extends BaseGSpec {
             String condition = row.get(1);
             String result = row.get(2);
 
+            this.getCommonSpec().getLogger().debug("Checking if header '{}' is '{}' to/than {}", header, condition, result);
             String headerValue = commonspec.getRestResponse().getHeaders().getValue(header);
             commonspec.evaluateJSONElementOperation(headerValue, condition, result);
         }
@@ -822,6 +747,7 @@ public class RestSpec extends BaseGSpec {
             String condition = row.get(1);
             String result = row.get(2);
 
+            this.getCommonSpec().getLogger().debug("Checking if cookie '{}' is '{}' to/than {}", cookie, condition, result);
             String cookieValue = commonspec.getRestResponse().getCookies().get(cookie);
             commonspec.evaluateJSONElementOperation(cookieValue, condition, result);
         }
@@ -849,6 +775,7 @@ public class RestSpec extends BaseGSpec {
 
         String headerValue = commonspec.getRestResponse().getHeaders().getValue(headerName);
         Assertions.assertThat(headerValue).as("The header " + headerName + " is not present in the response").isNotNull();
+        this.getCommonSpec().getLogger().debug("Saving '{}' in variable '{}'", headerValue, varName);
         ThreadProperty.set(varName, headerValue);
     }
 
@@ -865,11 +792,12 @@ public class RestSpec extends BaseGSpec {
 
         String cookieValue = commonspec.getRestResponse().getCookies().get(cookieName);
         Assertions.assertThat(cookieValue).as("The cookie " + cookieName + " is not present in the response").isNotNull();
+        this.getCommonSpec().getLogger().debug("Saving '{}' in variable '{}'", cookieValue, varName);
         ThreadProperty.set(varName, cookieValue);
     }
 
     /**
-     * Specify a custom map of url query parameters to be added to future requests
+     * Specify a custom map of url query parameters to be added to future request
      * <pre>{@code
      * Example:
      *
@@ -909,48 +837,8 @@ public class RestSpec extends BaseGSpec {
             String key = row.get(0);
             String value = row.get(1);
             queryParams.put(key, value);
+            this.getCommonSpec().getLogger().debug("Setting url parameter '{}' to '{}'", key, value);
             commonspec.getRestRequest().queryParam(key, value);
-        }
-    }
-
-    /**
-     * Clears the url query parameters that were configured in a previous step.
-     * <p>
-     * Once the user uses the step to set url query parameters (Given I set url parameters),
-     * the parameters are automatically added to all future requests in the same scenario. This
-     * step allows to delete this parameters from the system, so new requests are created without
-     * any url query parameters
-     * <pre>{@code
-     * Example:
-     *
-     * Scenario: First GET will have userId=3, second one will have userId=4
-     *      Given I securely send requests to 'jsonplaceholder.typicode.com:443'
-     *      Given I set url parameters:
-     *           | userId | 3 |
-     *      When I send a 'GET' request to '/posts'
-     *      Then I clear the url parameters from previous request
-     *      Given I set url parameters:
-     *       | userId | 4 |
-     *     When I send a 'GET' request to '/posts'
-     * }</pre>
-     *
-     * @see #iSetUrlQueryParameters(DataTable)
-     */
-    @Then("^I clear the url parameters from previous request$")
-    public void iClearTheUrlParametersFromPreviousRequest() {
-        /*
-          Since there is no easy way to remove all url parameters from the request,
-          a new request object is created with the same configuration
-          */
-        RequestSpecification spec = new RequestSpecBuilder().setContentType(ContentType.JSON).build();
-        commonspec.setRestRequest(given().header("Content-Type", "application/json").headers(commonspec.getHeaders()).spec(spec));
-        commonspec.setRestRequest(given().cookies(commonspec.getRestCookies()).spec(spec));
-
-
-        if (commonspec.getRestProtocol().matches("https://")) {
-            this.setupApp("https://", commonspec.getRestHost() + ":" + commonspec.getRestPort());
-        } else {
-            this.setupApp(null, commonspec.getRestHost() + ":" + commonspec.getRestPort());
         }
     }
 
@@ -990,6 +878,7 @@ public class RestSpec extends BaseGSpec {
      */
     @Given("I set the proxy to {string}")
     public void setRestProxy(String address) throws MalformedURLException {
+        this.getCommonSpec().getLogger().debug("Setting proxy {} with username=null and password=null", address);
         this.setRestProxyWithCredentials(address, null, null);
     }
 
@@ -1030,6 +919,7 @@ public class RestSpec extends BaseGSpec {
             ps = new ProxySpecification(url.getHost(), port, url.getProtocol()).withAuth(username, password);
         }
 
+        this.getCommonSpec().getLogger().debug("Setting proxy {} with username={} and password={}", address, username, password);
         this.commonspec.getRestRequest().given().proxy(ps);
 
     }
@@ -1070,5 +960,25 @@ public class RestSpec extends BaseGSpec {
         commonspec.getRestRequest().given().body(body);
         commonspec.generateRestRequest(requestType, endPoint);
         commonspec.getLogger().debug("Saving response");
+    }
+
+    /**
+     * Every time a request is sent, a new request object is initialized with the same base url and port that
+     * was configured in {@link #setupApp(String, String)}. This is because, if the user did previously set
+     * headers cookies or url parameters, this data will be added to all feature requests if the same request
+     * object is reused
+     */
+    private void initializeRestClient() {
+
+        commonspec.getLogger().debug("Re-initializing rest-client. Removing headers, cookies and url parameters");
+
+        RequestSpecification spec = new RequestSpecBuilder().setContentType(ContentType.JSON).build();
+        commonspec.setRestRequest(given().header("Content-Type", "application/json").spec(spec));
+
+        if (commonspec.getRestProtocol().matches("https://")) {
+            this.setupApp("https://", commonspec.getRestHost() + ":" + commonspec.getRestPort());
+        } else {
+            this.setupApp(null, commonspec.getRestHost() + ":" + commonspec.getRestPort());
+        }
     }
 }

@@ -47,7 +47,6 @@ Feature: Rest Assured Feature
     And I save element '$.[0]' in environment variable 'response'
     And 'response' matches the following cases:
       | $.userId | equal | 3 |
-    Then I clear the url parameters from previous request
     Given I set url parameters:
       | userId | 4 |
     When I send a 'GET' request to '/posts'
@@ -73,6 +72,5 @@ Feature: Rest Assured Feature
       | Cache-Control    | length          | 8     |
       | Cache-Control    | contains        | cache |
     And I save the response header 'Server' in environment variable 'SERVER'
-    And I clear headers from previous request
     When I send a 'GET' request to '/api/v1/shipment/1'
     Then the service response status must be '401'
