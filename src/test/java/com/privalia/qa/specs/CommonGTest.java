@@ -1084,7 +1084,6 @@ public class CommonGTest {
         commong.getMongoResults();
         commong.getResultsType();
         commong.getSeleniumCookies();
-        commong.getHeaders();
     }
 
 

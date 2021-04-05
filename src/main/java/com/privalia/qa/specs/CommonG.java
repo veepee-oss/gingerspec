@@ -239,24 +239,6 @@ public class CommonG {
     }
 
     /**
-     * Set the values of the cookies used when performing rest requests
-     *
-     * @return get the cookies returned from last operation
-     */
-    public Map<String, String> getRestCookies() {
-        return restCookies;
-    }
-
-    /**
-     * Returns the values of the cookies used in the rest requests
-     *
-     * @param restCookies Set REST cookies from last operation
-     */
-    public void setRestCookies(Map<String, String> restCookies) {
-        this.restCookies = restCookies;
-    }
-
-    /**
      * Get the previos Rest response (restassured)
      *
      * @return Rest response
@@ -1508,7 +1490,7 @@ public class CommonG {
         this.getLogger().debug("Generating " + requestType + " request to " + endPoint);
 
         if (this.getLogger().isDebugEnabled()) {
-            this.getLogger().debug(this.getRestRequest().given().log().all().toString());
+            this.getRestRequest().given().log().all();
         }
 
         switch (requestType) {
@@ -1538,7 +1520,7 @@ public class CommonG {
         }
 
         if (this.getLogger().isDebugEnabled()) {
-            this.getLogger().debug(this.getRestResponse().then().log().all().toString());
+            this.getRestResponse().then().log().all();
         }
 
     }
@@ -1609,14 +1591,6 @@ public class CommonG {
 
     public void setResultsType(String resultsType) {
         this.resultsType = resultsType;
-    }
-
-    public Map<String, String> getHeaders() {
-        return headers;
-    }
-
-    public void setHeaders(Map<String, String> headers) {
-        this.headers = headers;
     }
 
     /**
