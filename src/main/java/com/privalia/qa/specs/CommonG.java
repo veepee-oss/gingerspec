@@ -1505,7 +1505,11 @@ public class CommonG {
 
         this.getRestRequest().basePath(endPoint);
 
-        this.getLogger().debug("Generating " + requestType + " reauest to " + endPoint);
+        this.getLogger().debug("Generating " + requestType + " request to " + endPoint);
+
+        if (this.getLogger().isDebugEnabled()) {
+            this.getLogger().debug(this.getRestRequest().given().log().all().toString());
+        }
 
         switch (requestType) {
             case "GET":
@@ -1531,6 +1535,10 @@ public class CommonG {
             default:
                 Assertions.fail("Operation not implemented: " + requestType);
 
+        }
+
+        if (this.getLogger().isDebugEnabled()) {
+            this.getLogger().debug(this.getRestResponse().then().log().all().toString());
         }
 
     }

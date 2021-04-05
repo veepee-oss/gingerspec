@@ -125,6 +125,7 @@ public class RestSpec extends BaseGSpec {
             commonspec.getRestRequest().relaxedHTTPSValidation();
         }
 
+        this.getCommonSpec().getLogger().debug("Setting base URL to {} with port {}", restProtocol + restHost, Integer.parseInt(restPort));
         commonspec.getRestRequest().baseUri(restProtocol + restHost).port(Integer.parseInt(restPort));
     }
 
@@ -499,6 +500,7 @@ public class RestSpec extends BaseGSpec {
         }
 
         Assertions.assertThat(value).as("json result is empty").isNotEmpty();
+        this.getCommonSpec().getLogger().debug("Element {} found. Equal to {}. Saving in variable '{}'", element, value, envVar);
         ThreadProperty.set(envVar, value);
     }
 
@@ -542,8 +544,10 @@ public class RestSpec extends BaseGSpec {
             String key = row.get(0);
             String value = row.get(1);
             headers.put(key, value);
+            this.getCommonSpec().getLogger().debug("Setting header '{}' with value '{}'", key, value);
             commonspec.getRestRequest().header(key, value);
         }
+
     }
 
     /**
@@ -585,6 +589,7 @@ public class RestSpec extends BaseGSpec {
             String key = row.get(0);
             String value = row.get(1);
             cookies.put(key, value);
+            this.getCommonSpec().getLogger().debug("Setting cookie '{}' with value '{}'", key, value);
             commonspec.getRestRequest().cookie(key, value);
         }
 
@@ -785,6 +790,7 @@ public class RestSpec extends BaseGSpec {
             String condition = row.get(1);
             String result = row.get(2);
 
+            this.getCommonSpec().getLogger().debug("Checking if header '{}' is '{}' to/than {}", header, condition, result);
             String headerValue = commonspec.getRestResponse().getHeaders().getValue(header);
             commonspec.evaluateJSONElementOperation(headerValue, condition, result);
         }
@@ -822,6 +828,7 @@ public class RestSpec extends BaseGSpec {
             String condition = row.get(1);
             String result = row.get(2);
 
+            this.getCommonSpec().getLogger().debug("Checking if cookie '{}' is '{}' to/than {}", cookie, condition, result);
             String cookieValue = commonspec.getRestResponse().getCookies().get(cookie);
             commonspec.evaluateJSONElementOperation(cookieValue, condition, result);
         }
@@ -849,6 +856,7 @@ public class RestSpec extends BaseGSpec {
 
         String headerValue = commonspec.getRestResponse().getHeaders().getValue(headerName);
         Assertions.assertThat(headerValue).as("The header " + headerName + " is not present in the response").isNotNull();
+        this.getCommonSpec().getLogger().debug("Saving '{}' in variable '{}'", headerValue, varName);
         ThreadProperty.set(varName, headerValue);
     }
 
@@ -865,6 +873,7 @@ public class RestSpec extends BaseGSpec {
 
         String cookieValue = commonspec.getRestResponse().getCookies().get(cookieName);
         Assertions.assertThat(cookieValue).as("The cookie " + cookieName + " is not present in the response").isNotNull();
+        this.getCommonSpec().getLogger().debug("Saving '{}' in variable '{}'", cookieValue, varName);
         ThreadProperty.set(varName, cookieValue);
     }
 
@@ -909,6 +918,7 @@ public class RestSpec extends BaseGSpec {
             String key = row.get(0);
             String value = row.get(1);
             queryParams.put(key, value);
+            this.getCommonSpec().getLogger().debug("Setting url parameter '{}' to '{}'", key, value);
             commonspec.getRestRequest().queryParam(key, value);
         }
     }
@@ -990,6 +1000,7 @@ public class RestSpec extends BaseGSpec {
      */
     @Given("I set the proxy to {string}")
     public void setRestProxy(String address) throws MalformedURLException {
+        this.getCommonSpec().getLogger().debug("Setting proxy {} with username=null and password=null", address);
         this.setRestProxyWithCredentials(address, null, null);
     }
 
@@ -1030,6 +1041,7 @@ public class RestSpec extends BaseGSpec {
             ps = new ProxySpecification(url.getHost(), port, url.getProtocol()).withAuth(username, password);
         }
 
+        this.getCommonSpec().getLogger().debug("Setting proxy {} with username={} and password={}", address, username, password);
         this.commonspec.getRestRequest().given().proxy(ps);
 
     }

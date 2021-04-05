@@ -42,7 +42,10 @@
         <logger name="com.privalia.qa.cucumber.reporter.TestNGPrettyFormatter" level="INFO" additivity="false">
             <appender-ref ref="Hooks"/>
         </logger>
-        <logger name="com.privalia.qa.specs" level="WARN"/>
+
+        <logger name="com.privalia.qa.specs" level="${sys:logLevel:-WARN}" additivity="false">
+            <appender-ref ref="Console"/>
+        </logger>
 
         <logger name="org.apache.zookeeper" level="OFF"/>
         <logger name="org.apache.avro" level="WARN"/>
