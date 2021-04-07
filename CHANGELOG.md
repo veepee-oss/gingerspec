@@ -1,5 +1,29 @@
 # Changelog
 
+## 2.2.1-RC2
+
+* The functionality for executing the same selenium feature in all connected nodes was removed. It will no longer be maintained. This because it breaks with the newer versions of Selenium grid
+and because it forces the user to create separate runner classes for Selenium tests. This provides a cleaner implementation that is much easier to test and debug.
+
+* When using @web and a selenium grid, now the the full URL for the selenium grid will have to be provided (i.e -DSELENIUM_GRID=http://localhost:4444/wd/hub)
+
+* Updated the Selenium grid and node images that are used for running the integration tests in the pipeline
+
+* @mobile annotation will use http://127.0.0.1:4723 as default appium server URL if -DSELENIUM_GRID argument not found
+
+* The functionality for creating the driver using @web and @mobile tags was completely rewritten. For @web the user can now use at least 3 VM variables for browser selection:
+browserName, platform and version (that matches the manes of real capabilities). When executing the test against a Selenium Grid or when using Appium, the user can also provide
+a json file with capabilities to be used (using -DCAPABILITIES=/path/to/capabilities.json)
+
+* The steps to clear previous headers/cookies and url parameters were removed. Now, a new rest client is initialized as soon as a request completes its execution.
+
+* Fixed a long standing issue with logging. Now, using -DlogLevel=DEBUG will print all debug messages from the steps, and, in the case of rest steps, all request/response information
+can be printed for easier debugging
+
+* Variables -DSELENIUM_NODE, -DSELENIUM_NODE_TYPE and -Dbrowser were removed
+
+* Minor fixes in the Github actions workflows, removed unnecessary files related to TravisCI
+
 ## 2.2.1-RC1
 
 * The behavior of the @web and @mobile tags was redesigned. There is no longer a need to use a special constructor in the runner class
