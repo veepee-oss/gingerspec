@@ -49,6 +49,7 @@ jobs:
           SE_EVENT_BUS_SUBSCRIBE_PORT: 4443
         ports:
         - 6900:5900
+        options: -v /dev/shm:/dev/shm
       selenium-firefox:
         image: selenium/node-firefox:4.0.0-beta-3-prerelease-20210321
         env:
@@ -57,6 +58,7 @@ jobs:
           SE_EVENT_BUS_SUBSCRIBE_PORT: 4443
         ports:
         - 6902:5900
+        options: -v /dev/shm:/dev/shm
       kafka:
         image: landoop/fast-data-dev:1.0.1
         env:
