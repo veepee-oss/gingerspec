@@ -58,37 +58,20 @@ services:
     ports:
       - "80:80"
   selenium-grid:
-    image: 'selenium/hub:4.0.0-beta-3-prerelease-20210321'
+    image: 'selenium/hub:3.141.59-20210311'
     ports:
-      - "4442:4442"
-      - "4443:4443"
       - "4444:4444"
   selenium-chrome:
-    image: 'selenium/node-chrome:4.0.0-beta-3-prerelease-20210321'
+    image: 'selenium/node-chrome:3.141.59-20210311'
     volumes:
       - /dev/shm:/dev/shm
     depends_on:
       - selenium-grid
     environment:
-      - SE_EVENT_BUS_HOST=selenium-grid
-      - SE_EVENT_BUS_PUBLISH_PORT=4442
-      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
-    ports:
-      - "6900:5900"
-  selenium-firefox:
-    image: 'selenium/node-firefox:4.0.0-beta-3-prerelease-20210321'
-    volumes:
-      - /dev/shm:/dev/shm
-    depends_on:
-      - selenium-grid
-    environment:
-      - SE_EVENT_BUS_HOST=selenium-grid
-      - SE_EVENT_BUS_PUBLISH_PORT=4442
-      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
-    ports:
-      - "6902:5900"
+      - HUB_HOST=selenium-grid
+      - HUB_PORT=4444
   kafka:
-    image: 'landoop/fast-data-dev:1.0.1'
+    image: 'landoop/fast-data-dev:2.5.1'
     ports:
       - "2181:2181"
       - "3030:3030"
@@ -98,3 +81,4 @@ services:
       - "9092:9092"
     environment:
       - ADV_HOST=localhost
+      - CONNECT_HEAP=3G
