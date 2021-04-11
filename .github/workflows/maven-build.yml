@@ -45,18 +45,6 @@ jobs:
           HUB_HOST: selenium-grid
           HUB_PORT: 4444
         options: -v /dev/shm:/dev/shm
-      kafka:
-        image: landoop/fast-data-dev:2.5.1
-        env:
-          ADV_HOST: localhost
-        ports:
-        - 2181:2181
-        - 3030:3030
-        - 8081:8081
-        - 8082:8082
-        - 8083:8083
-        - 9092:9092
-        options: -e CONNECT_HEAP=3G
     steps:
     - uses: actions/checkout@v2
     - name: Setting up Java ${{ matrix.java }}

@@ -1,3 +1,4 @@
+@ignore @toocomplex
 Feature: Kafka steps test.
 
   This feature provides examples on how to use the included steps for testing kafka services
