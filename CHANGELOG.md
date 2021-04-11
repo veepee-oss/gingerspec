@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.2.1
+
+* Kafka tests were removed from the pipeline. They were failing intermittently without a clear reason (most likely, lack of memory int he github action runner nodes)
+
+* Downgraded to a more stable version of selenium grid and chrome and removed image for firefox since it was not really being used in the pipeline
+
 ## 2.2.1-RC2
 
 * The functionality for executing the same selenium feature in all connected nodes was removed. It will no longer be maintained. This because it breaks with the newer versions of Selenium grid
