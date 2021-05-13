@@ -316,7 +316,7 @@ public class KafkaUtils {
 
             RecordMetadata metadata = (RecordMetadata) producer.send(record).get(timeoutSeconds, TimeUnit.SECONDS);
             long elapsedTime = System.currentTimeMillis() - time;
-            logger.debug("Message sent and acknowlegded by Kafka(key=%s value=%s) meta(partition=%d, offset=%d) time=%d", record.key(), record.value(), metadata.partition(), metadata.offset(), elapsedTime);
+            logger.debug("Message sent and acknowlegded by Kafka(key={} value={}) meta(partition={}, offset={}) time={}", record.key(), record.value(), metadata.partition(), metadata.offset(), elapsedTime);
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
             logger.error("Message not sent or acknowlegded by Kafka {}", e.getMessage());
             throw e;

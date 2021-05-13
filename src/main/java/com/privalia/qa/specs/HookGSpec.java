@@ -16,7 +16,6 @@
 
 package com.privalia.qa.specs;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
@@ -46,15 +45,12 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.safari.SafariDriver;
 import org.openqa.selenium.safari.SafariOptions;
 import org.slf4j.LoggerFactory;
-import org.testng.Assert;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -259,7 +255,7 @@ public class HookGSpec extends BaseGSpec {
             /**
              * Execute the tests using a local browser
              */
-            this.getCommonSpec().getLogger().debug("Setting local driver with capabilities %s", mutableCapabilities.toJson().toString());
+            this.getCommonSpec().getLogger().debug("Setting local driver with capabilities {}", mutableCapabilities.toJson().toString());
             commonspec.setDriver(driver);
         } else {
             /**
@@ -282,7 +278,7 @@ public class HookGSpec extends BaseGSpec {
                 this.addCapabilitiesFromFile(System.getProperty("CAPABILITIES"), mutableCapabilities);
             }
 
-            this.getCommonSpec().getLogger().debug("Setting RemoteWebDriver with capabilities %s", mutableCapabilities.toJson().toString());
+            this.getCommonSpec().getLogger().debug("Setting RemoteWebDriver with capabilities {}", mutableCapabilities.toJson().toString());
             commonspec.setDriver(new RemoteWebDriver(new URL(System.getProperty("SELENIUM_GRID")), mutableCapabilities));
         }
 
@@ -335,7 +331,7 @@ public class HookGSpec extends BaseGSpec {
             capabilities.setCapability("platformName", "Android");
         }
 
-        this.getCommonSpec().getLogger().debug("Setting MobileWebDriver with capabilities %s", capabilities.toJson().toString());
+        this.getCommonSpec().getLogger().debug("Setting MobileWebDriver with capabilities {}", capabilities.toJson().toString());
 
         switch (capabilities.getCapability("platformName").toString().toLowerCase()) {
 
@@ -360,7 +356,7 @@ public class HookGSpec extends BaseGSpec {
                     this.addCapabilitiesFromFile(System.getProperty("CAPABILITIES"), capabilities);
                 }
 
-                commonspec.getLogger().debug("Building AndroidDriver with capabilities %s", capabilities.toJson().toString());
+                commonspec.getLogger().debug("Building AndroidDriver with capabilities {}", capabilities.toJson().toString());
                 commonspec.setDriver(new AndroidDriver(new URL(grid), capabilities));
                 break;
 
@@ -388,12 +384,12 @@ public class HookGSpec extends BaseGSpec {
                     this.addCapabilitiesFromFile(System.getProperty("CAPABILITIES"), capabilities);
                 }
 
-                commonspec.getLogger().debug("Building IOSDriver with capabilities %s", capabilities.toJson().toString());
+                commonspec.getLogger().debug("Building IOSDriver with capabilities {}", capabilities.toJson().toString());
                 commonspec.setDriver(new IOSDriver(new URL(grid), capabilities));
                 break;
 
             default:
-                commonspec.getLogger().error("Unknown platformName: %s, only android/ios is allowed", capabilities.getCapability("platformName").toString());
+                commonspec.getLogger().error("Unknown platformName: {}, only android/ios is allowed", capabilities.getCapability("platformName").toString());
                 throw new WebDriverException("Unknown platformName: " + capabilities.getCapability("platformName").toString() + ", only android/ios is allowed");
         }
 
