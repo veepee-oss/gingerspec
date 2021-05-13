@@ -113,7 +113,7 @@
         <jackson-databind.version>2.10.3</jackson-databind.version>
         <json-schema-validator.version>2.9.0</json-schema-validator.version>
         <kafka-clients.version>1.1.0</kafka-clients.version>
-        <kafka-avro-serializer.version>6.1.1</kafka-avro-serializer.version>
+        <kafka-avro-serializer.version>3.1.1</kafka-avro-serializer.version>
         <avro.version>1.8.0</avro.version>
         <mysql-connector-java.version>8.0.20</mysql-connector-java.version>
         <postgresql.version>42.2.12</postgresql.version>
