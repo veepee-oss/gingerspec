@@ -957,7 +957,7 @@ public class RestSpec extends BaseGSpec {
      */
     @When("I send a {string} request to {string} with body")
     public void sendRequestInlineBody(String requestType, String endPoint, DocString body) {
-        commonspec.getRestRequest().given().body(body);
+        commonspec.getRestRequest().given().body(body.getContent());
         commonspec.generateRestRequest(requestType, endPoint);
         commonspec.getLogger().debug("Saving response");
     }
