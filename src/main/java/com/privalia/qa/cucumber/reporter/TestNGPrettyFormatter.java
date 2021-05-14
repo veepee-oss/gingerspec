@@ -4,6 +4,7 @@ import com.privalia.qa.aspects.ReplacementAspect;
 import com.privalia.qa.utils.ThreadProperty;
 import io.cucumber.core.exception.CucumberException;
 import io.cucumber.core.stepexpression.ExpressionArgument;
+import io.cucumber.docstring.DocString;
 import io.cucumber.messages.Messages;
 import io.cucumber.plugin.ColorAware;
 import io.cucumber.plugin.ConcurrentEventListener;
@@ -303,7 +304,10 @@ public class TestNGPrettyFormatter implements ConcurrentEventListener, ColorAwar
                 if (argument instanceof io.cucumber.core.stepexpression.DocStringArgument) {
                     out.println(TABLES_INDENT + format.text("\"\"\""));
                     try {
-                        out.println(TABLES_INDENT + format.text(getReplacedValue(argument.getValue().toString())));
+                        Field textField = argument.getClass().getDeclaredField("content");
+                        textField.setAccessible(true);
+                        String textArgument = (String) textField.get(argument);
+                        out.println(TABLES_INDENT + format.text(getReplacedValue(textArgument)));
                     } catch (Exception e) {
                         out.println(TABLES_INDENT + format.text(argument.getValue().toString()));
                     }
