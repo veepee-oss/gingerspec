@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.2.2
+
+* Fixed problem that was causing the wrong body to be sent when using DocStrings in REST steps
+
+* Fixed a small problem that was causing DocStrings to be incorrectly printed in the formatter
+
+* Fixed logging messages in some classes
+
+* Confluence repository in POM now uses HTTPS to avoid maven from blocking when resolving the dependency for avro serializer
+
 ## 2.2.1
 
 * Kafka tests were removed from the pipeline. They were failing intermittently without a clear reason (most likely, lack of memory int he github action runner nodes)
