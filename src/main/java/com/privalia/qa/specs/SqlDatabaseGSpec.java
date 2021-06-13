@@ -362,8 +362,8 @@ public class SqlDatabaseGSpec extends BaseGSpec {
      *        | Barcelona | 5       | 37      | 0.4  | 2014-11-29 |
      *      Then I save the value of the row number '1' and the column with name 'city' in environment variable 'CITY'
      *      Then I save the value of the row number '2' and the column with name 'temp_hi' in environment variable 'TEMP_BARCELONA'
-     *      Then '!{CITY}' matches 'Caracas'
-     *      Then '!{TEMP_BARCELONA}' matches '37'
+     *      Then '${CITY}' matches 'Caracas'
+     *      Then '${TEMP_BARCELONA}' matches '37'
      * }</pre>
      * @see #connectDatabase(String, String, String, String, String, String, String)
      * @see #executeQueryFromFile(String)

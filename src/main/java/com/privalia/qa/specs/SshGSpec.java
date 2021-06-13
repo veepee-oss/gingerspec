@@ -53,7 +53,7 @@ public class SshGSpec extends BaseGSpec {
      * {@code
      *      Given I open a ssh connection to '10.200.56.59' with user 'myuser' and password 'temporal'
      *      When I run 'ls -l' in the ssh connection and save the value in environment variable 'RESULT'
-     *      Then '!{RESULT}' contains 'total'
+     *      Then '${RESULT}' contains 'total'
      * }
      * </pre>
      *
@@ -159,7 +159,7 @@ public class SshGSpec extends BaseGSpec {
      * Example: Run a command and save its value in variable for further inspection
      * {@code
      *      Given I run 'ls /tmp | wc -l' locally and save the value in environment variable 'WORDCOUNT'
-     *      Then '!{WORDCOUNT}' is '14'
+     *      Then '${WORDCOUNT}' is '14'
      * }
      * </pre>
      * @see UtilsGSpec#checkValue(String, String, String)
@@ -207,7 +207,7 @@ public class SshGSpec extends BaseGSpec {
      * {@code
      *      Given I open a ssh connection to '10.200.56.59' with user 'myuser' and password 'temporal'
      *      When I run 'ls -la /tmp' in the ssh connection and save the value in environment variable 'DEFEXSTAT'
-     *      Then '!{DEFEXSTAT}' contains 'total'
+     *      Then '${DEFEXSTAT}' contains 'total'
      * }
      * </pre>
      * @see #openSSHConnection(String, String, String, String, String, String)

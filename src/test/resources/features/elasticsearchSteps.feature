@@ -25,4 +25,4 @@ Feature: Elasticsearch steps test
     Given I drop every existing elasticsearch index
 
   Scenario: Connect to Elasticsearch with clustername obtained
-    Given I connect to Elasticsearch cluster at host '${ES_NODE}' using native port '9300' using cluster name '!{clusternameES}'
+    Given I connect to Elasticsearch cluster at host '${ES_NODE}' using native port '9300' using cluster name '${clusternameES}'

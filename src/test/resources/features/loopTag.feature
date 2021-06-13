@@ -20,11 +20,11 @@ Feature: Feature used in testing loop tag aspect
     Given I create file 'testSOATtag<VAR_NAME.id>.json' based on 'schemas/simple<VAR_NAME>.json' as 'json' with:
       | $.a | REPLACE | @{JSON.schemas/empty.json}     | object   |
     Given I save '@{JSON.testSOATtag<VAR_NAME.id>.json}' in variable 'VAR'
-    Then I run '[ "!{VAR}" = "{"a":{}}" ]' locally
+    Then I run '[ "${VAR}" = "{"a":{}}" ]' locally
 
   @skipOnEnv(AGENT_LIST)
   Scenario: This scenario should be omitted.
-    Given I run '[ "!{VAR_NOT_DEFINED}" = "{"a":{}}" ]' locally
+    Given I run '[ "${VAR_NOT_DEFINED}" = "{"a":{}}" ]' locally
     Given I run 'exit 1' locally
 
   @runOnEnv(AGENT_LIST)
@@ -37,7 +37,7 @@ Feature: Feature used in testing loop tag aspect
     Given I create file 'testSOATtag<VAR_NAME.id>B.json' based on 'schemas/simple<VAR_NAME>.json' as 'json' with:
       | $.a | REPLACE | @{JSON.schemas/empty.json}     | object   |
     Given I save '@{JSON.testSOATtag<VAR_NAME.id>B.json}' in variable 'VAR'
-    Then I run '[ "!{VAR}" = "{"a":{}}" ]' locally
+    Then I run '[ "${VAR}" = "{"a":{}}" ]' locally
 
   @runOnEnv(NO_VAR)
   @loop(NO_VAR,VAR_NAME)
@@ -45,5 +45,5 @@ Feature: Feature used in testing loop tag aspect
     Given I create file 'testSOATtag<VAR_NAME.id>B.json' based on 'schemas/simple<VAR_NAME>.json' as 'json' with:
       | $.a | REPLACE | @{JSON.schemas/empty.json}     | object   |
     Given I save '@{JSON.testSOATtag<VAR_NAME.id>B.json}' in variable 'VAR'
-    Then I run '[ "!{VAR}" = "{"a":{}}" ]' locally
+    Then I run '[ "${VAR}" = "{"a":{}}" ]' locally
 

@@ -82,8 +82,8 @@ public class UtilsGSpec extends BaseGSpec {
      * <pre>
      * Examples:
      * {@code
-     *      Then '!{content-type}' matches 'application/json; charset=utf-8'   //checks if the value of the variable matches the string 'application/json; charset=utf-8'
-     *      Then '!{DEFEXSTAT}' contains 'total'                               //checks if the value of the variable contains the string 'total'
+     *      Then '${content-type}' matches 'application/json; charset=utf-8'   //checks if the value of the variable matches the string 'application/json; charset=utf-8'
+     *      Then '${DEFEXSTAT}' contains 'total'                               //checks if the value of the variable contains the string 'total'
      * }
      * </pre>
      * @param envVar        The env var to verify

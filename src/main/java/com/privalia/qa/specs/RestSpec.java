@@ -479,8 +479,8 @@ public class RestSpec extends BaseGSpec {
      *      Given I securely send requests to 'jsonplaceholder.typicode.com:443'
      *      When I send a 'GET' request to '/users'
      *      And I save element '$.[0]' in environment variable 'first_user'
-     *      And I save element '!{first_user}.$.username' in environment variable 'username'
-     *      Then '!{username}' matches 'Bret'
+     *      And I save element '${first_user}.$.username' in environment variable 'username'
+     *      Then '${username}' matches 'Bret'
      * }</pre>
      * @see #sendRequestNoDataTable(String, String, String, String, String)
      * @see #sendRequestDataTable(String, String, String, String, String, DataTable)
@@ -770,7 +770,7 @@ public class RestSpec extends BaseGSpec {
      *      Given I securely send requests to 'jsonplaceholder.typicode.com:443'
      *      When I send a 'GET' request to '/users'
      *      And I save the response header 'Content-Type' in environment variable 'content-type'
-     *      Then '!{content-type}' matches 'application/json; charset=utf-8'
+     *      Then '${content-type}' matches 'application/json; charset=utf-8'
      * }</pre>
      * @see #sendRequestDataTable(String, String, String, String, String, DataTable)
      * @see #sendRequestNoDataTable(String, String, String, String, String)

@@ -671,7 +671,7 @@ public class KafkaGSpec extends BaseGSpec {
      * Example: To change consumer properties
      * {@code
      *      Then I configure the kafka consumers with:
-     *          | group.id           | !{ID}                                                                                               |
+     *          | group.id           | ${ID}                                                                                               |
      *          | key.deserializer   | org.apache.kafka.common.serialization.StringDeserializer                                            |
      *          | value.deserializer | org.apache.kafka.common.serialization.StringDeserializer                                            |
      *          | bootstrap.servers  | srdc1kafkassl5.privalia.pin:9092,srdc1kafkassl9.privalia.pin:9092,srdc1kafkassl10.privalia.pin:9092 |
