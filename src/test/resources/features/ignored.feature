@@ -6,12 +6,12 @@ Feature: Testing the @ignore tag
 
   @ignore
   Scenario: Ignored scenario (no reason specified)
-    Given I run '[ "THIS SHOULDNT HAVE BEEN RUN" = "@{JSON.unexistant.json}" ]' locally
+    Given I run '[ "THIS SHOULDNT HAVE BEEN RUN" = "${file:UTF-8:src/test/resources/schemas/unexistant.json}" ]' locally
     Given I run 'exit 1' locally
 
   @ignore @unimplemented
   Scenario: Ignored scenario (unimplemented)
-    Given I run '[ "THIS SHOULDNT HAVE BEEN RUN" = "@{JSON.unexistant.json}" ]' locally
+    Given I run '[ "THIS SHOULDNT HAVE BEEN RUN" = "${file:UTF-8:src/test/resources/schemas/unexistant.json}" ]' locally
     Given I run 'exit 1' locally
 
   @ignore @manual

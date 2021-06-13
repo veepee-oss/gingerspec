@@ -94,7 +94,7 @@ As part of GingerSpec implementation, there are a couple of AspectJ aspects whic
   
 - [BackgroundTagAspect](https://github.com/veepee-oss/gingerspec/wiki/Gherkin-tags#background-tag): An AspectJ aspect included in loopTagAspect that allows conditional backgrounds, or conditional executions of group of steps based in a environmental variable.
 
-- [ReplacementAspect](https://github.com/veepee-oss/gingerspec/wiki/Gherkin-variables): Allows the use of variables in the Feature file. Variables are enclosed in #{}, ${}, @{} and !{} symbols and could be global (feature level) or local (scenario level)
+- [ReplacementAspect](https://github.com/veepee-oss/gingerspec/wiki/Gherkin-variables): Allows the use of variables in the Feature file. Variables are enclosed in ${}.
   
 - [LogTagAspect](https://github.com/veepee-oss/gingerspec/wiki/Gherkin-tags#log-tag): Allows comments in the feature file to be printed in console when tests are executed.
   
@@ -111,7 +111,7 @@ _Testing Rest services_
     When I send a 'GET' request to '/posts'
     Then the service response status must be '200'
     And I save element '$.[0].userId' in environment variable 'USER_ID'
-    Then '!{USER_ID}' matches '1'
+    Then '${USER_ID}' matches '1'
 ```
 
 

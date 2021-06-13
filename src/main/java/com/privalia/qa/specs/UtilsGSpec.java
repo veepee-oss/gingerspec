@@ -82,8 +82,8 @@ public class UtilsGSpec extends BaseGSpec {
      * <pre>
      * Examples:
      * {@code
-     *      Then '!{content-type}' matches 'application/json; charset=utf-8'   //checks if the value of the variable matches the string 'application/json; charset=utf-8'
-     *      Then '!{DEFEXSTAT}' contains 'total'                               //checks if the value of the variable contains the string 'total'
+     *      Then '${content-type}' matches 'application/json; charset=utf-8'   //checks if the value of the variable matches the string 'application/json; charset=utf-8'
+     *      Then '${DEFEXSTAT}' contains 'total'                               //checks if the value of the variable contains the string 'total'
      * }
      * </pre>
      * @param envVar        The env var to verify
@@ -230,7 +230,7 @@ public class UtilsGSpec extends BaseGSpec {
      * <pre>
      * {@code
      *      Given I create file 'testCreateFilePlain.json' based on 'schemas/testCreateFile.json' as 'json' with:
-     *          | $.key2 | ADDTO | @{FILE.schemas/testCreateFileReplacePlainText.json} | string |
+     *          | $.key2 | ADDTO | ${file:UTF-8:src/test/resources/schemas/testCreateFileReplacePlainText.json} | string |
      * }
      * </pre>
      * Will create a file with name testCreateFilePlain under /target/test-classes, using'schemas/testCreateFile.json' as template,
