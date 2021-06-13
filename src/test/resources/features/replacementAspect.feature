@@ -4,8 +4,8 @@ Feature: Testing variable replacements ${VERSION}
   feature file: feature title, description, scenario description steps, datatables, docstrings and even comments.
 
   Scenario: Replacements scenario title (${VERSION})
-    #log the value of time.wait is #{wait.time}
-    And I wait '#{wait.time}' seconds
+    #log the value of time.wait is ${envProperties:wait.time}
+    And I wait '${envProperties:wait.time}' seconds
     #log the value of time.wait is ${envProperties:wait.time}
     And I wait '${envProperties:wait.time}' seconds
 
@@ -24,7 +24,7 @@ Feature: Testing variable replacements ${VERSION}
     And I wait '${SO_ENV_VAR}' seconds
     And I wait '${SO_ENV_VAR}' seconds
     And I wait '<other>' seconds
-    And I wait '#{wait.time}' seconds
+    And I wait '${envProperties:wait.time}' seconds
     And I wait '${envProperties:wait.time}' seconds
 
     Examples:
