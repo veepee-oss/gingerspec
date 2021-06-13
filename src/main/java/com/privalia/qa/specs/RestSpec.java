@@ -237,10 +237,10 @@ public class RestSpec extends BaseGSpec {
      * <p>
      * This function works in the same way as {@link #sendRequestNoDataTable(String, String, String, String, String)}
      * the difference is that this one accepts a datatable with a list of modification to be applied to the json
-     * body before the request is executed. In the datatable, the first column is the element in the json document to modify, the
-     * second column is the operation to execute (DELETE|ADD|UPDATE), and the third column is the new value. . As soon as the request
-     * is completed, the request object is re-initialized with the same base URI and port as configured in {@link #setupApp(String, String)}.
-     * This is to avoid future requests from re-using the same cookies/headers/url parameters that the user may have configured.
+     * body before the request is executed. As soon as the request, is completed, the request object is re-initialized
+     * with the same base URI and port as configured in {@link #setupApp(String, String)}. This is to avoid future requests
+     * from re-using the same cookies/headers/url parameters that the user may have configured.
+     *
      * <pre>{@code
      * Example
      *
@@ -248,32 +248,39 @@ public class RestSpec extends BaseGSpec {
      *      Given I securely send requests to 'jsonplaceholder.typicode.com:443'
      *      When I send a 'POST' request to '/posts' based on 'schemas/mytestdata.json' as 'json' with:
      *          | $.title | UPDATE | This is a test 2 |
-     * }</pre>
      *
+     *
+     * About the modifications datatable: The datatable will typically have the following
+     * structure:
+     *
+     *      | <key path> | <type of modification> | <new value> | <object type> (optional) |
+     *
+     * <key path>: jsonPath to the key to be modified.
+     * <type of modification>: DELETE|ADD|UPDATE|APPEND|PREPEND|REPLACE|ADDTO
+     * <new value>: In case of UPDATE or ADD, new value to be used.
+     *
+     *              If the element read is: {"key1": "value1", "key2": {"key3": "value3"}}
+     *              And the modifications datatable is: | key2.key3 | UPDATE | "new value3" |
+     *              The result will be: {"key1": "value1", "key2": {"key3": "new value3"}}
+     *
+     *              (The new value will always by added as a string, that is, will contain double
+     *              quotes "". If you want to override this behaviour, use REPLACE and specify the <object type> column)
+     *
+     * <object type>: In case of REPLACE and ADDTO, specifies the object type the value should be transformed to.
+     *                Accepted values are: array|object|string|number|array|boolean|null. Use null if you want that
+     *                value in the json to be null.
+     *
+     * }</pre>
      * @see #setupApp(String, String)
      * @see #sendRequestNoDataTable(String, String, String, String, String)
      * @see #sendRequestInlineBody(String, String, DocString)
-     * @param requestType   type of request to be sent. Possible values:
-     *                      GET|DELETE|POST|PUT|PATCH
-     * @param endPoint      end point to be used
-     * @param baseData      path to file containing the schema to be used
-     * @param type          element to read from file (element should contain a json)
-     * @param loginInfo     credentials for basic auth (if required)
+     * @param requestType   Type of request to be sent. Possible values: GET|DELETE|POST|PUT|PATCH
+     * @param endPoint      End point to be used (relative to the base path previously defined with {@link #setupApp(String, String)})
+     * @param baseData      Path to file containing the schema to be used
+     * @param type          Element to read from file (element should contain a json)
+     * @param loginInfo     Credentials for basic auth (if required)
      * @param modifications DataTable containing the modifications to be done to the
-     *                      base schema element. Syntax will be:
-     *                      {@code
-     *                      | <key path> | <type of modification> | <new value> |
-     *                      }
-     *                      where:
-     *                      key path: path to the key to be modified
-     *                      type of modification: DELETE|ADD|UPDATE
-     *                      new value: in case of UPDATE or ADD, new value to be used
-     *                      for example:
-     *                      if the element read is {"key1": "value1", "key2": {"key3": "value3"}}
-     *                      and we want to modify the value in "key3" with "new value3"
-     *                      the modification will be:
-     *                      | key2.key3 | UPDATE | "new value3" |
-     *                      being the result of the modification: {"key1": "value1", "key2": {"key3": "new value3"}}
+     *                      base schema element.
      * @throws Exception    Exception
      */
     @When("^I send a '(.+?)' request to '(.+?)'( with user and password '(.+:.+?)')? based on '([^:]+?)'( as '(json|string)')? with:$")
