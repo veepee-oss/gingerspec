@@ -33,7 +33,7 @@ Feature: Testing variable replacements ${VERSION}
       | ${envProperties:wait.time} |
 
   Scenario: Reading a file and saving it in a variable
-    Given I save '@{JSON.schemas/empty.json}' in variable 'VAR'
+    Given I save '${file:UTF-8:src/test/resources/schemas/empty.json}' in variable 'VAR'
     Then I run '[ "${VAR}" = "{}" ]' locally
     #log The same operation can be done with $variables
     Given I save '${file:UTF-8:src/test/resources/schemas/empty.json}' in variable 'VAR'

@@ -18,8 +18,8 @@ Feature: Feature used in testing loop tag aspect
   @loop(AGENT_LIST,VAR_NAME)
   Scenario: With scenarios outlines and datatables
     Given I create file 'testSOATtag<VAR_NAME.id>.json' based on 'schemas/simple<VAR_NAME>.json' as 'json' with:
-      | $.a | REPLACE | @{JSON.schemas/empty.json}     | object   |
-    Given I save '@{JSON.testSOATtag<VAR_NAME.id>.json}' in variable 'VAR'
+      | $.a | REPLACE | ${file:UTF-8:src/test/resources/schemas/empty.json}     | object   |
+    Given I save '${file:UTF-8:target/test-classes/testSOATtag<VAR_NAME.id>.json}' in variable 'VAR'
     Then I run '[ "${VAR}" = "{"a":{}}" ]' locally
 
   @skipOnEnv(AGENT_LIST)
@@ -35,15 +35,15 @@ Feature: Feature used in testing loop tag aspect
   @loop(AGENT_LIST,VAR_NAME)
   Scenario: With scenarios outlines and datatables
     Given I create file 'testSOATtag<VAR_NAME.id>B.json' based on 'schemas/simple<VAR_NAME>.json' as 'json' with:
-      | $.a | REPLACE | @{JSON.schemas/empty.json}     | object   |
-    Given I save '@{JSON.testSOATtag<VAR_NAME.id>B.json}' in variable 'VAR'
+      | $.a | REPLACE | ${file:UTF-8:src/test/resources/schemas/empty.json}     | object   |
+    Given I save '${file:UTF-8:target/test-classes/testSOATtag<VAR_NAME.id>B.json}' in variable 'VAR'
     Then I run '[ "${VAR}" = "{"a":{}}" ]' locally
 
   @runOnEnv(NO_VAR)
   @loop(NO_VAR,VAR_NAME)
   Scenario: With scenarios outlines and datatables
     Given I create file 'testSOATtag<VAR_NAME.id>B.json' based on 'schemas/simple<VAR_NAME>.json' as 'json' with:
-      | $.a | REPLACE | @{JSON.schemas/empty.json}     | object   |
-    Given I save '@{JSON.testSOATtag<VAR_NAME.id>B.json}' in variable 'VAR'
+      | $.a | REPLACE | ${file:UTF-8:src/test/resources/schemas/empty.json}     | object   |
+    Given I save '${file:UTF-8:target/test-classes/testSOATtag<VAR_NAME.id>B.json}' in variable 'VAR'
     Then I run '[ "${VAR}" = "{"a":{}}" ]' locally
 
