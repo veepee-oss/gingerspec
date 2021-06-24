@@ -2,11 +2,11 @@
 ┌───────────────────────────────────────────────────────────────────────────────────┐
 │ GingerSpec wiki:  https://github.com/veepee-oss/gingerspec/wiki                   │
 │ Discussion/ideas: https://github.com/veepee-oss/gingerspec/discussions            │
-│ Report a bug:     https://github.com/veepee-oss/gingerspec/issues                 |
-|                                                                                   |
-| Command line options:                                                             │
-│ -DSHOW_ERRORS_STACKTRACE: Show errors full stacktrace                             |
-| -DlogLevel=DEBUG: Change logging level                                            |
-| -DSHOW_STACK_INFO: Shows step definition location and arguments                   |
-| -Dmaven.failsafe.debug: Debug (Intellij IDEA)                                     |
+│ Report a bug:     https://github.com/veepee-oss/gingerspec/issues                 │
+│                                                                                   │
+│ Command line options:                                                             │
+│ -DSHOW_ERRORS_STACKTRACE: Show errors full stacktrace                             │
+│ -DlogLevel=DEBUG: Change logging level                                            │
+│ -DSHOW_STACK_INFO: Shows step definition location and arguments                   │
+│ -Dmaven.failsafe.debug: Debug (Intellij IDEA)                                     │
 └───────────────────────────────────────────────────────────────────────────────────┘
