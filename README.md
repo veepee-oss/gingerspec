@@ -70,10 +70,15 @@ You must use the following dependency in your testng project to get access to al
 </dependency>
 ``` 
 
-However, we **strongly** suggest to make use of the special archetype for GingerSpec based projects: [gingerspec-starter](https://github.com/PrivaliaTech/gingerspec-starter). Just run the following command in your terminal
+However, we **strongly** suggest to make use of the special archetype for GingerSpec based projects: [gingerspec-starter](https://github.com/PrivaliaTech/gingerspec-starter). Just run the following command in your terminal (replace the values for groupId, version and artifactId as needed):
 
 ``` 
-mvn -U archetype:generate -DarchetypeGroupId=com.github.privaliatech -DarchetypeArtifactId=gingerspec-starter
+mvn archetype:generate \
+  -DarchetypeGroupId=com.github.privaliatech \
+  -DarchetypeArtifactId=gingerspec-starter \
+  -DgroupId=eu.vptech \
+  -Dversion=1.0-SNAPSHOT \
+  -DartifactId=myproject
 ``` 
 
 This will create a ready-to-use project based on a template with best practices and examples that you can modify in the way you see fit for your needs
@@ -112,6 +117,18 @@ _Testing Rest services_
     Then the service response status must be '200'
     And I save element '$.[0].userId' in environment variable 'USER_ID'
     Then '${USER_ID}' matches '1'
+    
+  Scenario: Add the body to be sent directly
+    Given I securely send requests to 'jsonplaceholder.typicode.com:443'
+    When I send a 'POST' request to '/posts' with body
+        """
+            {
+              "userId": 1,
+              "title": "This is a test",
+              "body": "This is a test"
+            }
+          """
+    Then the service response status must be '201'
 ```
 
 
@@ -129,13 +146,26 @@ _Testing a web page_
 
 _Testing database_
 ```
-Scenario: Send message to kafka topic
-    Given I connect to kafka at 'myzookeeperaddress:2181'
-    Given I create a Kafka topic named 'testqa' if it doesn't exists
-    Then A kafka topic named 'testqa' exists
-    Given I send a message 'hello' to the kafka topic named 'testqa'
-    Then The kafka topic 'testqa' has a message containing 'hello'
-    Then I close the connection to kafka
+  @sql
+  Scenario: Executing SELECT statements on a MySQL database
+    Given I connect with JDBC to database 'mysql' type 'mysql' on host '${MYSQL_HOST}' and port '3306' with user 'root' and password 'mysql'
+    Then I execute query 'CREATE TABLE IF NOT EXISTS weather1 (city varchar(80), temp_lo int, temp_hi int, prcp real, date date);'
+    Then I execute query 'TRUNCATE weather1'
+    Then I execute query 'INSERT INTO weather1 (city, temp_lo, temp_hi, prcp, date) VALUES ('San Francisco', 15, 43, 0.0, '2004-11-29');'
+    Then I execute query 'INSERT INTO weather1 (city, temp_lo, temp_hi, prcp, date) VALUES ('Kyiv', 5, 37, 0.4, '2014-11-29');'
+    Then I execute query 'INSERT INTO weather1 (city, temp_lo, temp_hi, prcp, date) VALUES ('Paris', 8, 37, 0.4, '2016-11-30');'
+    When I query the database with 'SELECT * FROM weather1;'
+    Then I check that result is:
+      | city          | temp_lo | temp_hi | prcp | date       |
+      | San Francisco | 15      | 43      | 0.0  | 2004-11-29 |
+      | Kyiv          | 5       | 37      | 0.4  | 2014-11-29 |
+      | Paris         | 8       | 37      | 0.4  | 2016-11-30 |
+    Then I check that table 'weather1' is iqual to
+      | city          | temp_lo | temp_hi | prcp | date       |
+      | San Francisco | 15      | 43      | 0.0  | 2004-11-29 |
+      | Kyiv          | 5       | 37      | 0.4  | 2014-11-29 |
+      | Paris         | 8       | 37      | 0.4  | 2016-11-30 |
+
 ```
   
 
