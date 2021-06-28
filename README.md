@@ -58,19 +58,10 @@ Check the following articles to get more information about how to use GingerSpec
 * [Getting started](https://github.com/veepee-oss/gingerspec/wiki/Getting-started)  
 * [Running your tests](https://github.com/veepee-oss/gingerspec/wiki/Running-your-tests)
 
-## Using the library
 
-You must use the following dependency in your testng project to get access to all GingerSpec library functionality
+## Using GingerSpec
 
-``` 
-<dependency>
-    <groupId>com.github.privaliatech</groupId>
-    <artifactId>gingerspec</artifactId>
-    <version>2.2.0</version>
-</dependency>
-``` 
-
-However, we **strongly** suggest to make use of the special archetype for GingerSpec based projects: [gingerspec-starter](https://github.com/PrivaliaTech/gingerspec-starter). Just run the following command in your terminal (replace the values for groupId, version and artifactId as needed):
+We **strongly** suggest to make use of the special archetype for GingerSpec based projects: [gingerspec-starter](https://github.com/PrivaliaTech/gingerspec-starter). Just run the following command in your terminal (replace the values for groupId, version and artifactId as needed):
 
 ``` 
 mvn archetype:generate \
@@ -82,7 +73,6 @@ mvn archetype:generate \
 ``` 
 
 This will create a ready-to-use project based on a template with best practices and examples that you can modify in the way you see fit for your needs
-
 
 
 ## Aspects  
