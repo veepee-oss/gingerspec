@@ -480,9 +480,10 @@ public class HookGSpec extends BaseGSpec {
      * Will check if the scenario contains any reference to a Jira ticket and will try to update
      * its status based on the result of the scenario execution. It will also try to close any remaining
      * SSH connection
+     * @param scenario  Scenario
      */
     @After(order = 10)
-    public void teardown(Scenario scenario) throws Exception {
+    public void teardown(Scenario scenario) {
 
         if (scenario.isFailed()) {
             Collection<String> tags = scenario.getSourceTagNames();
