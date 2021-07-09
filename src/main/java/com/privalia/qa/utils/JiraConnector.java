@@ -63,7 +63,7 @@ public class JiraConnector {
             throw new Exception("Unexpected status code response:" + r.getStatusCode() + ". Body: '" + r.getResponseBody() + "'");
         }
 
-        return JsonPath.read(r.getResponseBody(),"$.fields.status.name").toString().toUpperCase();
+        return JsonPath.read(r.getResponseBody(), "$.fields.status.name").toString().toUpperCase();
     }
 
     /**
@@ -142,7 +142,7 @@ public class JiraConnector {
             throw new Exception("Unexpected status code response:" + r.getStatusCode() + ". Body: '" + r.getResponseBody() + "'");
         }
 
-        Object transitionStrings = JsonPath.read(r.getResponseBody(),"$.transitions[?(@.name=='" + transitionName + "')].id");
+        Object transitionStrings = JsonPath.read(r.getResponseBody(), "$.transitions[?(@.name=='" + transitionName + "')].id");
         JSONArray ja = (JSONArray) transitionStrings;
 
         if (ja.isEmpty()) {
