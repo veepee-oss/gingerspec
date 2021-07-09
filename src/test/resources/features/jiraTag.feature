@@ -1,3 +1,4 @@
+@ignore
 Feature: Testing the Jira Integration
   
   Using the @jira() you can control the execution of scenarios based on its status 
@@ -8,3 +9,4 @@ Feature: Testing the Jira Integration
   @jira(QMS-990)
   Scenario: This scenario should run only if ticket QMS-990 is Done or Deployed status
     Given I wait '1' seconds
+    Then 'a' matches 'b'

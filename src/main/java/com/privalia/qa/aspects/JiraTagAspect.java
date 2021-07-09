@@ -22,6 +22,8 @@ public class JiraTagAspect {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
 
+    JiraConnector jc = new JiraConnector();
+
     /**
      * Pointcut is executed for {@link io.cucumber.testng.AbstractTestNGCucumberTests#runScenario(PickleWrapper, FeatureWrapper)}
      * @param pickleWrapper         the pickleWrapper
@@ -37,14 +39,18 @@ public class JiraTagAspect {
         List<String> tags = pickleWrapper.getPickle().getTags();
         String scenarioName = pickleWrapper.getPickle().getName();
 
-        String ticket = this.getFirstTicketReference(tags);
+        String ticket = this.jc.getFirstTicketReference(tags);
 
         if (ticket != null) {
-            JiraConnector jc = new JiraConnector();
-            if (!jc.entityShouldRun(ticket)) {
-                logger.warn("Scenario '" + scenarioName + "' was ignored, it is in a non runnable status in Jira.");
-                return;
-            } else {
+            try {
+                if (!jc.entityShouldRun(ticket)) {
+                    logger.warn("Scenario '" + scenarioName + "' was ignored, it is in a non runnable status in Jira.");
+                    return;
+                } else {
+                    pjp.proceed();
+                }
+            } catch (Exception e) {
+                logger.warn("Could not retrieve info of ticket " + ticket + " from jira: " + e.getMessage() + ". Proceeding with execution...");
                 pjp.proceed();
             }
 
@@ -53,17 +59,4 @@ public class JiraTagAspect {
         }
     }
 
-    private String getFirstTicketReference(List<String> tags) {
-        String pattern = "@jira\\((.*)\\)";
-        Pattern r = Pattern.compile(pattern);
-
-        for (String tag: tags) {
-            Matcher m = r.matcher(tag);
-            if (m.find()) {
-                return m.group(1);
-            }
-        }
-
-        return null;
-    }
 }

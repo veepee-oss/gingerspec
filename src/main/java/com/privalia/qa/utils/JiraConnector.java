@@ -7,7 +7,11 @@ import com.ning.http.client.RequestBuilder;
 import com.ning.http.client.Response;
 import org.apache.commons.text.StringSubstitutor;
 import net.minidev.json.JSONArray;
+
+import java.util.List;
 import java.util.concurrent.Future;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * An small utility for interacting with entities in Jira
@@ -195,5 +199,24 @@ public class JiraConnector {
             this.transitionEntityToGivenStatus(entity, jiraTransitionToStatus);
         }
 
+    }
+
+    /**
+     * Returns the first reference to the jira ticket from the tag reference
+     * @param tags      List of thats (i.e @ignore, @jira(QMS-123))
+     * @return          The first ticket reference (i.e QMS-123)
+     */
+    public String getFirstTicketReference(List<String> tags) {
+        String pattern = "@jira\\((.*)\\)";
+        Pattern r = Pattern.compile(pattern);
+
+        for (String tag: tags) {
+            Matcher m = r.matcher(tag);
+            if (m.find()) {
+                return m.group(1);
+            }
+        }
+
+        return null;
     }
 }

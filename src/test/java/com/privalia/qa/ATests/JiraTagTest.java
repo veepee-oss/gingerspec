@@ -3,6 +3,10 @@ package com.privalia.qa.ATests;
 import com.privalia.qa.utils.JiraConnector;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
+
+import java.util.Arrays;
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -95,5 +99,11 @@ public class JiraTagTest {
     @Test(enabled = false)
     public void shouldAddANewCommentToEntity() throws Exception {
         this.jc.postCommentToEntity("QMS-990", "This is a test message");
+    }
+
+    @Test
+    public void shouldReturnTheTicketFromTheTag() throws Exception {
+        List<String> tags = Arrays.asList("@jira(QMS-990)", "@ignore", "@jira(QMS-123)");
+        assertThat("QMS-990").isEqualToIgnoringCase(this.jc.getFirstTicketReference(tags));
     }
 }
