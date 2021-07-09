@@ -31,6 +31,12 @@ public class JiraTagIT {
     }
 
     @Test
+    public void shouldUseDefaultValueIfProvided() {
+        String jiraServerURL = this.jc.getProperty("not.real.key:-test");
+        assertThat(jiraServerURL).isEqualTo("test");
+    }
+
+    @Test
     public void shouldThrowExceptionIfVariableNotFound() {
         assertThatThrownBy(() -> {
             this.jc.getProperty("not.real.property.key");

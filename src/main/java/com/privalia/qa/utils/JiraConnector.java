@@ -52,7 +52,7 @@ public class JiraConnector {
 
     public Boolean entityShouldRun(String entity) throws Exception {
 
-        String[] valid_statuses = this.getProperty("jira.valid.runnable.statuses").split(",");
+        String[] valid_statuses = this.getProperty("jira.valid.runnable.statuses:-Done,Deployed").split(",");
         String entity_current_status = this.getEntityStatus(entity).toUpperCase();
 
         for (String status: valid_statuses) {
@@ -140,8 +140,12 @@ public class JiraConnector {
 
     public void transitionEntity(String entity) throws Exception {
 
-        String jiraTransitionIfFail = this.getProperty("jira.transition.if.fail");
-        this.transitionEntityToGivenStatus(entity, jiraTransitionIfFail);
+        String jiraTransitionToStatus = this.getProperty("jira.transition.if.fail.status:-In Progress");
+        Boolean jiraTransition = Boolean.valueOf(this.getProperty("jira.transition.if.fail:-true"));
+
+        if (jiraTransition) {
+            this.transitionEntityToGivenStatus(entity, jiraTransitionToStatus);
+        }
 
     }
 }
