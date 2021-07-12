@@ -1,4 +1,4 @@
-
+@ignore
 Feature: Testing the Jira Integration
   
   Using the @jira() you can control the execution of scenarios based on its status 
@@ -7,6 +7,9 @@ Feature: Testing the Jira Integration
   configuration file located at src/test/resources/jira.properties
 
   @jira(QMS-990)
-  Scenario: This scenario should run only if ticket QMS-990 is Done or Deployed status
-    Given I wait '1' seconds
-    Then 'a' matches 'b'
+  Scenario: A new element is inserted via a POST call
+    Given I send requests to '${REST_SERVER_HOST}:3000'
+    When I send a 'POST' request to '/posts' based on 'schemas/mytestdata.json' as 'json'
+    Then the service response status must be '201'
+    And I save element '$.title' in environment variable 'TITLE'
+    Then '${TITLE}' matches 'This is a test'
