@@ -192,7 +192,7 @@ public class JiraConnector {
      */
     public void transitionEntity(String entity) throws Exception {
 
-        String jiraTransitionToStatus = this.getProperty("jira.transition.if.fail.status:-In Progress");
+        String jiraTransitionToStatus = this.getProperty("jira.transition.if.fail.status:-TO REVIEW");
         Boolean jiraTransition = Boolean.valueOf(this.getProperty("jira.transition.if.fail:-true"));
 
         if (jiraTransition) {

@@ -1,4 +1,4 @@
-@ignore
+
 Feature: Testing the Jira Integration
   
   Using the @jira() you can control the execution of scenarios based on its status 
