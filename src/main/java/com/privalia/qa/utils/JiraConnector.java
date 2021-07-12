@@ -5,8 +5,10 @@ import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
 import com.ning.http.client.Response;
+import com.privalia.qa.lookups.DefaultLookUp;
 import org.apache.commons.text.StringSubstitutor;
 import net.minidev.json.JSONArray;
+import org.apache.commons.text.lookup.StringLookupFactory;
 
 import java.util.List;
 import java.util.concurrent.Future;
@@ -32,12 +34,16 @@ public class JiraConnector {
      * @param property  key
      * @return          value
      */
-    public String getProperty(String property) {
-
-        interpolator.setEnableUndefinedVariableException(true);
+    private String getProperty(String property, String defaultValue) {
 
         if (System.getProperty(property) != null) {
             return System.getProperty(property);
+        }
+
+        interpolator.setEnableUndefinedVariableException(true);
+
+        if (defaultValue != null) {
+            property = property + ":-" + defaultValue;
         }
 
         return interpolator.replace("${properties:src/test/resources/" + JIRA_PROPERTIES_FILE + "::" + property + "}");
@@ -49,10 +55,10 @@ public class JiraConnector {
      * @return              Status as string (i.e 'In Progress')
      * @throws Exception    Exception
      */
-    public String getEntityStatus(String entity) throws Exception {
+    private String getEntityStatus(String entity) throws Exception {
 
-        String jiraURL = this.getProperty("jira.server.url");
-        String jiraToken = this.getProperty("jira.personal.access.token");
+        String jiraURL = this.getProperty("jira.server.url", null);
+        String jiraToken = this.getProperty("jira.personal.access.token", null);
 
         Request getRequest = new RequestBuilder()
                 .setMethod("GET")
@@ -78,7 +84,7 @@ public class JiraConnector {
      */
     public Boolean entityShouldRun(String entity) throws Exception {
 
-        String[] valid_statuses = this.getProperty("jira.valid.runnable.statuses:-Done,Deployed").split(",");
+        String[] valid_statuses = this.getProperty("jira.valid.runnable.statuses", "Done,Deployed").split(",");
         String entity_current_status = this.getEntityStatus(entity).toUpperCase();
 
         for (String status: valid_statuses) {
@@ -97,12 +103,12 @@ public class JiraConnector {
      * @param new_status    New status (i.e 'Done')
      * @throws Exception    Exception
      */
-    public void transitionEntityToGivenStatus(String entity, String new_status) throws Exception {
+    private void transitionEntityToGivenStatus(String entity, String new_status) throws Exception {
 
         int targetTransition = this.getTransitionIDForEntityByName(entity, new_status);
 
-        String jiraURL = this.getProperty("jira.server.url");
-        String jiraToken = this.getProperty("jira.personal.access.token");
+        String jiraURL = this.getProperty("jira.server.url", "");
+        String jiraToken = this.getProperty("jira.personal.access.token", "");
 
         Request postRequest = new RequestBuilder()
                 .setMethod("POST")
@@ -128,10 +134,10 @@ public class JiraConnector {
      * @return                  Id of the transition for that name
      * @throws Exception        Exception
      */
-    public int getTransitionIDForEntityByName(String entity, String transitionName) throws Exception {
+    private int getTransitionIDForEntityByName(String entity, String transitionName) throws Exception {
 
-        String jiraURL = this.getProperty("jira.server.url");
-        String jiraToken = this.getProperty("jira.personal.access.token");
+        String jiraURL = this.getProperty("jira.server.url", "");
+        String jiraToken = this.getProperty("jira.personal.access.token", "");
 
         Request getRequest = new RequestBuilder()
                 .setMethod("GET")
@@ -165,8 +171,8 @@ public class JiraConnector {
      */
     public void postCommentToEntity(String entity, String message) throws Exception {
 
-        String jiraURL = this.getProperty("jira.server.url");
-        String jiraToken = this.getProperty("jira.personal.access.token");
+        String jiraURL = this.getProperty("jira.server.url", "");
+        String jiraToken = this.getProperty("jira.personal.access.token", "");
 
         Request postRequest = new RequestBuilder()
                 .setMethod("POST")
@@ -192,8 +198,8 @@ public class JiraConnector {
      */
     public void transitionEntity(String entity) throws Exception {
 
-        String jiraTransitionToStatus = this.getProperty("jira.transition.if.fail.status:-TO REVIEW");
-        Boolean jiraTransition = Boolean.valueOf(this.getProperty("jira.transition.if.fail:-true"));
+        String jiraTransitionToStatus = this.getProperty("jira.transition.if.fail.status", "TO REVIEW");
+        Boolean jiraTransition = Boolean.valueOf(this.getProperty("jira.transition.if.fail", "true"));
 
         if (jiraTransition) {
             this.transitionEntityToGivenStatus(entity, jiraTransitionToStatus);
