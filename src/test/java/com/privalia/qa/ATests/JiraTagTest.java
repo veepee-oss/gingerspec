@@ -8,13 +8,14 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 
 public class JiraTagTest {
 
     JiraConnector jc = new JiraConnector();
 
-    @BeforeTest
+    @BeforeTest(enabled = false)
     public void setUp() throws Exception {
         System.setProperty("jira.transition.if.fail.status", "Done");
         this.jc.transitionEntity("QMS-990");
@@ -38,6 +39,14 @@ public class JiraTagTest {
     @Test(enabled = false)
     public void shouldAddANewCommentToEntity() throws Exception {
         this.jc.postCommentToEntity("QMS-990", "This is a test message");
+    }
+
+    @Test(enabled = false)
+    public void shouldReturnExceptionIkFeyVariablesNotFound() {
+        assertThatThrownBy(() -> {
+            System.setProperty("jira.server.url", null);
+            this.jc.transitionEntity("QMS-990");
+        }).isInstanceOf(NullPointerException.class);
     }
 
     @Test
