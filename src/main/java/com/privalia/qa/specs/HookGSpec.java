@@ -19,6 +19,7 @@ package com.privalia.qa.specs;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
+import com.privalia.qa.utils.JiraConnector;
 import com.privalia.qa.utils.ThreadProperty;
 import io.appium.java_client.MobileDriver;
 import io.appium.java_client.android.AndroidDriver;
@@ -51,6 +52,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -77,6 +81,7 @@ public class HookGSpec extends BaseGSpec {
 
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(HookGSpec.class);
 
+    JiraConnector jiraConnector = new JiraConnector();
 
     protected WebDriver driver;
 
@@ -472,10 +477,29 @@ public class HookGSpec extends BaseGSpec {
     }
 
     /**
-     * Disconnect any remaining open SSH connection after each scenario is completed
+     * Will check if the scenario contains any reference to a Jira ticket and will try to update
+     * its status based on the result of the scenario execution. It will also try to close any remaining
+     * SSH connection
+     * @param scenario  Scenario
      */
     @After(order = 10)
-    public void remoteSSHConnectionTeardown() {
+    public void teardown(Scenario scenario) {
+
+        if (scenario.isFailed()) {
+            Collection<String> tags = scenario.getSourceTagNames();
+            String ticket = this.jiraConnector.getFirstTicketReference(new ArrayList(tags));
+
+            if (ticket != null) {
+                try {
+                    commonspec.getLogger().debug("Updating ticket " + ticket + " in Jira...");
+                    this.jiraConnector.transitionEntity(ticket);
+                    this.jiraConnector.postCommentToEntity(ticket, "Scenario '" + scenario.getName() + "' failed at: " + scenario.getId());
+                } catch (Exception e) {
+                    commonspec.getLogger().warn("Could not change the status of entity " + ticket + " in jira: " + e.getMessage());
+                }
+            }
+        }
+
         if (commonspec.getRemoteSSHConnection() != null) {
             commonspec.getLogger().debug("Closing SSH remote connection");
             commonspec.getRemoteSSHConnection().getSession().disconnect();
@@ -494,4 +518,5 @@ public class HookGSpec extends BaseGSpec {
             commonspec.getSqlClient().disconnect();
         }
     }
+
 }
