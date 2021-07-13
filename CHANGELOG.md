@@ -1,5 +1,17 @@
 # Changelog
 
+## 2.2.3
+
+* Added a new tag, @jira(QMS-123), that will allow users to skip the execution of scenarios based on the status of the referenced entities in Jira. this tag could also change the status of the entity in Jira based on the result of the scenario execution
+
+* Minor fixes in README file
+
+* Minor fix in footer message shown during tests executions
+
+* Removed references to old variables placeholders (!{}, @{} and #{})
+
+* Updated javadoc documentation for some rest steps
+
 ## 2.2.2
 
 * Fixed problem that was causing the wrong body to be sent when using DocStrings in REST steps
