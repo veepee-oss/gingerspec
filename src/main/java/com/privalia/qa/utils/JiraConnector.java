@@ -29,8 +29,9 @@ public class JiraConnector {
      * Reads the given key from the properties file. The system will try to locate the key first in
      * the maven variables (System.getProperty) and if not found will look for it in the properties file.
      * If the value is still not found it will return the default value (if provided) or an exception
-     * @param property  key
-     * @return          value
+     * @param property      key
+     * @param defaultValue  defaultValue
+     * @return              value
      */
     public String getProperty(String property, String defaultValue) {
 

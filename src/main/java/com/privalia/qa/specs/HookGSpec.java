@@ -98,6 +98,7 @@ public class HookGSpec extends BaseGSpec {
 
     /**
      * Clean the exception list before each scenario.
+     * @param scenario  scenario reference
      */
     @Before(order = 0)
     public void globalSetup(Scenario scenario) {
@@ -116,7 +117,7 @@ public class HookGSpec extends BaseGSpec {
         if (ticket != null) {
             try {
                 if (!jiraConnector.entityShouldRun(ticket)) {
-                    String message = String.format("Scenario skipped!, it is in a non runnable status in Jira (check %s/browse/%s)", jiraConnector.getProperty("jira.server.url" ,null), ticket);
+                    String message = String.format("Scenario skipped!, it is in a non runnable status in Jira (check %s/browse/%s)", jiraConnector.getProperty("jira.server.url", null), ticket);
                     scenario.log(message);
                     throw new SkipException(message);
                 }
