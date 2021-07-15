@@ -5,10 +5,8 @@ import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
 import com.ning.http.client.Response;
-import com.privalia.qa.lookups.DefaultLookUp;
-import org.apache.commons.text.StringSubstitutor;
 import net.minidev.json.JSONArray;
-import org.apache.commons.text.lookup.StringLookupFactory;
+import org.apache.commons.text.StringSubstitutor;
 
 import java.util.List;
 import java.util.concurrent.Future;
@@ -34,7 +32,7 @@ public class JiraConnector {
      * @param property  key
      * @return          value
      */
-    private String getProperty(String property, String defaultValue) {
+    public String getProperty(String property, String defaultValue) {
 
         if (System.getProperty(property) != null) {
             return System.getProperty(property);
@@ -213,7 +211,7 @@ public class JiraConnector {
      * @return          The first ticket reference (i.e QMS-123)
      */
     public String getFirstTicketReference(List<String> tags) {
-        String pattern = "@jira\\((.*)\\)";
+        String pattern = "@jira[\\(\\[](.*)[\\)\\]]";
         Pattern r = Pattern.compile(pattern);
 
         for (String tag: tags) {
