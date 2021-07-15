@@ -46,6 +46,7 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.safari.SafariDriver;
 import org.openqa.selenium.safari.SafariOptions;
 import org.slf4j.LoggerFactory;
+import org.testng.SkipException;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -97,9 +98,10 @@ public class HookGSpec extends BaseGSpec {
 
     /**
      * Clean the exception list before each scenario.
+     * @param scenario  scenario reference
      */
     @Before(order = 0)
-    public void globalSetup() {
+    public void globalSetup(Scenario scenario) {
         /*Removes unnecessary logging messages that are produced by dependencies that make use of java.util.logging.Logger*/
         Logger rootLogger = LogManager.getLogManager().getLogger("");
         rootLogger.setLevel(Level.WARNING);
@@ -107,8 +109,26 @@ public class HookGSpec extends BaseGSpec {
         /*Clears the exceptions stacktrace for the new test*/
         commonspec.getExceptions().clear();
 
-    }
+        /*Get list of tags present in the Scenario*/
+        Collection<String> tags = scenario.getSourceTagNames();
+        String ticket = this.jiraConnector.getFirstTicketReference(new ArrayList(tags));
 
+        /*If theres a jira ticket in the scenario*/
+        if (ticket != null) {
+            try {
+                if (!jiraConnector.entityShouldRun(ticket)) {
+                    String message = String.format("Scenario skipped!, it is in a non runnable status in Jira (check %s/browse/%s)", jiraConnector.getProperty("jira.server.url", null), ticket);
+                    scenario.log(message);
+                    throw new SkipException(message);
+                }
+            } catch (SkipException se) {
+                throw se;
+            } catch (Exception e) {
+                LOGGER.error("Could not retrieve info of ticket " + ticket + " from jira: " + e.getMessage() + ". Proceeding with execution...");
+            }
+
+        }
+    }
 
     /**
      * If the feature has the @web annotation, creates a new selenium web driver

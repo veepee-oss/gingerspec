@@ -22,7 +22,6 @@
         <aspect name="com.privalia.qa.aspects.LoopIncludeTagAspect"/>
         <aspect name="com.privalia.qa.aspects.ReplacementAspect"/>
         <aspect name="com.privalia.qa.aspects.IgnoreTagAspect"/>
-        <aspect name="com.privalia.qa.aspects.JiraTagAspect"/>
     </aspects>
     <weaver
             options="-Xlint:ignore -Xset:weaveJavaPackages=true,weaveJavaxPackages=true">

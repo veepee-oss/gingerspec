@@ -1,5 +1,11 @@
 # Changelog
 
+### 2.2.4
+
+* Jira tags can now use brackets instead of parenthesis (i.e @jira[QMS-123]). This is because it can be problematic to run scenarios based on tags if the tags contains parenthesis (it is a reserved character for cucumber tags)
+
+* For Jira tags, the scenarios are now skipped at hook level using SkipException from TestNG. This is to improve the integration of GingerSpec with intellij IDEA (aspects are not picked up when running tests as cucumber java in Intellij IDEA)
+
 ## 2.2.3
 
 * Added a new tag, @jira(QMS-123), that will allow users to skip the execution of scenarios based on the status of the referenced entities in Jira. this tag could also change the status of the entity in Jira based on the result of the scenario execution

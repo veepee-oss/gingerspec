@@ -53,5 +53,17 @@ public class JiraTagTest {
     public void shouldReturnTheTicketFromTheTag() throws Exception {
         List<String> tags = Arrays.asList("@jira(QMS-990)", "@ignore", "@jira(QMS-123)");
         assertThat("QMS-990").isEqualToIgnoringCase(this.jc.getFirstTicketReference(tags));
+
+        tags = Arrays.asList("@jira[QMS-990]", "@ignore", "@jira(QMS-123)");
+        assertThat("QMS-990").isEqualToIgnoringCase(this.jc.getFirstTicketReference(tags));
+
+        tags = Arrays.asList("@jira[QMS-123]", "@ignore", "@jira(QMS-990)");
+        assertThat("QMS-123").isEqualToIgnoringCase(this.jc.getFirstTicketReference(tags));
+
+        tags = Arrays.asList("@ignore", "@jira(QMS-123)");
+        assertThat("QMS-123").isEqualToIgnoringCase(this.jc.getFirstTicketReference(tags));
+
+        tags = Arrays.asList("@ignore");
+        assertThat(this.jc.getFirstTicketReference(tags)).isNull();
     }
 }

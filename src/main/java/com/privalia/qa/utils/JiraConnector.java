@@ -5,10 +5,8 @@ import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
 import com.ning.http.client.Response;
-import com.privalia.qa.lookups.DefaultLookUp;
-import org.apache.commons.text.StringSubstitutor;
 import net.minidev.json.JSONArray;
-import org.apache.commons.text.lookup.StringLookupFactory;
+import org.apache.commons.text.StringSubstitutor;
 
 import java.util.List;
 import java.util.concurrent.Future;
@@ -31,10 +29,11 @@ public class JiraConnector {
      * Reads the given key from the properties file. The system will try to locate the key first in
      * the maven variables (System.getProperty) and if not found will look for it in the properties file.
      * If the value is still not found it will return the default value (if provided) or an exception
-     * @param property  key
-     * @return          value
+     * @param property      key
+     * @param defaultValue  defaultValue
+     * @return              value
      */
-    private String getProperty(String property, String defaultValue) {
+    public String getProperty(String property, String defaultValue) {
 
         if (System.getProperty(property) != null) {
             return System.getProperty(property);
@@ -213,7 +212,7 @@ public class JiraConnector {
      * @return          The first ticket reference (i.e QMS-123)
      */
     public String getFirstTicketReference(List<String> tags) {
-        String pattern = "@jira\\((.*)\\)";
+        String pattern = "@jira[\\(\\[](.*)[\\)\\]]";
         Pattern r = Pattern.compile(pattern);
 
         for (String tag: tags) {
