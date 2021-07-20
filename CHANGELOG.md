@@ -1,6 +1,6 @@
 # Changelog
 
-### 2.2.4
+## 2.2.4
 
 * Jira tags can now use brackets instead of parenthesis (i.e @jira[QMS-123]). This is because it can be problematic to run scenarios based on tags if the tags contains parenthesis (it is a reserved character for cucumber tags)
 
