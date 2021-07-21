@@ -553,7 +553,7 @@ public class HookGSpec extends BaseGSpec {
 
         for (String tag: tags) {
             if (tag.matches("(?i)@debug|@trace|@info|@warn|@error|@fatal")) {
-                Configurator.setLevel("com.privalia.qa.specs", org.apache.logging.log4j.Level.getLevel(tag.replace("@","").toUpperCase()));
+                Configurator.setLevel("com.privalia.qa.specs", org.apache.logging.log4j.Level.getLevel(tag.replace("@", "").toUpperCase()));
             }
         }
     }
