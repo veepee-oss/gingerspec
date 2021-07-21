@@ -151,7 +151,7 @@ public class JiraConnector {
             throw new Exception("Unexpected status code response:" + r.getStatusCode() + ". Body: '" + r.getResponseBody() + "'");
         }
 
-        Object transitionStrings = JsonPath.read(r.getResponseBody(), "$.transitions[?(@.name=='" + transitionName + "')].id");
+        Object transitionStrings = JsonPath.read(r.getResponseBody(), "$.transitions[?(@.name=~/" + transitionName + "/i)].id");
         JSONArray ja = (JSONArray) transitionStrings;
 
         if (ja.isEmpty()) {
