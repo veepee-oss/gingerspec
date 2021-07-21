@@ -46,10 +46,10 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.safari.SafariDriver;
 import org.openqa.selenium.safari.SafariOptions;
-import org.slf4j.ILoggerFactory;
 import org.slf4j.LoggerFactory;
 import org.testng.SkipException;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -57,7 +57,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -515,7 +514,10 @@ public class HookGSpec extends BaseGSpec {
                 try {
                     commonspec.getLogger().debug("Updating ticket " + ticket + " in Jira...");
                     this.jiraConnector.transitionEntity(ticket);
-                    this.jiraConnector.postCommentToEntity(ticket, "Scenario '" + scenario.getName() + "' failed at: " + scenario.getId());
+
+                    String fileLocation = new File(scenario.getUri()).getPath();
+                    this.jiraConnector.postCommentToEntity(ticket, "Scenario '" + scenario.getName() + "' failed at: " + fileLocation.substring(fileLocation.indexOf("/src") + 1).trim());
+
                 } catch (Exception e) {
                     commonspec.getLogger().warn("Could not change the status of entity " + ticket + " in jira: " + e.getMessage());
                 }
