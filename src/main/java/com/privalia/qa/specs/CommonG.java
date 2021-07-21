@@ -37,8 +37,8 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Wait;
 import org.reflections.Reflections;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -65,7 +65,7 @@ public class CommonG {
 
     private static final int DEFAULT_SLEEP_TIME = 1500;
 
-    private final Logger logger = LoggerFactory.getLogger((ThreadProperty.get("class") != null ? ThreadProperty.get("class") : this.getClass().getName()));
+    private final Logger logger = LogManager.getLogger((ThreadProperty.get("class") != null ? ThreadProperty.get("class") : this.getClass().getName()));
 
     private WebDriver driver = null;
 
