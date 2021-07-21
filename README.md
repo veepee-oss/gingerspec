@@ -77,7 +77,7 @@ This will create a ready-to-use project based on a template with best practices 
 
 ## Aspects  
   
-As part of GingerSpec implementation, there are a couple of AspectJ aspects which may be useful for your scenarios:  
+As part of GingerSpec implementation, there are a couple of tags which may be useful for your scenarios:  
   
 - [RunOnTagAspect](https://github.com/veepee-oss/gingerspec/wiki/Gherkin-tags#runonenv-tag):  Allow the conditional execution of scenarios based on a given environment variable
   
@@ -92,6 +92,8 @@ As part of GingerSpec implementation, there are a couple of AspectJ aspects whic
 - [ReplacementAspect](https://github.com/veepee-oss/gingerspec/wiki/Gherkin-variables): Allows the use of variables in the Feature file. Variables are enclosed in ${}.
   
 - [LogTagAspect](https://github.com/veepee-oss/gingerspec/wiki/Gherkin-tags#log-tag): Allows comments in the feature file to be printed in console when tests are executed.
+
+- [JiraTag](https://github.com/veepee-oss/gingerspec/wiki/Gherkin-tags#jira-tag): This tag allows for the conditional execution of scenarios based on the status of the linked entity in Jira. It is also capable of updating the status of the given entity in Jira depending on the result of the scenario
   
   
 ## Steps
