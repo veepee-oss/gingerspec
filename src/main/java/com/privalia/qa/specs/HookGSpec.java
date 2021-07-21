@@ -30,6 +30,7 @@ import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import io.restassured.http.ContentType;
+import org.apache.logging.log4j.core.config.Configurator;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -45,6 +46,7 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.safari.SafariDriver;
 import org.openqa.selenium.safari.SafariOptions;
+import org.slf4j.ILoggerFactory;
 import org.slf4j.LoggerFactory;
 import org.testng.SkipException;
 
@@ -537,6 +539,31 @@ public class HookGSpec extends BaseGSpec {
             commonspec.getLogger().debug("Closing SQL remote connection");
             commonspec.getSqlClient().disconnect();
         }
+    }
+
+    /**
+     * Changes the logging level of the log4j logger used in the specs package to the given value
+     * @param scenario  Scenario
+     */
+    @Before(value = "@debug or @trace or @info or @warn or @error or @fatal")
+    public void activateLogLevel(Scenario scenario) {
+
+        /*Get list of tags present in the Scenario*/
+        Collection<String> tags = scenario.getSourceTagNames();
+
+        for (String tag: tags) {
+            if (tag.matches("(?i)@debug|@trace|@info|@warn|@error|@fatal")) {
+                Configurator.setLevel("com.privalia.qa.specs", org.apache.logging.log4j.Level.getLevel(tag.replace("@","").toUpperCase()));
+            }
+        }
+    }
+
+    /**
+     * Returns logging level back to default value (WARN)
+     */
+    @After(value = "@debug or @trace or @info or @warn or @error or @fatal")
+    public void deactivateLogLevel() {
+        Configurator.setLevel("com.privalia.qa.specs", org.apache.logging.log4j.Level.getLevel(System.getProperty("logLevel", "WARN")));
     }
 
 }
