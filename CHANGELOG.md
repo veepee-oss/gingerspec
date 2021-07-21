@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.2.5
+
+* Small update in JiraConnector. Search of the correct transition id by name is now case insensitive.
+
+* Comment posted to jira now only contains path from content root and not full path.
+
+* Added a hook to change logging level at runtime (@debug, @trace, @info, etc). This is for debugging within Intellij IDEA.
+
+* Added information in README file about the Jira tag hook.
+
 ## 2.2.4
 
 * Jira tags can now use brackets instead of parenthesis (i.e @jira[QMS-123]). This is because it can be problematic to run scenarios based on tags if the tags contains parenthesis (it is a reserved character for cucumber tags)
