@@ -11,13 +11,13 @@
     <url>https://github.com/PrivaliaTech/gingerspec</url>
     <inceptionYear>2014</inceptionYear>
     <organization>
-        <name>Privalia</name>
-        <url>https://es.privalia.com/</url>
+        <name>Veepee</name>
+        <url>https://www.veepee.com/</url>
     </organization>
     <licenses>
         <license>
-            <name>The Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <name>ISC License</name>
+            <url>https://www.isc.org/licenses/</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
@@ -193,24 +193,6 @@
             <artifactId>jsoup</artifactId>
             <version>${jsoup.version}</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>org.apache.logging.log4j</groupId>-->
-<!--            <artifactId>log4j-slf4j-impl</artifactId>-->
-<!--            <version>2.14</version>-->
-<!--            <scope>test</scope>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>org.apache.logging.log4j</groupId>-->
-<!--            <artifactId>log4j-core</artifactId>-->
-<!--            <version>2.14</version>-->
-<!--            <scope>test</scope>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>org.apache.logging.log4j</groupId>-->
-<!--            <artifactId>log4j-api</artifactId>-->
-<!--            <version>2.14</version>-->
-<!--            <scope>test</scope>-->
-<!--        </dependency>-->
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-api</artifactId>
@@ -524,7 +506,7 @@
                         <scss>JAVADOC_STYLE</scss>
                     </mapping>
                     <useDefaultExcludes>true</useDefaultExcludes>
-                    <header>com/mycila/maven/plugin/license/templates/APACHE-2.txt</header>
+                    <header>LICENSE</header>
                     <properties>
                         <owner>${project.organization.name}</owner>
                         <email>${project.organization.url}</email>
@@ -535,13 +517,15 @@
                     </includes>
                     <excludes>
                         <exclude>**/.*/**</exclude>
-                        <exclude>**/_themes/privalia/**</exclude>
                         <exclude>**/*.rst</exclude>
                         <exclude>**/*.feature</exclude>
                         <exclude>**/README*</exclude>
                         <exclude>**/node*/**</exclude>
                         <exclude>**/*.conf</exclude>
                         <exclude>**/*.sh</exclude>
+                        <exclude>**/helpMessage.txt</exclude>
+                        <exclude>**/banner.txt</exclude>
+                        <exclude>**/*.sql</exclude>
                     </excludes>
                 </configuration>
             </plugin>
