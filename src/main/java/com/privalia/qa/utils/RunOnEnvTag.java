@@ -14,16 +14,9 @@
  * THIS SOFTWARE.
 */
 
-package com.privalia.qa.aspects;
+package com.privalia.qa.utils;
 
-import io.cucumber.testng.FeatureWrapper;
-import io.cucumber.testng.PickleWrapper;
-import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Pointcut;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -38,34 +31,7 @@ import java.util.List;
  * @author Jose Fernandez
  */
 @Aspect
-public class RunOnTagAspect {
-
-    private final Logger logger = LoggerFactory.getLogger(this.getClass().getCanonicalName());
-
-    /**
-     * Pointcut is executed for {@link io.cucumber.testng.AbstractTestNGCucumberTests#runScenario(PickleWrapper, FeatureWrapper)}
-     * @param pickleWrapper     the pickleWrapper
-     * @param featureWrapper    the featureWrapper
-     */
-    @Pointcut("execution (void *.runScenario(..)) && args(pickleWrapper, featureWrapper)")
-    protected void addIgnoreTagPointcutScenario(PickleWrapper pickleWrapper, FeatureWrapper featureWrapper) {
-    }
-
-
-    @Around(value = "addIgnoreTagPointcutScenario(pickleWrapper, featureWrapper)")
-    public void aroundAddIgnoreTagPointcut(ProceedingJoinPoint pjp, PickleWrapper pickleWrapper, FeatureWrapper featureWrapper) throws Throwable {
-
-        List<String> tags = pickleWrapper.getPickle().getTags();
-        String scenarioName = pickleWrapper.getPickle().getName();
-        Boolean exit = tagsIteration(tags);
-
-        if (exit) {
-            logger.warn("Scenario '" + scenarioName + "' ignored by execution tag.");
-            return;
-        }
-
-        pjp.proceed();
-    }
+public class RunOnEnvTag {
 
     public boolean tagsIteration(List<String> tags) throws Exception {
         for (String tag : tags) {

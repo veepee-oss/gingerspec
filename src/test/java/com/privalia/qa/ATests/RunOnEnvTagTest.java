@@ -14,18 +14,19 @@
  * THIS SOFTWARE.
 */
 
-package com.privalia.qa.aspects;
+package com.privalia.qa.ATests;
 
 
+import com.privalia.qa.utils.RunOnEnvTag;
 import org.testng.annotations.Test;
 import java.util.ArrayList;
 import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 
-public class RunOnEnvTagAspectTest {
+public class RunOnEnvTagTest {
 
-    public RunOnTagAspect runontag = new RunOnTagAspect();
+    public RunOnEnvTag runontag = new RunOnEnvTag();
 
     @Test
     public void testGetParams() throws Exception {
