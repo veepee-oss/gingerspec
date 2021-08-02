@@ -62,6 +62,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static io.restassured.RestAssured.given;
 
@@ -566,6 +568,42 @@ public class HookGSpec extends BaseGSpec {
     @After(value = "@debug or @trace or @info or @warn or @error or @fatal")
     public void deactivateLogLevel() {
         Configurator.setLevel("com.privalia.qa.specs", org.apache.logging.log4j.Level.getLevel(System.getProperty("logLevel", "WARN")));
+    }
+
+    /**
+     * Skips an scenario/feature if it contains the @ignore tag
+     * @param scenario  Scenario
+     */
+    @Before(value = "@ignore or @IGNORE or @Ignore")
+    public void ignoreTag(Scenario scenario) {
+
+        Collection<String> tagList = scenario.getSourceTagNames();
+        String scenarioName = scenario.getName();
+
+        for (String tag : tagList) {
+            Pattern pattern = Pattern.compile("@tillfixed\\((.*?)\\)");
+            Matcher matcher = pattern.matcher(tag);
+            if (matcher.find()) {
+                String ticket = matcher.group(1);
+                scenario.log("Scenario '" + scenarioName + "' ignored because of ticket: " + ticket);
+                throw new SkipException("Scenario '" + scenarioName + "' ignored because of ticket: " + ticket);
+            }
+        }
+        if (tagList.contains("@unimplemented")) {
+            scenario.log("Scenario '" + scenarioName + "' ignored because it is not yet implemented.");
+            throw new SkipException("Scenario '" + scenarioName + "' ignored because it is not yet implemented.");
+        }
+        if (tagList.contains("@manual")) {
+            scenario.log("Scenario '" + scenarioName + "' ignored because it is marked as manual test.");
+            throw new SkipException("Scenario '" + scenarioName + "' ignored because it is marked as manual test.");
+        }
+        if (tagList.contains("@toocomplex")) {
+            scenario.log("Scenario '" + scenarioName + "' ignored because the test is too complex.");
+            throw new SkipException("Scenario '" + scenarioName + "' ignored because the test is too complex.");
+        }
+
+        scenario.log("Scenario '" + scenarioName + "' ignored, no reason specified.");
+        throw new SkipException("Scenario '" + scenarioName + "' ignored, no reason specified.");
     }
 
 }
