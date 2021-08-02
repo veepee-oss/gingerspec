@@ -147,7 +147,11 @@ public class HookGSpec extends BaseGSpec {
      * @throws MalformedURLException MalformedURLException
      */
     @Before(order = 10, value = "@web")
-    public void seleniumSetup() throws Exception {
+    public void seleniumSetup(Scenario scenario) throws Exception {
+
+        if (scenario.getStatus().name().toLowerCase().matches("skipped")) {
+            throw new SkipException("@web tag ignored since scenario was skipped");
+        }
 
         MutableCapabilities mutableCapabilities = null;
         ObjectMapper mapper = new ObjectMapper();
@@ -328,7 +332,11 @@ public class HookGSpec extends BaseGSpec {
      * @throws MalformedURLException MalformedURLException
      */
     @Before(order = 20, value = "@mobile")
-    public void AppiumSetup() throws IOException {
+    public void AppiumSetup(Scenario scenario) throws IOException {
+
+        if (scenario.getStatus().name().toLowerCase().matches("skipped")) {
+            throw new SkipException("@mobile tag ignored since scenario was skipped");
+        }
 
         ObjectMapper mapper = new ObjectMapper();
         MutableCapabilities capabilities = new DesiredCapabilities();
@@ -442,6 +450,11 @@ public class HookGSpec extends BaseGSpec {
      */
     @After(order = 20, value = "@web or @mobile")
     public void seleniumTeardown(Scenario scenario) throws IOException {
+
+        if (scenario.getStatus().name().toLowerCase().matches("skipped")) {
+            throw new SkipException("@web/@mobile tag ignored since scenario was skipped");
+        }
+
         if (commonspec.getDriver() != null) {
             try {
                 if (scenario.isFailed()) {
@@ -479,7 +492,16 @@ public class HookGSpec extends BaseGSpec {
      * If the feature has the @rest annotation, creates a new REST client before each scenario
      */
     @Before(order = 10, value = "@rest")
-    public void restClientSetup() {
+    public void restClientSetup(Scenario scenario) {
+
+        if (scenario.getStatus().name().toLowerCase().matches("skipped")) {
+            throw new SkipException("@rest tag ignored since scenario was skipped");
+        }
+
+        if (scenario.getStatus().toString().matches("skipped")) {
+            return;
+        }
+
         commonspec.getLogger().debug("Starting a REST client");
 
         commonspec.setClient(new AsyncHttpClient(new AsyncHttpClientConfig.Builder().setAcceptAnyCertificate(true).setAllowPoolingConnections(false)
@@ -493,7 +515,12 @@ public class HookGSpec extends BaseGSpec {
      * If the feature has the @rest annotation, closes the REST client after each scenario is completed
      */
     @After(order = 10, value = "@rest")
-    public void restClientTeardown() {
+    public void restClientTeardown(Scenario scenario) {
+
+        if (scenario.getStatus().name().toLowerCase().matches("skipped")) {
+            throw new SkipException("@web tag ignored since scenario was skipped");
+        }
+
         commonspec.getLogger().debug("Shutting down REST client");
         commonspec.getClient().close();
 
@@ -574,7 +601,7 @@ public class HookGSpec extends BaseGSpec {
      * Skips an scenario/feature if it contains the @ignore tag
      * @param scenario  Scenario
      */
-    @Before(value = "@ignore or @IGNORE or @Ignore")
+    @Before(value = "@ignore or @IGNORE or @Ignore", order = 5)
     public void ignoreTag(Scenario scenario) {
 
         Collection<String> tagList = scenario.getSourceTagNames();
