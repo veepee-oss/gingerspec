@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
 import com.privalia.qa.utils.JiraConnector;
+import com.privalia.qa.utils.RunOnEnvTag;
 import com.privalia.qa.utils.ThreadProperty;
 import io.appium.java_client.MobileDriver;
 import io.appium.java_client.android.AndroidDriver;
@@ -87,6 +88,8 @@ public class HookGSpec extends BaseGSpec {
 
     JiraConnector jiraConnector = new JiraConnector();
 
+    RunOnEnvTag runontag = new RunOnEnvTag();
+
     protected WebDriver driver;
 
     /**
@@ -144,6 +147,7 @@ public class HookGSpec extends BaseGSpec {
      * VM argument -DCAPABILITIES=/path/to/capabilities.json, to override the default capabilities
      * with the ones from the json file
      *
+     * @param scenario  Scenario
      * @throws MalformedURLException MalformedURLException
      */
     @Before(order = 10, value = "@web")
@@ -329,6 +333,7 @@ public class HookGSpec extends BaseGSpec {
      * The user can use the VM argument -DCAPABILITIES=/path/to/capabilities.json, to
      * override the default capabilities with the ones from the json file
      *
+     * @param scenario  Scenario
      * @throws MalformedURLException MalformedURLException
      */
     @Before(order = 20, value = "@mobile")
@@ -490,6 +495,8 @@ public class HookGSpec extends BaseGSpec {
 
     /**
      * If the feature has the @rest annotation, creates a new REST client before each scenario
+     *
+     * @param scenario  Scenario
      */
     @Before(order = 10, value = "@rest")
     public void restClientSetup(Scenario scenario) {
@@ -631,6 +638,27 @@ public class HookGSpec extends BaseGSpec {
 
         scenario.log("Scenario '" + scenarioName + "' ignored, no reason specified.");
         throw new SkipException("Scenario '" + scenarioName + "' ignored, no reason specified.");
+    }
+
+    /**
+     * Allows conditional scenario execution using @skipOnEnv and @runOnEnv tags
+     * <pre>
+     * {@code
+     *      \@runOnEnv(param1,param2,param3,..): The scenario will only be executed if ALL the params are defined.
+     *      \@skipOnEnv(param1,param2,param3,..) The scenario will be omitted if ANY of params are defined.
+     * }</pre>
+     * @param scenario  Scenario
+     */
+    @Before(order = 6)
+    public void runOnEnvTag(Scenario scenario) throws Exception {
+
+        Collection<String> tags = scenario.getSourceTagNames();
+        Boolean exit = this.runontag.tagsIteration(new ArrayList<>(tags));
+
+        if (exit) {
+            scenario.log("Scenario '" + scenario.getName() + "' ignored by execution tag.");
+            throw new SkipException("Scenario '" + scenario.getName() + "' ignored by execution tag.");
+        }
     }
 
 }

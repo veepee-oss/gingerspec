@@ -18,7 +18,6 @@
 -->
 <aspectj>
     <aspects>
-        <aspect name="com.privalia.qa.aspects.RunOnTagAspect"/>
         <aspect name="com.privalia.qa.aspects.LoopIncludeTagAspect"/>
         <aspect name="com.privalia.qa.aspects.ReplacementAspect"/>
     </aspects>
