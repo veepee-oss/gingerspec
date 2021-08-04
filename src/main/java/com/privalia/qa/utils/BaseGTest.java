@@ -19,7 +19,6 @@ package com.privalia.qa.utils;
 import com.privalia.qa.cucumber.testng.CucumberOptionsImpl;
 import io.cucumber.testng.AbstractTestNGCucumberTests;
 import io.cucumber.testng.CucumberOptions;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.ITestContext;

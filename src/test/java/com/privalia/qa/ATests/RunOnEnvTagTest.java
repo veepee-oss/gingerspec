@@ -19,8 +19,10 @@ package com.privalia.qa.ATests;
 
 import com.privalia.qa.utils.RunOnEnvTag;
 import org.testng.annotations.Test;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 

@@ -30,7 +30,6 @@ import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Realm;
 import com.ning.http.client.Response;
 import com.ning.http.client.cookie.Cookie;
-
 import com.privalia.qa.aspects.ReplacementAspect;
 import com.privalia.qa.conditions.Conditions;
 import com.privalia.qa.utils.*;
@@ -39,6 +38,8 @@ import io.cucumber.datatable.DataTable;
 import io.restassured.specification.RequestSpecification;
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.io.FileUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.aspectj.lang.JoinPoint;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.Condition;
@@ -53,8 +54,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Wait;
 import org.reflections.Reflections;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;

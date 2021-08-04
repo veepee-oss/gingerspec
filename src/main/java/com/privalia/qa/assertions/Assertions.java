@@ -17,7 +17,6 @@
 package com.privalia.qa.assertions;
 
 import com.mongodb.DBObject;
-
 import io.cucumber.datatable.DataTable;
 
 import java.util.ArrayList;

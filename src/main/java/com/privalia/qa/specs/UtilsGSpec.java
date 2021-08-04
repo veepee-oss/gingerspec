@@ -18,10 +18,10 @@ package com.privalia.qa.specs;
 
 import com.csvreader.CsvReader;
 import com.privalia.qa.utils.ThreadProperty;
+import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import io.cucumber.datatable.DataTable;
 import org.assertj.core.api.Assertions;
 import org.hjson.JsonArray;
 import org.hjson.JsonValue;

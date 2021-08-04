@@ -19,7 +19,6 @@ package com.privalia.qa.utils;
 import com.mongodb.*;
 import com.mongodb.util.JSON;
 import com.privalia.qa.exceptions.DBException;
-
 import io.cucumber.datatable.DataTable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

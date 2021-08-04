@@ -25,7 +25,6 @@ import io.cucumber.messages.Messages.GherkinDocument.Feature.FeatureChild.RuleCh
 import io.cucumber.messages.Messages.GherkinDocument.Feature.Scenario.Examples;
 import io.cucumber.messages.internal.com.google.protobuf.GeneratedMessageV3;
 import io.cucumber.messages.internal.com.google.protobuf.Message;
-import io.cucumber.plugin.event.TestCase;
 import io.cucumber.plugin.event.TestSourceRead;
 
 import java.io.File;

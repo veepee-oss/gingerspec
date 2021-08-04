@@ -20,7 +20,6 @@ import com.privalia.qa.aspects.ReplacementAspect;
 import com.privalia.qa.utils.ThreadProperty;
 import io.cucumber.core.exception.CucumberException;
 import io.cucumber.core.stepexpression.ExpressionArgument;
-import io.cucumber.docstring.DocString;
 import io.cucumber.messages.Messages;
 import io.cucumber.plugin.ColorAware;
 import io.cucumber.plugin.ConcurrentEventListener;

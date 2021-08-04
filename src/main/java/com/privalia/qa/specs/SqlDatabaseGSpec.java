@@ -17,10 +17,10 @@
 package com.privalia.qa.specs;
 
 import com.privalia.qa.utils.ThreadProperty;
+import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import io.cucumber.datatable.DataTable;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
