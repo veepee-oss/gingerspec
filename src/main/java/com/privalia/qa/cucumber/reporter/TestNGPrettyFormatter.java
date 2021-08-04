@@ -237,7 +237,7 @@ public class TestNGPrettyFormatter implements ConcurrentEventListener, ColorAwar
 
             StringBuilder formattedComment;
             try {
-                if (comment.substring(0, 4).toLowerCase().matches("#log")) {
+                if (comment.toUpperCase().startsWith("#LOG")) {
                     formattedComment = new StringBuilder(formats.get("output").text(getReplacedValue(comment)));
                     out.println(STEP_INDENT + formattedComment);
                 }
