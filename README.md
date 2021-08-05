@@ -94,6 +94,8 @@ As part of GingerSpec implementation, there are a couple of tags which may be us
 - [JiraTag](https://github.com/veepee-oss/gingerspec/wiki/Gherkin-tags#jira-tag): This tag allows for the conditional execution of scenarios based on the status of the linked entity in Jira. It is also capable of updating the status of the given entity in Jira depending on the result of the scenario
 
 - [DebugTag](https://github.com/veepee-oss/gingerspec/wiki/Hook-tags#debug-tag): This tag allows changing the default logging level for scenarios at runtime.
+
+- [ifStatementAspect](https://github.com/veepee-oss/gingerspec/wiki/Hook-tags#if-statement): This allows the conditional execution of steps during runtime.
   
 ## Steps
 

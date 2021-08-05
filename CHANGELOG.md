@@ -1,5 +1,25 @@
 # Changelog
 
+## 2.2.6
+
+* License changed from Apache 2 to ISC and header information updated in all relevant files
+
+* @ignore tag functionality is now executed in a hook and not an aspect since this was causing the aspectj pointcut not to be triggered when running the test in Intellij IDE as a cucumber java test
+
+* @runOnEnv and @skipOnEnv tag are now executed on a hook and not via aspects since aspectj pointcuts were not triggered when running the tests in Intellij IDEA as cucumber java tests
+
+* Added a new aspect (ifStatementAspect) that allows the conditional execution of steps during runtime
+
+* Optimized imports in all classes in the project
+
+* Fixed a bug in which comments were not correctly processed by the TestNGPrettyFormatter
+
+* Set a variable in a before hook to remove the warning coming from nashborn engine
+
+* Removed unnecessary docs folder from root
+
+* Small fix in logger name for CommonG class that was causing the @debug tag not to work correctly in all cases
+
 ## 2.2.5
 
 * Small update in JiraConnector. Search of the correct transition id by name is now case insensitive.
