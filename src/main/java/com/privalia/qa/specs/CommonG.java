@@ -80,7 +80,7 @@ public class CommonG {
 
     private static final int DEFAULT_SLEEP_TIME = 1500;
 
-    private final Logger logger = LogManager.getLogger((ThreadProperty.get("class") != null ? ThreadProperty.get("class") : this.getClass().getName()));
+    private final Logger logger = LogManager.getLogger("com.privalia.qa.specs.CommonG");
 
     private WebDriver driver = null;
 
