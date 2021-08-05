@@ -12,26 +12,15 @@
  * OF USE, DATA  OR PROFITS, WHETHER IN AN ACTION OF  CONTRACT, NEGLIGENCE OR OTHER
  * TORTIOUS ACTION, ARISING OUT OF OR  IN CONNECTION WITH THE USE OR PERFORMANCE OF
  * THIS SOFTWARE.
-*/
+ */
 
-package com.privalia.qa.assertions;
+package com.privalia.qa.ATests;
 
-import com.mongodb.DBObject;
-import io.cucumber.datatable.DataTable;
+import com.privalia.qa.utils.BaseGTest;
+import io.cucumber.testng.CucumberOptions;
 
-import java.util.ArrayList;
-
-
-public class Assertions extends org.assertj.core.api.Assertions {
-    /**
-     * Check if two WebElements are equals.
-     *
-     * @param data      Current data
-     * @param actual    Actual webElement
-     * @return          SeleniumAssert assertion
-     */
-    public static DBObjectsAssert assertThat(DataTable data, ArrayList<DBObject> actual) {
-        return new DBObjectsAssert(actual);
-    }
-
+@CucumberOptions(
+        features = {"src/test/resources/features/ifStatement.feature"},
+        glue = "com.privalia.qa.specs")
+public class IfStatementIT extends BaseGTest {
 }

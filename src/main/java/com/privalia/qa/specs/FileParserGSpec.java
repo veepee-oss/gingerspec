@@ -18,10 +18,10 @@ package com.privalia.qa.specs;
 
 import com.sonalake.utah.config.Config;
 import com.sonalake.utah.config.ConfigLoader;
+import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
-import io.cucumber.datatable.DataTable;
 
 import javax.xml.bind.JAXBException;
 import java.io.*;

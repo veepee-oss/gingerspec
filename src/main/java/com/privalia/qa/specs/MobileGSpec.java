@@ -16,8 +16,8 @@
 
 package com.privalia.qa.specs;
 
-import io.cucumber.java.en.Given;
 import io.appium.java_client.MobileDriver;
+import io.cucumber.java.en.Given;
 import org.openqa.selenium.ScreenOrientation;
 
 import static org.testng.Assert.fail;

@@ -16,7 +16,6 @@
 
 package com.privalia.qa.utils;
 
-import com.privalia.qa.utils.ThreadProperty;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;

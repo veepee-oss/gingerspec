@@ -19,8 +19,7 @@ package com.privalia.qa.cucumber.testng;
 import io.cucumber.core.backend.ObjectFactory;
 import io.cucumber.testng.CucumberOptions;
 
-
-import java.lang.annotation.*;
+import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 

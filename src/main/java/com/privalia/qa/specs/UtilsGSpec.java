@@ -18,10 +18,10 @@ package com.privalia.qa.specs;
 
 import com.csvreader.CsvReader;
 import com.privalia.qa.utils.ThreadProperty;
+import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import io.cucumber.datatable.DataTable;
 import org.assertj.core.api.Assertions;
 import org.hjson.JsonArray;
 import org.hjson.JsonValue;
@@ -542,4 +542,48 @@ public class UtilsGSpec extends BaseGSpec {
         }
         ThreadProperty.set(varName, out);
     }
+
+    /**
+     * Creates a conditional block of execution
+     * <p>
+     * This allows the conditional execution of steps during runtime. All steps enclosed
+     * between this step and {@link #ifStamenetEndBlock()} will be executed only if the given
+     * statement returns true, otherwise, the steps will be skipped.
+     * The statement can be any javascript expression that can return a true|false output. You can even
+     * use variables created during the scenario execution.
+     * <p>
+     * <b>Warning: use this functionality sparingly, or only in very concrete automation cases. We discourage
+     * the creation of tests that could return different results on different runs. Also, this functionality
+     * has not been tested on multi-threaded mode, so it may break when running tests in parallel</b>
+     * <br>
+     * <pre>
+     * {@code
+     * Examples
+     *
+     * Scenario: Using if block to control execution
+     *     * I save 'GingerSpec' in variable 'NAME'
+     *     * if ('${NAME}'.contains('Ginger')) {
+     *     * I run 'echo "This should be executed"' locally
+     *     * }
+     *     * if ('${NAME}'.contains('foo')) {
+     *     * I run 'echo "This should NOT be executed"' locally
+     *     * I run 'exit 1' locally
+     *     * }
+     * }
+     * </pre>
+     * @see #ifStamenetEndBlock()
+     * @param statement Any javascript expression that could be resolved to true or false
+     */
+    @Given("^if \\((.*)\\) \\{$")
+    public void ifStamenetBeginBlock(String statement) { }
+
+    /**
+     * If statement end block
+     * <p>
+     * Indicates the end of the if block
+     *
+     * @see #ifStamenetBeginBlock(String)
+     */
+    @Given("^\\}$")
+    public void ifStamenetEndBlock() { }
 }

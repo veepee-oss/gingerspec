@@ -115,6 +115,9 @@ public class HookGSpec extends BaseGSpec {
         /*Clears the exceptions stacktrace for the new test*/
         commonspec.getExceptions().clear();
 
+        /*Removes warnings for the Nashorn Engine*/
+        System.setProperty("nashorn.args", "--no-deprecation-warning");
+
         /*Get list of tags present in the Scenario*/
         Collection<String> tags = scenario.getSourceTagNames();
         String ticket = this.jiraConnector.getFirstTicketReference(new ArrayList(tags));
@@ -520,6 +523,7 @@ public class HookGSpec extends BaseGSpec {
 
     /**
      * If the feature has the @rest annotation, closes the REST client after each scenario is completed
+     * @param scenario  Scenario
      */
     @After(order = 10, value = "@rest")
     public void restClientTeardown(Scenario scenario) {
@@ -648,6 +652,7 @@ public class HookGSpec extends BaseGSpec {
      *      \@skipOnEnv(param1,param2,param3,..) The scenario will be omitted if ANY of params are defined.
      * }</pre>
      * @param scenario  Scenario
+     * @throws Exception Exception
      */
     @Before(order = 6)
     public void runOnEnvTag(Scenario scenario) throws Exception {

@@ -17,12 +17,8 @@
 package com.privalia.qa.aspects;
 
 import com.privalia.qa.exceptions.IncludeException;
-//import cucumber.runtime.io.Resource;
 import com.privalia.qa.exceptions.NonReplaceableException;
-import io.cucumber.core.feature.FeatureParser;
 import io.cucumber.core.resource.Resource;
-import io.cucumber.testng.FeatureWrapper;
-import io.cucumber.testng.PickleWrapper;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
