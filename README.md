@@ -33,8 +33,6 @@ GingerSpec provides common functionality that can be reused by different test pr
 ### Requirements
 * Java 8+
 * Maven 3+
-* Docker/docker-compose (for testing)
-
 
 ### Technologies
 * Cucumber for test definition   
@@ -94,7 +92,8 @@ As part of GingerSpec implementation, there are a couple of tags which may be us
 - [LogTagAspect](https://github.com/veepee-oss/gingerspec/wiki/Gherkin-tags#log-tag): Allows comments in the feature file to be printed in console when tests are executed.
 
 - [JiraTag](https://github.com/veepee-oss/gingerspec/wiki/Gherkin-tags#jira-tag): This tag allows for the conditional execution of scenarios based on the status of the linked entity in Jira. It is also capable of updating the status of the given entity in Jira depending on the result of the scenario
-  
+
+- [DebugTag](https://github.com/veepee-oss/gingerspec/wiki/Hook-tags#debug-tag): This tag allows changing the default logging level for scenarios at runtime.
   
 ## Steps
 
