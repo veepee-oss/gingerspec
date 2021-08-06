@@ -149,7 +149,7 @@ public class ifStatementAspect {
             statement = m.group(1);
         }
 
-        String result = interpolator.replace("${javascript:" + statement + "}");
+        String result = interpolator.replace("${script:javascript:" + statement + "}");
         return Boolean.parseBoolean(result.toLowerCase());
     }
 }

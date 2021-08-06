@@ -1,8 +1,8 @@
+@ignore
 Feature: Conditional execution
 
-  This allows the conditional execution of steps during runtime. All steps enclosed
-  between this step and if (statement) { } will be executed only if the given
-  statement returns true, otherwise, the steps will be skipped.
+  This allows the conditional execution of steps during runtime. All steps enclosed between if (statement) { and }
+  will be executed only if the given statement returns true, otherwise, the steps will be skipped.
   The statement can be any javascript expression that can return a true|false output. You can even
   use variables created during the scenario execution.
 
