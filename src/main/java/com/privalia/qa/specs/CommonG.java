@@ -754,31 +754,17 @@ public class CommonG {
             dir = dir + testSuffix + "/";
         }
 
-        String clazz = ThreadProperty.get("class");
-        String currentBrowser = ThreadProperty.get("browser");
-        String currentData = ThreadProperty.get("dataSet");
+        String feature = ThreadProperty.get("feature", "unknown_feature");
+        String currentBrowser = ThreadProperty.get("browser", "default");
+        String scenario = ThreadProperty.get("scenario", "unknown_scenario");
 
-        /* When running a cucumber test using Intellij IDEA
-        * this parameter can be null*/
-        if (currentBrowser == null) {
-            currentBrowser = "defaul";
-        }
-
-        if (!currentData.equals("")) {
-            currentData = currentData
+        if (!scenario.equals("")) {
+            scenario = scenario
                     .replaceAll("[\\\\|\\/|\\|\\s|:|\\*]", "_");
         }
 
-        if (!"".equals(currentData)) {
-            currentData = "-" + HashUtils.doHash(currentData);
-        }
-
         Timestamp ts = new Timestamp(new Date().getTime());
-        String outputFile = dir + clazz + "/"
-                + ThreadProperty.get("feature") + "." + ThreadProperty.get("scenario") + "/" + currentBrowser +
-                currentData + ts.toString() + suffix;
-
-        outputFile = outputFile.replaceAll(" ", "_");
+        String outputFile = dir + feature + "/" + scenario + "/" + currentBrowser + "-" + ts + suffix;
 
         if (type.endsWith("htmlSource")) {
             if (type.equals("framehtmlSource")) {
@@ -845,9 +831,9 @@ public class CommonG {
 
         } else if ("mobileScreenCapture".equals(type)) {
 
-            outputFile = dir + clazz + "/"
+            outputFile = dir + feature + "/"
                     + ThreadProperty.get("feature") + "." + ThreadProperty.get("scenario") + "/"  +
-                    currentData + ts.toString() + suffix;
+                    scenario + ts.toString() + suffix;
 
             outputFile = outputFile.replaceAll(" ", "_") + ".png";
 
@@ -860,9 +846,9 @@ public class CommonG {
 
         } else if ("mobilePageSource".equals(type)) {
 
-            outputFile = dir + clazz + "/"
+            outputFile = dir + feature + "/"
                     + ThreadProperty.get("feature") + "." + ThreadProperty.get("scenario") + "/"  +
-                    currentData + ts.toString() + suffix;
+                    scenario + ts.toString() + suffix;
 
             outputFile = outputFile.replaceAll(" ", "_") + ".xml";
 

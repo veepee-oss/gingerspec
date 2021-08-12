@@ -53,4 +53,15 @@ public final class ThreadProperty {
         return PROPS.get().getProperty(key);
     }
 
+    /**
+     * Get a property shared. If not found it returns the default value.
+     *
+     * @param key           the key
+     * @param defaultValue  The default value
+     * @return String       string
+     */
+    public static String get(String key, String defaultValue) {
+        return PROPS.get().getProperty(key, defaultValue);
+    }
+
 }
