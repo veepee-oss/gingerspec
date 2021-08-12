@@ -137,18 +137,6 @@ public class TestNGPrettyFormatter implements ConcurrentEventListener, ColorAwar
         preCalculateLocationIndent(event);
         printTags(event);
         printScenarioDefinition(event);
-
-        /*dataSet is used to correctly create the folder name under target/executions when screenshot is taken*/
-        /*Why here you may wonder?.... why not?*/
-        try {
-            String feature = testSources.getFeature(event.getTestCase().getUri()).getName();
-            String scenario = event.getTestCase().getName();
-            ThreadProperty.set("dataSet", feature + "." + scenario);
-            ThreadProperty.set("feature", feature);
-            ThreadProperty.set("scenario", scenario);
-        } catch (Exception e) {
-            ThreadProperty.set("dataSet", "");
-        }
     }
 
     private void handleTestStepFinished(TestStepFinished event) {

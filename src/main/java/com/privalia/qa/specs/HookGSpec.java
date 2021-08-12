@@ -31,6 +31,8 @@ import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import io.restassured.http.ContentType;
+import org.apache.commons.compress.compressors.FileNameUtil;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.core.config.Configurator;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -118,6 +120,10 @@ public class HookGSpec extends BaseGSpec {
         /*Removes warnings for the Nashorn Engine*/
         System.setProperty("nashorn.args", "--no-deprecation-warning");
 
+        /* Sets feature and scenario variables (these are used to create the appropriate folders/filename when takin an screenshot)*/
+        ThreadProperty.set("feature", FilenameUtils.getName(scenario.getUri().getPath()));
+        ThreadProperty.set("scenario", scenario.getName());
+
         /*Get list of tags present in the Scenario*/
         Collection<String> tags = scenario.getSourceTagNames();
         String ticket = this.jiraConnector.getFirstTicketReference(new ArrayList(tags));
@@ -164,8 +170,9 @@ public class HookGSpec extends BaseGSpec {
         ObjectMapper mapper = new ObjectMapper();
         boolean isLocal = ((System.getProperty("SELENIUM_GRID") != null) ? false : true);
         String[] arguments = System.getProperty("SELENIUM_ARGUMENTS", "--ignore-certificate-errors;--no-sandbox").split(";");
+        String browserName = System.getProperty("browserName", "chrome").toLowerCase();
 
-        switch (System.getProperty("browserName", "chrome").toLowerCase()) {
+        switch (browserName) {
             case "chrome":
 
                 mutableCapabilities = DesiredCapabilities.chrome();
@@ -289,6 +296,9 @@ public class HookGSpec extends BaseGSpec {
                 commonspec.getLogger().error("Unknown browser: " + System.getProperty("browserName") + ". For using local browser, only Chrome/Opera/MicrosoftEdge/IE/Firefox/Safari are supported");
                 throw new WebDriverException("Unknown browser: " + System.getProperty("browserName") + ". For using local browser, only Chrome/Opera/MicrosoftEdge/IE/Firefox/Safari are supported");
         }
+
+        /* Set the variable browser with the name of the current browser */
+        ThreadProperty.set("browser", browserName);
 
         if (isLocal) {
             /**
