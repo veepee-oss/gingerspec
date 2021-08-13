@@ -411,14 +411,6 @@ public final class ReplacementAspect {
         return null;
     }
 
-    private static Properties mergeProperties(Properties... properties) {
-        Properties mergedProperties = new Properties();
-        for (Properties property : properties) {
-            mergedProperties.putAll(property);
-        }
-        return mergedProperties;
-    }
-
 
 }
 
