@@ -597,14 +597,14 @@ public class HookGSpec extends BaseGSpec {
      * Changes the logging level of the log4j logger used in the specs package to the given value
      * @param scenario  Scenario
      */
-    @Before(value = "@debug or @trace or @info or @warn or @error or @fatal")
+    @Before(value = "@debug or @trace or @info or @warn or @error or @fatal or @off or @all")
     public void activateLogLevel(Scenario scenario) {
 
         /*Get list of tags present in the Scenario*/
         Collection<String> tags = scenario.getSourceTagNames();
 
         for (String tag: tags) {
-            if (tag.matches("(?i)@debug|@trace|@info|@warn|@error|@fatal")) {
+            if (tag.matches("(?i)@debug|@trace|@info|@warn|@error|@fatal|@off|@all")) {
                 Configurator.setLevel("com.privalia.qa.specs", org.apache.logging.log4j.Level.getLevel(tag.replace("@", "").toUpperCase()));
             }
         }
