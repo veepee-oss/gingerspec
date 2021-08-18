@@ -95,9 +95,9 @@ As part of GingerSpec implementation, there are a couple of tags which may be us
 
 - [DebugTag](https://github.com/veepee-oss/gingerspec/wiki/Hook-tags#debug-tag): This tag allows changing the default logging level for scenarios at runtime.
 
-- [ifStatementAspect](https://github.com/veepee-oss/gingerspec/wiki/Hook-tags#if-statement): This allows the conditional execution of steps during runtime.
+- [ifStatementAspect](https://github.com/veepee-oss/gingerspec/wiki/Gherkin-tags#if-statement): This allows the conditional execution of steps during runtime.
 
-- [SlackTag](https://github.com/veepee-oss/gingerspec/wiki/Hook-tags#slack-tag): This tag allows you to send a message to a Slack channel(s) when your scenario fails.
+- [SlackTag](https://github.com/veepee-oss/gingerspec/wiki/Gherkin-tags#slack-tag): This tag allows you to send a message to a Slack channel(s) when your scenario fails.
   
 ## Steps
 
