@@ -224,7 +224,7 @@ public class JiraConnector {
 
     /**
      * Returns the first reference to the jira ticket from the tag reference
-     * @param tags      List of thats (i.e @ignore, @jira(QMS-123))
+     * @param tags      List of tags (i.e @ignore, @jira(QMS-123))
      * @return          The first ticket reference (i.e QMS-123)
      */
     public String getFirstTicketReference(List<String> tags) {

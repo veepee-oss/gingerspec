@@ -21,7 +21,12 @@ import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
 import com.privalia.qa.utils.JiraConnector;
 import com.privalia.qa.utils.RunOnEnvTag;
+import com.privalia.qa.utils.SlackConnector;
 import com.privalia.qa.utils.ThreadProperty;
+import com.slack.api.Slack;
+import com.slack.api.methods.SlackApiException;
+import com.slack.api.methods.response.chat.ChatPostMessageResponse;
+import com.slack.api.model.Message;
 import io.appium.java_client.MobileDriver;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
@@ -60,6 +65,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -89,6 +95,8 @@ public class HookGSpec extends BaseGSpec {
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(HookGSpec.class);
 
     JiraConnector jiraConnector = new JiraConnector();
+
+    SlackConnector slackConnector = new SlackConnector();
 
     RunOnEnvTag runontag = new RunOnEnvTag();
 
@@ -548,28 +556,48 @@ public class HookGSpec extends BaseGSpec {
     }
 
     /**
-     * Will check if the scenario contains any reference to a Jira ticket and will try to update
-     * its status based on the result of the scenario execution. It will also try to close any remaining
-     * SSH connection
+     * Checks if the scenario contains any reference to a Jira ticket and will try to update
+     * its status based on the result of the scenario execution.
+     * Checks if theres any reference to an slack channel and sends a notification to that channel
+     * if the scenario failed
+     * Closes any remaining SSH connection
      * @param scenario  Scenario
      */
     @After(order = 10)
-    public void teardown(Scenario scenario) {
+    public void teardown(Scenario scenario) throws SlackApiException, IOException {
 
         if (scenario.isFailed()) {
+
+            String fileLocation = new File(scenario.getUri()).getPath();
             Collection<String> tags = scenario.getSourceTagNames();
             String ticket = this.jiraConnector.getFirstTicketReference(new ArrayList(tags));
+            String failureMessage = "Scenario *'" + scenario.getName() + "'* failed at: *" + fileLocation.substring(fileLocation.indexOf("/src") + 1).trim() + "*";
 
+            /* If there are any ticket referenced by the @jira tag */
             if (ticket != null) {
                 try {
                     commonspec.getLogger().debug("Updating ticket " + ticket + " in Jira...");
                     this.jiraConnector.transitionEntity(ticket);
 
-                    String fileLocation = new File(scenario.getUri()).getPath();
-                    this.jiraConnector.postCommentToEntity(ticket, "Scenario '" + scenario.getName() + "' failed at: " + fileLocation.substring(fileLocation.indexOf("/src") + 1).trim());
+                    this.jiraConnector.postCommentToEntity(ticket, failureMessage);
 
                 } catch (Exception e) {
                     commonspec.getLogger().warn("Could not change the status of entity " + ticket + " in jira: " + e.getMessage());
+                }
+            }
+
+            /* If there are any channel(s) referenced by the @slack tag */
+            List<String> channels = this.slackConnector.getChannels(new ArrayList(tags));
+            if (channels.size() >= 1) {
+                List<ChatPostMessageResponse> responses = this.slackConnector.sendMessageToChannels(channels, failureMessage);
+
+                for (ChatPostMessageResponse response: responses) {
+                    if (response.isOk()) {
+                        this.getCommonSpec().getLogger().debug("Message correctly sent to slack channel " + response.getChannel());
+                        this.commonspec.getLogger().trace(response.getMessage());
+                    } else {
+                        this.getCommonSpec().getLogger().warn("Could not send the notification to channel " + response.getChannel() + " in slack: " + response.getError());
+                    }
                 }
             }
         }
