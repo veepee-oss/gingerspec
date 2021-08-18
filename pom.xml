@@ -396,6 +396,11 @@
             <artifactId>commons-lang3</artifactId>
             <version>3.11</version>
         </dependency>
+        <dependency>
+            <groupId>com.slack.api</groupId>
+            <artifactId>slack-api-client</artifactId>
+            <version>1.10.0</version>
+        </dependency>
     </dependencies>
 
     <repositories>
