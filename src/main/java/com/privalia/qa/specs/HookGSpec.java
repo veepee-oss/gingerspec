@@ -555,6 +555,7 @@ public class HookGSpec extends BaseGSpec {
 
     }
 
+
     /**
      * Checks if the scenario contains any reference to a Jira ticket and will try to update
      * its status based on the result of the scenario execution.
@@ -562,6 +563,8 @@ public class HookGSpec extends BaseGSpec {
      * if the scenario failed
      * Closes any remaining SSH connection
      * @param scenario  Scenario
+     * @throws SlackApiException    SlackApiException
+     * @throws IOException          IOException
      */
     @After(order = 10)
     public void teardown(Scenario scenario) throws SlackApiException, IOException {
