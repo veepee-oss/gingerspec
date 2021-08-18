@@ -1,5 +1,19 @@
 # Changelog
 
+## 2.2.8
+
+* Removed some unnecessary classes and methods
+
+* Added new tag @slack that allows sending an slack notification when a scenario fails
+
+* Added ALL and OFF as possible debug level when using tags
+
+* Fixed a bug when creating folder structure when taking an screenshot during selenium tests
+
+## 2.2.7
+
+* Fixed a small bug with ifStatementAspect
+
 ## 2.2.6
 
 * License changed from Apache 2 to ISC and header information updated in all relevant files
