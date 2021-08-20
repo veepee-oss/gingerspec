@@ -51,7 +51,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.lang.reflect.Field;
 import java.net.*;
-import java.util.*;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Aspect to replace variables used in the feature files
