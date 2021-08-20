@@ -17,14 +17,19 @@
 package com.privalia.qa.specs;
 
 import com.csvreader.CsvReader;
+import com.privalia.qa.utils.SlackConnector;
 import com.privalia.qa.utils.ThreadProperty;
+import com.slack.api.methods.SlackApiException;
+import com.slack.api.methods.response.chat.ChatPostMessageResponse;
 import io.cucumber.datatable.DataTable;
+import io.cucumber.docstring.DocString;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.assertj.core.api.Assertions;
 import org.hjson.JsonArray;
 import org.hjson.JsonValue;
+import org.testng.Assert;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -586,4 +591,45 @@ public class UtilsGSpec extends BaseGSpec {
      */
     @Given("^\\}$")
     public void ifStamenetEndBlock() { }
+
+
+    /**
+     * Send a message to the given slack channel.
+     * <p>
+     * Sends a message to the given channel (or group of channels separated by comma). The message is a {@link DocString} object
+     * and it can also contain other variables created during the execution of the scenario. you will need to provide the slack token
+     * either via src/test/resources/slack.properties file or via maven variables as Dslack.token=abcdefg123456. Check the attached link
+     * for more information.
+     * <br>
+     * <pre>
+     * {@code
+     * Examples
+     *
+     *     Scenario: Sending message to a slack channel
+     *          Given I save 'GingerSpec' in variable 'FRAMEWORK'
+     *          Given I send a message to the slack channel '#qms-notifications' with text
+     *          """
+     *          :wave: Hello! You can send any type of text to a given slack channel.
+     *          You can even send variables created during your steps
+     *
+     *          Regards, ${FRAMEWORK} :slightly_smiling_face:
+     *          """
+     * }
+     * </pre>
+     * @see <a href="https://github.com/veepee-oss/gingerspec/wiki/Gherkin-tags#slack-tag">@slack tag</a>
+     * @param slackChannel          Name of the channel to send the notification to. It can also be a list of channels separated by comma (i.e #channel1,#channel2,#channel3)
+     * @param message               Message to send. It can contain variables created during the scenario
+     * @throws SlackApiException    SlackApiException
+     * @throws IOException          IOException
+     */
+    @Given("I send a message to the slack channel(s) {string} with text")
+    public void sendMessageToSlackChannel(String slackChannel, DocString message) throws SlackApiException, IOException {
+        SlackConnector sc = new SlackConnector();
+        String[] channels = slackChannel.split(",");
+        List<ChatPostMessageResponse> responses = sc.sendMessageToChannels(Arrays.asList(channels), message.getContent());
+
+        for (ChatPostMessageResponse response: responses) {
+            Assert.assertTrue(response.isOk(), "Could not send the notification to channel " + response.getChannel() + " in slack: " + response.getError());
+        }
+    }
 }

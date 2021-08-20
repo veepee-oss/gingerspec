@@ -75,7 +75,8 @@ public class SlackConnector {
 
     /**
      * Sends the given message to the specified list of channels. For more information and settings, you
-     * can check.
+     * can check the attached link.
+     * @see <a href="https://api.slack.com/methods/chat.postMessage">Sends a message to a channel.</a>
      * @param channels              List of channels
      * @param message               Text to send
      * @return                      List of {@link ChatPostMessageResponse}
