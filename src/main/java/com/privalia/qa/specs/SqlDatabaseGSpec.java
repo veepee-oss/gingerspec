@@ -16,6 +16,7 @@
 
 package com.privalia.qa.specs;
 
+import com.google.common.io.CharStreams;
 import com.privalia.qa.utils.ThreadProperty;
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.Given;
@@ -75,12 +76,15 @@ public class SqlDatabaseGSpec extends BaseGSpec {
      */
     @Given("^I( securely)? connect with JDBC to database '(.+?)' type '(mysql|postgresql)' on host '(.+?)' and port '(.+?)' with user '(.+?)'( and password '(.+?)')?$")
     public void connectDatabase(String isSecured, String database, String dataBaseType, String host, String port, String user, String password) {
+
+        commonspec.getLogger().debug("opening database connection to {} database {} at {}:{} with user {} and password {}",dataBaseType, database, host, port, user, password);
+
         try {
             if (isSecured != null) {
-                commonspec.getLogger().debug("opening secure database");
+                commonspec.getLogger().debug("opening secure database connection");
                 this.commonspec.getSqlClient().connect(host, Integer.parseInt(port), dataBaseType, database, Boolean.parseBoolean(isSecured), user, password);
             } else {
-                commonspec.getLogger().debug("opening database");
+                commonspec.getLogger().debug("opening non secure database connection");
                 this.commonspec.getSqlClient().connect(host, Integer.parseInt(port), dataBaseType, database, Boolean.parseBoolean(isSecured), user, password);
             }
         } catch (ClassNotFoundException | SQLException e) {
@@ -110,6 +114,7 @@ public class SqlDatabaseGSpec extends BaseGSpec {
     @Then("^I close database connection$")
     public void disconnectDatabase() {
         try {
+            commonspec.getLogger().debug("closing database connection");
             this.commonspec.getSqlClient().disconnect();
         } catch (SQLException e) {
             fail("Could not close DB connection" + e.getMessage());
@@ -146,7 +151,9 @@ public class SqlDatabaseGSpec extends BaseGSpec {
 
         int result;
         try {
+            commonspec.getLogger().debug("executing query: {}", query);
             result = this.commonspec.getSqlClient().executeUpdateQuery(query);
+            commonspec.getLogger().debug("query execution result was: {}", result);
         } catch (SQLException e) {
             fail("A problem was found while executing the query: " + e.getMessage());
         }
@@ -172,7 +179,7 @@ public class SqlDatabaseGSpec extends BaseGSpec {
      */
     @Then("^table '(.+?)' exists$")
     public void verifyTableExists(String tableName) {
-
+        commonspec.getLogger().debug("checking if table with name '{}' exists", tableName);
         assertThat(this.verifyTable(tableName)).as(String.format("The table %s is not present in the database", tableName)).isTrue();
     }
 
@@ -195,7 +202,7 @@ public class SqlDatabaseGSpec extends BaseGSpec {
      */
     @Then("^table '(.+?)' doesn't exists$")
     public void verifyTableDoesNotExists(String tableName) {
-
+        commonspec.getLogger().debug("checking if table with name '{}' does not exists", tableName);
         assertThat(this.verifyTable(tableName)).as(String.format("The table %s is present in the database", tableName)).isFalse();
     }
 
@@ -221,9 +228,15 @@ public class SqlDatabaseGSpec extends BaseGSpec {
     @When("^I query the database with '(.+?)'$")
     public void executeSelectQuery(String query) {
 
-        List<List<String>> result = null;
+        List<List<String>> result;
         try {
+            commonspec.getLogger().debug("executing query: {}", query);
             result = this.commonspec.getSqlClient().executeSelectQuery(query);
+
+            if (result != null) {
+                commonspec.getLogger().debug("query returned {} rows: {}", result.size(), result);
+            }
+
             this.commonspec.setPreviousSqlResult(result);
         } catch (SQLException e) {
             fail("A problem was found while executing the query: " + e.getMessage());
@@ -262,6 +275,8 @@ public class SqlDatabaseGSpec extends BaseGSpec {
         List<List<String>> previousResult = this.commonspec.getPreviousSqlResult();
         assertThat(previousResult).as("The last SQL query returned a null result").isNotNull();
         assertThat(previousResult.size()).as("The last SQL query did not returned any rows").isNotEqualTo(0);
+
+        commonspec.getLogger().debug("comparing {} with given datatable", previousResult);
         assertThat(dataTable.asLists()).as("The returned and the expected results do not match.").isEqualTo(previousResult);
 
     }
@@ -330,10 +345,11 @@ public class SqlDatabaseGSpec extends BaseGSpec {
         Reader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
 
         try {
-
+            commonspec.getLogger().debug("running query from file {}", baseData);
             boolean r = this.commonspec.getSqlClient().executeQuery(reader);
 
             if (r) {
+                commonspec.getLogger().debug("query returned a result set: {}", this.commonspec.getSqlClient().getPreviousSqlResult());
                 this.commonspec.setPreviousSqlResult(this.commonspec.getSqlClient().getPreviousSqlResult());
             }
 
@@ -380,10 +396,12 @@ public class SqlDatabaseGSpec extends BaseGSpec {
         assertThat(previousResult.size()).as("The last SQL query did not return any rows").isNotEqualTo(0);
         assertThat(previousResult.get(0).contains(columnName)).as("The last SQL query did not have a column with name " + columnName).isTrue();
 
-        int columnNUmber = previousResult.get(0).indexOf(columnName);
+        commonspec.getLogger().debug("getting index of {}", columnName);
+        int columnNumber = previousResult.get(0).indexOf(columnName);
+        commonspec.getLogger().debug("index of {} is {}", columnName, columnNumber);
 
         assertThat(previousResult.size() - 1 >= rowNumber).as("The column " + columnName + " only contains " + (previousResult.size() - 1) + " elements").isTrue();
-        ThreadProperty.set(envVar, previousResult.get(rowNumber).get(columnNUmber).trim());
+        ThreadProperty.set(envVar, previousResult.get(rowNumber).get(columnNumber).trim());
 
     }
 
@@ -391,11 +409,13 @@ public class SqlDatabaseGSpec extends BaseGSpec {
 
         boolean exists;
         try {
+            commonspec.getLogger().debug("checking if table '{}' exists", tableName);
             exists = this.commonspec.getSqlClient().verifyTable(tableName);
         } catch (SQLException e) {
             commonspec.getLogger().error("A problem was found when checking if {} exists: \n{}", tableName, e.toString());
             exists = false;
         }
+        commonspec.getLogger().debug("table '{}' exists: {}", tableName, exists);
         return exists;
     }
 }
