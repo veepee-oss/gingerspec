@@ -77,7 +77,7 @@ public class SqlDatabaseGSpec extends BaseGSpec {
     @Given("^I( securely)? connect with JDBC to database '(.+?)' type '(mysql|postgresql)' on host '(.+?)' and port '(.+?)' with user '(.+?)'( and password '(.+?)')?$")
     public void connectDatabase(String isSecured, String database, String dataBaseType, String host, String port, String user, String password) {
 
-        commonspec.getLogger().debug("opening database connection to {} database {} at {}:{} with user {} and password {}",dataBaseType, database, host, port, user, password);
+        commonspec.getLogger().debug("opening database connection to {} database {} at {}:{} with user {} and password {}", dataBaseType, database, host, port, user, password);
 
         try {
             if (isSecured != null) {
