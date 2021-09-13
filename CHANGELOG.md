@@ -1,5 +1,21 @@
 # Changelog
 
+## 2.2.9
+
+* Added debug messages for SQL steps
+
+* Bump jackson-databind from 2.10.3 to 2.10.5.1 
+
+* Bump jsoup from 1.7.3 to 1.14.2
+
+* Bump commons-io from 2.6 to 2.7
+
+* Bump httpclient from 4.5.1 to 4.5.13
+
+* Optimized imports
+
+* Added step to send messages to a slack channel
+
 ## 2.2.8
 
 * Removed some unnecessary classes and methods
