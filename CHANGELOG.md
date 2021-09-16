@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.2.10
+
+* Restored JaCoCoClient.java class to allow connections to a remote JaCoCo server
+
 ## 2.2.9
 
 * Added debug messages for SQL steps
