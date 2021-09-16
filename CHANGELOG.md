@@ -4,6 +4,12 @@
 
 * Restored JaCoCoClient.java class to allow connections to a remote JaCoCo server
 
+* Bump commons-beanutils from 1.9.3 to 1.9.4
+  
+* Upgrade com.google.guava:guava to version 30.0-jre
+  
+* Bump commons-configuration2 from 2.3 to 2.7
+
 ## 2.2.9
 
 * Added debug messages for SQL steps
