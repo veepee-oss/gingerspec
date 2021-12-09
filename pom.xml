@@ -4,7 +4,7 @@
 
     <groupId>com.github.privaliatech</groupId>
     <artifactId>gingerspec</artifactId>
-    <version>2.2.10</version>
+    <version>2.2.11</version>
 
     <name>Privalia GingerSpec framework</name>
     <description>Acceptance Test library. General purpose automation framework.</description>
@@ -115,7 +115,7 @@
         <kafka-clients.version>1.1.0</kafka-clients.version>
         <kafka-avro-serializer.version>3.1.1</kafka-avro-serializer.version>
         <avro.version>1.8.0</avro.version>
-        <mysql-connector-java.version>8.0.20</mysql-connector-java.version>
+        <mysql-connector-java.version>8.0.25</mysql-connector-java.version>
         <postgresql.version>42.2.12</postgresql.version>
         <rest-assured.version>4.3.0</rest-assured.version>
         <webdrivermanager.version>4.3.1</webdrivermanager.version>
