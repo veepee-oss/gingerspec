@@ -100,6 +100,7 @@ Feature: Testing variable replacements ${VERSION}
               "userId": ${faker:number.number_between '1','10'},
               "title": "This is a test: ${envProperties:wait.time}",
               "body": "${VERSION}"
+              "price": "${math:3 * sin(90) - 2 / (5 - 2)}"
             }
          """
 

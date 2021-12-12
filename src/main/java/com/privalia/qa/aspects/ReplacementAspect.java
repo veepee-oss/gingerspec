@@ -69,6 +69,7 @@ public final class ReplacementAspect {
             put("toUpperCase", new UpperCaseLookUp());
             put("toLowerCase", new LowerCaseLookup());
             put("faker", new FakerLookUp());
+            put("math", new MathLookup());
         }
     };
 
