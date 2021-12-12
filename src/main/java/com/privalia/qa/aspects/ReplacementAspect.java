@@ -18,10 +18,7 @@ package com.privalia.qa.aspects;
 
 
 import com.privalia.qa.exceptions.NonReplaceableException;
-import com.privalia.qa.lookups.DefaultLookUp;
-import com.privalia.qa.lookups.EnvPropertyLookup;
-import com.privalia.qa.lookups.LowerCaseLookup;
-import com.privalia.qa.lookups.UpperCaseLookUp;
+import com.privalia.qa.lookups.*;
 import com.privalia.qa.specs.CommonG;
 import com.privalia.qa.utils.ThreadProperty;
 import io.cucumber.core.backend.TestCaseState;
@@ -71,6 +68,7 @@ public final class ReplacementAspect {
             put("envProperties", new EnvPropertyLookup());
             put("toUpperCase", new UpperCaseLookUp());
             put("toLowerCase", new LowerCaseLookup());
+            put("faker", new FakerLookUp());
         }
     };
 
