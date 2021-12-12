@@ -22,7 +22,7 @@ public class FakerLookUp implements StringLookup {
 
         String[] arr = key.split(":");
 
-        if (arr.length >=2) {
+        if (arr.length >= 2) {
             this.faker = new Faker((new Locale(arr[0])));
             key = arr[1];
         } else {
