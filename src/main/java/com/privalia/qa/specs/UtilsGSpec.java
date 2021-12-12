@@ -632,4 +632,22 @@ public class UtilsGSpec extends BaseGSpec {
             Assert.assertTrue(response.isOk(), "Could not send the notification to channel " + response.getChannel() + " in slack: " + response.getError());
         }
     }
+
+    /**
+     * This step is for testing purposes of GingerSpec. Should NOT be used
+     * @param body  Example DocString argument
+     */
+    @Given("This is a DocString")
+    public void thisIsADocString(DocString body) {
+        System.out.println(body.getContent());
+    }
+
+    /**
+     * This step is for testing purposes of GingerSpec. Should NOT be used
+     * @param table Example DataTable argument
+     */
+    @Given("this is a datatable:")
+    public void thisIsADatatable(DataTable table) {
+        System.out.println(table.toString());
+    }
 }

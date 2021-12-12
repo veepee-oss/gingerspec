@@ -309,7 +309,7 @@ public class TestNGPrettyFormatter implements ConcurrentEventListener, ColorAwar
                         Field textField = argument.getClass().getDeclaredField("content");
                         textField.setAccessible(true);
                         String textArgument = (String) textField.get(argument);
-                        out.println(TABLES_INDENT + format.text(getReplacedValue(textArgument)));
+                        out.println(TABLES_INDENT + format.text(textArgument));
                     } catch (Exception e) {
                         out.println(TABLES_INDENT + format.text(argument.getValue().toString()));
                     }
@@ -318,7 +318,7 @@ public class TestNGPrettyFormatter implements ConcurrentEventListener, ColorAwar
                 if (argument instanceof io.cucumber.core.stepexpression.DataTableArgument) {
                     String[] rows = argument.getValue().toString().split("\n");
                     for (String row : rows) {
-                        out.println(TABLES_INDENT + format.text(getReplacedValue(row.trim())));
+                        out.println(TABLES_INDENT + format.text(row.trim()));
                     }
                 }
             }
@@ -504,7 +504,9 @@ public class TestNGPrettyFormatter implements ConcurrentEventListener, ColorAwar
             // val can be null if the argument isn't there, for example
             // @And("(it )?has something")
             if (argument.getValue() != null) {
-                String text = stepText.substring(argument.getStart(), argument.getEnd());
+                //in this case we take the argument value since the argument was already changed to the correct value in the ReplacementAspect class (if it was a variable)
+                String text = argument.getValue();
+                //String text = stepText.substring(argument.getStart(), argument.getEnd());
                 result.append(argFormat.text(text));
                 // set beginIndex to end of argument
                 beginIndex = argument.getEnd();
@@ -515,7 +517,8 @@ public class TestNGPrettyFormatter implements ConcurrentEventListener, ColorAwar
             result.append(textFormat.text(text));
         }
         try {
-            return getReplacedValue(result.toString());
+            return result.toString();
+            //return getReplacedValue(result.toString());
         } catch (Exception e) {
             return result.toString();
         }

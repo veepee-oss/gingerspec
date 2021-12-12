@@ -92,3 +92,24 @@ Feature: Testing variable replacements ${VERSION}
     Given I generate a random number between '0' and '10' and save it in the variable 'RANDOM'
     #log ${RANDOM}
     And I wait '1' seconds
+
+  Scenario: Replacements in a DocString
+    Given This is a DocString
+        """
+            {
+              "userId": ${faker:number.number_between '1','10'},
+              "title": "This is a test: ${envProperties:wait.time}",
+              "body": "${VERSION}"
+            }
+         """
+
+  Scenario: Replacements in datatables
+    Given this is a datatable:
+      | $.title  | contains  | ${faker:number.number_between '1','10'}    |
+      | $.body   | contains  | This is a test: ${envProperties:wait.time} |
+      | $.userId | not equal | ${VERSION}                                 |
+
+  Scenario: Using the faker library
+    Given I save '${faker:number.number_between '1','10'}' in variable 'RANDOM_NUMBER'
+    Given I save '${faker:Internet.emailAddress}' in variable 'RANDOM_EMAIL'
+    Given I save '${faker:Name.first_name}' in variable 'RANDOM_NAME'
