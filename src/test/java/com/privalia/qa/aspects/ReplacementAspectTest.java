@@ -26,6 +26,7 @@ import java.io.FileNotFoundException;
 import java.net.URISyntaxException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 
 public class ReplacementAspectTest {
@@ -35,7 +36,7 @@ public class ReplacementAspectTest {
         ThreadProperty.set("class", this.getClass().getCanonicalName());
         ReplacementAspect repAspect = new ReplacementAspect();
         ProceedingJoinPoint pjp = null;
-        assertThat(repAspect.replaceEnvironmentPlaceholders("", pjp)).as("Replacing an empty placeholded string should not modify it").isEqualTo("");
+        assertThat(repAspect.replacePlaceholders("", true)).as("Replacing an empty placeholded string should not modify it").isEqualTo("");
     }
 
     @Test
@@ -46,13 +47,13 @@ public class ReplacementAspectTest {
         System.setProperty("DUMMYBDD_ENV1", "33");
         System.setProperty("DUMMYBDD_ENV2", "aa");
 
-        assertThat(repAspect.replaceEnvironmentPlaceholders("${DUMMYBDD_ENV1}", pjp))
+        assertThat(repAspect.replacePlaceholders("${DUMMYBDD_ENV1}", true))
                 .as("Unexpected replacement").isEqualTo("33");
-        assertThat(repAspect.replaceEnvironmentPlaceholders("${DUMMYBDD_ENV1}${DUMMYBDD_ENV2}", pjp))
+        assertThat(repAspect.replacePlaceholders("${DUMMYBDD_ENV1}${DUMMYBDD_ENV2}", true))
                 .as("Unexpected replacement").isEqualTo("33aa");
-        assertThat(repAspect.replaceEnvironmentPlaceholders("${DUMMYBDD_ENV1}:${DUMMYBDD_ENV2}", pjp))
+        assertThat(repAspect.replacePlaceholders("${DUMMYBDD_ENV1}:${DUMMYBDD_ENV2}", true))
                 .as("Unexpected replacement").isEqualTo("33:aa");
-        assertThat(repAspect.replaceEnvironmentPlaceholders("|${DUMMYBDD_ENV1}|:|${DUMMYBDD_ENV2}|", pjp))
+        assertThat(repAspect.replacePlaceholders("|${DUMMYBDD_ENV1}|:|${DUMMYBDD_ENV2}|", true))
                 .as("Unexpected replacement").isEqualTo("|33|:|aa|");
     }
 
@@ -64,13 +65,13 @@ public class ReplacementAspectTest {
         System.setProperty("DUMMYBDD_ENV1", "33");
         System.setProperty("DUMMYBDD_ENV2", "aA");
 
-        assertThat(repAspect.replaceEnvironmentPlaceholders("${toUpperCase:${DUMMYBDD_ENV1}}", pjp)).as("Unexpected replacement").isEqualTo("33");
-        assertThat(repAspect.replaceEnvironmentPlaceholders("${toLowerCase:${DUMMYBDD_ENV1}}", pjp)).as("Unexpected replacement").isEqualTo("33");
-        assertThat(repAspect.replaceEnvironmentPlaceholders("${toUpperCase:${DUMMYBDD_ENV2}}", pjp)).as("Unexpected replacement").isEqualTo("AA");
-        assertThat(repAspect.replaceEnvironmentPlaceholders("${toLowerCase:${DUMMYBDD_ENV2}}", pjp)).as("Unexpected replacement").isEqualTo("aa");
-        assertThat(repAspect.replaceEnvironmentPlaceholders("${DUMMYBDD_ENV1}${toLowerCase:${DUMMYBDD_ENV2}}", pjp)).as("Unexpected replacement").isEqualTo("33aa");
-        assertThat(repAspect.replaceEnvironmentPlaceholders("${DUMMYBDD_ENV1}:${toUpperCase:${DUMMYBDD_ENV2}}", pjp)).as("Unexpected replacement").isEqualTo("33:AA");
-        assertThat(repAspect.replaceEnvironmentPlaceholders("|${toUpperCase:${DUMMYBDD_ENV2}}", pjp)).as("Unexpected replacement").isEqualTo("|AA");
+        assertThat(repAspect.replacePlaceholders("${toUpperCase:${DUMMYBDD_ENV1}}", true)).as("Unexpected replacement").isEqualTo("33");
+        assertThat(repAspect.replacePlaceholders("${toLowerCase:${DUMMYBDD_ENV1}}", true)).as("Unexpected replacement").isEqualTo("33");
+        assertThat(repAspect.replacePlaceholders("${toUpperCase:${DUMMYBDD_ENV2}}", true)).as("Unexpected replacement").isEqualTo("AA");
+        assertThat(repAspect.replacePlaceholders("${toLowerCase:${DUMMYBDD_ENV2}}", true)).as("Unexpected replacement").isEqualTo("aa");
+        assertThat(repAspect.replacePlaceholders("${DUMMYBDD_ENV1}${toLowerCase:${DUMMYBDD_ENV2}}", true)).as("Unexpected replacement").isEqualTo("33aa");
+        assertThat(repAspect.replacePlaceholders("${DUMMYBDD_ENV1}:${toUpperCase:${DUMMYBDD_ENV2}}", true)).as("Unexpected replacement").isEqualTo("33:AA");
+        assertThat(repAspect.replacePlaceholders("|${toUpperCase:${DUMMYBDD_ENV2}}", true)).as("Unexpected replacement").isEqualTo("|AA");
     }
 
     @Test
@@ -81,45 +82,12 @@ public class ReplacementAspectTest {
         System.setProperty("DUMMYBDD_ENV4", "33");
         System.setProperty("DUMMYBDD_ENV5", "aA");
 
-        assertThat(repAspect.replacedElement("${DUMMYBDD_ENV4}", pjp)).isEqualTo("33");
-        assertThat(repAspect.replacedElement("${toLowerCase:${DUMMYBDD_ENV5}}", pjp)).isEqualTo("aa");
-        assertThat(repAspect.replacedElement("${toUpperCase:${DUMMYBDD_ENV5}}", pjp)).isEqualTo("AA");
-        assertThat(repAspect.replacedElement("${DUMMYBDD_ENV5}", pjp)).isEqualTo("aA");
-        assertThat(repAspect.replacedElement("${DUMMYBDD_ENV4}${DUMMYBDD_ENV5}", pjp)).isEqualTo("33aA");
-        assertThat(repAspect.replacedElement("${DUMMYBDD_ENV4}:${DUMMYBDD_ENV5}", pjp)).isEqualTo("33:aA");
-    }
-    @Test
-    public void replaceReflectionPlaceholderCaseTest() throws NonReplaceableException {
-        ThreadProperty.set("class", this.getClass().getCanonicalName());
-        ReplacementAspect repAspect = new ReplacementAspect();
-        ProceedingJoinPoint pjp = null;
-
-        assertThatExceptionOfType(Exception.class).isThrownBy(() -> repAspect.replaceReflectionPlaceholders("!{NO_VAL}", pjp));
-    }
-
-    @Test
-    public void replaceCodePlaceholderCaseTest() throws NonReplaceableException {
-        ThreadProperty.set("class", this.getClass().getCanonicalName());
-        ReplacementAspect repAspect = new ReplacementAspect();
-        ProceedingJoinPoint pjp = null;
-
-        assertThat(repAspect.replaceCodePlaceholders("@{schemas/simple1.json}", pjp)).isEqualTo("");
-        assertThat(repAspect.replaceCodePlaceholders("@{JSON.schemas/simple1.json}", pjp)).isEqualTo("{\"a\":true}");
-        assertThatExceptionOfType(Exception.class).isThrownBy(() -> repAspect.replaceCodePlaceholders("@{IP.10.10.10.10}", pjp));
-    }
-
-    @Test
-    public void replaceMixedPlaceholdersTest() throws Exception {
-        ThreadProperty.set("class", this.getClass().getCanonicalName());
-        ThreadProperty.set("DUMMYBDD_LOCAL1", "LOCAL");
-        ProceedingJoinPoint pjp = null;
-        ReplacementAspect repAspect = new ReplacementAspect();
-        System.setProperty("DUMMYBDD_ENV2", "aa");
-
-        assertThat(repAspect.replaceReflectionPlaceholders(repAspect.replaceEnvironmentPlaceholders("!{DUMMYBDD_LOCAL1}:${DUMMYBDD_ENV2}", pjp), pjp))
-                .as("Unexpected replacement").isEqualTo("LOCAL:aa");
-        assertThat(repAspect.replaceReflectionPlaceholders(repAspect.replaceEnvironmentPlaceholders("${DUMMYBDD_ENV2}:!{DUMMYBDD_LOCAL1}", pjp), pjp))
-                .as("Unexpected replacement").isEqualTo("aa:LOCAL");
+        assertThat(repAspect.replacePlaceholders("${DUMMYBDD_ENV4}", true)).isEqualTo("33");
+        assertThat(repAspect.replacePlaceholders("${toLowerCase:${DUMMYBDD_ENV5}}", true)).isEqualTo("aa");
+        assertThat(repAspect.replacePlaceholders("${toUpperCase:${DUMMYBDD_ENV5}}", true)).isEqualTo("AA");
+        assertThat(repAspect.replacePlaceholders("${DUMMYBDD_ENV5}", true)).isEqualTo("aA");
+        assertThat(repAspect.replacePlaceholders("${DUMMYBDD_ENV4}${DUMMYBDD_ENV5}", true)).isEqualTo("33aA");
+        assertThat(repAspect.replacePlaceholders("${DUMMYBDD_ENV4}:${DUMMYBDD_ENV5}", true)).isEqualTo("33:aA");
     }
 
     @Test
@@ -130,18 +98,18 @@ public class ReplacementAspectTest {
         System.setProperty("DUMMYBDD_ENV1", "aa");
         System.setProperty("DUMMYBDD_ENV3", "cc");
 
-        assertThat(repAspect.replaceEnvironmentPlaceholders("${DUMMYBDD_ENV1:-bb}", pjp)).as("Unexpected replacement").isEqualTo("aa");
-        assertThat(repAspect.replaceEnvironmentPlaceholders("${DUMMYBDD_ENV2:-bb}", pjp)).as("Unexpected replacement").isEqualTo("bb");
-        assertThat(repAspect.replaceEnvironmentPlaceholders("${DUMMYBDD_ENV2:-bb}${DUMMYBDD_ENV4:-dd}", pjp)).as("Unexpected replacement").isEqualTo("bbdd");
-        assertThat(repAspect.replaceEnvironmentPlaceholders("${DUMMYBDD_ENV2:-bb}${DUMMYBDD_ENV1}", pjp)).as("Unexpected replacement").isEqualTo("bbaa");
-        assertThat(repAspect.replaceEnvironmentPlaceholders("${DUMMYBDD_ENV1}${DUMMYBDD_ENV2:-bb}", pjp)).as("Unexpected replacement").isEqualTo("aabb");
-        assertThat(repAspect.replaceEnvironmentPlaceholders("${DUMMYBDD_ENV1}${DUMMYBDD_ENV2:-bb}${DUMMYBDD_ENV3}", pjp)).as("Unexpected replacement").isEqualTo("aabbcc");
-        assertThat(repAspect.replaceEnvironmentPlaceholders("${toUpperCase:${DUMMYBDD_ENV1}}${DUMMYBDD_ENV2:-bb}${DUMMYBDD_ENV3}", pjp)).as("Unexpected replacement").isEqualTo("AAbbcc");
-        assertThat(repAspect.replaceEnvironmentPlaceholders("${DUMMYBDD_ENV1}${toUpperCase:${DUMMYBDD_ENV2:-bb}}${DUMMYBDD_ENV3}", pjp)).as("Unexpected replacement").isEqualTo("aaBBcc");
-        assertThat(repAspect.replaceEnvironmentPlaceholders("${DUMMYBDD_ENV1}${DUMMYBDD_ENV2:-bb}${DUMMYBDD_ENV3:-aa}", pjp)).as("Unexpected replacement").isEqualTo("aabbcc");
-        assertThat(repAspect.replaceEnvironmentPlaceholders("${DUMMYBDD_ENV1}${DUMMYBDD_ENV2:-bb}${toUpperCase:${DUMMYBDD_ENV3:-aa}}", pjp)).as("Unexpected replacement").isEqualTo("aabbCC");
-        assertThat(repAspect.replaceEnvironmentPlaceholders("${DUMMYBDD_ENV1}${DUMMYBDD_ENV2:-bb.bb}${DUMMYBDD_ENV3:-aa}", pjp)).as("Unexpected replacement").isEqualTo("aabb.bbcc");
-        assertThat(repAspect.replaceEnvironmentPlaceholders("${DUMMYBDD_ENV1}${DUMMYBDD_ENV2:-bb}${DUMMYBDD_ENV3:-aa.aa}", pjp)).as("Unexpected replacement").isEqualTo("aabbcc");
+        assertThat(repAspect.replacePlaceholders("${DUMMYBDD_ENV1:-bb}", true)).as("Unexpected replacement").isEqualTo("aa");
+        assertThat(repAspect.replacePlaceholders("${DUMMYBDD_ENV2:-bb}", true)).as("Unexpected replacement").isEqualTo("bb");
+        assertThat(repAspect.replacePlaceholders("${DUMMYBDD_ENV2:-bb}${DUMMYBDD_ENV4:-dd}", true)).as("Unexpected replacement").isEqualTo("bbdd");
+        assertThat(repAspect.replacePlaceholders("${DUMMYBDD_ENV2:-bb}${DUMMYBDD_ENV1}", true)).as("Unexpected replacement").isEqualTo("bbaa");
+        assertThat(repAspect.replacePlaceholders("${DUMMYBDD_ENV1}${DUMMYBDD_ENV2:-bb}", true)).as("Unexpected replacement").isEqualTo("aabb");
+        assertThat(repAspect.replacePlaceholders("${DUMMYBDD_ENV1}${DUMMYBDD_ENV2:-bb}${DUMMYBDD_ENV3}", true)).as("Unexpected replacement").isEqualTo("aabbcc");
+        assertThat(repAspect.replacePlaceholders("${toUpperCase:${DUMMYBDD_ENV1}}${DUMMYBDD_ENV2:-bb}${DUMMYBDD_ENV3}", true)).as("Unexpected replacement").isEqualTo("AAbbcc");
+        assertThat(repAspect.replacePlaceholders("${DUMMYBDD_ENV1}${toUpperCase:${DUMMYBDD_ENV2:-bb}}${DUMMYBDD_ENV3}", true)).as("Unexpected replacement").isEqualTo("aaBBcc");
+        assertThat(repAspect.replacePlaceholders("${DUMMYBDD_ENV1}${DUMMYBDD_ENV2:-bb}${DUMMYBDD_ENV3:-aa}", true)).as("Unexpected replacement").isEqualTo("aabbcc");
+        assertThat(repAspect.replacePlaceholders("${DUMMYBDD_ENV1}${DUMMYBDD_ENV2:-bb}${toUpperCase:${DUMMYBDD_ENV3:-aa}}", true)).as("Unexpected replacement").isEqualTo("aabbCC");
+        assertThat(repAspect.replacePlaceholders("${DUMMYBDD_ENV1}${DUMMYBDD_ENV2:-bb.bb}${DUMMYBDD_ENV3:-aa}", true)).as("Unexpected replacement").isEqualTo("aabb.bbcc");
+        assertThat(repAspect.replacePlaceholders("${DUMMYBDD_ENV1}${DUMMYBDD_ENV2:-bb}${DUMMYBDD_ENV3:-aa.aa}", true)).as("Unexpected replacement").isEqualTo("aabbcc");
     }
 
     @Test
@@ -149,11 +117,13 @@ public class ReplacementAspectTest {
         ProceedingJoinPoint pjp = null;
         ReplacementAspect repAspect = new ReplacementAspect();
 
-        assertThat(repAspect.replaceEnvironmentPlaceholders("${envProperties:wait.time}", pjp)).as("Unexpected replacement").isEqualTo("1");
-        assertThat(repAspect.replaceEnvironmentPlaceholders("${envProperties:invalid.property}", pjp)).as("Unexpected replacement").isEqualTo("${envProperties:invalid.property}");
+        assertThat(repAspect.replacePlaceholders("${envProperties:wait.time}", true)).as("Unexpected replacement").isEqualTo("1");
+        assertThatThrownBy(() -> { repAspect.replacePlaceholders("${envProperties:invalid.property}", true); })
+                .isInstanceOf(AssertionError.class)
+                .hasMessageContaining("Cannot resolve variable 'envProperties:invalid.property");
 
         System.setProperty("env", "pre");
-        assertThat(repAspect.replaceEnvironmentPlaceholders("${envProperties:wait.time}", pjp)).as("Unexpected replacement").isEqualTo("2");
+        assertThat(repAspect.replacePlaceholders("${envProperties:wait.time}", true)).as("Unexpected replacement").isEqualTo("2");
 
     }
 }

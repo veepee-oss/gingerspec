@@ -30,7 +30,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.privalia.qa.aspects.ReplacementAspect.replaceEnvironmentPlaceholders;
+import static com.privalia.qa.aspects.ReplacementAspect.replacePlaceholders;
 
 /**
  * Aspect for managing the @include, @background and @loop tags. This particulars tags must be handled right
@@ -146,12 +146,12 @@ public class LoopIncludeTagAspect {
         for (int s = 0; s < lines.size(); s++) {
             String debug = lines.get(s);
             if (lines.get(s).matches("\\s*Scenario:.*") || lines.get(s).matches("\\s*Scenario Outline:.*") || lines.get(s).matches("\\s*Background:.*") || lines.get(s).matches("\\s*Rule:.*")) {
-                lines.set(s, replaceEnvironmentPlaceholders(lines.get(s), null));
+                lines.set(s, replacePlaceholders(lines.get(s), false));
                 stop = true;
             }
 
             if (!stop) {
-                lines.set(s, replaceEnvironmentPlaceholders(lines.get(s), null));
+                lines.set(s, replacePlaceholders(lines.get(s), false));
             }
         }
         return lines;

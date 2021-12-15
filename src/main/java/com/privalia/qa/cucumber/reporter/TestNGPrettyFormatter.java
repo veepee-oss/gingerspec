@@ -224,7 +224,7 @@ public class TestNGPrettyFormatter implements ConcurrentEventListener, ColorAwar
             StringBuilder formattedComment;
             try {
                 if (comment.toUpperCase().startsWith("#LOG")) {
-                    formattedComment = new StringBuilder(formats.get("output").text(getReplacedValue(comment)));
+                    formattedComment = new StringBuilder(formats.get("output").text(replacementAspect.replacePlaceholders(comment, false)));
                     out.println(STEP_INDENT + formattedComment);
                 }
             } catch (Exception e) {
@@ -529,20 +529,4 @@ public class TestNGPrettyFormatter implements ConcurrentEventListener, ColorAwar
         formats = monochrome ? monochrome() : Formats.ansi();
     }
 
-    /**
-     * Sometimes, when trying to use Replacement aspect with !{VAR}, using a null JoinPoint
-     * can return an unexpected exception
-     * @param text
-     * @return
-     */
-    private String getReplacedValue(String text) {
-        try {
-            if (text.contains("!{") || text.contains("@{") || text.contains("#{")) {
-                out.println(STEP_INDENT + formats.get("undefined").text("!{}, @{} and #{} variable placeholders are deprecated. Check https://github.com/veepee-oss/gingerspec/wiki/Gherkin-variables"));
-            }
-            return replacementAspect.replacedElement(text, null);
-        } catch (Exception e) {
-            return text;
-        }
-    }
 }
