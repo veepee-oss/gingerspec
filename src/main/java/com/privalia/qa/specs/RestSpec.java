@@ -17,6 +17,7 @@
 package com.privalia.qa.specs;
 
 import com.jayway.jsonpath.PathNotFoundException;
+import com.privalia.qa.exceptions.NonReplaceableException;
 import com.privalia.qa.utils.ThreadProperty;
 import io.cucumber.datatable.DataTable;
 import io.cucumber.docstring.DocString;
@@ -29,9 +30,11 @@ import io.restassured.http.ContentType;
 import io.restassured.response.ResponseBody;
 import io.restassured.specification.ProxySpecification;
 import io.restassured.specification.RequestSpecification;
+import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.assertj.core.api.Assertions;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -309,20 +312,24 @@ public class RestSpec extends BaseGSpec {
 
     /**
      * Verifies the status response (HTTP response code) of a rest request.
-     *
+     * <p>
      * This step was deprecated, please, use {@link #assertResponseStatusCode(Integer)}, {@link #assertResponseMessage(String)},
      * {@link #assertResponseLength(Integer)} or {@link #assertResponseSchema(String)}
      *
-     * @see #assertResponseStatusCode(Integer)
-     * @see #assertResponseMessage(String)
-     * @see #assertResponseLength(Integer)
-     * @see #assertResponseSchema(String)
+     * @param expectedStatus Expected HTTP status code
+     * @param responseAssert Expression to determine if assert length, text or schema
+     * @throws NonReplaceableException the non replaceable exception
+     * @throws ConfigurationException  the configuration exception
+     * @throws FileNotFoundException   the file not found exception
+     * @throws URISyntaxException      the uri syntax exception
+     * @see #assertResponseStatusCode(Integer) #assertResponseStatusCode(Integer)
+     * @see #assertResponseMessage(String) #assertResponseMessage(String)
+     * @see #assertResponseLength(Integer) #assertResponseLength(Integer)
+     * @see #assertResponseSchema(String) #assertResponseSchema(String)
      * @see <a href="http://json-schema.org/">http://json-schema.org/</a>
-     * @param expectedStatus        Expected HTTP status code
-     * @param responseAssert        Expression to determine if assert length, text or schema
      */
     @Deprecated
-    public void assertResponseStatusLength(Integer expectedStatus, String responseAssert) {
+    public void assertResponseStatusLength(Integer expectedStatus, String responseAssert) throws NonReplaceableException, ConfigurationException, FileNotFoundException, URISyntaxException {
 
         commonspec.getRestResponse().then().statusCode(expectedStatus);
 
@@ -360,14 +367,19 @@ public class RestSpec extends BaseGSpec {
      *     Given I securely send requests to 'jsonplaceholder.typicode.com:443'
      *     When I send a 'GET' request to '/posts'
      *     Then the service response matches the schema in 'schemas/responseSchema.json'
-     * }</pre>
-     * @see #sendRequestNoDataTable(String, String, String, String, String)
-     * @see #sendRequestDataTable(String, String, String, String, String, DataTable)
+     * }*</pre>
+     *
+     * @param expectedSchema File under /resources directory that contains the expected schema
+     * @throws NonReplaceableException the non replaceable exception
+     * @throws ConfigurationException  the configuration exception
+     * @throws FileNotFoundException   the file not found exception
+     * @throws URISyntaxException      the uri syntax exception
+     * @see #sendRequestNoDataTable(String, String, String, String, String) #sendRequestNoDataTable(String, String, String, String, String)
+     * @see #sendRequestDataTable(String, String, String, String, String, DataTable) #sendRequestDataTable(String, String, String, String, String, DataTable)
      * @see <a href="http://json-schema.org/">http://json-schema.org/</a>
-     * @param expectedSchema        File under /resources directory that contains the expected schema
      */
     @Then("^the service response matches the schema in '(.*?)'$")
-    public void assertResponseSchema(String expectedSchema) {
+    public void assertResponseSchema(String expectedSchema) throws NonReplaceableException, ConfigurationException, FileNotFoundException, URISyntaxException {
         String schemaData = commonspec.retrieveData(expectedSchema, "json");
         commonspec.getRestResponse().then().assertThat().body(matchesJsonSchema(schemaData));
     }

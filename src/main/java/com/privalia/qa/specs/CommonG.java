@@ -32,11 +32,13 @@ import com.ning.http.client.Response;
 import com.ning.http.client.cookie.Cookie;
 import com.privalia.qa.aspects.ReplacementAspect;
 import com.privalia.qa.conditions.Conditions;
+import com.privalia.qa.exceptions.NonReplaceableException;
 import com.privalia.qa.utils.*;
 import io.appium.java_client.MobileDriver;
 import io.cucumber.datatable.DataTable;
 import io.restassured.specification.RequestSpecification;
 import org.apache.commons.collections.IteratorUtils;
+import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -60,6 +62,7 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.util.*;
@@ -1035,9 +1038,13 @@ public class CommonG {
      *
      * @param baseData path to file to be read
      * @param type     type of information, it can be: json|string
-     * @return String
+     * @return String string
+     * @throws NonReplaceableException the non replaceable exception
+     * @throws ConfigurationException  the configuration exception
+     * @throws FileNotFoundException   the file not found exception
+     * @throws URISyntaxException      the uri syntax exception
      */
-    public String retrieveData(String baseData, String type) {
+    public String retrieveData(String baseData, String type) throws NonReplaceableException, ConfigurationException, FileNotFoundException, URISyntaxException {
         return this.retrieveData(baseData, type, "UTF-8");
     }
 
@@ -1047,9 +1054,10 @@ public class CommonG {
      * @param baseData path to file to be read
      * @param type     type of information, it can be: json|string
      * @param charset  charset to use when reading the file
-     * @return String
+     * @return String string
+     * @throws NonReplaceableException the non replaceable exception
      */
-    public String retrieveData(String baseData, String type, String charset) {
+    public String retrieveData(String baseData, String type, String charset) throws NonReplaceableException {
         String result;
 
         InputStream stream = getClass().getClassLoader().getResourceAsStream(baseData);
@@ -1082,6 +1090,9 @@ public class CommonG {
 
         String std = text.replace("\r", "").replace("\n", ""); // make sure we have unix style text regardless of the input
 
+        //make any possible variable replacement
+        ReplacementAspect replacementAspect = new ReplacementAspect();
+        std = replacementAspect.replacePlaceholders(std, true);
 
         if ("json".equals(type)) {
             result = JsonValue.readHjson(std).asObject().toString();
@@ -2177,13 +2188,13 @@ public class CommonG {
      *      getVariable("@{variable}")      //returns attribute value
      * }
      * </pre>
-     * @see ReplacementAspect#replacedElement(String, JoinPoint)
+     * @see ReplacementAspect#replacePlaceholders(String, boolean)
      * @param variable      Variable placeholder as used in the gherkin file
      * @return              Value assign to that variable
      */
     public String getVariable(String variable) {
         try {
-            return ReplacementAspect.replacedElement(variable, null);
+            return ReplacementAspect.replacePlaceholders(variable, false);
         } catch (Exception e) {
             return null;
         }
