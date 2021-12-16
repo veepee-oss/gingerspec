@@ -1,5 +1,21 @@
 # Changelog
 
+## 2.2.11
+
+* mysql and postgre dependencies were updated and connection string used to bootstrap the connection no longer uses UTC timezone
+
+* Added new lookup to StringSubstitutor in replacement aspect to evaluate expressions from the Java Faker library
+
+* Fixed and error in which the formatter was unnecessarily calling the replacement aspect. Added a couple of steps for testing how the formatter prints docstring and datatables
+
+* Added a new lookup to StringSubstitutor in replacementAspect to evaluate mathematical expressions using the exp4j library
+
+* Bump log4j-api from 2.14.1 to 2.16.0
+
+* Removed deprecated code from ReplacementAspect, changed its public API method to make it more coherent. Support for !{} #{} and @{} variable placeholders was completely removed from GingerSpec
+
+* Added support make variable replacements in local files. Now, for example, you can use variables directly in the json body of a request that is stored in a local file. GingerSpec will try to perform variable replacement in the text before adding the body to the request. This eliminates the need to use a datatable for altering the body of the request
+
 ## 2.2.10
 
 * Restored JaCoCoClient.java class to allow connections to a remote JaCoCo server
