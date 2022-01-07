@@ -1,5 +1,7 @@
+<div align="center">
+
 ```  
-  
+
   /$$$$$$  /$$                                          /$$$$$$                               
  /$$__  $$|__/                                         /$$__  $$                              
 | $$  \__/ /$$ /$$$$$$$   /$$$$$$   /$$$$$$   /$$$$$$ | $$  \__/  /$$$$$$   /$$$$$$   /$$$$$$$
@@ -10,16 +12,28 @@
  \______/ |__/|__/  |__/ \____  $$ \_______/|__/       \______/ | $$____/  \_______/ \_______/
                          /$$  \ $$                              | $$                          
                         |  $$$$$$/                              | $$                          
-                         \______/                               |__/ 
-```
+                         \______/                               |__/                          
 
+```
 [![GingerSpec pipeline](https://github.com/veepee-oss/gingerspec/actions/workflows/maven-build.yml/badge.svg)](https://github.com/veepee-oss/gingerspec/actions/workflows/maven-build.yml)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.privaliatech/gingerspec/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.privaliatech/gingerspec)
 [![License](https://img.shields.io/badge/License-ISC-blue.svg)](https://opensource.org/licenses/ISC)
 ![GitHub Release Date](https://img.shields.io/github/release-date/veepee-oss/gingerspec)
 [![javadoc](https://javadoc.io/badge2/com.github.privaliatech/gingerspec/javadoc.svg)](https://javadoc.io/doc/com.github.privaliatech/gingerspec)
+</div>
 
-Acceptance Test library. General purpose automation framework.
+<div align="center"><h2>Acceptance Test library. General purpose automation framework.</h2></div>
+
+<p align="center">
+    <a href="#project-introobjective">Intro</a> |
+    <a href="#documentation">Documentation</a> |
+    <a href="#requirements">Requirements</a> |
+    <a href="#technologies">Technologies</a> |
+    <a href="#using-gingerspec">Using GingerSpec</a> |
+    <a href="#aspects">Aspects</a> |
+    <a href="#steps">Steps</a> |
+    <a href="#contributing-members-to-gingerspec">Contribute</a>
+</p>
 
 ## Project Intro/Objective
 The purpose of this project is to provide a generic BDT (behaviour driven testing) library with common BDD steps and extended gherkin language.
@@ -47,16 +61,6 @@ GingerSpec provides common functionality that can be reused by different test pr
 * WebServices (SOAP)
 * Kafka & ZooKeeper
 
-
-## Getting Started
-
-Check the following articles to get more information about how to use GingerSpec:
-
-* [Technical documentation](https://github.com/veepee-oss/gingerspec/wiki/Technical-documentation)
-* [Getting started](https://github.com/veepee-oss/gingerspec/wiki/Getting-started)  
-* [Running your tests](https://github.com/veepee-oss/gingerspec/wiki/Running-your-tests)
-
-
 ## Using GingerSpec
 
 We **strongly** suggest to make use of the special archetype for GingerSpec based projects: [gingerspec-starter](https://github.com/PrivaliaTech/gingerspec-starter). Just run the following command in your terminal (replace the values for groupId, version and artifactId as needed):
@@ -76,28 +80,65 @@ This will create a ready-to-use project based on a template with best practices 
 ## Aspects  
   
 As part of GingerSpec implementation, there are a couple of tags which may be useful for your scenarios:  
-  
-- [RunOnTagAspect](https://github.com/veepee-oss/gingerspec/wiki/Gherkin-tags#runonenv-tag):  Allow the conditional execution of scenarios based on a given environment variable
-  
-- [IgnoreTagAspect](https://github.com/veepee-oss/gingerspec/wiki/Gherkin-tags#ignore-tag): An AspectJ aspect that allows to skip an scenario or a whole feature. To do so, a tag must be used before the scenario or the feature keyword. Additionally, an ignored reason can be set.  
-  
-- [IncludeTagAspect](https://github.com/veepee-oss/gingerspec/wiki/Gherkin-tags#include-tag): An AspectJ aspect that includes an scenario before the tagged one. It manages parameters as well. Scenario name of the included feature cannot contain spaces. Parameters should be wrapped in []  
 
-- [LoopTagAspect](https://github.com/veepee-oss/gingerspec/wiki/Gherkin-tags#loop-tag): An AspectJ aspect that allows looping over scenarios. Using this tag before an scenario will convert this scenario into a scenario outline.
-  
-- [BackgroundTagAspect](https://github.com/veepee-oss/gingerspec/wiki/Gherkin-tags#background-tag): An AspectJ aspect included in loopTagAspect that allows conditional backgrounds, or conditional executions of group of steps based in a environmental variable.
+### :envelope: Slack integration: 
+Send a message to a Slack channel(s) when your scenario fails. [Read more](https://github.com/veepee-oss/gingerspec/wiki/Gherkin-tags#slack-tag).
 
-- [ReplacementAspect](https://github.com/veepee-oss/gingerspec/wiki/Gherkin-variables): Allows the use of variables in the Feature file. Variables are enclosed in ${}.
-  
-- [LogTagAspect](https://github.com/veepee-oss/gingerspec/wiki/Gherkin-tags#log-tag): Allows comments in the feature file to be printed in console when tests are executed.
+```gherkin
+@slack[#mychannel]
+    Scenario: A successful response with a valid body is returned
+        Given I securely send requests to 'jsonplaceholder.typicode.com:443'
+        When I send a 'GET' request to '/posts'
+        Then the service response status must be '200'
+```
 
-- [JiraTag](https://github.com/veepee-oss/gingerspec/wiki/Gherkin-tags#jira-tag): This tag allows for the conditional execution of scenarios based on the status of the linked entity in Jira. It is also capable of updating the status of the given entity in Jira depending on the result of the scenario
+### :bar_chart: Jira integration
+Update tickets in jira based onn tests results and perform conditional execution based on status of tickets. [Read more](https://github.com/veepee-oss/gingerspec/wiki/Gherkin-tags#jira-tag).
 
-- [DebugTag](https://github.com/veepee-oss/gingerspec/wiki/Hook-tags#debug-tag): This tag allows changing the default logging level for scenarios at runtime.
+```gherkin
+@jira[QMS-990]
+Scenario: A new element is inserted via a POST call
+    Given I send requests to '${REST_SERVER_HOST}:3000'
+    When I send a 'POST' request to '/posts' based on 'schemas/mytestdata.json' as 'json'
+    Then the service response status must be '201'
+```
 
-- [ifStatementAspect](https://github.com/veepee-oss/gingerspec/wiki/Gherkin-tags#if-statement): This allows the conditional execution of steps during runtime.
+### :no_entry: Ignore scenarios
+Easily ignore scenarios using the @ignore tag. [Read more](https://github.com/veepee-oss/gingerspec/wiki/Gherkin-tags#ignore-tag).
 
-- [SlackTag](https://github.com/veepee-oss/gingerspec/wiki/Gherkin-tags#slack-tag): This tag allows you to send a message to a Slack channel(s) when your scenario fails.
+```gherkin
+  @ignore @toocomplex
+  Scenario: Ignored scenario (too complex)
+    Given I run '[ "THIS SHOULDNT HAVE BEEN RUN" = "!UNEXISTANT_VAR" ]' locally
+    Given I run 'exit 1' locally
+```
+
+### :gear: Use and create variables
+Use annd create variables directly in feature files. [Read more](https://github.com/veepee-oss/gingerspec/wiki/Gherkin-variables).
+
+````gherkin
+  Scenario: A new element is inserted via a POST call
+    Given I send requests to '${REST_SERVER_HOST}:3000'
+    When I send a 'POST' request to '/posts' based on 'schemas/mytestdata.json' as 'json'
+    Then the service response status must be '201'
+    And I save element '$.title' in environment variable 'TITLE'
+    Then '${TITLE}' matches 'This is a test'
+````
+
+### :arrows_counterclockwise: Conditional execution
+Allow the conditional execution of scenarios based on a given environment variable. [Read more](https://github.com/veepee-oss/gingerspec/wiki/Gherkin-tags#runonenv-tag).
+
+```gherkin
+@runOnEnv(SECS)
+Scenario: Dummy scenario
+     And I wait '${SECS}' seconds
+
+@skipOnEnv(SECS_2)
+Scenario: Dummy scenario
+    And I wait '${SECS}' seconds
+```
+
+And [many others more!](https://github.com/veepee-oss/gingerspec/wiki/Gherkin-tags) :yum:
   
 ## Steps
 
