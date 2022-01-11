@@ -40,6 +40,12 @@ The purpose of this project is to provide a generic BDT (behaviour driven testin
 
 GingerSpec provides common functionality that can be reused by different test projects, It encourages code reusability, as we test (in most of the cases) the same, it will help our QA Community to get our objectives much faster. It focuses on the reuse of actions (also steps or key tabs) that implement low level functionality and that can be organized to create much more complex features.
 
+<br>
+
+<div align="center">
+  <img src="https://github.com/veepee-oss/gingerspec/wiki/resources/gingerspec_highlights.png" alt="GingerSpec Highlights">
+</div>
+
 ## Documentation
 * [Project wiki](https://github.com/veepee-oss/gingerspec/wiki)
 * [Javadoc](https://javadoc.io/doc/com.github.privaliatech/gingerspec/latest/index.html)  
