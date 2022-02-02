@@ -116,7 +116,7 @@
         <kafka-avro-serializer.version>3.1.1</kafka-avro-serializer.version>
         <avro.version>1.8.0</avro.version>
         <mysql-connector-java.version>8.0.25</mysql-connector-java.version>
-        <postgresql.version>42.2.12</postgresql.version>
+        <postgresql.version>42.2.25</postgresql.version>
         <rest-assured.version>4.3.0</rest-assured.version>
         <webdrivermanager.version>4.3.1</webdrivermanager.version>
         <appium.version>7.3.0</appium.version>
