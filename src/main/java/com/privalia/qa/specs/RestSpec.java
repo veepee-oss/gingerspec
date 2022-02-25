@@ -27,6 +27,7 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
+import io.restassured.path.json.JsonPath;
 import io.restassured.response.ResponseBody;
 import io.restassured.specification.ProxySpecification;
 import io.restassured.specification.RequestSpecification;
@@ -159,16 +160,12 @@ public class RestSpec extends BaseGSpec {
         Assertions.assertThat(jsonString).as("The variable '" + envVar + "' was not set correctly previously").isNotNull();
 
         for (List<String> row : table.asLists()) {
-            String expression = row.get(0);
+            String jsonPath = row.get(0);
             String condition = row.get(1);
             String result = row.get(2);
 
-            //The value could also be obtained in a more "rest-assured" way
-            //but requires more testing for every possible corner case
-            //Object value = new JsonPath(jsonString).get(expression.replace("$.", ""));
-
-            String value = commonspec.getJSONPathString(jsonString, expression, null);
-            commonspec.evaluateJSONElementOperation(value, condition, result);
+            Object value = new JsonPath(jsonString).get(jsonPath.replace("$.", ""));
+            commonspec.evaluateJSONElementOperation(value, condition, result, jsonPath);
         }
     }
 
@@ -726,7 +723,7 @@ public class RestSpec extends BaseGSpec {
 
             this.getCommonSpec().getLogger().debug("Checking if header '{}' is '{}' to/than {}", header, condition, result);
             String headerValue = commonspec.getRestResponse().getHeaders().getValue(header);
-            commonspec.evaluateJSONElementOperation(headerValue, condition, result);
+            commonspec.evaluateJSONElementOperation(headerValue, condition, result, header);
         }
 
     }
@@ -764,7 +761,7 @@ public class RestSpec extends BaseGSpec {
 
             this.getCommonSpec().getLogger().debug("Checking if cookie '{}' is '{}' to/than {}", cookie, condition, result);
             String cookieValue = commonspec.getRestResponse().getCookies().get(cookie);
-            commonspec.evaluateJSONElementOperation(cookieValue, condition, result);
+            commonspec.evaluateJSONElementOperation(cookieValue, condition, result, cookie);
         }
 
     }

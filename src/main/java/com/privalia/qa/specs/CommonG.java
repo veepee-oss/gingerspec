@@ -19,6 +19,7 @@ package com.privalia.qa.specs;
 import com.datastax.driver.core.ColumnDefinitions;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
+import com.google.common.collect.Lists;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
@@ -72,6 +73,7 @@ import java.util.regex.Pattern;
 
 import static com.privalia.qa.assertions.Assertions.assertThat;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.values;
 import static org.testng.Assert.fail;
 
 /**
@@ -2056,32 +2058,51 @@ public class CommonG {
      * @param o         object to be evaluated
      * @param condition condition to compare
      * @param result    expected result
+     * @param jsonPath  jsonPath under evaluation (to provide more info when an assertion fails)
      */
-    public void evaluateJSONElementOperation(Object o, String condition, String result) {
+    public void evaluateJSONElementOperation(Object o, String condition, String result, String jsonPath) {
 
-        if (o instanceof String) {
-            String value = (String) o;
+        if (o instanceof List) {
+            List<String> keys = (List<String>) o;
+            switch (condition) {
+                case "contains":
+                    assertThat(keys).as("'%s' array does not contain the value '%s'", jsonPath, result).contains(result);
+                    break;
+                case "size":
+                    assertThat(keys).as("'%s' array size is not of the expected size %s", jsonPath, Integer.parseInt(result)).hasSize(Integer.parseInt(result));
+                    break;
+                default:
+                    Assertions.fail("Operation '" + condition + "' not implemented for JSONArrays");
+            }
+        } else {
+            String value = ((o == null) ? null : o.toString());
             switch (condition) {
                 case "equal":
-                    assertThat(value).as("Evaluate JSONPath/value does not match with proposed value").isEqualTo(result);
+                    assertThat(value).as("'%s' value does not equal with proposed value '%s'", jsonPath, result).isEqualTo(result);
                     break;
                 case "not equal":
-                    assertThat(value).as("Evaluate JSONPath/value match with proposed value").isNotEqualTo(result);
+                    assertThat(value).as("'%s' value does equal with proposed value '%s'", jsonPath, result).isNotEqualTo(result);
                     break;
                 case "contains":
-                    assertThat(value).as("Evaluate JSONPath/value does not contain proposed value").contains(result);
+                    assertThat(value).as("'%s' value does not contain proposed value '%s'", jsonPath, result).contains(result);
                     break;
                 case "does not contain":
-                    assertThat(value).as("Evaluate JSONPath/value contain proposed value").doesNotContain(result);
+                    assertThat(value).as("'%s' value does contain proposed value '%s'", jsonPath, result).doesNotContain(result);
                     break;
                 case "length":
-                    assertThat(value).as("Evaluate JSONPath/value contain proposed value").hasSize(Integer.parseInt(result));
+                    assertThat(value).as("'%s' value length is not proposed value '%s'", jsonPath, result).hasSize(Integer.parseInt(result));
                     break;
                 case "exists":
-                    assertThat(value).as("Evaluate JSONPath/value contain proposed value").isNotNull();
+                    assertThat(value).as("'%s' element does not exist!", jsonPath).isNotNull();
                     break;
                 case "does not exists":
-                    assertThat(value).as("Evaluate JSONPath/value contain proposed value").isNull();
+                    assertThat(value).as("'%s' element was found. It was expected not to be present", jsonPath).isNull();
+                    break;
+                case "is null":
+                    assertThat(value).as("'%s' value was expected to be null, but is not!. Value is '%s'", jsonPath, value).isNull();
+                    break;
+                case "is not null":
+                    assertThat(value).as("'%s' was expected not to be null, but it is!", jsonPath).isNotNull();
                     break;
                 case "size":
                     JsonValue jsonObject = JsonValue.readHjson(value);
@@ -2095,20 +2116,7 @@ public class CommonG {
                     Assertions.fail("Not valid operation '" + condition + "'. Valid operations: 'equal', 'not equal', 'contains', 'does not contain', 'length', 'exists', 'does not exists' and 'size'");
                     break;
             }
-        } else if (o instanceof List) {
-            List<String> keys = (List<String>) o;
-            switch (condition) {
-                case "contains":
-                    assertThat(keys).as("Keys does not contain that name").contains(result);
-                    break;
-                case "size":
-                    assertThat(keys).as("Keys size does not match").hasSize(Integer.parseInt(result));
-                    break;
-                default:
-                    Assertions.fail("Operation not implemented for JSON keys");
-            }
         }
-
     }
 
     public ZookeeperSecUtils getZkSecClient() {

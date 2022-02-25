@@ -806,7 +806,7 @@ public class KafkaGSpec extends BaseGSpec {
 
                     String value = commonspec.getJSONPathString(jsonString, expression, null);
                     try {
-                        commonspec.evaluateJSONElementOperation(value, condition, expectedResult);
+                        commonspec.evaluateJSONElementOperation(value, condition, expectedResult, expression);
                     } catch (AssertionError e) {
                         matches--;
                         break;

@@ -6,71 +6,180 @@ Feature: Rest Assured Feature
   This is necessary, since it signals the library that it should bootstrap some necessary components for testing REST APIs
 
 
-  Scenario: How to perform a simple request, verify the HTTP code returned, and check the body and its schema
-    Given I send requests to '${REST_SERVER_HOST}:3000'
-    When I send a 'GET' request to '/posts'
-    Then the service response status must be '200'
-    And the service response must contain the text 'body'
-    And the service response matches the schema in 'schemas/responseSchema.json'
-    Given I send a 'GET' request to '/comments/1'
-    When the service response length must be '268'
-    And the service response must contain the text 'body'
-    And in less than '10' seconds, checking each '2' seconds, I send a 'GET' request to '/posts' so that the response contains 'body'
+  Rule: Set up initial base URI for future requests
+
+    Scenario: Setting up base URI for future requests using http (if port not specified, defaults to 80)
+      Given I send requests to '${REST_SERVER_HOST}:3000'
+
+    Scenario: Setting up base URI for future requests using https (if port not specified, defaults to 443)
+      Given I securely send requests to '${REST_SERVER_HOST}:3000'
 
 
-  Scenario: A new element is inserted via a POST call
-    Given I send requests to '${REST_SERVER_HOST}:3000'
-    When I send a 'POST' request to '/posts' based on 'schemas/mytestdata.json' as 'json'
-    Then the service response status must be '201'
-    And I save element '$.title' in environment variable 'TITLE'
-    Then '${TITLE}' matches 'This is a test'
+  Rule: Specifying Request Data
+
+    Scenario: Invoking HTTP resources (GET, POST, DELETE, PATCH, UPDATE)
+      Given I send requests to '${REST_SERVER_HOST}:3000'
+      When I send a 'GET' request to '/posts'
+
+    Scenario: Adding URL parameters (i.e /posts?userId=3)
+      Given I send requests to '${REST_SERVER_HOST}:3000'
+      Given I set url parameters:
+        | userId | 3 |
+      When I send a 'GET' request to '/posts'
+
+    @ignore
+    Scenario: Adding cookies
+      Given I send requests to '${REST_SERVER_HOST}:3000'
+      Given I set cookies:
+        | cookieName | value1 |
+      When I send a 'GET' request to '/posts'
+
+    @ignore
+    Scenario: Adding headers
+      Given I send requests to '${REST_SERVER_HOST}:3000'
+      Given I set headers:
+        | headerName | value1 |
+      When I send a 'GET' request to '/posts'
+
+    Scenario: Adding request body from a file
+      Given I send requests to '${REST_SERVER_HOST}:3000'
+      When I send a 'POST' request to '/posts' based on 'schemas/mytestdata.json' as 'json'
+
+    Scenario: Adding request body from a file but modifying elements of the json before sending
+      Given I send requests to '${REST_SERVER_HOST}:3000'
+      When I send a 'POST' request to '/posts' based on 'schemas/mytestdata.json' as 'json' with:
+        | $.title | UPDATE | This is a test 2 |
+
+    Scenario: Adding request body directly in the gherkin step
+      Given I send requests to '${REST_SERVER_HOST}:3000'
+      When I send a 'POST' request to '/posts' with body
+           """
+              {
+                "userId": 1,
+                "title": "This is a test",
+                "body": "This is a test"
+              }
+          """
+
+    @ignore
+    Scenario: Sending a file
+      Given I send requests to '${REST_SERVER_HOST}:3000'
+      And I set headers:
+        | Content-Type | multipart/form-data |
+      And I add the file in 'schemas/mytestdata.json' to the request
+      When I send a 'POST' request to '/posts'
+      Then the service response status must be '201'
 
 
-  Scenario: Data in local file is altered using a datatable before sending
-    Given I send requests to '${REST_SERVER_HOST}:3000'
-    When I send a 'POST' request to '/posts' based on 'schemas/mytestdata.json' as 'json' with:
-      | $.title | UPDATE | This is a test 2 |
-    Then the service response status must be '201'
-    And I save element '$' in environment variable 'response'
-    And 'response' matches the following cases:
-      | $.title  | contains  | 2              |
-      | $.body   | contains  | This is a test |
-      | $.userId | not equal | 2              |
+  Rule: Verifying Response Data
+
+    Scenario: Verify status code
+      Given I send requests to '${REST_SERVER_HOST}:3000'
+      When I send a 'GET' request to '/posts'
+      Then the service response status must be '200'
+
+    Scenario: Verify the response body contains specific text
+      Given I send requests to '${REST_SERVER_HOST}:3000'
+      When I send a 'GET' request to '/posts'
+      And the service response must contain the text 'body'
+
+    Scenario: Verify the response body is the specified length
+      Given I send requests to '${REST_SERVER_HOST}:3000'
+      When I send a 'GET' request to '/posts/1'
+      When the service response length must be '292'
+
+    Scenario: Validating the response body matches a predefined json schema
+      Given I send requests to '${REST_SERVER_HOST}:3000'
+      When I send a 'GET' request to '/posts'
+      And the service response matches the schema in 'schemas/responseSchema.json'
+
+    Scenario: Saving an single element from the response body in a variable for future use using jsonpath
+      Given I send requests to '${REST_SERVER_HOST}:3000'
+      When I send a 'GET' request to '/posts'
+      Then the service response status must be '200'
+      And I save element '$.[0].id' in environment variable 'ID'
+      Then '${ID}' matches '1'
+
+    Scenario: Saving the whole response body and evaluating several elements at the same time
+      Given I send requests to '${REST_SERVER_HOST}:3000'
+      When I send a 'GET' request to '/comments/1'
+      Then the service response status must be '200'
+      And I save element '$' in environment variable 'response'
+      And 'response' matches the following cases:
+        | $.postId    | equal            | 1      |
+        | $.id        | not equal        | 2      |
+        | $.email     | contains         | Eliseo |
+        | $.email     | does not contain | foobar |
+        | $.body      | exists           |        |
+        | $.fakefield | does not exists  |        |
+
+    Scenario: Verifying a single response header
+      Given I send requests to '${REST_SERVER_HOST}:3000'
+      When I send a 'GET' request to '/posts'
+      And I save the response header 'Content-Type' in environment variable 'CONTENT-TYPE'
+      Then '${CONTENT-TYPE}' matches 'application/json; charset=utf-8'
+
+    Scenario: Verifying several headers using a datatable
+      Given I send requests to '${REST_SERVER_HOST}:3000'
+      When I send a 'GET' request to '/posts'
+      And the service response headers match the following cases:
+        | Content-Type | equal  | application/json; charset=utf-8 |
+        | Expires      | equal  | -1                              |
+        | Expires      | exists |                                 |
+
+    @ignore
+    Scenario: Verifying a single response cookie
+      Given I send requests to '${REST_SERVER_HOST}:3000'
+      When I send a 'GET' request to '/posts'
+      And I save the response cookie 'cookieName' in environment variable 'COOKIE'
+      Then '${COOKIE}' matches 'value'
+
+    @ignore
+    Scenario: Verifying several cookies using a datatable
+      Given I send requests to '${REST_SERVER_HOST}:3000'
+      When I send a 'GET' request to '/posts'
+      And the service response cookies match the following cases:
+        | cookieName1 | equal  | value1 |
+        | cookieName2 | equal  | value2 |
+        | cookieName3 | exists |        |
 
 
-  Scenario: URL parameters are added to the request (i.e /posts?userId=3)
-    Given I send requests to '${REST_SERVER_HOST}:3000'
-    Given I set url parameters:
-      | userId | 3 |
-    When I send a 'GET' request to '/posts'
-    Then the service response status must be '200'
-    And I save element '$.[0]' in environment variable 'response'
-    And 'response' matches the following cases:
-      | $.userId | equal | 3 |
-    Given I set url parameters:
-      | userId | 4 |
-    When I send a 'GET' request to '/posts'
-    Then the service response status must be '200'
-    And I save element '$.[0]' in environment variable 'response'
-    And 'response' matches the following cases:
-      | $.userId | equal | 4 |
+  Rule: Authentication
+
+    @ignore
+    Scenario: Generating a request using basic authentication
+      Given I securely send requests to '${REST_SERVER_HOST}:3000'
+      When I send a 'GET' request to '/posts' with user and password 'user:password'
 
 
-  @ignore @toocomplex
-  Scenario: Setting headers using a datatable and verifying the returned headers
-    Given I send requests to 'dummy-test.com:80'
-    Given I set headers:
-      | x-user  | vente_privee_es                                                  |
-      | x-token | 93f44fdfe7c186e354fafbf0ff064eec1e2d6e31df6956cbeb7d3a7b5c112dc4 |
-    When I send a 'GET' request to '/api/v1/shipment/1' as 'json'
-    Then the service response status must be '200'
-    And the service response headers match the following cases:
-      | Server           | equal           | nginx |
-      | Content-Encoding | equal           | gzip  |
-      | Connection       | exists          |       |
-      | test             | does not exists |       |
-      | Cache-Control    | length          | 8     |
-      | Cache-Control    | contains        | cache |
-    And I save the response header 'Server' in environment variable 'SERVER'
-    When I send a 'GET' request to '/api/v1/shipment/1'
-    Then the service response status must be '401'
+  Rule: Proxy configuration
+
+    @ignore
+    Scenario: Setting a proxy
+      Given I securely send requests to '${REST_SERVER_HOST}:3000'
+      And I set the proxy to 'http://localhost:80'
+
+    @ignore
+    Scenario: Setting a proxy with credentials
+      Given I securely send requests to '${REST_SERVER_HOST}:3000'
+      And I set the proxy to 'http://localhost:80' with username 'myusername' and password 'mypassword'
+
+
+  Rule: Miscellaneous and examples
+
+    Scenario: Operations that can be done on a json response (using a sample json file as seed json)
+      And I save '${file:UTF-8:src/test/resources/schemas/sampleJsonResponse.json}' in variable 'SAMPLE_JSON'
+      And 'SAMPLE_JSON' matches the following cases:
+        | $.firstName             | equal            | John    |
+        | $.firstName             | not equal        | Smith   |
+        | $.lastName              | contains         | d       |
+        | $.lastName              | does not contain | foo     |
+        | $.age                   | length           | 2       |
+        | $.age                   | is not null      |         |
+        | $.occupation            | is null          |         |
+        | $.phoneNumbers[0].type  | equal            | iPhone  |
+        | $.phoneNumbers[0].local | equal            | false   |
+        | $.address               | exists           |         |
+        | $.fakefield             | does not exists  |         |
+        | $.phoneNumbers          | size             | 2       |
+        | $.hobbies               | contains         | netflix |

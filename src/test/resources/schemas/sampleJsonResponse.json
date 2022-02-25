@@ -1,0 +1,24 @@
+{
+  "firstName": "John",
+  "lastName": "doe",
+  "age": 26,
+  "occupation": null,
+  "address": {
+    "streetAddress": "naist street",
+    "city": "Nara",
+    "postalCode": "630-0192"
+  },
+  "hobbies": ["run", "tennis", "netflix"],
+  "phoneNumbers": [
+    {
+      "type": "iPhone",
+      "number": "0123-4567-8888",
+      "local": false
+    },
+    {
+      "type": "home",
+      "number": "0123-4567-8910",
+      "local": true
+    }
+  ]
+}
