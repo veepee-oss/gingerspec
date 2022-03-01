@@ -189,8 +189,6 @@ Feature: Rest Assured Feature
         | $.lastName              | contains         | d       |
         | $.lastName              | does not contain | foo     |
         | $.age                   | length           | 2       |
-        | $.age                   | is not null      |         |
-        | $.occupation            | is null          |         |
         | $.phoneNumbers[0].type  | equal            | iPhone  |
         | $.phoneNumbers[0].local | equal            | false   |
         | $.address               | exists           |         |

@@ -23,6 +23,7 @@ import com.google.common.collect.Lists;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.PathNotFoundException;
 import com.jayway.jsonpath.spi.json.GsonJsonProvider;
 import com.jayway.jsonpath.spi.mapper.GsonMappingProvider;
 import com.mongodb.DBCursor;
@@ -2006,7 +2007,13 @@ public class CommonG {
             }
         } else {
             String result = JsonValue.readHjson(jsonString).toString();
-            Object data = JsonPath.parse(result).read(expr);
+            Object data;
+            try {
+                data = JsonPath.parse(result).read(expr);
+            } catch (PathNotFoundException e) {
+                this.getLogger().debug("jsonpath '{}' not found in the json document. Returning null.", expr);
+                return null;
+            }
             if (position != null) {
                 JSONArray jsonArray = new JSONArray(data.toString());
                 value = jsonArray.get(Integer.parseInt(position)).toString();
@@ -2062,47 +2069,40 @@ public class CommonG {
      */
     public void evaluateJSONElementOperation(String value, String condition, String result, String jsonPath) {
 
-            value = ((value == null) ? null : value);
-            switch (condition) {
-                case "equal":
-                    assertThat(value).as("'%s' value does not equal with proposed value '%s'", jsonPath, result).isEqualTo(result);
-                    break;
-                case "not equal":
-                    assertThat(value).as("'%s' value does equal with proposed value '%s'", jsonPath, result).isNotEqualTo(result);
-                    break;
-                case "contains":
-                    assertThat(value).as("'%s' value does not contain proposed value '%s'", jsonPath, result).contains(result);
-                    break;
-                case "does not contain":
-                    assertThat(value).as("'%s' value does contain proposed value '%s'", jsonPath, result).doesNotContain(result);
-                    break;
-                case "length":
-                    assertThat(value).as("'%s' value length is not proposed value '%s'", jsonPath, result).hasSize(Integer.parseInt(result));
-                    break;
-                case "exists":
-                    assertThat(value).as("'%s' element does not exist!", jsonPath).isNotNull();
-                    break;
-                case "does not exists":
-                    assertThat(value).as("'%s' element was found. It was expected not to be present", jsonPath).isNull();
-                    break;
-                case "is null":
-                    assertThat(value).as("'%s' value was expected to be null, but is not!. Value is '%s'", jsonPath, value).isNull();
-                    break;
-                case "is not null":
-                    assertThat(value).as("'%s' was expected not to be null, but it is!", jsonPath).isNotNull();
-                    break;
-                case "size":
-                    JsonValue jsonObject = JsonValue.readHjson(value);
-                    if (jsonObject.isArray()) {
-                        assertThat(jsonObject.asArray()).as("Keys size does not match").hasSize(Integer.parseInt(result));
-                    } else {
-                        Assertions.fail("Expected array for size operation check");
-                    }
-                    break;
-                default:
-                    Assertions.fail("Not valid operation '" + condition + "'. Valid operations: 'equal', 'not equal', 'contains', 'does not contain', 'length', 'exists', 'does not exists' and 'size'");
-                    break;
-            }
+        switch (condition) {
+            case "equal":
+                assertThat(value).as("'%s' value does not equal with proposed value '%s'", jsonPath, result).isEqualTo(result);
+                break;
+            case "not equal":
+                assertThat(value).as("'%s' value does equal with proposed value '%s'", jsonPath, result).isNotEqualTo(result);
+                break;
+            case "contains":
+                assertThat(value).as("'%s' value does not contain proposed value '%s'", jsonPath, result).contains(result);
+                break;
+            case "does not contain":
+                assertThat(value).as("'%s' value does contain proposed value '%s'", jsonPath, result).doesNotContain(result);
+                break;
+            case "length":
+                assertThat(value).as("'%s' value length is not proposed value '%s'", jsonPath, result).hasSize(Integer.parseInt(result));
+                break;
+            case "exists":
+                assertThat(value).as("'%s' element does not exist!", jsonPath).isNotNull();
+                break;
+            case "does not exists":
+                assertThat(value).as("'%s' element was found. It was expected not to be present", jsonPath).isNull();
+                break;
+            case "size":
+                JsonValue jsonObject = JsonValue.readHjson(value);
+                if (jsonObject.isArray()) {
+                    assertThat(jsonObject.asArray()).as("'%s' array is not the expected size", jsonPath).hasSize(Integer.parseInt(result));
+                } else {
+                    Assertions.fail("'%s' is not an array. It must be an array to calculate size", jsonPath);
+                }
+                break;
+            default:
+                Assertions.fail("Not valid operation '" + condition + "'. Valid operations: 'equal', 'not equal', 'contains', 'does not contain', 'length', 'exists', 'does not exists' and 'size'");
+                break;
+        }
     }
 
     public ZookeeperSecUtils getZkSecClient() {

@@ -2,7 +2,6 @@
   "firstName": "John",
   "lastName": "doe",
   "age": 26,
-  "occupation": null,
   "address": {
     "streetAddress": "naist street",
     "city": "Nara",
