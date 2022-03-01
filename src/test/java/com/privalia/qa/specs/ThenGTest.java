@@ -218,7 +218,7 @@ public class ThenGTest {
         theng.matchWithExpresion(envVar, table);
     }
 
-    @Test(expectedExceptions = AssertionError.class, expectedExceptionsMessageRegExp = ".*?Expected array for size operation.*?")
+    @Test(expectedExceptions = AssertionError.class, expectedExceptionsMessageRegExp = ".*?is not an array. It must be an array to calculate size.*?")
     public void testNotArraySizeInJSON() throws Exception {
         String baseData = "consulMesosJSON.conf";
         String envVar = "exampleEnvVar";
