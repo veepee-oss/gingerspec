@@ -2055,27 +2055,14 @@ public class CommonG {
      * <p>
      * Object o could be a string or a list.
      *
-     * @param o         object to be evaluated
+     * @param value         object to be evaluated
      * @param condition condition to compare
      * @param result    expected result
      * @param jsonPath  jsonPath under evaluation (to provide more info when an assertion fails)
      */
-    public void evaluateJSONElementOperation(Object o, String condition, String result, String jsonPath) {
+    public void evaluateJSONElementOperation(String value, String condition, String result, String jsonPath) {
 
-        if (o instanceof List) {
-            List<String> keys = (List<String>) o;
-            switch (condition) {
-                case "contains":
-                    assertThat(keys).as("'%s' array does not contain the value '%s'", jsonPath, result).contains(result);
-                    break;
-                case "size":
-                    assertThat(keys).as("'%s' array size is not of the expected size %s", jsonPath, Integer.parseInt(result)).hasSize(Integer.parseInt(result));
-                    break;
-                default:
-                    Assertions.fail("Operation '" + condition + "' not implemented for JSONArrays");
-            }
-        } else {
-            String value = ((o == null) ? null : o.toString());
+            value = ((value == null) ? null : value);
             switch (condition) {
                 case "equal":
                     assertThat(value).as("'%s' value does not equal with proposed value '%s'", jsonPath, result).isEqualTo(result);
@@ -2116,7 +2103,6 @@ public class CommonG {
                     Assertions.fail("Not valid operation '" + condition + "'. Valid operations: 'equal', 'not equal', 'contains', 'does not contain', 'length', 'exists', 'does not exists' and 'size'");
                     break;
             }
-        }
     }
 
     public ZookeeperSecUtils getZkSecClient() {

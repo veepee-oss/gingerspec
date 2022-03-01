@@ -5,6 +5,12 @@ Feature: Rest Assured Feature
   the steps for testing REST APIs (such as this one) must include the "@rest" annotation at the beginning of the file.
   This is necessary, since it signals the library that it should bootstrap some necessary components for testing REST APIs
 
+    1.- Set up initial base URI for future requests
+    2.- Specifying Request Data
+    3.- Verifying Response Data
+    4.- Authentication
+    5.- Proxy configuration
+    6.- Miscellaneous and examples
 
   Rule: Set up initial base URI for future requests
 
@@ -73,7 +79,7 @@ Feature: Rest Assured Feature
 
   Rule: Verifying Response Data
 
-    Scenario: Verify status code
+    Scenario: Verify response status code
       Given I send requests to '${REST_SERVER_HOST}:3000'
       When I send a 'GET' request to '/posts'
       Then the service response status must be '200'
@@ -93,7 +99,7 @@ Feature: Rest Assured Feature
       When I send a 'GET' request to '/posts'
       And the service response matches the schema in 'schemas/responseSchema.json'
 
-    Scenario: Saving an single element from the response body in a variable for future use using jsonpath
+    Scenario: Saving an element from the response body in a variable for future use using jsonpath
       Given I send requests to '${REST_SERVER_HOST}:3000'
       When I send a 'GET' request to '/posts'
       Then the service response status must be '200'
@@ -113,7 +119,7 @@ Feature: Rest Assured Feature
         | $.body      | exists           |        |
         | $.fakefield | does not exists  |        |
 
-    Scenario: Verifying a single response header
+    Scenario: Saving the value of a response header in a variable for future use
       Given I send requests to '${REST_SERVER_HOST}:3000'
       When I send a 'GET' request to '/posts'
       And I save the response header 'Content-Type' in environment variable 'CONTENT-TYPE'
@@ -128,7 +134,7 @@ Feature: Rest Assured Feature
         | Expires      | exists |                                 |
 
     @ignore
-    Scenario: Verifying a single response cookie
+    Scenario: Saving the value of a response cookie in a variable for future use
       Given I send requests to '${REST_SERVER_HOST}:3000'
       When I send a 'GET' request to '/posts'
       And I save the response cookie 'cookieName' in environment variable 'COOKIE'
@@ -143,25 +149,33 @@ Feature: Rest Assured Feature
         | cookieName2 | equal  | value2 |
         | cookieName3 | exists |        |
 
+    Scenario: Measuring Response Time
+      Given I send requests to '${REST_SERVER_HOST}:3000'
+      When I send a 'GET' request to '/posts'
+      And the service response time is lower than '1000' milliseconds
+
 
   Rule: Authentication
 
-    @ignore
     Scenario: Generating a request using basic authentication
-      Given I securely send requests to '${REST_SERVER_HOST}:3000'
+      Given I send requests to '${REST_SERVER_HOST}:3000'
       When I send a 'GET' request to '/posts' with user and password 'user:password'
+
+    Scenario: Generating a request using basic authentication (POST example)
+      Given I send requests to '${REST_SERVER_HOST}:3000'
+      When I send a 'POST' request to '/posts' with user and password 'user:password' based on 'schemas/mytestdata.json' as 'json'
 
 
   Rule: Proxy configuration
 
     @ignore
     Scenario: Setting a proxy
-      Given I securely send requests to '${REST_SERVER_HOST}:3000'
+      Given I send requests to '${REST_SERVER_HOST}:3000'
       And I set the proxy to 'http://localhost:80'
 
     @ignore
     Scenario: Setting a proxy with credentials
-      Given I securely send requests to '${REST_SERVER_HOST}:3000'
+      Given I send requests to '${REST_SERVER_HOST}:3000'
       And I set the proxy to 'http://localhost:80' with username 'myusername' and password 'mypassword'
 
 

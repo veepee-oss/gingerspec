@@ -42,6 +42,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -164,7 +165,7 @@ public class RestSpec extends BaseGSpec {
             String condition = row.get(1);
             String result = row.get(2);
 
-            Object value = new JsonPath(jsonString).get(jsonPath.replace("$.", ""));
+            String value = commonspec.getJSONPathString(jsonString, jsonPath, null);
             commonspec.evaluateJSONElementOperation(value, condition, result, jsonPath);
         }
     }
@@ -992,5 +993,33 @@ public class RestSpec extends BaseGSpec {
         } else {
             this.setupApp(null, commonspec.getRestHost() + ":" + commonspec.getRestPort());
         }
+    }
+
+    /**
+     * Verify that service response time
+     * <p>
+     * This step verifies that the response time of the last request is lower than the given number. The number provided
+     * is in milliseconds
+     * <pre>{@code
+     * Example:
+     *
+     *  Scenario: Measuring Response Time
+     *     Given I send requests to 'localhost:3000'
+     *     When I send a 'GET' request to '/posts'
+     *     And the service response time is lower than '500' milliseconds
+     * }
+     * </pre>
+     *
+     * @see #assertResponseStatusCode(Integer)
+     * @see #assertResponseLength(Integer)
+     * @see #assertResponseMessage(String)
+     * @param responseTime   Response time value in milliseconds
+     */
+    @And("the service response time is lower than '{long}' milliseconds")
+    public void assertResponseTime(long responseTime) {
+        commonspec.getLogger().debug("Getting response time of last request in milliseconds");
+        long timeInMs =  this.getCommonSpec().getRestResponse().timeIn(TimeUnit.MILLISECONDS);
+        commonspec.getLogger().debug("Response time of last request was {} milliseconds", timeInMs);
+        Assertions.assertThat(timeInMs).as("The service response time was higher than the expected '%s' milliseconds", responseTime).isLessThan(responseTime);
     }
 }
