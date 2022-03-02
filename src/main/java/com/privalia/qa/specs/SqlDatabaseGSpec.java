@@ -17,11 +17,14 @@
 package com.privalia.qa.specs;
 
 import com.google.common.io.CharStreams;
+import com.privalia.qa.aspects.ReplacementAspect;
 import com.privalia.qa.utils.ThreadProperty;
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import org.apache.commons.text.io.StringSubstitutorReader;
+import org.apache.tools.ant.taskdefs.Replace;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -319,7 +322,9 @@ public class SqlDatabaseGSpec extends BaseGSpec {
      * <p>
      * The SQL could be of any kind (a typical SELECT or a SQL Data
      * Manipulation Language (DML) statement, such as INSERT, UPDATE or DELETE) or even SQL Scripts.
-     * If the SQL returns a {@link java.sql.ResultSet}, it is stored internally so further steps can use it
+     * If the SQL returns a {@link java.sql.ResultSet}, it is stored internally so further steps can use it.
+     * GingerSpec will try to resolve any variable present in the file (variables are enclosed in ${})
+     * before executing the query.
      * <pre>{@code
      * Example:
      *
@@ -342,7 +347,10 @@ public class SqlDatabaseGSpec extends BaseGSpec {
     @Then("^I execute query from '(.+?)'")
     public void executeQueryFromFile(String baseData) throws IOException {
         InputStream stream = getClass().getClassLoader().getResourceAsStream(baseData);
-        Reader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
+
+        //Performs variable replacements in the file before executing the query
+        StringSubstitutorReader reader = new StringSubstitutorReader(new InputStreamReader(stream, StandardCharsets.UTF_8),
+                ReplacementAspect.getInterpolator());
 
         try {
             commonspec.getLogger().debug("running query from file {}", baseData);

@@ -63,6 +63,10 @@ public final class ReplacementAspect {
         }
     };
 
+    public static StringSubstitutor getInterpolator() {
+        return interpolator;
+    }
+
     private static StringSubstitutor interpolator = new StringSubstitutor(StringLookupFactory.INSTANCE.interpolatorStringLookup(stringLookupMap, new DefaultLookUp(), true))
             .setEnableSubstitutionInVariables(true);
 
