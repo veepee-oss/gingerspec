@@ -17,6 +17,7 @@
 package com.privalia.qa.lookups;
 
 import com.privalia.qa.aspects.ReplacementAspect;
+import com.privalia.qa.exceptions.NonReplaceableException;
 import org.apache.commons.configuration2.CombinedConfiguration;
 import org.apache.commons.configuration2.FileBasedConfiguration;
 import org.apache.commons.configuration2.PropertiesConfiguration;
@@ -56,12 +57,16 @@ public class EnvPropertyLookup implements StringLookup {
             return null;
         }
 
+
+
         try {
             Parameters params = new Parameters();
             CombinedConfiguration config = new CombinedConfiguration(new OverrideCombiner());
 
             /*If environment specific file is required, search it by its name and add it as a source of properties*/
-            String environment = System.getProperty("env", null);
+            String environment = ReplacementAspect.replacePlaceholders("${env}", false);
+            environment = ((environment == "${env}") ? null : environment);
+
             if (environment != null) {
                 FileBasedConfigurationBuilder<FileBasedConfiguration> config2 = new FileBasedConfigurationBuilder<FileBasedConfiguration>(
                         PropertiesConfiguration.class).configure(params.properties().setFile(getfile(environment)));
@@ -78,6 +83,8 @@ public class EnvPropertyLookup implements StringLookup {
         } catch (final ConfigurationException e) {
             throw new IllegalArgumentException(String.format("Could not find property %s in included properties files (under resources/configuration/).", key), e);
         } catch (URISyntaxException e) {
+            throw new IllegalArgumentException(e.getMessage(), e);
+        } catch (NonReplaceableException e) {
             throw new IllegalArgumentException(e.getMessage(), e);
         }
     }
