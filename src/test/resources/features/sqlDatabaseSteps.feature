@@ -155,7 +155,7 @@ Feature: SQL Database Steps
       | Barcelona | 5       | 37      | 0.4  | 2014-11-29 |
 
 
-  Scenario: Store the value returned by a query in an environment variable
+  Scenario: Store the value returned by a query in an environment variable (MySQL database)
     Given I connect with JDBC to database 'mysql' type 'mysql' on host '${MYSQL_HOST}' and port '3306' with user 'root' and password 'mysql'
     When I execute query from 'sql/createWeather.sql'
     When I execute query from 'sql/selectWeather.sql'
@@ -165,7 +165,7 @@ Feature: SQL Database Steps
     Then '${TEMP_BARCELONA}' matches '37'
 
 
-  Scenario: Store the value returned by a query in an environment variable
+  Scenario: Store the value returned by a query in an environment variable (PostgreSQL database)
     Given I connect with JDBC to database 'postgres' type 'postgresql' on host '${POSTGRES_HOST}' and port '5432' with user 'postgres' and password 'postgres'
     When I execute query from 'sql/createWeather.sql'
     When I execute query from 'sql/selectWeather.sql'
@@ -173,3 +173,26 @@ Feature: SQL Database Steps
     Then I save the value of the row number '2' and the column with name 'temp_hi' in environment variable 'TEMP_BARCELONA'
     Then '${CITY}' matches 'Caracas'
     Then '${TEMP_BARCELONA}' matches '37'
+
+
+  Scenario: Verify amount ot rows returned from last query (MySQL database)
+    Given I connect with JDBC to database 'mysql' type 'mysql' on host '${MYSQL_HOST}' and port '3306' with user 'root' and password 'mysql'
+    And I execute query from 'sql/createWeather.sql'
+    When I execute query from 'sql/selectWeather.sql'
+    Then The last sql query returned at least '1' rows
+    Then The last sql query returned exactly '3' rows
+    Then The last sql query returned more than '2' rows
+    Then The last sql query returned less than '4' rows
+
+
+  Scenario: Verify amount ot rows returned from last query (PostgreSQL database)
+    Given I connect with JDBC to database 'postgres' type 'postgresql' on host '${POSTGRES_HOST}' and port '5432' with user 'postgres' and password 'postgres'
+    And I execute query from 'sql/createWeather.sql'
+    When I execute query from 'sql/selectWeather.sql'
+    Then The last sql query returned at least '1' rows
+    Then The last sql query returned exactly '3' rows
+    Then The last sql query returned more than '2' rows
+    Then The last sql query returned less than '4' rows
+
+
+

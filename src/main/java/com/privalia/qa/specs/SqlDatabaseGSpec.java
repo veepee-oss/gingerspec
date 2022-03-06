@@ -25,6 +25,8 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.apache.commons.text.io.StringSubstitutorReader;
 import org.apache.tools.ant.taskdefs.Replace;
+import org.assertj.core.api.Assert;
+import org.assertj.core.api.Assertions;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -425,5 +427,53 @@ public class SqlDatabaseGSpec extends BaseGSpec {
         }
         commonspec.getLogger().debug("table '{}' exists: {}", tableName, exists);
         return exists;
+    }
+
+    /**
+     * Check amount of rows returned by last query
+     * <p>
+     * Verifies if the amount of rows returned by the last SQL query is exactly/at least/more than/less than the given value.
+     * The last SQL query executed should have returned rows (like a SELECT statement), otherwise, the step will fail.
+     * <pre>{@code
+     * Example:
+     *
+     * Scenario: Verify amount ot rows returned from last query (PostgreSQL database)
+     *     Given I connect with JDBC to database 'postgres' type 'postgresql' on host '${POSTGRES_HOST}' and port '5432' with user 'postgres' and password 'postgres'
+     *     And I execute query from 'sql/createWeather.sql'
+     *     When I execute query from 'sql/selectWeather.sql'
+     *     Then The last sql query returned at least '1' rows
+     *     Then The last sql query returned exactly '3' rows
+     *     Then The last sql query returned more than '2' rows
+     *     Then The last sql query returned less than '4' rows
+     *
+     * }</pre>
+     * @see #connectDatabase(String, String, String, String, String, String, String)
+     * @see #executeQueryFromFile(String)
+     * @param condition     Condition to evaluate (at least|exactly|less than|more than)
+     * @param numberOfRows  Expected value of rows for the condition
+     */
+    @Then("^The last sql query returned (at least|exactly|less than|more than) '(\\d+?)' rows$")
+    public void evaluateNumberOfRowsReturnedByQuery(String condition, int numberOfRows) {
+
+        Assertions.assertThat(this.commonspec.getPreviousSqlResult()).as("Last SQL query did not return any results!").isNotNull();
+        int lastQueryReturnedRows = this.commonspec.getPreviousSqlResult().size() - 1;
+
+        switch (condition) {
+            case "at least":
+                Assertions.assertThat(lastQueryReturnedRows).as("Expecting %s %s rows from last sql query, but got %s!", condition, numberOfRows, lastQueryReturnedRows).isGreaterThanOrEqualTo(numberOfRows);
+                break;
+
+            case "exactly":
+                Assertions.assertThat(lastQueryReturnedRows).as("Expecting %s %s rows from last sql query, but got %s!", condition, numberOfRows, lastQueryReturnedRows).isEqualTo(numberOfRows);
+                break;
+
+            case "less than":
+                Assertions.assertThat(lastQueryReturnedRows).as("Expecting %s %s rows from last sql query, but got %s!", condition, numberOfRows, lastQueryReturnedRows).isLessThan(numberOfRows);
+                break;
+
+            case "more than":
+                Assertions.assertThat(lastQueryReturnedRows).as("Expecting %s %s rows from last sql query, but got %s!", condition, numberOfRows, lastQueryReturnedRows).isGreaterThan(numberOfRows);
+                break;
+        }
     }
 }
