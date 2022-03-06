@@ -474,6 +474,10 @@ public class SqlDatabaseGSpec extends BaseGSpec {
             case "more than":
                 Assertions.assertThat(lastQueryReturnedRows).as("Expecting %s %s rows from last sql query, but got %s!", condition, numberOfRows, lastQueryReturnedRows).isGreaterThan(numberOfRows);
                 break;
+
+            default:
+                fail("Not supported operation '%s'", condition);
+                break;
         }
     }
 
