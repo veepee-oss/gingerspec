@@ -476,4 +476,29 @@ public class SqlDatabaseGSpec extends BaseGSpec {
                 break;
         }
     }
+
+    /**
+     * Save amount of rows returned from last query
+     * <p>
+     * Saves the amount of rows returned from last query for future use in the scenario
+     * <pre>{@code
+     * Example:
+     *
+     * Scenario: Saving the amount of rows returned by last query in a variable for future use (PostgreSQL database)
+     *     Given I connect with JDBC to database 'postgres' type 'postgresql' on host '${POSTGRES_HOST}' and port '5432' with user 'postgres' and password 'postgres'
+     *     And I execute query from 'sql/createWeather.sql'
+     *     When I execute query from 'sql/selectWeather.sql'
+     *     Then I save the amount of rows returned by the last query in environment variable 'ROWS'
+     *     And '${ROWS}' is '3'
+     *
+     * }</pre>
+     * @see #connectDatabase(String, String, String, String, String, String, String)
+     * @see #executeQueryFromFile(String)
+     * @param envVar     Variable name
+     */
+    @Then("I save the amount of rows returned by the last query in environment variable {string}")
+    public void saveAmountOfRowsReturnedInVariable(String envVar) {
+        int lastQueryReturnedRows = this.commonspec.getPreviousSqlResult().size() - 1;
+        ThreadProperty.set(envVar, String.valueOf(lastQueryReturnedRows));
+    }
 }

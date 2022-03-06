@@ -194,5 +194,16 @@ Feature: SQL Database Steps
     Then The last sql query returned more than '2' rows
     Then The last sql query returned less than '4' rows
 
+  Scenario: Saving the amount of rows returned by last query in a variable for future use (MySQL database)
+    Given I connect with JDBC to database 'mysql' type 'mysql' on host '${MYSQL_HOST}' and port '3306' with user 'root' and password 'mysql'
+    And I execute query from 'sql/createWeather.sql'
+    When I execute query from 'sql/selectWeather.sql'
+    Then I save the amount of rows returned by the last query in environment variable 'ROWS'
+    And '${ROWS}' is '3'
 
-
+  Scenario: Saving the amount of rows returned by last query in a variable for future use (PostgreSQL database)
+    Given I connect with JDBC to database 'postgres' type 'postgresql' on host '${POSTGRES_HOST}' and port '5432' with user 'postgres' and password 'postgres'
+    And I execute query from 'sql/createWeather.sql'
+    When I execute query from 'sql/selectWeather.sql'
+    Then I save the amount of rows returned by the last query in environment variable 'ROWS'
+    And '${ROWS}' is '3'
