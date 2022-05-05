@@ -411,6 +411,11 @@
             <artifactId>exp4j</artifactId>
             <version>0.4.8</version>
         </dependency>
+        <dependency>
+            <groupId>org.freemarker</groupId>
+            <artifactId>freemarker</artifactId>
+            <version>2.3.31</version>
+        </dependency>
     </dependencies>
 
     <repositories>
