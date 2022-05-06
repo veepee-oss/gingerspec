@@ -24,7 +24,6 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.util.JSON;
-import com.ning.http.client.Response;
 import com.privalia.qa.assertions.DBObjectsAssert;
 import com.privalia.qa.exceptions.DBException;
 import com.privalia.qa.utils.ThreadProperty;
@@ -37,7 +36,6 @@ import org.elasticsearch.common.xcontent.XContentBuilder;
 import java.lang.reflect.InvocationTargetException;
 import java.net.UnknownHostException;
 import java.util.*;
-import java.util.concurrent.Future;
 import java.util.regex.Pattern;
 
 import static com.privalia.qa.assertions.Assertions.assertThat;
@@ -238,14 +236,11 @@ public class BigDataGSpec extends BaseGSpec {
         RestSpec restSpec = new RestSpec(this.commonspec);
         restSpec.setupApp(null, host + ":" + port);
 
-        Future<Response> response;
-
-        response = commonspec.generateRequest("GET", false, null, null, "/", "", "json", "");
-        commonspec.setResponse("GET", response.get());
+        restSpec.sendRequestNoDataTable("GET", "/", null, null, "json");
 
         String json;
         String parsedElement;
-        json = commonspec.getResponse().getResponse();
+        json = commonspec.getRestResponse().getBody().prettyPrint();
         parsedElement = "$..cluster_name";
 
         String json2 = "[" + json + "]";
