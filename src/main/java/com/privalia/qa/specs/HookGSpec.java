@@ -17,8 +17,6 @@
 package com.privalia.qa.specs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.AsyncHttpClientConfig;
 import com.privalia.qa.utils.JiraConnector;
 import com.privalia.qa.utils.RunOnEnvTag;
 import com.privalia.qa.utils.SlackConnector;
@@ -529,9 +527,6 @@ public class HookGSpec extends BaseGSpec {
 
         commonspec.getLogger().debug("Starting a REST client");
 
-        commonspec.setClient(new AsyncHttpClient(new AsyncHttpClientConfig.Builder().setAcceptAnyCertificate(true).setAllowPoolingConnections(false)
-                .build()));
-
         commonspec.setRestRequest(given().contentType(ContentType.JSON));
 
     }
@@ -544,12 +539,8 @@ public class HookGSpec extends BaseGSpec {
     public void restClientTeardown(Scenario scenario) {
 
         if (scenario.getStatus().name().toLowerCase().matches("skipped")) {
-            throw new SkipException("@web tag ignored since scenario was skipped");
+            throw new SkipException("@rest tag ignored since scenario was skipped");
         }
-
-        commonspec.getLogger().debug("Shutting down REST client");
-        commonspec.getClient().close();
-
     }
 
 

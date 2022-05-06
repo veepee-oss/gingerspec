@@ -17,15 +17,13 @@
 package com.privalia.qa.utils;
 
 import com.jayway.jsonpath.JsonPath;
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.Request;
-import com.ning.http.client.RequestBuilder;
-import com.ning.http.client.Response;
+import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
+import io.restassured.response.Response;
 import net.minidev.json.JSONArray;
 import org.apache.commons.text.StringSubstitutor;
 
 import java.util.List;
-import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -38,8 +36,6 @@ public class JiraConnector {
     public static final String JIRA_PROPERTIES_FILE = "jira.properties";
 
     final StringSubstitutor interpolator = StringSubstitutor.createInterpolator();
-
-    AsyncHttpClient client = new AsyncHttpClient();
 
     /**
      * Reads the given key from the properties file. The system will try to locate the key first in
@@ -75,20 +71,16 @@ public class JiraConnector {
         String jiraURL = this.getProperty("jira.server.url", null);
         String jiraToken = this.getProperty("jira.personal.access.token", null);
 
-        Request getRequest = new RequestBuilder()
-                .setMethod("GET")
-                .setUrl(jiraURL + "/rest/api/2/issue/" + entity)
-                .addHeader("Authorization", "Bearer " + jiraToken)
-                .build();
+        Response RestResponse = RestAssured.given().relaxedHTTPSValidation().contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + jiraToken)
+                .when()
+                .get(jiraURL + "/rest/api/2/issue/" + entity);
 
-        Future  f = this.client.executeRequest(getRequest);
-        Response r = (Response) f.get();
-
-        if (r.getStatusCode() != 200) {
-            throw new Exception("Unexpected status code response:" + r.getStatusCode() + ". Body: '" + r.getResponseBody() + "'");
+        if (RestResponse.getStatusCode() != 200) {
+            throw new Exception("Unexpected status code response:" + RestResponse.getStatusCode() + ". Body: '" + RestResponse.getBody().asString() + "'");
         }
 
-        return JsonPath.read(r.getResponseBody(), "$.fields.status.name").toString().toUpperCase();
+        return JsonPath.read(RestResponse.getBody().asString(), "$.fields.status.name");
     }
 
     /**
@@ -125,19 +117,15 @@ public class JiraConnector {
         String jiraURL = this.getProperty("jira.server.url", "");
         String jiraToken = this.getProperty("jira.personal.access.token", "");
 
-        Request postRequest = new RequestBuilder()
-                .setMethod("POST")
-                .setUrl(jiraURL + "/rest/api/2/issue/" + entity + "/transitions")
-                .addHeader("Authorization", "Bearer " + jiraToken)
-                .addHeader("Content-Type", "application/json")
-                .setBody("{\"transition\": {\"id\": " + targetTransition + " }}")
-                .build();
+        Response RestResponse = RestAssured.given().relaxedHTTPSValidation().contentType(ContentType.JSON)
+                .body("{\"transition\": {\"id\": " + targetTransition + " }}")
+                .header("Authorization", "Bearer " + jiraToken)
+                .header("Content-Type", "application/json")
+                .when()
+                .post(jiraURL + "/rest/api/2/issue/" + entity + "/transitions");
 
-        Future  f = this.client.executeRequest(postRequest);
-        Response r = (Response) f.get();
-
-        if (r.getStatusCode() != 204) {
-            throw new Exception("Unexpected status code response:" + r.getStatusCode() + ". Body: '" + r.getResponseBody() + "'");
+        if (RestResponse.getStatusCode() != 204) {
+            throw new Exception("Unexpected status code response:" + RestResponse.getStatusCode() + ". Body: '" + RestResponse.getBody().asString() + "'");
         }
 
     }
@@ -154,20 +142,16 @@ public class JiraConnector {
         String jiraURL = this.getProperty("jira.server.url", "");
         String jiraToken = this.getProperty("jira.personal.access.token", "");
 
-        Request getRequest = new RequestBuilder()
-                .setMethod("GET")
-                .setUrl(jiraURL + "/rest/api/2/issue/" + entity + "/transitions")
-                .addHeader("Authorization", "Bearer " + jiraToken)
-                .build();
+        Response RestResponse = RestAssured.given().relaxedHTTPSValidation().contentType(ContentType.JSON)
+                .header("Authorization", "Bearer " + jiraToken)
+                .when()
+                .get(jiraURL + "/rest/api/2/issue/" + entity + "/transitions");
 
-        Future  f = this.client.executeRequest(getRequest);
-        Response r = (Response) f.get();
-
-        if (r.getStatusCode() != 200) {
-            throw new Exception("Unexpected status code response:" + r.getStatusCode() + ". Body: '" + r.getResponseBody() + "'");
+        if (RestResponse.getStatusCode() != 200) {
+            throw new Exception("Unexpected status code response:" + RestResponse.getStatusCode() + ". Body: '" + RestResponse.getBody().asString() + "'");
         }
 
-        Object transitionStrings = JsonPath.read(r.getResponseBody(), "$.transitions[?(@.name=~/" + transitionName + "/i)].id");
+        Object transitionStrings = JsonPath.read(RestResponse.getBody().asString(), "$.transitions[?(@.name=~/" + transitionName + "/i)].id");
         JSONArray ja = (JSONArray) transitionStrings;
 
         if (ja.isEmpty()) {
@@ -189,19 +173,15 @@ public class JiraConnector {
         String jiraURL = this.getProperty("jira.server.url", "");
         String jiraToken = this.getProperty("jira.personal.access.token", "");
 
-        Request postRequest = new RequestBuilder()
-                .setMethod("POST")
-                .setUrl(jiraURL + "/rest/api/2/issue/" + entity + "/comment")
-                .addHeader("Authorization", "Bearer " + jiraToken)
-                .addHeader("Content-Type", "application/json")
-                .setBody("{\"body\": \"" + message + "\"}")
-                .build();
+        Response RestResponse = RestAssured.given().relaxedHTTPSValidation().contentType(ContentType.JSON)
+                .body("{\"body\": \"" + message + "\"}")
+                .header("Authorization", "Bearer " + jiraToken)
+                .header("Content-Type", "application/json")
+                .when()
+                .post(jiraURL + "/rest/api/2/issue/" + entity + "/comment");
 
-        Future  f = this.client.executeRequest(postRequest);
-        Response r = (Response) f.get();
-
-        if (r.getStatusCode() != 201) {
-            throw new Exception("Unexpected status code response:" + r.getStatusCode() + ". Body: '" + r.getResponseBody() + "'");
+        if (RestResponse.getStatusCode() != 201) {
+            throw new Exception("Unexpected status code response:" + RestResponse.getStatusCode() + ". Body: '" + RestResponse.getBody().asString() + "'");
         }
     }
 

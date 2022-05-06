@@ -19,7 +19,6 @@ package com.privalia.qa.specs;
 import com.datastax.driver.core.ColumnDefinitions;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
-import com.google.common.collect.Lists;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
@@ -28,10 +27,6 @@ import com.jayway.jsonpath.spi.json.GsonJsonProvider;
 import com.jayway.jsonpath.spi.mapper.GsonMappingProvider;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.Realm;
-import com.ning.http.client.Response;
-import com.ning.http.client.cookie.Cookie;
 import com.privalia.qa.aspects.ReplacementAspect;
 import com.privalia.qa.conditions.Conditions;
 import com.privalia.qa.exceptions.NonReplaceableException;
@@ -44,7 +39,6 @@ import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.aspectj.lang.JoinPoint;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.Condition;
 import org.hjson.JsonValue;
@@ -68,13 +62,12 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.util.*;
-import java.util.concurrent.Future;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.privalia.qa.assertions.Assertions.assertThat;
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static java.util.concurrent.TimeUnit.values;
 import static org.testng.Assert.fail;
 
 /**
@@ -96,10 +89,6 @@ public class CommonG {
 
     private String parentWindow = "";
 
-    private AsyncHttpClient client;
-
-    private HttpResponse response;
-
     private List<Cookie> cookies = new ArrayList<Cookie>();
 
     private ResultSet previousCassandraResults;
@@ -113,10 +102,6 @@ public class CommonG {
     private String resultsType = "";
 
     private Set<org.openqa.selenium.Cookie> seleniumCookies = new HashSet<org.openqa.selenium.Cookie>();
-
-    private Map<String, String> headers = new HashMap<>();
-
-    private Map<String, String> restCookies = new HashMap<>();
 
     private String restHost;
 
@@ -133,8 +118,6 @@ public class CommonG {
     private String commandResult;
 
     private String restProtocol;
-
-    private ZookeeperSecUtils zkSecClient;
 
     private Alert SeleniumAlert;
 
@@ -1014,27 +997,6 @@ public class CommonG {
 
     }
 
-    // COPIED FROM COMMON.JAVA
-    public AsyncHttpClient getClient() {
-        return client;
-    }
-
-    public void setClient(AsyncHttpClient client) {
-        this.client = client;
-    }
-
-    public HttpResponse getResponse() {
-        return response;
-    }
-
-    public void setResponse(String endpoint, Response response) throws IOException {
-
-        Integer statusCode = response.getStatusCode();
-        String httpResponse = response.getResponseBody();
-        List<Cookie> cookies = response.getCookies();
-        this.response = new HttpResponse(statusCode, httpResponse, cookies);
-    }
-
     /**
      * Returns the information contained in file passed as parameter. the file
      * is read with UTF-8 charset by default
@@ -1205,291 +1167,6 @@ public class CommonG {
             modifiedData = jsonUtils.modifyDataString(data, type, modifications);
         }
         return modifiedData;
-    }
-
-    /**
-     * Generates the request based on the type of request, the end point, the data and type passed
-     *
-     * @param requestType type of request to be sent
-     * @param secure      type of protocol
-     * @param user        user to be used in request
-     * @param password    password to be used in request
-     * @param endPoint    end point to sent the request to
-     * @param data        to be sent for PUT/POST requests
-     * @param type        type of data to be sent (json|string)
-     * @param codeBase64  XXX
-     * @return request object
-     * @throws Exception exception
-     */
-    @Deprecated
-    public Future<Response> generateRequest(String requestType, boolean secure, String user, String password, String endPoint, String data, String type, String codeBase64) throws Exception {
-        return generateRequest(requestType, secure, user, password, endPoint, data, type);
-    }
-
-
-    /**
-     * Generates the request based on the type of request, the end point, the data and type passed
-     *
-     * @param requestType type of request to be sent
-     * @param secure      type of protocol
-     * @param user        user to be used in request
-     * @param password    password to be used in request
-     * @param endPoint    end point to sent the request to
-     * @param data        to be sent for PUT/POST requests
-     * @param type        type of data to be sent (json|string)
-     * @return rest request
-     * @throws Exception exception
-     */
-    public Future<Response> generateRequest(String requestType, boolean secure, String user, String password, String endPoint, String data, String type) throws Exception {
-
-        String protocol = this.getRestProtocol();
-        Future<Response> response = null;
-        AsyncHttpClient.BoundRequestBuilder request;
-        Realm realm = null;
-
-
-        if (this.getRestHost() == null) {
-            throw new Exception("Rest host has not been set");
-        }
-
-        if (this.getRestPort() == null) {
-            throw new Exception("Rest port has not been set");
-        }
-
-        if (this.getRestProtocol() == null) {
-            protocol = "http://";
-        }
-
-        String restURL = protocol + this.getRestHost() + this.getRestPort();
-
-        // Setup user and password for requests
-        if (user != null) {
-            realm = new Realm.RealmBuilder()
-                    .setPrincipal(user)
-                    .setPassword(password)
-                    .setUsePreemptiveAuth(true)
-                    .setScheme(Realm.AuthScheme.BASIC)
-                    .build();
-        }
-
-        switch (requestType.toUpperCase()) {
-            case "GET":
-                request = this.getClient().prepareGet(restURL + endPoint);
-
-                if ("json".equals(type)) {
-                    request = request.setHeader("Content-Type", "application/json");
-                } else if ("string".equals(type)) {
-                    this.getLogger().debug("Sending request as: {}", type);
-                    request = request.setHeader("Content-Type", "application/x-www-form-urlencoded");
-                }
-
-                if (this.getResponse() != null) {
-                    this.getLogger().debug("Reusing coookies: {}", this.getResponse().getCookies());
-                    request = request.setCookies(this.getResponse().getCookies());
-                }
-
-                for (Cookie cook : this.getCookies()) {
-                    request = request.addCookie(cook);
-                }
-
-                if (this.getSeleniumCookies().size() > 0) {
-                    for (org.openqa.selenium.Cookie cookie : this.getSeleniumCookies()) {
-                        request.addCookie(new Cookie(cookie.getName(), cookie.getValue(),
-                                false, cookie.getDomain(), cookie.getPath(), 99, false, false));
-                    }
-                }
-
-                if (!this.headers.isEmpty()) {
-                    for (Map.Entry<String, String> header : headers.entrySet()) {
-                        request = request.setHeader(header.getKey(), header.getValue());
-                    }
-                }
-
-                if (user != null) {
-                    request = request.setRealm(realm);
-                }
-
-                response = request.execute();
-                break;
-            case "DELETE":
-                request = this.getClient().prepareDelete(restURL + endPoint);
-
-                if (this.getResponse() != null) {
-                    request = request.setCookies(this.getResponse().getCookies());
-                }
-
-                if (this.getSeleniumCookies().size() > 0) {
-                    for (org.openqa.selenium.Cookie cookie : this.getSeleniumCookies()) {
-                        request.addCookie(new Cookie(cookie.getName(), cookie.getValue(),
-                                false, cookie.getDomain(), cookie.getPath(), 99, false, false));
-                    }
-                }
-
-                for (Cookie cook : this.getCookies()) {
-                    request = request.addCookie(cook);
-                }
-
-                if (!this.headers.isEmpty()) {
-                    for (Map.Entry<String, String> header : headers.entrySet()) {
-                        request = request.setHeader(header.getKey(), header.getValue());
-                    }
-                }
-
-                if (user != null) {
-                    request = request.setRealm(realm);
-                }
-
-                response = request.execute();
-                break;
-            case "POST":
-                if (data == null) {
-                    Exception missingFields = new Exception("Missing fields in request.");
-                    throw missingFields;
-                } else {
-                    request = this.getClient().preparePost(restURL + endPoint).setBody(data);
-                    if ("json".equals(type)) {
-                        request = request.setHeader("Content-Type", "application/json");
-                    } else if ("string".equals(type)) {
-                        this.getLogger().debug("Sending request as: {}", type);
-                        request = request.setHeader("Content-Type", "application/x-www-form-urlencoded");
-                    }
-
-                    if (this.getResponse() != null) {
-                        request = request.setCookies(this.getResponse().getCookies());
-                    }
-
-                    if (this.getSeleniumCookies().size() > 0) {
-                        for (org.openqa.selenium.Cookie cookie : this.getSeleniumCookies()) {
-                            request.addCookie(new Cookie(cookie.getName(), cookie.getValue(),
-                                    false, cookie.getDomain(), cookie.getPath(), 99, false, false));
-                        }
-                    }
-
-                    for (Cookie cook : this.getCookies()) {
-                        request = request.addCookie(cook);
-                    }
-
-                    if (!this.headers.isEmpty()) {
-                        for (Map.Entry<String, String> header : headers.entrySet()) {
-                            request = request.setHeader(header.getKey(), header.getValue());
-                        }
-                    }
-
-                    if (user != null) {
-                        request = request.setRealm(realm);
-                    }
-
-                    response = this.getClient().executeRequest(request.build());
-                    break;
-                }
-            case "PUT":
-                if (data == null) {
-                    Exception missingFields = new Exception("Missing fields in request.");
-                    throw missingFields;
-                } else {
-                    request = this.getClient().preparePut(restURL + endPoint).setBody(data);
-                    if ("json".equals(type)) {
-                        request = request.setHeader("Content-Type", "application/json");
-                    } else if ("string".equals(type)) {
-                        request = request.setHeader("Content-Type", "application/x-www-form-urlencoded");
-                    }
-
-                    if (this.getResponse() != null) {
-                        request = request.setCookies(this.getResponse().getCookies());
-                    }
-
-                    if (this.getSeleniumCookies().size() > 0) {
-                        for (org.openqa.selenium.Cookie cookie : this.getSeleniumCookies()) {
-                            request.addCookie(new Cookie(cookie.getName(), cookie.getValue(),
-                                    false, cookie.getDomain(), cookie.getPath(), 99, false, false));
-                        }
-                    }
-
-                    for (Cookie cook : this.getCookies()) {
-                        request = request.addCookie(cook);
-                    }
-
-                    if (!this.headers.isEmpty()) {
-                        for (Map.Entry<String, String> header : headers.entrySet()) {
-                            request = request.setHeader(header.getKey(), header.getValue());
-                        }
-                    }
-
-                    if (user != null) {
-                        request = request.setRealm(realm);
-                    }
-
-                    response = this.getClient().executeRequest(request.build());
-                    break;
-                }
-            case "CONNECT":
-            case "PATCH":
-                if (data == null) {
-                    Exception missingFields = new Exception("Missing fields in request.");
-                    throw missingFields;
-                } else {
-                    request = this.getClient().preparePatch(restURL + endPoint).setBody(data);
-                    if ("json".equals(type)) {
-                        request = request.setHeader("Content-Type", "application/json");
-                    } else if ("string".equals(type)) {
-                        this.getLogger().debug("Sending request as: {}", type);
-                        request = request.setHeader("Content-Type", "application/x-www-form-urlencoded");
-                    }
-
-                    if (this.getResponse() != null) {
-                        request = request.setCookies(this.getResponse().getCookies());
-                    }
-
-                    if (this.getSeleniumCookies().size() > 0) {
-                        for (org.openqa.selenium.Cookie cookie : this.getSeleniumCookies()) {
-                            request.addCookie(new Cookie(cookie.getName(), cookie.getValue(),
-                                    false, cookie.getDomain(), cookie.getPath(), 99, false, false));
-                        }
-                    }
-
-                    for (Cookie cook : this.getCookies()) {
-                        request = request.addCookie(cook);
-                    }
-
-                    if (!this.headers.isEmpty()) {
-                        for (Map.Entry<String, String> header : headers.entrySet()) {
-                            request = request.setHeader(header.getKey(), header.getValue());
-                        }
-                    }
-
-                    if (user != null) {
-                        request = request.setRealm(realm);
-                    }
-
-                    response = this.getClient().executeRequest(request.build());
-                    break;
-                }
-            case "HEAD":
-            case "OPTIONS":
-            case "REQUEST":
-            case "TRACE":
-                throw new Exception("Operation not implemented: " + requestType);
-            default:
-                throw new Exception("Operation not valid: " + requestType);
-        }
-        return response;
-    }
-
-    /**
-     * Generates the request based on the type of request, the end point, the data and type passed
-     *
-     * @param requestType type of request to be sent
-     * @param secure      type of protocol
-     * @param endPoint    end point to sent the request to
-     * @param data        to be sent for PUT/POST requests
-     * @param type        type of data to be sent (json|string)
-     * @param codeBase64  codeBase64
-     * @return rest request
-     * @throws Exception exception
-     */
-    @Deprecated
-    public Future<Response> generateRequest(String requestType, boolean secure, String endPoint, String data, String type, String codeBase64) throws Exception {
-        return generateRequest(requestType, false, null, null, endPoint, data, type, "");
     }
 
     /**
@@ -2105,10 +1782,6 @@ public class CommonG {
         }
     }
 
-    public ZookeeperSecUtils getZkSecClient() {
-        return zkSecClient;
-    }
-
     public void runCommandAndGetResult(String command) throws Exception {
         getRemoteSSHConnection().runCommand(command);
         setCommandResult(getRemoteSSHConnection().getResult());
@@ -2152,24 +1825,6 @@ public class CommonG {
         }
     }
 
-
-    /**
-     * Add sso token list.
-     *
-     * @param ssoCookies the sso cookies
-     * @param tokenList  the token list
-     * @return the list
-     */
-    public List<Cookie> addSsoToken(HashMap<String, String> ssoCookies, String[] tokenList) {
-        List<Cookie> cookiesAttributes = new ArrayList<>();
-
-        for (String tokenKey : tokenList) {
-            cookiesAttributes.add(new Cookie(tokenKey, ssoCookies.get(tokenKey),
-                    false, null,
-                    null, 999999, false, false));
-        }
-        return cookiesAttributes;
-    }
 
     /**
      * Returns the value of the given placeholder as used in the gherkin step

@@ -204,11 +204,6 @@
             <version>2.14.1</version>
         </dependency>
         <dependency>
-            <groupId>com.ning</groupId>
-            <artifactId>async-http-client</artifactId>
-            <version>1.9.40</version>
-        </dependency>
-        <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
             <version>${json.version}</version>

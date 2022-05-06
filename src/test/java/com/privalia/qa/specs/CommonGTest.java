@@ -16,8 +16,6 @@
 
 package com.privalia.qa.specs;
 
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.Response;
 import com.privalia.qa.utils.JsonUtils;
 import com.privalia.qa.utils.ThreadProperty;
 import io.cucumber.datatable.DataTable;
@@ -34,7 +32,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.Future;
 import java.util.regex.Pattern;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -843,103 +840,6 @@ public class CommonGTest {
     }
 
     @Test
-    public void generateRequestNoAppURLTest() throws Exception {
-        ThreadProperty.set("class", this.getClass().getCanonicalName());
-        CommonG commong = new CommonG();
-        String requestType = "MYREQUEST";
-        String endPoint = "endpoint";
-        String data = "data";
-        String type = "string";
-
-        try {
-            commong.generateRequest(requestType, false, null, null, endPoint, data, type, "");
-            fail("Expected Exception");
-        } catch (Exception e) {
-            assertThat(e.getClass().toString()).as("Unexpected exception").isEqualTo(Exception.class.toString());
-            assertThat(e.getMessage()).as("Unexpected exception message").isEqualTo("Rest host has not been set");
-        }
-    }
-
-    @Test
-    public void generateRequestInvalidRequestTypeTest() throws Exception {
-        ThreadProperty.set("class", this.getClass().getCanonicalName());
-        CommonG commong = new CommonG();
-        String requestType = "MYREQUEST";
-        String endPoint = "endpoint";
-        String data = "data";
-        String type = "string";
-
-        try {
-            commong.setRestHost("localhost");
-            commong.setRestPort("80");
-
-            commong.generateRequest(requestType, false, null, null, endPoint, data, type, "");
-            fail("Expected Exception");
-        } catch (Exception e) {
-            assertThat(e.getClass().toString()).as("Unexpected exception").isEqualTo(Exception.class.toString());
-            assertThat(e.getMessage()).as("Unexpected exception message").isEqualTo("Operation not valid: MYREQUEST");
-        }
-    }
-
-    @Test
-    public void generateRequestNotImplementedRequestTypeTest() throws Exception {
-        ThreadProperty.set("class", this.getClass().getCanonicalName());
-        CommonG commong = new CommonG();
-        String requestType = "TRACE";
-        String endPoint = "endpoint";
-        String data = "data";
-        String type = "string";
-
-        try {
-            commong.setRestHost("localhost");
-            commong.setRestPort("80");
-            commong.generateRequest(requestType, false, null, null, endPoint, data, type, "");
-            fail("Expected Exception");
-        } catch (Exception e) {
-            assertThat(e.getClass().toString()).as("Unexpected exception").isEqualTo(Exception.class.toString());
-            assertThat(e.getMessage()).as("Unexpected exception message").isEqualTo("Operation not implemented: TRACE");
-        }
-    }
-
-    @Test
-    public void generateRequestDataNullPUTTest() throws Exception {
-        ThreadProperty.set("class", this.getClass().getCanonicalName());
-        CommonG commong = new CommonG();
-        String requestType = "PUT";
-        String endPoint = "endpoint";
-        String type = "string";
-
-        try {
-            commong.setRestHost("localhost");
-            commong.setRestPort("80");
-            commong.generateRequest(requestType, false, null, null, endPoint, null, type, "");
-            fail("Expected Exception");
-        } catch (Exception e) {
-            assertThat(e.getClass().toString()).as("Unexpected exception").isEqualTo(Exception.class.toString());
-            assertThat(e.getMessage()).as("Unexpected exception message").isEqualTo("Missing fields in request.");
-        }
-    }
-
-    @Test
-    public void generateRequestDataNullPOSTTest() throws Exception {
-        ThreadProperty.set("class", this.getClass().getCanonicalName());
-        CommonG commong = new CommonG();
-        String requestType = "POST";
-        String endPoint = "endpoint";
-        String type = "string";
-
-        try {
-            commong.setRestHost("localhost");
-            commong.setRestPort("80");
-            commong.generateRequest(requestType, false, null, null, endPoint, null, type, "");
-            fail("Expected Exception");
-        } catch (Exception e) {
-            assertThat(e.getClass().toString()).as("Unexpected exception").isEqualTo(Exception.class.toString());
-            assertThat(e.getMessage()).as("Unexpected exception message").isEqualTo("Missing fields in request.");
-        }
-    }
-
-    @Test
     public void testRunLocalCommand() throws Exception {
         ThreadProperty.set("class", this.getClass().getCanonicalName());
         CommonG commong = new CommonG();
@@ -1013,65 +913,6 @@ public class CommonGTest {
         String exit = Pattern.compile(Pattern.quote(expectedMsg)).toString();
 
         assertThat(exit).as("Regex matcher").isEqualTo(CommonG.matchesOrContains(expectedMsg).toString());
-    }
-
-
-    @Test(enabled = false)
-    public void testGETRequest() throws Exception {
-        ThreadProperty.set("class", this.getClass().getCanonicalName());
-        CommonG commong = new CommonG();
-
-        commong.setClient(new AsyncHttpClient());
-        commong.setRestHost("jenkins-ci.privalia.pin");
-        commong.setRestPort(":80");
-        Future<Response> response = commong.generateRequest("GET", false, "bdt", "bdt", "/monitoring", "", "");
-
-        assertThat(401).as("GET Request with exit code status 401").isEqualTo(response.get().getStatusCode());
-    }
-
-    @Test(enabled = false)
-    public void testPOSTRequest() throws Exception {
-        ThreadProperty.set("class", this.getClass().getCanonicalName());
-        CommonG commong = new CommonG();
-
-        commong.setClient(new AsyncHttpClient());
-        commong.setRestHost("jenkins-ci.privalia.pin");
-        commong.setRestPort(":80");
-        String data = "{j_username=user&j_password=pass";
-
-        Future<Response> response = commong.generateRequest("POST", false, "bdt", "bdt", "/j_acegi_security_check", data, "");
-
-        assertThat(401).as("GET Request with exit code status 401").isEqualTo(response.get().getStatusCode());
-    }
-
-    @Test(enabled = false)
-    public void testDELETERequest() throws Exception {
-        ThreadProperty.set("class", this.getClass().getCanonicalName());
-        CommonG commong = new CommonG();
-
-        commong.setClient(new AsyncHttpClient());
-        commong.setRestHost("jenkins-ci.privalia.pin");
-        commong.setRestPort(":80");
-        String data = "{j_username=user&j_password=pass";
-
-        Future<Response> response = commong.generateRequest("DELETE", false, "bdt", "bdt", "/j_acegi_security_check", data, "");
-
-        assertThat(401).as("GET Request with exit code status 401").isEqualTo(response.get().getStatusCode());
-    }
-
-    @Test(enabled = false)
-    public void testPUTRequest() throws Exception {
-        ThreadProperty.set("class", this.getClass().getCanonicalName());
-        CommonG commong = new CommonG();
-
-        commong.setClient(new AsyncHttpClient());
-        commong.setRestHost("jenkins-ci.privalia.pin");
-        commong.setRestPort(":80");
-        String data = "{j_username=user&j_password=pass";
-
-        Future<Response> response = commong.generateRequest("PUT", false, "bdt", "bdt", "/j_acegi_security_check", data, "");
-
-        assertThat(401).as("GET Request with exit code status 401").isEqualTo(response.get().getStatusCode());
     }
 
     @Test
