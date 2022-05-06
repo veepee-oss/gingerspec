@@ -42,7 +42,7 @@ public class featureDoc {
 
         for (int i = 0; i <= rules.length - 1; i++) {
 
-            List<String> matches = this.getPattern(rules[i],"^Rule: (.*?)[\\n\\r]");
+            List<String> matches = this.getPattern(rules[i], "^Rule: (.*?)[\\n\\r]");
 
             if (!matches.isEmpty()) {
 
