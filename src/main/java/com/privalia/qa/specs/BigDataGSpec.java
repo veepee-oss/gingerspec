@@ -31,6 +31,9 @@ import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
+import io.restassured.response.Response;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 
 import java.lang.reflect.InvocationTargetException;
@@ -233,14 +236,14 @@ public class BigDataGSpec extends BaseGSpec {
             port = address[1];
         }
 
-        RestSpec restSpec = new RestSpec(this.commonspec);
-        restSpec.setupApp(null, host + ":" + port);
-
-        restSpec.sendRequestNoDataTable("GET", "/", null, null, "json");
+        Response RestResponse = RestAssured
+                .given().relaxedHTTPSValidation().contentType(ContentType.JSON)
+                .when()
+                .get(host + ":" + port);
 
         String json;
         String parsedElement;
-        json = commonspec.getRestResponse().getBody().prettyPrint();
+        json = RestResponse.getBody().asString();
         parsedElement = "$..cluster_name";
 
         String json2 = "[" + json + "]";
