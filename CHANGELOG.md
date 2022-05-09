@@ -1,5 +1,27 @@
 # Changelog
 
+## 2.2.12
+
+* Updated step so Rest client from rest assured is not initialized using a port if the user does not specify one
+
+* Removed unnecessary reference to RestGSpec from BigDataGSpec
+
+* Completely removed async-http-client to make Rest requests. Now GingerSpec only uses rest-assured internally
+
+* Created a new formatted to automatically generate features documentation (WIP)
+
+* Added a step for saving the amount of rows returned in the last SQL query in a variable for future use in the scenario
+
+* Added new step to verify the amount of rows returned by an SQL query
+
+* ReplacementAspect feature was reorganized and more examples were added
+
+* EnvPropertyLookup can now also read the env variable from a previously saved variable in the same scenario, not only from CLI variables
+
+* GingerSpec now performs variable replacement in the SQL files before executing the query in the database
+
+* Multiples improvements in the rest steps. Method for getting the value of a json element given the jsonpath was modified to use the one that comes pre-bumdled in rest-assured. Several bug fixes and improvements in the log messages when theres an assertion error. Feature for rest steps was revamped with more examples and use cases
+
 ## 2.2.11
 
 * mysql and postgre dependencies were updated and connection string used to bootstrap the connection no longer uses UTC timezone
