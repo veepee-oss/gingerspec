@@ -14,10 +14,10 @@ Feature: Rest Assured Feature
 
   Rule: Set up initial base URI for future requests
 
-    Scenario: Setting up base URI for future requests using http (if port not specified, defaults to 80)
+    Scenario: Setting up base URI for future requests using http
       Given I send requests to '${REST_SERVER_HOST}:3000'
 
-    Scenario: Setting up base URI for future requests using https (if port not specified, defaults to 443)
+    Scenario: Setting up base URI for future requests using https
       Given I securely send requests to '${REST_SERVER_HOST}:3000'
 
 

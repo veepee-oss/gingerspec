@@ -73,19 +73,19 @@ public class RestSpec extends BaseGSpec {
      * {@code
      * Examples
      *
-     * Scenario: Setting up the host. Defaults to port 80
+     * Scenario: Setting up the host.
      *      Given I send requests to 'jsonplaceholder.typicode.com'
      *
      * Scenario: Setting up host and specific port
      *      Given I send requests to 'jsonplaceholder.typicode.com:8080'
      *
-     * Scenario: using the keyword 'securely' to use https, defaults to port 443
+     * Scenario: using the keyword 'securely' to use https.
      *      Given I securely send requests to 'jsonplaceholder.typicode.com'
      * }
      * </pre>
      *
      * @param isSecured     Indicates if https:// should be used (if false, defaults to http://)
-     * @param restHost      Port where the API is running. Defaults to 80 if null
+     * @param restHost      Base url of the API (without the http/https prefix, like mybaseurl.com). You can also specify a port number with baseURL:port
      */
     @Given("^I( securely)? send requests to '(.*)'$")
     public void setupApp(String isSecured, String restHost) {
@@ -94,40 +94,33 @@ public class RestSpec extends BaseGSpec {
 
         if (isSecured != null) {
             restProtocol = "https://";
+            commonspec.getRestRequest().relaxedHTTPSValidation();
         }
 
-        if (restHost == null) {
-            restHost = "localhost";
-        }
-
+        Assertions.assertThat(restHost).isNotNull();
         Assertions.assertThat(restHost).as("Malformed url. No need to use http(s):// prefix").doesNotContain("http://").doesNotContain("https://");
+        Assertions.assertThat(commonspec.getRestRequest()).as("No rest client initialized. Did you forget to use @rest annotation in your feature?").isNotNull();
+
         String[] restAddress = restHost.split(":");
 
         if (restAddress.length == 2) {
             restHost = restAddress[0];
             restPort = restAddress[1];
+            restPort = restPort.replace(":", "");
         }
 
-        if (restPort == null) {
-            if (isSecured == null)  {
-                restPort = "80";
-            } else {
-                restPort = "443";
-            }
+        this.getCommonSpec().getLogger().debug("Setting base URL to {}", restProtocol + restHost);
+        commonspec.getRestRequest().baseUri(restProtocol + restHost);
+
+        if (restPort != null) {
+            this.getCommonSpec().getLogger().debug("Setting port to {}", Integer.parseInt(restPort));
+            commonspec.getRestRequest().port(Integer.parseInt(restPort));
         }
 
-        restPort = restPort.replace(":", "");
-        Assertions.assertThat(commonspec.getRestRequest()).as("No rest client initialized. Did you forget to use @rest annotation in your feature?").isNotNull();
         commonspec.setRestHost(restHost);
         commonspec.setRestPort(restPort);
         commonspec.setRestProtocol(restProtocol);
 
-        if (restProtocol.matches("https://")) {
-            commonspec.getRestRequest().relaxedHTTPSValidation();
-        }
-
-        this.getCommonSpec().getLogger().debug("Setting base URL to {} with port {}", restProtocol + restHost, Integer.parseInt(restPort));
-        commonspec.getRestRequest().baseUri(restProtocol + restHost).port(Integer.parseInt(restPort));
     }
 
     /**
@@ -985,13 +978,20 @@ public class RestSpec extends BaseGSpec {
 
         commonspec.getLogger().debug("Re-initializing rest-client. Removing headers, cookies and url parameters");
 
-        RequestSpecification spec = new RequestSpecBuilder().setContentType(ContentType.JSON).build();
+        RequestSpecification spec = new RequestSpecBuilder().setContentType(ContentType.JSON).setRelaxedHTTPSValidation().build();
         commonspec.setRestRequest(given().header("Content-Type", "application/json").spec(spec));
 
-        if (commonspec.getRestProtocol().matches("https://")) {
-            this.setupApp("https://", commonspec.getRestHost() + ":" + commonspec.getRestPort());
+        String baseUrl;
+        if (commonspec.getRestPort() != null) {
+            baseUrl = commonspec.getRestHost() + ":" + commonspec.getRestPort();
         } else {
-            this.setupApp(null, commonspec.getRestHost() + ":" + commonspec.getRestPort());
+            baseUrl = commonspec.getRestHost();
+        }
+
+        if (commonspec.getRestProtocol().matches("https://")) {
+            this.setupApp("https://", baseUrl);
+        } else {
+            this.setupApp(null, baseUrl);
         }
     }
 
