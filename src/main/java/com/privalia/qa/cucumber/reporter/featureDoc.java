@@ -1,4 +1,4 @@
-package com.privalia.qa.cucumber.reporter.templates;
+package com.privalia.qa.cucumber.reporter;
 
 import io.cucumber.plugin.event.TestSourceRead;
 import org.apache.commons.lang3.RegExUtils;
@@ -7,6 +7,13 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * A java class that contains a representation of the feature file. It is used by the
+ * {@link gingerHtmlFormatter} class to extract the elements of the feature and build the HTML
+ * page
+ *
+ * @author Jose Fernandez
+ */
 public class featureDoc {
 
     String featureName;

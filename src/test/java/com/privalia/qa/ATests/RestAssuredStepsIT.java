@@ -19,7 +19,9 @@ package com.privalia.qa.ATests;
 import com.privalia.qa.utils.BaseGTest;
 import io.cucumber.testng.CucumberOptions;
 
-@CucumberOptions(
+@CucumberOptions(plugin = {
+        "com.privalia.qa.cucumber.reporter.gingerHtmlFormatter:target/RestAssuredStepsIT.html",
+        },
         features = {"src/test/resources/features/restAssured.feature"},
         glue = "com.privalia.qa.specs")
 public class RestAssuredStepsIT extends BaseGTest {
