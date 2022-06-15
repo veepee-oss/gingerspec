@@ -1,6 +1,5 @@
 package com.privalia.qa.cucumber.reporter;
 
-
 import freemarker.cache.FileTemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -10,12 +9,16 @@ import io.cucumber.plugin.ConcurrentEventListener;
 import io.cucumber.plugin.event.EventPublisher;
 import io.cucumber.plugin.event.TestSourceRead;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.text.WordUtils;
+import scala.collection.immutable.Stream;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Simple formatter to create a html web page representation of the feature file with a
@@ -25,10 +28,10 @@ import java.util.Map;
  */
 public class gingerHtmlFormatter implements ConcurrentEventListener {
 
-    private final Writer writer;
+    private final String destinationFolder;
 
-    public gingerHtmlFormatter(OutputStream out) {
-        this.writer = new OutputStreamWriter(out, StandardCharsets.UTF_8);
+    public gingerHtmlFormatter(String destinationFolder) {
+        this.destinationFolder = destinationFolder;
     }
 
     @Override
@@ -42,7 +45,7 @@ public class gingerHtmlFormatter implements ConcurrentEventListener {
 
     private void generateHtml(TestSourceRead event) {
 
-        featureDoc f = new featureDoc(event);
+        featureDoc f = new featureDoc(event.getSource());
 
         if (!f.getFeatureRules().isEmpty()) {
 
@@ -53,19 +56,32 @@ public class gingerHtmlFormatter implements ConcurrentEventListener {
                 cfg.setIncompatibleImprovements(new Version(2, 3, 31));
                 cfg.setDefaultEncoding("UTF-8");
                 cfg.setLocale(Locale.US);
-                Template template = cfg.getTemplate("feature_doc_page.ftl");
-                Writer fileWriter = new FileWriter(new File("output.html"));
+                Template featureTemplate = cfg.getTemplate("feature_doc_page.ftl");
+                Template indexTemplate = cfg.getTemplate("index_template.ftl");
+                Writer featureWriter = new FileWriter(this.destinationFolder + "/" + WordUtils.uncapitalize(f.getFeatureName()).replaceAll(" ", "-") + ".html");
+                Writer indexWriter = new FileWriter(this.destinationFolder + "/index.html");
 
                 try {
-                    Map<String, Object> root = new HashMap<>();
-                    root.put("featureDoc", f);
-                    root.put("tableOfContents", this.getFileAsString("src/main/java/com/privalia/qa/cucumber/reporter/resources/table-of-contents.js"));
-                    root.put("returnToTop", this.getFileAsString("src/main/java/com/privalia/qa/cucumber/reporter/resources/return-to-top.js"));
-                    root.put("copyToClipboard", this.getFileAsString("src/main/java/com/privalia/qa/cucumber/reporter/resources/copy-to-clipboard.js"));
-                    root.put("style", this.getFileAsString("src/main/java/com/privalia/qa/cucumber/reporter/resources/style.css"));
-                    template.process(root, fileWriter);
+                    /*Build the feature html page*/
+                    Map<String, Object> featurePageVariables = new HashMap<>();
+                    featurePageVariables.put("featureDoc", f);
+                    featurePageVariables.put("tableOfContents", this.getFileAsString("src/main/java/com/privalia/qa/cucumber/reporter/resources/table-of-contents.js"));
+                    featurePageVariables.put("returnToTop", this.getFileAsString("src/main/java/com/privalia/qa/cucumber/reporter/resources/return-to-top.js"));
+                    featurePageVariables.put("copyToClipboard", this.getFileAsString("src/main/java/com/privalia/qa/cucumber/reporter/resources/copy-to-clipboard.js"));
+                    featurePageVariables.put("style", this.getFileAsString("src/main/java/com/privalia/qa/cucumber/reporter/resources/style.css"));
+                    featureTemplate.process(featurePageVariables, featureWriter);
+
+                    /*Build the index page with whatever *.html files it finds in the same folder*/
+                    Map<String, Object> indexPageVariables = new HashMap<>();
+                    File[] files = new File(this.destinationFolder).listFiles();
+                    indexPageVariables.put("files", Arrays.asList(files));
+                    indexPageVariables.put("style", this.getFileAsString("src/main/java/com/privalia/qa/cucumber/reporter/resources/style.css"));
+                    indexPageVariables.put("gingerLogo", this.getFileAsString("src/test/resources/banner.txt"));
+                    indexTemplate.process(indexPageVariables, indexWriter);
+
                 } finally {
-                    fileWriter.close();
+                    featureWriter.close();
+                    indexWriter.close();
                 }
 
             } catch (IOException | TemplateException e) {
@@ -84,4 +100,5 @@ public class gingerHtmlFormatter implements ConcurrentEventListener {
             return null;
         }
     }
+
 }
