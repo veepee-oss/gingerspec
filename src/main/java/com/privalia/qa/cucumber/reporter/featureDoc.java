@@ -34,7 +34,9 @@ public class featureDoc {
         return this.featureName;
     }
 
-    public String getFeatureDescription() { return featureDescription; }
+    public String getFeatureDescription() {
+        return featureDescription;
+    }
 
     public Map<String, Map> getFeatureRules() {
         return featureRules;
@@ -130,8 +132,8 @@ public class featureDoc {
                 finalScenarioList.add(scenarios[i].replaceAll("([\\n\\r]+\\s*)*$", ""));
             }
 
-            if (scenarios[i].contains("Scenario Outline") && scenarios[i+1].contains("Example")) {
-                finalScenarioList.add(scenarios[i] + scenarios[i+1].replaceAll("([\\n\\r]+\\s*)*$", ""));
+            if (scenarios[i].contains("Scenario Outline") && scenarios[i + 1].contains("Example")) {
+                finalScenarioList.add(scenarios[i] + scenarios[i + 1].replaceAll("([\\n\\r]+\\s*)*$", ""));
             }
         }
 
