@@ -18,32 +18,31 @@ public class featureDoc {
 
     String featureName;
 
+    String featureDescription;
+
     Map<String, Map> featureRules;
 
     String[] ruleSet;
 
-    TestSourceRead event;
-
-    public featureDoc(TestSourceRead event) {
-        this.featureName = this.getPattern(event.getSource(), "^Feature: (.*?)[\\n\\r]").get(0);
-        this.featureRules = this.parseFeatureRules(event);
+    public featureDoc(String featureBody) {
+        this.featureName = this.getPattern(featureBody, "^Feature: (.*?)[\\n\\r]").get(0);
+        this.featureRules = this.parseFeatureRules(featureBody);
+        this.featureDescription = this.parseFeatureDescription(featureBody);
     }
 
     public String getFeatureName() {
         return this.featureName;
     }
 
+    public String getFeatureDescription() { return featureDescription; }
+
     public Map<String, Map> getFeatureRules() {
         return featureRules;
     }
 
-    public Map<String, Map> parseFeatureRules(TestSourceRead event) {
-
-        String featureBody = event.getSource();
+    public Map<String, Map> parseFeatureRules(String featureBody) {
 
         Map<String, Map> featureRules = new LinkedHashMap<>();
-
-        this.featureName = this.getPattern(featureBody, "^Feature: (.*?)[\\n\\r]").get(0);
 
         String[] rules = featureBody.split("(?=Rule:)");
 
@@ -59,16 +58,16 @@ public class featureDoc {
 
                 String ruleBody = RegExUtils.removePattern(rules[i], "^Rule: (.*?)[\\n\\r]");
 
-                String[] scenarios = ruleBody.split("(?=Scenario:|Scenario Outline:|@)");
+                List<String> scenarios = this.parseScenariosFromRuleBody(ruleBody);
                 for (String scenarioBody: scenarios) {
 
                     if (scenarioBody.contains("Scenario: ")) {
-                        String scenarioName = this.getPattern(scenarioBody, "^Scenario: (.*?)[\\n\\r]").get(0);
+                        String scenarioName = this.getPattern(scenarioBody, "Scenario: (.*?)[\\n\\r]").get(0);
                         ruleScenarios.put(scenarioName, scenarioBody);
                     }
 
                     if (scenarioBody.contains("Scenario Outline: ")) {
-                        String scenarioName = this.getPattern(scenarioBody, "^Scenario Outline: (.*?)[\\n\\r]").get(0);
+                        String scenarioName = this.getPattern(scenarioBody, "Scenario Outline: (.*?)[\\n\\r]").get(0);
                         ruleScenarios.put(scenarioName, scenarioBody);
                     }
                 }
@@ -100,5 +99,43 @@ public class featureDoc {
             }
         }
         return groups;
+    }
+
+    public String parseFeatureDescription(String featureBody) {
+        String description = "";
+        boolean takeline = false;
+        String[] lines = featureBody.split("\n");
+        for (String line: lines) {
+            if (line.trim().startsWith("Feature:")) {
+                takeline = true;
+            } else if (takeline && (line.trim().startsWith("Rule:") || line.trim().startsWith("Scenario:") || line.trim().startsWith("@") || line.trim().startsWith("#"))) {
+                takeline = false;
+                break;
+            } else {
+                if (takeline) {
+                    description = description + line + "\n";
+                }
+            }
+        }
+        return description;
+    }
+
+    private List<String> parseScenariosFromRuleBody(String ruleBody) {
+
+        String[] scenarios = ruleBody.split("(?m)^\\s*$");
+        List<String> finalScenarioList = new LinkedList<>();
+
+        for (int i = 0; i <= scenarios.length - 1; i++) {
+            if (scenarios[i].contains("Scenario") && !scenarios[i].contains("Scenario Outline")) {
+                finalScenarioList.add(scenarios[i].replaceAll("([\\n\\r]+\\s*)*$", ""));
+            }
+
+            if (scenarios[i].contains("Scenario Outline") && scenarios[i+1].contains("Example")) {
+                finalScenarioList.add(scenarios[i] + scenarios[i+1].replaceAll("([\\n\\r]+\\s*)*$", ""));
+            }
+        }
+
+        return finalScenarioList;
+
     }
 }
