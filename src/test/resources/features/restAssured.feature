@@ -5,12 +5,6 @@ Feature: Rest Assured Feature
   the steps for testing REST APIs (such as this one) must include the "@rest" annotation at the beginning of the file.
   This is necessary, since it signals the library that it should bootstrap some necessary components for testing REST APIs
 
-    1.- Set up initial base URI for future requests
-    2.- Specifying Request Data
-    3.- Verifying Response Data
-    4.- Authentication
-    5.- Proxy configuration
-    6.- Miscellaneous and examples
 
   Rule: Set up initial base URI for future requests
 
