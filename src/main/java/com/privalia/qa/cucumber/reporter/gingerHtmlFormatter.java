@@ -58,6 +58,7 @@ public class gingerHtmlFormatter implements ConcurrentEventListener {
                 cfg.setLocale(Locale.US);
                 Template featureTemplate = cfg.getTemplate("feature_doc_page.ftl");
                 Template indexTemplate = cfg.getTemplate("index_template.ftl");
+                new File(this.destinationFolder).mkdirs();
                 Writer featureWriter = new FileWriter(this.destinationFolder + "/" + WordUtils.uncapitalize(f.getFeatureName()).replaceAll(" ", "-") + ".html");
                 Writer indexWriter = new FileWriter(this.destinationFolder + "/index.html");
 

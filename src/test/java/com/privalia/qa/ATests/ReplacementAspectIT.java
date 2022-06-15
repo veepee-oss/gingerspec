@@ -20,9 +20,7 @@ import com.privalia.qa.utils.BaseGTest;
 import io.cucumber.testng.CucumberOptions;
 
 @CucumberOptions(plugin = {
-                "json:target/ReplacementAspectIT.json",
-                "html:target/ReplacementAspectIT.html",
-                "junit:target/ReplacementAspectIT.xml"
+        "com.privalia.qa.cucumber.reporter.gingerHtmlFormatter:target/documentation",
         },
         features = {"src/test/resources/features/replacementAspect.feature"},
         glue = "com.privalia.qa.specs")
