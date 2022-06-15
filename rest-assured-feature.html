@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+	<header>
+		<em>Back to <a href="index.html">Index</a>.</em>
+	</header>
+
+	<title>Rest Assured Feature</title>
+
+	<style type="text/css">
+		body {
+    margin: 1em auto;
+    max-width: 60em;
+    padding-bottom: 95vh;
+    width: 88%;
+    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji";
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--color-fg-default);
+    background-color: var(--color-canvas-default);
+}
+
+h3 {
+    text-decoration: underline;
+}
+
+#myBtn {
+    display: none; /* Hidden by default */
+    position: fixed; /* Fixed/sticky position */
+    bottom: 20px; /* Place the button at the bottom of the page */
+    right: 30px; /* Place the button 30px from the right */
+    z-index: 99; /* Make sure it does not overlap */
+    border: none; /* Remove borders */
+    outline: none; /* Remove outline */
+    background-color: grey; /* Set a background color */
+    color: white; /* Text color */
+    cursor: pointer; /* Add a mouse pointer on hover */
+    padding: 15px; /* Some padding */
+    border-radius: 10px; /* Rounded corners */
+    font-size: 18px; /* Increase font size */
+}
+
+#myBtn:hover {
+    background-color: #555; /* Add a dark-grey background on hover */
+}
+
+pre code {
+    background-color: #eee;
+    display: block;
+    padding: 16px;
+    overflow: auto;
+    border-radius: 6px;
+    font-family: ui-monospace,SFMono-Regular,SF Mono,Menlo,Consolas,Liberation Mono,monospace;
+    font-size: 85%;
+    border-style: solid;
+    border-width: 1px;
+    border-color: darkgray;
+}
+
+.highlight-wrapper {
+    display: block;
+}
+
+.highlight {
+    position: relative;
+    z-index: 0;
+    padding: 0;
+    margin: 0;
+    border-radius: 4px;
+}
+
+.highlight > .chroma {
+    color: #d0d0d0;
+    background-color: #212121;
+    position: static;
+    z-index: 1;
+    border-radius: 4px;
+    padding: 10px;
+}
+
+.chroma {
+    overflow: auto;
+}
+
+.chroma .lntable {
+    display: table;
+    width: 100%;
+    padding: 0 0 5px;
+    margin: 0;
+    border-spacing: 0;
+    border: 0;
+    overflow: auto;
+}
+
+.chroma .lntd:first-child {
+    padding: 7px 7px 7px 10px;
+    margin: 0;
+}
+
+.chroma .lntd:last-child {
+    padding: 7px 10px 7px 7px;
+    margin: 0;
+}
+
+.copy-code-button {
+    position: absolute;
+    z-index: 2;
+    right: 0;
+    top: 0;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 14px;
+    width: 65px;
+    color: white;
+    background-color: #808080;
+    border: 1.25px solid #232326;
+    border-top-left-radius: 0;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 4px;
+    white-space: nowrap;
+    padding: 4px 4px 5px 4px;
+    margin: 0 0 0 1px;
+    cursor: pointer;
+    opacity: 0.6;
+}
+
+.copy-code-button:hover,
+.copy-code-button:focus,
+.copy-code-button:active,
+.copy-code-button:active:hover {
+    color: #222225;
+    background-color: #b3b3b3;
+    opacity: 0.8;
+}
+
+.copyable-text-area {
+    position: absolute;
+    height: 0;
+    z-index: -1;
+    opacity: 0.01;
+}
+	</style>
+</head>
+<body>
+
+	<h1>Rest Assured Feature</h1>
+
+	<p><pre>
+  This feature provides examples on how to use the steps for testing REST APIs. All feature files that make use of
+  the steps for testing REST APIs (such as this one) must include the "@rest" annotation at the beginning of the file.
+  This is necessary, since it signals the library that it should bootstrap some necessary components for testing REST APIs
+
+    1.- Set up initial base URI for future requests
+    2.- Specifying Request Data
+    3.- Verifying Response Data
+    4.- Authentication
+    5.- Proxy configuration
+    6.- Miscellaneous and examples
+
+</pre></p>
+
+	<div data-toc></div>
+
+	<hr>
+
+	<div data-content>
+
+		<button onclick="topFunction()" id="myBtn" title="Go to top">Back to top</button>
+
+		<ol>
+			<li><h2>Set up initial base URI for future requests</h2></li>
+			<ul>
+			<li><h3>Setting up base URI for future requests using https</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+    Scenario: Setting up base URI for future requests using https
+      Given I securely send requests to '${REST_SERVER_HOST}:3000'
+			</code></pre>
+			</div>
+			</ul>
+			<ul>
+			<li><h3>Setting up base URI for future requests using http</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+    Scenario: Setting up base URI for future requests using http
+      Given I send requests to '${REST_SERVER_HOST}:3000'
+			</code></pre>
+			</div>
+			</ul>
+
+			<hr>
+
+			<li><h2>Specifying Request Data</h2></li>
+			<ul>
+			<li><h3>Invoking HTTP resources (GET, POST, DELETE, PATCH, UPDATE)</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+    Scenario: Invoking HTTP resources (GET, POST, DELETE, PATCH, UPDATE)
+      Given I send requests to '${REST_SERVER_HOST}:3000'
+      When I send a 'GET' request to '/posts'
+			</code></pre>
+			</div>
+			</ul>
+			<ul>
+			<li><h3>Adding URL parameters (i.e /posts?userId=3)</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+    Scenario: Adding URL parameters (i.e /posts?userId=3)
+      Given I send requests to '${REST_SERVER_HOST}:3000'
+      Given I set url parameters:
+        | userId | 3 |
+      When I send a 'GET' request to '/posts'
+			</code></pre>
+			</div>
+			</ul>
+			<ul>
+			<li><h3>Adding headers</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+    @ignore
+    Scenario: Adding headers
+      Given I send requests to '${REST_SERVER_HOST}:3000'
+      Given I set headers:
+        | headerName | value1 |
+      When I send a 'GET' request to '/posts'
+			</code></pre>
+			</div>
+			</ul>
+			<ul>
+			<li><h3>Sending a file</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+    @ignore
+    Scenario: Sending a file
+      Given I send requests to '${REST_SERVER_HOST}:3000'
+      And I set headers:
+        | Content-Type | multipart/form-data |
+      And I add the file in 'schemas/mytestdata.json' to the request
+      When I send a 'POST' request to '/posts'
+      Then the service response status must be '201'
+			</code></pre>
+			</div>
+			</ul>
+			<ul>
+			<li><h3>Adding request body from a file but modifying elements of the json before sending</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+    Scenario: Adding request body from a file but modifying elements of the json before sending
+      Given I send requests to '${REST_SERVER_HOST}:3000'
+      When I send a 'POST' request to '/posts' based on 'schemas/mytestdata.json' as 'json' with:
+        | $.title | UPDATE | This is a test 2 |
+			</code></pre>
+			</div>
+			</ul>
+			<ul>
+			<li><h3>Adding request body directly in the gherkin step</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+    Scenario: Adding request body directly in the gherkin step
+      Given I send requests to '${REST_SERVER_HOST}:3000'
+      When I send a 'POST' request to '/posts' with body
+           """
+              {
+                "userId": 1,
+                "title": "This is a test",
+                "body": "This is a test"
+              }
+          """
+			</code></pre>
+			</div>
+			</ul>
+			<ul>
+			<li><h3>Adding request body from a file</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+    Scenario: Adding request body from a file
+      Given I send requests to '${REST_SERVER_HOST}:3000'
+      When I send a 'POST' request to '/posts' based on 'schemas/mytestdata.json' as 'json'
+			</code></pre>
+			</div>
+			</ul>
+			<ul>
+			<li><h3>Adding cookies</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+    @ignore
+    Scenario: Adding cookies
+      Given I send requests to '${REST_SERVER_HOST}:3000'
+      Given I set cookies:
+        | cookieName | value1 |
+      When I send a 'GET' request to '/posts'
+			</code></pre>
+			</div>
+			</ul>
+
+			<hr>
+
+			<li><h2>Verifying Response Data</h2></li>
+			<ul>
+			<li><h3>Verifying several headers using a datatable</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+    Scenario: Verifying several headers using a datatable
+      Given I send requests to '${REST_SERVER_HOST}:3000'
+      When I send a 'GET' request to '/posts'
+      And the service response headers match the following cases:
+        | Content-Type | equal  | application/json; charset=utf-8 |
+        | Expires      | equal  | -1                              |
+        | Expires      | exists |                                 |
+			</code></pre>
+			</div>
+			</ul>
+			<ul>
+			<li><h3>Verifying several cookies using a datatable</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+    @ignore
+    Scenario: Verifying several cookies using a datatable
+      Given I send requests to '${REST_SERVER_HOST}:3000'
+      When I send a 'GET' request to '/posts'
+      And the service response cookies match the following cases:
+        | cookieName1 | equal  | value1 |
+        | cookieName2 | equal  | value2 |
+        | cookieName3 | exists |        |
+			</code></pre>
+			</div>
+			</ul>
+			<ul>
+			<li><h3>Verify the response body contains specific text</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+    Scenario: Verify the response body contains specific text
+      Given I send requests to '${REST_SERVER_HOST}:3000'
+      When I send a 'GET' request to '/posts'
+      And the service response must contain the text 'body'
+			</code></pre>
+			</div>
+			</ul>
+			<ul>
+			<li><h3>Saving the whole response body and evaluating several elements at the same time</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+    Scenario: Saving the whole response body and evaluating several elements at the same time
+      Given I send requests to '${REST_SERVER_HOST}:3000'
+      When I send a 'GET' request to '/comments/1'
+      Then the service response status must be '200'
+      And I save element '$' in environment variable 'response'
+      And 'response' matches the following cases:
+        | $.postId    | equal            | 1      |
+        | $.id        | not equal        | 2      |
+        | $.email     | contains         | Eliseo |
+        | $.email     | does not contain | foobar |
+        | $.body      | exists           |        |
+        | $.fakefield | does not exists  |        |
+			</code></pre>
+			</div>
+			</ul>
+			<ul>
+			<li><h3>Saving an element from the response body in a variable for future use using jsonpath</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+    Scenario: Saving an element from the response body in a variable for future use using jsonpath
+      Given I send requests to '${REST_SERVER_HOST}:3000'
+      When I send a 'GET' request to '/posts'
+      Then the service response status must be '200'
+      And I save element '$.[0].id' in environment variable 'ID'
+      Then '${ID}' matches '1'
+			</code></pre>
+			</div>
+			</ul>
+			<ul>
+			<li><h3>Measuring Response Time</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+    Scenario: Measuring Response Time
+      Given I send requests to '${REST_SERVER_HOST}:3000'
+      When I send a 'GET' request to '/posts'
+      And the service response time is lower than '1000' milliseconds
+			</code></pre>
+			</div>
+			</ul>
+			<ul>
+			<li><h3>Verify response status code</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+    Scenario: Verify response status code
+      Given I send requests to '${REST_SERVER_HOST}:3000'
+      When I send a 'GET' request to '/posts'
+      Then the service response status must be '200'
+			</code></pre>
+			</div>
+			</ul>
+			<ul>
+			<li><h3>Saving the value of a response header in a variable for future use</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+    Scenario: Saving the value of a response header in a variable for future use
+      Given I send requests to '${REST_SERVER_HOST}:3000'
+      When I send a 'GET' request to '/posts'
+      And I save the response header 'Content-Type' in environment variable 'CONTENT-TYPE'
+      Then '${CONTENT-TYPE}' matches 'application/json; charset=utf-8'
+			</code></pre>
+			</div>
+			</ul>
+			<ul>
+			<li><h3>Saving the value of a response cookie in a variable for future use</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+    @ignore
+    Scenario: Saving the value of a response cookie in a variable for future use
+      Given I send requests to '${REST_SERVER_HOST}:3000'
+      When I send a 'GET' request to '/posts'
+      And I save the response cookie 'cookieName' in environment variable 'COOKIE'
+      Then '${COOKIE}' matches 'value'
+			</code></pre>
+			</div>
+			</ul>
+			<ul>
+			<li><h3>Verify the response body is the specified length</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+    Scenario: Verify the response body is the specified length
+      Given I send requests to '${REST_SERVER_HOST}:3000'
+      When I send a 'GET' request to '/posts/1'
+      When the service response length must be '292'
+			</code></pre>
+			</div>
+			</ul>
+			<ul>
+			<li><h3>Validating the response body matches a predefined json schema</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+    Scenario: Validating the response body matches a predefined json schema
+      Given I send requests to '${REST_SERVER_HOST}:3000'
+      When I send a 'GET' request to '/posts'
+      And the service response matches the schema in 'schemas/responseSchema.json'
+			</code></pre>
+			</div>
+			</ul>
+
+			<hr>
+
+			<li><h2>Authentication</h2></li>
+			<ul>
+			<li><h3>Generating a request using basic authentication</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+    Scenario: Generating a request using basic authentication
+      Given I send requests to '${REST_SERVER_HOST}:3000'
+      When I send a 'GET' request to '/posts' with user and password 'user:password'
+			</code></pre>
+			</div>
+			</ul>
+			<ul>
+			<li><h3>Generating a request using basic authentication (POST example)</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+    Scenario: Generating a request using basic authentication (POST example)
+      Given I send requests to '${REST_SERVER_HOST}:3000'
+      When I send a 'POST' request to '/posts' with user and password 'user:password' based on 'schemas/mytestdata.json' as 'json'
+			</code></pre>
+			</div>
+			</ul>
+
+			<hr>
+
+			<li><h2>Proxy configuration</h2></li>
+			<ul>
+			<li><h3>Setting a proxy</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+    @ignore
+    Scenario: Setting a proxy
+      Given I send requests to '${REST_SERVER_HOST}:3000'
+      And I set the proxy to 'http://localhost:80'
+			</code></pre>
+			</div>
+			</ul>
+			<ul>
+			<li><h3>Setting a proxy with credentials</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+    @ignore
+    Scenario: Setting a proxy with credentials
+      Given I send requests to '${REST_SERVER_HOST}:3000'
+      And I set the proxy to 'http://localhost:80' with username 'myusername' and password 'mypassword'
+			</code></pre>
+			</div>
+			</ul>
+
+			<hr>
+
+			<li><h2>Miscellaneous and examples</h2></li>
+			<ul>
+			<li><h3>Operations that can be done on a json response (using a sample json file as seed json)</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+    Scenario: Operations that can be done on a json response (using a sample json file as seed json)
+      And I save '${file:UTF-8:src/test/resources/schemas/sampleJsonResponse.json}' in variable 'SAMPLE_JSON'
+      And 'SAMPLE_JSON' matches the following cases:
+        | $.firstName             | equal            | John    |
+        | $.firstName             | not equal        | Smith   |
+        | $.lastName              | contains         | d       |
+        | $.lastName              | does not contain | foo     |
+        | $.age                   | length           | 2       |
+        | $.phoneNumbers[0].type  | equal            | iPhone  |
+        | $.phoneNumbers[0].local | equal            | false   |
+        | $.address               | exists           |         |
+        | $.fakefield             | does not exists  |         |
+        | $.phoneNumbers          | size             | 2       |
+        | $.hobbies               | contains         | netflix |
+			</code></pre>
+			</div>
+			</ul>
+
+			<hr>
+
+		</ol>
+	</div>
+
+	<footer>
+		<em>Automatically generated documentation for <a href="https://github.com/veepee-oss/gingerspec">GingerSpec library</a>.</em>
+	</footer>
+
+	<script>
+		/*! tableOfContents.js v1.0.0 | (c) 2020 Chris Ferdinandi | MIT License | http://github.com/cferdinandi/table-of-contents */
+
+/*
+ * Automatically generate a table of contents from the headings on the page
+ * @param  {String} content A selector for the element that the content is in
+ * @param  {String} target  The selector for the container to render the table of contents into
+ * @param  {Object} options An object of user options [optional]
+ */
+var tableOfContents = function (content, target, options) {
+
+	//
+	// Variables
+	//
+
+	// Get content
+	var contentWrap = document.querySelector(content);
+	var toc = document.querySelector(target);
+	if (!contentWrap || !toc) return;
+
+	// Settings & Defaults
+	var defaults = {
+		levels: 'h2, h3, h4, h5, h6',
+		heading: 'Table of Contents',
+		headingLevel: 'h2',
+		listType: 'ul'
+	};
+	var settings = {};
+
+	// Placeholder for headings
+	var headings;
+
+
+	//
+	// Methods
+	//
+
+	/**
+	 * Merge user options into defaults
+	 * @param  {Object} obj The user options
+	 */
+	var merge = function (obj) {
+		for (var key in defaults) {
+			if (Object.prototype.hasOwnProperty.call(defaults, key)) {
+				settings[key] = Object.prototype.hasOwnProperty.call(obj, key) ? obj[key] : defaults[key];
+			}
+		}
+	};
+
+	/**
+	 * Create an ID for a heading if one does not exist
+	 * @param  {Node} heading The heading element
+	 */
+	var createID = function (heading) {
+		if (heading.id.length) return;
+		heading.id = 'toc_' + heading.textContent.replace(/[^A-Za-z0-9]/g, '-');
+	};
+
+	/**
+	 * Get the HTML to indent a list a specific number of levels
+	 * @param  {Integer} count The number of times to indent the list
+	 * @return {String}        The HTML
+	 */
+	var getIndent = function (count) {
+		var html = '';
+		for (var i = 0; i < count; i++) {
+			html += '<' + settings.listType + '>';
+		}
+		return html;
+	};
+
+	/**
+	 * Get the HTML to close an indented list a specific number of levels
+	 * @param  {Integer} count The number of times to "outdent" the list
+	 * @return {String}        The HTML
+	 */
+	var getOutdent = function (count) {
+		var html = '';
+		for (var i = 0; i < count; i++) {
+			html += '</' + settings.listType + '></li>';
+		}
+		return html;
+	};
+
+	/**
+	 * Get the HTML string to start a new list of headings
+	 * @param  {Integer} diff  The number of levels in or out from the current level the list is
+	 * @param  {Integer} index The index of the heading in the "headings" NodeList
+	 * @return {String}        The HTML
+	 */
+	var getStartingHTML = function (diff, index) {
+
+		// If indenting
+		if (diff > 0) {
+			return getIndent(diff);
+		}
+
+		// If outdenting
+		if (diff < 0) {
+			return getOutdent(Math.abs(diff));
+		}
+
+		// If it's not the first item and there's no difference
+		if (index && !diff) {
+			return '</li>';
+		}
+
+		return '';
+
+	};
+
+	/**
+	 * Inject the table of contents into the DOM
+	 */
+	var injectTOC = function () {
+
+		// Track the current heading level
+		var level = headings[0].tagName.slice(1);
+		var startingLevel = level;
+
+		// Cache the number of headings
+		var len = headings.length - 1;
+
+		// Inject the HTML into the DOM
+		toc.innerHTML =
+			'<' + settings.headingLevel + '>' + settings.heading + '</' + settings.headingLevel + '>' +
+			'<' + settings.listType + '>' +
+				Array.prototype.map.call(headings, function (heading, index) {
+
+					// Add an ID if one is missing
+					createID(heading);
+
+					// Check the heading level vs. the current list
+					var currentLevel = heading.tagName.slice(1);
+					var levelDifference = currentLevel - level;
+					level = currentLevel;
+					var html = getStartingHTML(levelDifference, index);
+
+					// Generate the HTML
+					html +=
+						'<li>' +
+							'<a href="#' + heading.id + '">' +
+								heading.innerHTML.trim() +
+							'</a>';
+
+					// If the last item, close it all out
+					if (index === len) {
+						html += getOutdent(Math.abs(startingLevel - currentLevel));
+					}
+
+					return html;
+
+				}).join('') +
+			'</' + settings.listType + '>';
+	};
+
+	/**
+	 * Initialize the script
+	 */
+	var init = function () {
+
+		// Merge any user settings into the defaults
+		merge(options || {});
+
+		// Get the headings
+		// If none are found, don't render a list
+		headings = contentWrap.querySelectorAll(settings.levels);
+		if (!headings.length) return;
+
+		// Inject the table of contents
+		injectTOC();
+
+	};
+
+
+	//
+	// Initialize the script
+	//
+
+	init();
+
+};
+	</script>
+	<script>
+		//Get the button:
+mybutton = document.getElementById("myBtn");
+
+// When the user scrolls down 20px from the top of the document, show the button
+window.onscroll = function() {scrollFunction()};
+
+function scrollFunction() {
+    if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+        mybutton.style.display = "block";
+    } else {
+        mybutton.style.display = "none";
+    }
+}
+
+// When the user clicks on the button, scroll to the top of the document
+function topFunction() {
+    document.body.scrollTop = 0; // For Safari
+    document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+}
+	</script>
+	<script>
+		function createCopyButton(highlightDiv) {
+    const button = document.createElement("button");
+    button.className = "copy-code-button";
+    button.type = "button";
+    button.innerText = "Copy";
+    button.addEventListener("click", () =>
+        copyCodeToClipboard(button, highlightDiv)
+    );
+    addCopyButtonToDom(button, highlightDiv);
+}
+
+async function copyCodeToClipboard(button, highlightDiv) {
+    const codeToCopy = highlightDiv.querySelector(":last-child > code")
+        .innerText;
+    try {
+        result = await navigator.permissions.query({ name: "clipboard-write" });
+        if (result.state == "granted" || result.state == "prompt") {
+            await navigator.clipboard.writeText(codeToCopy);
+        } else {
+            copyCodeBlockExecCommand(codeToCopy, highlightDiv);
+        }
+    } catch (_) {
+        copyCodeBlockExecCommand(codeToCopy, highlightDiv);
+    } finally {
+        codeWasCopied(button);
+    }
+}
+
+function copyCodeBlockExecCommand(codeToCopy, highlightDiv) {
+    const textArea = document.createElement("textArea");
+    textArea.contentEditable = "true";
+    textArea.readOnly = "false";
+    textArea.className = "copyable-text-area";
+    textArea.value = codeToCopy;
+    highlightDiv.insertBefore(textArea, highlightDiv.firstChild);
+    const range = document.createRange();
+    range.selectNodeContents(textArea);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+    textArea.setSelectionRange(0, 999999);
+    document.execCommand("copy");
+    highlightDiv.removeChild(textArea);
+}
+
+function codeWasCopied(button) {
+    button.blur();
+    button.innerText = "Copied!";
+    setTimeout(function () {
+        button.innerText = "Copy";
+    }, 2000);
+}
+
+function addCopyButtonToDom(button, highlightDiv) {
+    highlightDiv.insertBefore(button, highlightDiv.firstChild);
+    const wrapper = document.createElement("div");
+    wrapper.className = "highlight-wrapper";
+    highlightDiv.parentNode.insertBefore(wrapper, highlightDiv);
+    wrapper.appendChild(highlightDiv);
+}
+
+document
+    .querySelectorAll(".highlight")
+    .forEach((highlightDiv) => createCopyButton(highlightDiv));
+
+	</script>
+	<script>
+		tableOfContents('[data-content]', '[data-toc]', {
+			heading: 'On this page...', // Change the headings
+			listType: 'ol', // Change the list type
+			// levels: 'h2, h3' // Change the levels used
+		});
+	</script>
+</body>
+</html>
