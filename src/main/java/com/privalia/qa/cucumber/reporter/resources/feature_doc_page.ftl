@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
+
+	<header>
+		<em>Back to <a href="index.html">Index</a>.</em>
+	</header>
+
 	<title>${featureDoc.featureName}</title>
 
 	<style type="text/css">
@@ -10,6 +15,8 @@
 <body>
 
 	<h1>${featureDoc.featureName}</h1>
+
+	<p><pre>${featureDoc.featureDescription}</pre></p>
 
 	<div data-toc></div>
 
