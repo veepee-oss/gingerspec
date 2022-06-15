@@ -16,7 +16,7 @@
 
 	<h1>${featureDoc.featureName}</h1>
 
-	<p><pre>${featureDoc.featureDescription}</pre></p>
+	<p>${featureDoc.featureDescription}</p>
 
 	<div data-toc></div>
 
