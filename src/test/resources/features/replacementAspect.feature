@@ -1,4 +1,4 @@
-Feature: Testing variable replacements ${VERSION}
+Feature: Using variables
 
   This feature provides an example on how to use variables in GingerSpec. The default definition of a variable
   is ${variableName}. GingerSpec will try to get the value of 'variableName' before executing the step. if GingerSpec
@@ -6,20 +6,8 @@ Feature: Testing variable replacements ${VERSION}
   description, scenario description steps, datatables, docstrings and even comments.
 
   There are many ways of creating new variables: you can pass variables via the CLI using -DvariableName=variableValue,
-  or they can be defined in a previous step. You can also use variables to automatically generate fake data.
-
-  1.- Using variables in Scenario names, titles and log messages
-  2.- Creating local variables
-  3.- Injecting system variables via CLI
-  4.- Using default values
-  5.- Using interpolation
-  6.- Recursive variable replacements
-  7.- Using environment-dependent variables
-  8.- Generating fake data
-  9.- Resolving mathematical expressions
-  10.- Resolving variables in files
-  11.- Miscellaneous and examples
-
+  or they can be defined in a previous step. You can also use variables to automatically generate fake data. Please, read
+  the full documentation here: https://github.com/veepee-oss/gingerspec/wiki/Gherkin-variables
 
   Rule: Using variables in Scenario names, titles, log messages, datatables, docStrings
 

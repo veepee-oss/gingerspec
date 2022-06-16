@@ -7,16 +7,16 @@ Feature: Slack Integration
   at src/test/resources/slack.properties
   More information here: https://github.com/veepee-oss/gingerspec/wiki/Gherkin-tags#slack-tag
 
-  Rule: Using the slack tag
+  Rule: Getting slack notifications
 
+    # This will send a notification message to qms-notifications channel if the scenario fails
     @slack[#qms-notifications]
     Scenario: Using the slack tag with one channel
-      Given I run 'echo "This scenario should fail and send a notification to #qms-notifications channel in slack"' locally
       Then 'a' matches 'b'
 
+      # This will send a notification message to qms-notifications and o1-e2e-test-report channel if the scenario fails
     @slack[#qms-notifications,#o1-e2e-test-report]
     Scenario: Using the slack tag with more than one channel
-      Given I run 'echo "This scenario should fail and send a notification to #qms-notifications and #o1-e2e-test-report channels in slack"' locally
       Then 'a' matches 'b'
 
   Rule: Sending more complex messages in slack
@@ -24,8 +24,8 @@ Feature: Slack Integration
     Scenario: Sending message to a slack channel
       Given I save 'GingerSpec' in variable 'FRAMEWORK'
       Given I send a message to the slack channel '#qms-notifications' with text
-    """
-    :wave: Hello! You can send any type of text to a given slack channel.
-    You can even send variables created during your steps
-    Regards, ${FRAMEWORK} :slightly_smiling_face:
-    """
+      """
+      :wave: Hello! You can send any type of text to a given slack channel.
+      You can even send variables created during your steps
+      Regards, ${FRAMEWORK} :slightly_smiling_face:
+      """

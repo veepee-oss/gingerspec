@@ -20,6 +20,9 @@ import com.privalia.qa.utils.BaseGTest;
 import io.cucumber.testng.CucumberOptions;
 
 @CucumberOptions(
+        plugin = {
+                "com.privalia.qa.cucumber.reporter.gingerHtmlFormatter:target/documentation",
+        },
         features = {
                 "src/test/resources/features/jiraTag.feature",
         },
