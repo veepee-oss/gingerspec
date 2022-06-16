@@ -1,6 +1,7 @@
 package com.privalia.qa.cucumber.reporter;
 
 import io.cucumber.plugin.event.TestSourceRead;
+import net.bytebuddy.dynamic.scaffold.MethodGraph;
 import org.apache.commons.lang3.RegExUtils;
 
 import java.util.*;
@@ -56,7 +57,7 @@ public class featureDoc {
 
                 String ruleName = matches.get(0);
 
-                Map<String, String> ruleScenarios = new HashMap<>();
+                Map<String, String> ruleScenarios = new LinkedHashMap<>();
 
                 String ruleBody = RegExUtils.removePattern(rules[i], "^Rule: (.*?)[\\n\\r]");
 
