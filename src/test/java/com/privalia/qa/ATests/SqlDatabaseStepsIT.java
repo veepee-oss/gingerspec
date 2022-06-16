@@ -19,7 +19,9 @@ package com.privalia.qa.ATests;
 import com.privalia.qa.utils.BaseGTest;
 import io.cucumber.testng.CucumberOptions;
 
-@CucumberOptions(
+@CucumberOptions(plugin = {
+        "com.privalia.qa.cucumber.reporter.gingerHtmlFormatter:target/documentation",
+        },
         features = {"src/test/resources/features/sqlDatabaseSteps.feature"},
         glue = "com.privalia.qa.specs")
 public class SqlDatabaseStepsIT extends BaseGTest {
