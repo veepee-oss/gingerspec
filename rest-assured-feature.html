@@ -147,19 +147,13 @@ pre code {
 
 	<h1>Rest Assured Feature</h1>
 
-	<p><pre>
+	<p>
   This feature provides examples on how to use the steps for testing REST APIs. All feature files that make use of
   the steps for testing REST APIs (such as this one) must include the "@rest" annotation at the beginning of the file.
   This is necessary, since it signals the library that it should bootstrap some necessary components for testing REST APIs
 
-    1.- Set up initial base URI for future requests
-    2.- Specifying Request Data
-    3.- Verifying Response Data
-    4.- Authentication
-    5.- Proxy configuration
-    6.- Miscellaneous and examples
 
-</pre></p>
+</p>
 
 	<div data-toc></div>
 
@@ -172,20 +166,20 @@ pre code {
 		<ol>
 			<li><h2>Set up initial base URI for future requests</h2></li>
 			<ul>
-			<li><h3>Setting up base URI for future requests using https</h3></li>
-			<div class="highlight">
-			<pre><code class="language-gherkin">
-    Scenario: Setting up base URI for future requests using https
-      Given I securely send requests to '${REST_SERVER_HOST}:3000'
-			</code></pre>
-			</div>
-			</ul>
-			<ul>
 			<li><h3>Setting up base URI for future requests using http</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
     Scenario: Setting up base URI for future requests using http
       Given I send requests to '${REST_SERVER_HOST}:3000'
+			</code></pre>
+			</div>
+			</ul>
+			<ul>
+			<li><h3>Setting up base URI for future requests using https</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+    Scenario: Setting up base URI for future requests using https
+      Given I securely send requests to '${REST_SERVER_HOST}:3000'
 			</code></pre>
 			</div>
 			</ul>
@@ -216,6 +210,19 @@ pre code {
 			</div>
 			</ul>
 			<ul>
+			<li><h3>Adding cookies</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+    @ignore
+    Scenario: Adding cookies
+      Given I send requests to '${REST_SERVER_HOST}:3000'
+      Given I set cookies:
+        | cookieName | value1 |
+      When I send a 'GET' request to '/posts'
+			</code></pre>
+			</div>
+			</ul>
+			<ul>
 			<li><h3>Adding headers</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
@@ -229,17 +236,12 @@ pre code {
 			</div>
 			</ul>
 			<ul>
-			<li><h3>Sending a file</h3></li>
+			<li><h3>Adding request body from a file</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    @ignore
-    Scenario: Sending a file
+    Scenario: Adding request body from a file
       Given I send requests to '${REST_SERVER_HOST}:3000'
-      And I set headers:
-        | Content-Type | multipart/form-data |
-      And I add the file in 'schemas/mytestdata.json' to the request
-      When I send a 'POST' request to '/posts'
-      Then the service response status must be '201'
+      When I send a 'POST' request to '/posts' based on 'schemas/mytestdata.json' as 'json'
 			</code></pre>
 			</div>
 			</ul>
@@ -272,25 +274,17 @@ pre code {
 			</div>
 			</ul>
 			<ul>
-			<li><h3>Adding request body from a file</h3></li>
-			<div class="highlight">
-			<pre><code class="language-gherkin">
-    Scenario: Adding request body from a file
-      Given I send requests to '${REST_SERVER_HOST}:3000'
-      When I send a 'POST' request to '/posts' based on 'schemas/mytestdata.json' as 'json'
-			</code></pre>
-			</div>
-			</ul>
-			<ul>
-			<li><h3>Adding cookies</h3></li>
+			<li><h3>Sending a file</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
     @ignore
-    Scenario: Adding cookies
+    Scenario: Sending a file
       Given I send requests to '${REST_SERVER_HOST}:3000'
-      Given I set cookies:
-        | cookieName | value1 |
-      When I send a 'GET' request to '/posts'
+      And I set headers:
+        | Content-Type | multipart/form-data |
+      And I add the file in 'schemas/mytestdata.json' to the request
+      When I send a 'POST' request to '/posts'
+      Then the service response status must be '201'
 			</code></pre>
 			</div>
 			</ul>
@@ -299,31 +293,13 @@ pre code {
 
 			<li><h2>Verifying Response Data</h2></li>
 			<ul>
-			<li><h3>Verifying several headers using a datatable</h3></li>
+			<li><h3>Verify response status code</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Verifying several headers using a datatable
+    Scenario: Verify response status code
       Given I send requests to '${REST_SERVER_HOST}:3000'
       When I send a 'GET' request to '/posts'
-      And the service response headers match the following cases:
-        | Content-Type | equal  | application/json; charset=utf-8 |
-        | Expires      | equal  | -1                              |
-        | Expires      | exists |                                 |
-			</code></pre>
-			</div>
-			</ul>
-			<ul>
-			<li><h3>Verifying several cookies using a datatable</h3></li>
-			<div class="highlight">
-			<pre><code class="language-gherkin">
-    @ignore
-    Scenario: Verifying several cookies using a datatable
-      Given I send requests to '${REST_SERVER_HOST}:3000'
-      When I send a 'GET' request to '/posts'
-      And the service response cookies match the following cases:
-        | cookieName1 | equal  | value1 |
-        | cookieName2 | equal  | value2 |
-        | cookieName3 | exists |        |
+      Then the service response status must be '200'
 			</code></pre>
 			</div>
 			</ul>
@@ -335,6 +311,41 @@ pre code {
       Given I send requests to '${REST_SERVER_HOST}:3000'
       When I send a 'GET' request to '/posts'
       And the service response must contain the text 'body'
+			</code></pre>
+			</div>
+			</ul>
+			<ul>
+			<li><h3>Verify the response body is the specified length</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+    Scenario: Verify the response body is the specified length
+      Given I send requests to '${REST_SERVER_HOST}:3000'
+      When I send a 'GET' request to '/posts/1'
+      When the service response length must be '292'
+			</code></pre>
+			</div>
+			</ul>
+			<ul>
+			<li><h3>Validating the response body matches a predefined json schema</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+    Scenario: Validating the response body matches a predefined json schema
+      Given I send requests to '${REST_SERVER_HOST}:3000'
+      When I send a 'GET' request to '/posts'
+      And the service response matches the schema in 'schemas/responseSchema.json'
+			</code></pre>
+			</div>
+			</ul>
+			<ul>
+			<li><h3>Saving an element from the response body in a variable for future use using jsonpath</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+    Scenario: Saving an element from the response body in a variable for future use using jsonpath
+      Given I send requests to '${REST_SERVER_HOST}:3000'
+      When I send a 'GET' request to '/posts'
+      Then the service response status must be '200'
+      And I save element '$.[0].id' in environment variable 'ID'
+      Then '${ID}' matches '1'
 			</code></pre>
 			</div>
 			</ul>
@@ -358,41 +369,6 @@ pre code {
 			</div>
 			</ul>
 			<ul>
-			<li><h3>Saving an element from the response body in a variable for future use using jsonpath</h3></li>
-			<div class="highlight">
-			<pre><code class="language-gherkin">
-    Scenario: Saving an element from the response body in a variable for future use using jsonpath
-      Given I send requests to '${REST_SERVER_HOST}:3000'
-      When I send a 'GET' request to '/posts'
-      Then the service response status must be '200'
-      And I save element '$.[0].id' in environment variable 'ID'
-      Then '${ID}' matches '1'
-			</code></pre>
-			</div>
-			</ul>
-			<ul>
-			<li><h3>Measuring Response Time</h3></li>
-			<div class="highlight">
-			<pre><code class="language-gherkin">
-    Scenario: Measuring Response Time
-      Given I send requests to '${REST_SERVER_HOST}:3000'
-      When I send a 'GET' request to '/posts'
-      And the service response time is lower than '1000' milliseconds
-			</code></pre>
-			</div>
-			</ul>
-			<ul>
-			<li><h3>Verify response status code</h3></li>
-			<div class="highlight">
-			<pre><code class="language-gherkin">
-    Scenario: Verify response status code
-      Given I send requests to '${REST_SERVER_HOST}:3000'
-      When I send a 'GET' request to '/posts'
-      Then the service response status must be '200'
-			</code></pre>
-			</div>
-			</ul>
-			<ul>
 			<li><h3>Saving the value of a response header in a variable for future use</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
@@ -401,6 +377,20 @@ pre code {
       When I send a 'GET' request to '/posts'
       And I save the response header 'Content-Type' in environment variable 'CONTENT-TYPE'
       Then '${CONTENT-TYPE}' matches 'application/json; charset=utf-8'
+			</code></pre>
+			</div>
+			</ul>
+			<ul>
+			<li><h3>Verifying several headers using a datatable</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+    Scenario: Verifying several headers using a datatable
+      Given I send requests to '${REST_SERVER_HOST}:3000'
+      When I send a 'GET' request to '/posts'
+      And the service response headers match the following cases:
+        | Content-Type | equal  | application/json; charset=utf-8 |
+        | Expires      | equal  | -1                              |
+        | Expires      | exists |                                 |
 			</code></pre>
 			</div>
 			</ul>
@@ -418,24 +408,28 @@ pre code {
 			</div>
 			</ul>
 			<ul>
-			<li><h3>Verify the response body is the specified length</h3></li>
+			<li><h3>Verifying several cookies using a datatable</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Verify the response body is the specified length
+    @ignore
+    Scenario: Verifying several cookies using a datatable
       Given I send requests to '${REST_SERVER_HOST}:3000'
-      When I send a 'GET' request to '/posts/1'
-      When the service response length must be '292'
+      When I send a 'GET' request to '/posts'
+      And the service response cookies match the following cases:
+        | cookieName1 | equal  | value1 |
+        | cookieName2 | equal  | value2 |
+        | cookieName3 | exists |        |
 			</code></pre>
 			</div>
 			</ul>
 			<ul>
-			<li><h3>Validating the response body matches a predefined json schema</h3></li>
+			<li><h3>Measuring Response Time</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Validating the response body matches a predefined json schema
+    Scenario: Measuring Response Time
       Given I send requests to '${REST_SERVER_HOST}:3000'
       When I send a 'GET' request to '/posts'
-      And the service response matches the schema in 'schemas/responseSchema.json'
+      And the service response time is lower than '1000' milliseconds
 			</code></pre>
 			</div>
 			</ul>

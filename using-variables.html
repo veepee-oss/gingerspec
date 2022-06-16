@@ -6,7 +6,7 @@
 		<em>Back to <a href="index.html">Index</a>.</em>
 	</header>
 
-	<title>Testing variable replacements 1.0</title>
+	<title>Using variables</title>
 
 	<style type="text/css">
 		body {
@@ -145,31 +145,19 @@ pre code {
 </head>
 <body>
 
-	<h1>Testing variable replacements 1.0</h1>
+	<h1>Using variables</h1>
 
-	<p><pre>
+	<p>
   This feature provides an example on how to use variables in GingerSpec. The default definition of a variable
   is ${variableName}. GingerSpec will try to get the value of 'variableName' before executing the step. if GingerSpec
   is unable to find the value, the test will fail. You can use variables at any point in your feature file: feature title,
   description, scenario description steps, datatables, docstrings and even comments.
 
   There are many ways of creating new variables: you can pass variables via the CLI using -DvariableName=variableValue,
-  or they can be defined in a previous step. You can also use variables to automatically generate fake data.
+  or they can be defined in a previous step. You can also use variables to automatically generate fake data. Please, read
+  the full documentation here: https://github.com/veepee-oss/gingerspec/wiki/Gherkin-variables
 
-  1.- Using variables in Scenario names, titles and log messages
-  2.- Creating local variables
-  3.- Injecting system variables via CLI
-  4.- Using default values
-  5.- Using interpolation
-  6.- Recursive variable replacements
-  7.- Using environment-dependent variables
-  8.- Generating fake data
-  9.- Resolving mathematical expressions
-  10.- Resolving variables in files
-  11.- Miscellaneous and examples
-
-
-</pre></p>
+</p>
 
 	<div data-toc></div>
 
@@ -188,6 +176,15 @@ pre code {
     Scenario: Replacements scenario title and log comments. 1.0
       #log The value of VERSION in the title should be ${VERSION}
       And I wait '1' seconds
+			</code></pre>
+			</div>
+			</ul>
+			<ul>
+			<li><h3>Simplest read {} on scenario name</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+    Scenario: Simplest read {} on scenario name
+      Given I run 'ls' locally
 			</code></pre>
 			</div>
 			</ul>
@@ -217,15 +214,6 @@ pre code {
               "price": "${math:3 * sin(90) - 2 / (5 - 2)}"
             }
          """
-			</code></pre>
-			</div>
-			</ul>
-			<ul>
-			<li><h3>Simplest read {} on scenario name</h3></li>
-			<div class="highlight">
-			<pre><code class="language-gherkin">
-    Scenario: Simplest read {} on scenario name
-      Given I run 'ls' locally
 			</code></pre>
 			</div>
 			</ul>
@@ -392,22 +380,17 @@ pre code {
 
 			<li><h2>Miscellaneous and examples</h2></li>
 			<ul>
-			<li><h3>With scenarios outlines and datatables2</h3></li>
+			<li><h3>With scenarios outlines in examples table</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario Outline: With scenarios outlines and datatables2
-      Given I run 'ls' locally
-      Given I create file 'testSOATtag.json' based on 'schemas/simple1.json' as 'json' with:
-        | $.a     | REPLACE | ${file:UTF-8:src/test/resources/schemas/<file>.json} | object |
-        | b       | ADD     | ${WAIT}                                              | N/A    |
-        | ${WAIT} | ADD     | ${file:UTF-8:src/test/resources/schemas/<file>.json} | object |
-      Given I save '${file:UTF-8:target/test-classes/testSOATtag.json}' in variable 'VAR'
+    Scenario Outline: With scenarios outlines in examples table
+      Given I save '<file>' in variable 'VAR'
       Then I run '[ "${VAR}" = "<content>" ]' locally
 
       Examples:
-        | content                 | file    |
-        | {"a":{},"1":{},"b":"1"} | empty   |
-        | {"a":{},"1":{},"b":"1"} | simple0 |
+        | content     | file                                                  |
+        | {}          | ${file:UTF-8:src/test/resources/schemas/simple0.json} |
+        | {"a": true} | ${file:UTF-8:src/test/resources/schemas/simple1.json} |
 			</code></pre>
 			</div>
 			</ul>
@@ -428,6 +411,26 @@ pre code {
 			</div>
 			</ul>
 			<ul>
+			<li><h3>With scenarios outlines and datatables2</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+    Scenario Outline: With scenarios outlines and datatables2
+      Given I run 'ls' locally
+      Given I create file 'testSOATtag.json' based on 'schemas/simple1.json' as 'json' with:
+        | $.a     | REPLACE | ${file:UTF-8:src/test/resources/schemas/<file>.json} | object |
+        | b       | ADD     | ${WAIT}                                              | N/A    |
+        | ${WAIT} | ADD     | ${file:UTF-8:src/test/resources/schemas/<file>.json} | object |
+      Given I save '${file:UTF-8:target/test-classes/testSOATtag.json}' in variable 'VAR'
+      Then I run '[ "${VAR}" = "<content>" ]' locally
+
+      Examples:
+        | content                 | file    |
+        | {"a":{},"1":{},"b":"1"} | empty   |
+        | {"a":{},"1":{},"b":"1"} | simple0 |
+			</code></pre>
+			</div>
+			</ul>
+			<ul>
 			<li><h3>Reading a file and saving it in a variable</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
@@ -437,21 +440,6 @@ pre code {
       #log The same operation can be done with $variables
       Given I save '${file:UTF-8:src/test/resources/schemas/empty.json}' in variable 'VAR'
       Then I run '[ "${VAR}" = "{}" ]' locally
-			</code></pre>
-			</div>
-			</ul>
-			<ul>
-			<li><h3>With scenarios outlines in examples table</h3></li>
-			<div class="highlight">
-			<pre><code class="language-gherkin">
-    Scenario Outline: With scenarios outlines in examples table
-      Given I save '<file>' in variable 'VAR'
-      Then I run '[ "${VAR}" = "<content>" ]' locally
-
-      Examples:
-        | content     | file                                                  |
-        | {}          | ${file:UTF-8:src/test/resources/schemas/simple0.json} |
-        | {"a": true} | ${file:UTF-8:src/test/resources/schemas/simple1.json} |
 			</code></pre>
 			</div>
 			</ul>

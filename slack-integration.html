@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+	<header>
+		<em>Back to <a href="index.html">Index</a>.</em>
+	</header>
+
+	<title>Slack Integration</title>
+
+	<style type="text/css">
+		body {
+    margin: 1em auto;
+    max-width: 60em;
+    padding-bottom: 95vh;
+    width: 88%;
+    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji";
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--color-fg-default);
+    background-color: var(--color-canvas-default);
+}
+
+h3 {
+    text-decoration: underline;
+}
+
+#myBtn {
+    display: none; /* Hidden by default */
+    position: fixed; /* Fixed/sticky position */
+    bottom: 20px; /* Place the button at the bottom of the page */
+    right: 30px; /* Place the button 30px from the right */
+    z-index: 99; /* Make sure it does not overlap */
+    border: none; /* Remove borders */
+    outline: none; /* Remove outline */
+    background-color: grey; /* Set a background color */
+    color: white; /* Text color */
+    cursor: pointer; /* Add a mouse pointer on hover */
+    padding: 15px; /* Some padding */
+    border-radius: 10px; /* Rounded corners */
+    font-size: 18px; /* Increase font size */
+}
+
+#myBtn:hover {
+    background-color: #555; /* Add a dark-grey background on hover */
+}
+
+pre code {
+    background-color: #eee;
+    display: block;
+    padding: 16px;
+    overflow: auto;
+    border-radius: 6px;
+    font-family: ui-monospace,SFMono-Regular,SF Mono,Menlo,Consolas,Liberation Mono,monospace;
+    font-size: 85%;
+    border-style: solid;
+    border-width: 1px;
+    border-color: darkgray;
+}
+
+.highlight-wrapper {
+    display: block;
+}
+
+.highlight {
+    position: relative;
+    z-index: 0;
+    padding: 0;
+    margin: 0;
+    border-radius: 4px;
+}
+
+.highlight > .chroma {
+    color: #d0d0d0;
+    background-color: #212121;
+    position: static;
+    z-index: 1;
+    border-radius: 4px;
+    padding: 10px;
+}
+
+.chroma {
+    overflow: auto;
+}
+
+.chroma .lntable {
+    display: table;
+    width: 100%;
+    padding: 0 0 5px;
+    margin: 0;
+    border-spacing: 0;
+    border: 0;
+    overflow: auto;
+}
+
+.chroma .lntd:first-child {
+    padding: 7px 7px 7px 10px;
+    margin: 0;
+}
+
+.chroma .lntd:last-child {
+    padding: 7px 10px 7px 7px;
+    margin: 0;
+}
+
+.copy-code-button {
+    position: absolute;
+    z-index: 2;
+    right: 0;
+    top: 0;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 14px;
+    width: 65px;
+    color: white;
+    background-color: #808080;
+    border: 1.25px solid #232326;
+    border-top-left-radius: 0;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 4px;
+    white-space: nowrap;
+    padding: 4px 4px 5px 4px;
+    margin: 0 0 0 1px;
+    cursor: pointer;
+    opacity: 0.6;
+}
+
+.copy-code-button:hover,
+.copy-code-button:focus,
+.copy-code-button:active,
+.copy-code-button:active:hover {
+    color: #222225;
+    background-color: #b3b3b3;
+    opacity: 0.8;
+}
+
+.copyable-text-area {
+    position: absolute;
+    height: 0;
+    z-index: -1;
+    opacity: 0.01;
+}
+	</style>
+</head>
+<body>
+
+	<h1>Slack Integration</h1>
+
+	<p>
+  Using the @slack[] tag, you can send a notification to a slack channel(s) everytime your scenario fails.
+  The message will contain the name of the scenario that failed as well as the feature file where it is
+  located. You can fully configure the behavior of this tag using the configuration file located
+  at src/test/resources/slack.properties
+  More information here: https://github.com/veepee-oss/gingerspec/wiki/Gherkin-tags#slack-tag
+
+</p>
+
+	<div data-toc></div>
+
+	<hr>
+
+	<div data-content>
+
+		<button onclick="topFunction()" id="myBtn" title="Go to top">Back to top</button>
+
+		<ol>
+			<li><h2>Getting slack notifications</h2></li>
+			<ul>
+			<li><h3>Using the slack tag with one channel</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+    # This will send a notification message to qms-notifications channel if the scenario fails
+    @slack[#qms-notifications]
+    Scenario: Using the slack tag with one channel
+      Then 'a' matches 'b'
+			</code></pre>
+			</div>
+			</ul>
+			<ul>
+			<li><h3>Using the slack tag with more than one channel</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+      # This will send a notification message to qms-notifications and o1-e2e-test-report channel if the scenario fails
+    @slack[#qms-notifications,#o1-e2e-test-report]
+    Scenario: Using the slack tag with more than one channel
+      Then 'a' matches 'b'
+			</code></pre>
+			</div>
+			</ul>
+
+			<hr>
+
+			<li><h2>Sending more complex messages in slack</h2></li>
+			<ul>
+			<li><h3>Sending message to a slack channel</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+    Scenario: Sending message to a slack channel
+      Given I save 'GingerSpec' in variable 'FRAMEWORK'
+      Given I send a message to the slack channel '#qms-notifications' with text
+      """
+      :wave: Hello! You can send any type of text to a given slack channel.
+      You can even send variables created during your steps
+      Regards, ${FRAMEWORK} :slightly_smiling_face:
+      """
+			</code></pre>
+			</div>
+			</ul>
+
+			<hr>
+
+		</ol>
+	</div>
+
+	<footer>
+		<em>Automatically generated documentation for <a href="https://github.com/veepee-oss/gingerspec">GingerSpec library</a>.</em>
+	</footer>
+
+	<script>
+		/*! tableOfContents.js v1.0.0 | (c) 2020 Chris Ferdinandi | MIT License | http://github.com/cferdinandi/table-of-contents */
+
+/*
+ * Automatically generate a table of contents from the headings on the page
+ * @param  {String} content A selector for the element that the content is in
+ * @param  {String} target  The selector for the container to render the table of contents into
+ * @param  {Object} options An object of user options [optional]
+ */
+var tableOfContents = function (content, target, options) {
+
+	//
+	// Variables
+	//
+
+	// Get content
+	var contentWrap = document.querySelector(content);
+	var toc = document.querySelector(target);
+	if (!contentWrap || !toc) return;
+
+	// Settings & Defaults
+	var defaults = {
+		levels: 'h2, h3, h4, h5, h6',
+		heading: 'Table of Contents',
+		headingLevel: 'h2',
+		listType: 'ul'
+	};
+	var settings = {};
+
+	// Placeholder for headings
+	var headings;
+
+
+	//
+	// Methods
+	//
+
+	/**
+	 * Merge user options into defaults
+	 * @param  {Object} obj The user options
+	 */
+	var merge = function (obj) {
+		for (var key in defaults) {
+			if (Object.prototype.hasOwnProperty.call(defaults, key)) {
+				settings[key] = Object.prototype.hasOwnProperty.call(obj, key) ? obj[key] : defaults[key];
+			}
+		}
+	};
+
+	/**
+	 * Create an ID for a heading if one does not exist
+	 * @param  {Node} heading The heading element
+	 */
+	var createID = function (heading) {
+		if (heading.id.length) return;
+		heading.id = 'toc_' + heading.textContent.replace(/[^A-Za-z0-9]/g, '-');
+	};
+
+	/**
+	 * Get the HTML to indent a list a specific number of levels
+	 * @param  {Integer} count The number of times to indent the list
+	 * @return {String}        The HTML
+	 */
+	var getIndent = function (count) {
+		var html = '';
+		for (var i = 0; i < count; i++) {
+			html += '<' + settings.listType + '>';
+		}
+		return html;
+	};
+
+	/**
+	 * Get the HTML to close an indented list a specific number of levels
+	 * @param  {Integer} count The number of times to "outdent" the list
+	 * @return {String}        The HTML
+	 */
+	var getOutdent = function (count) {
+		var html = '';
+		for (var i = 0; i < count; i++) {
+			html += '</' + settings.listType + '></li>';
+		}
+		return html;
+	};
+
+	/**
+	 * Get the HTML string to start a new list of headings
+	 * @param  {Integer} diff  The number of levels in or out from the current level the list is
+	 * @param  {Integer} index The index of the heading in the "headings" NodeList
+	 * @return {String}        The HTML
+	 */
+	var getStartingHTML = function (diff, index) {
+
+		// If indenting
+		if (diff > 0) {
+			return getIndent(diff);
+		}
+
+		// If outdenting
+		if (diff < 0) {
+			return getOutdent(Math.abs(diff));
+		}
+
+		// If it's not the first item and there's no difference
+		if (index && !diff) {
+			return '</li>';
+		}
+
+		return '';
+
+	};
+
+	/**
+	 * Inject the table of contents into the DOM
+	 */
+	var injectTOC = function () {
+
+		// Track the current heading level
+		var level = headings[0].tagName.slice(1);
+		var startingLevel = level;
+
+		// Cache the number of headings
+		var len = headings.length - 1;
+
+		// Inject the HTML into the DOM
+		toc.innerHTML =
+			'<' + settings.headingLevel + '>' + settings.heading + '</' + settings.headingLevel + '>' +
+			'<' + settings.listType + '>' +
+				Array.prototype.map.call(headings, function (heading, index) {
+
+					// Add an ID if one is missing
+					createID(heading);
+
+					// Check the heading level vs. the current list
+					var currentLevel = heading.tagName.slice(1);
+					var levelDifference = currentLevel - level;
+					level = currentLevel;
+					var html = getStartingHTML(levelDifference, index);
+
+					// Generate the HTML
+					html +=
+						'<li>' +
+							'<a href="#' + heading.id + '">' +
+								heading.innerHTML.trim() +
+							'</a>';
+
+					// If the last item, close it all out
+					if (index === len) {
+						html += getOutdent(Math.abs(startingLevel - currentLevel));
+					}
+
+					return html;
+
+				}).join('') +
+			'</' + settings.listType + '>';
+	};
+
+	/**
+	 * Initialize the script
+	 */
+	var init = function () {
+
+		// Merge any user settings into the defaults
+		merge(options || {});
+
+		// Get the headings
+		// If none are found, don't render a list
+		headings = contentWrap.querySelectorAll(settings.levels);
+		if (!headings.length) return;
+
+		// Inject the table of contents
+		injectTOC();
+
+	};
+
+
+	//
+	// Initialize the script
+	//
+
+	init();
+
+};
+	</script>
+	<script>
+		//Get the button:
+mybutton = document.getElementById("myBtn");
+
+// When the user scrolls down 20px from the top of the document, show the button
+window.onscroll = function() {scrollFunction()};
+
+function scrollFunction() {
+    if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+        mybutton.style.display = "block";
+    } else {
+        mybutton.style.display = "none";
+    }
+}
+
+// When the user clicks on the button, scroll to the top of the document
+function topFunction() {
+    document.body.scrollTop = 0; // For Safari
+    document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+}
+	</script>
+	<script>
+		function createCopyButton(highlightDiv) {
+    const button = document.createElement("button");
+    button.className = "copy-code-button";
+    button.type = "button";
+    button.innerText = "Copy";
+    button.addEventListener("click", () =>
+        copyCodeToClipboard(button, highlightDiv)
+    );
+    addCopyButtonToDom(button, highlightDiv);
+}
+
+async function copyCodeToClipboard(button, highlightDiv) {
+    const codeToCopy = highlightDiv.querySelector(":last-child > code")
+        .innerText;
+    try {
+        result = await navigator.permissions.query({ name: "clipboard-write" });
+        if (result.state == "granted" || result.state == "prompt") {
+            await navigator.clipboard.writeText(codeToCopy);
+        } else {
+            copyCodeBlockExecCommand(codeToCopy, highlightDiv);
+        }
+    } catch (_) {
+        copyCodeBlockExecCommand(codeToCopy, highlightDiv);
+    } finally {
+        codeWasCopied(button);
+    }
+}
+
+function copyCodeBlockExecCommand(codeToCopy, highlightDiv) {
+    const textArea = document.createElement("textArea");
+    textArea.contentEditable = "true";
+    textArea.readOnly = "false";
+    textArea.className = "copyable-text-area";
+    textArea.value = codeToCopy;
+    highlightDiv.insertBefore(textArea, highlightDiv.firstChild);
+    const range = document.createRange();
+    range.selectNodeContents(textArea);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+    textArea.setSelectionRange(0, 999999);
+    document.execCommand("copy");
+    highlightDiv.removeChild(textArea);
+}
+
+function codeWasCopied(button) {
+    button.blur();
+    button.innerText = "Copied!";
+    setTimeout(function () {
+        button.innerText = "Copy";
+    }, 2000);
+}
+
+function addCopyButtonToDom(button, highlightDiv) {
+    highlightDiv.insertBefore(button, highlightDiv.firstChild);
+    const wrapper = document.createElement("div");
+    wrapper.className = "highlight-wrapper";
+    highlightDiv.parentNode.insertBefore(wrapper, highlightDiv);
+    wrapper.appendChild(highlightDiv);
+}
+
+document
+    .querySelectorAll(".highlight")
+    .forEach((highlightDiv) => createCopyButton(highlightDiv));
+
+	</script>
+	<script>
+		tableOfContents('[data-content]', '[data-toc]', {
+			heading: 'On this page...', // Change the headings
+			listType: 'ol', // Change the list type
+			// levels: 'h2, h3' // Change the levels used
+		});
+	</script>
+</body>
+</html>
