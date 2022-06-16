@@ -47,8 +47,28 @@ public class featureDocTest {
     public void shouldReturnCorrectNumberOfScenariosPerRule() {
         featureDoc featureDoc = new featureDoc(this.featureBody);
         Map<String, Map> featureRules = featureDoc.getFeatureRules();
-        Assert.assertEquals(featureRules.get("Specifying Request Data").size(), 4);
+        Assert.assertEquals(featureRules.get("Specifying Request Data").size(), 5);
         Assert.assertEquals(featureRules.get("Verifying Response Data").size(), 2);
+    }
+
+    @Test
+    public void shouldCorrectlyReturnScenarioWithDocString() {
+        featureDoc featureDoc = new featureDoc(this.featureBody);
+        Map<String, Map> featureRules = featureDoc.getFeatureRules();
+        Map<String, String> scenarios = featureRules.get("Specifying Request Data");
+        String scenarioDocString = scenarios.get("Replacements in a DocString");
+        Assert.assertTrue(scenarioDocString.contains("Test1"));
+        Assert.assertTrue(scenarioDocString.contains("Test2"));
+        Assert.assertTrue(scenarioDocString.contains("Test3"));
+    }
+
+    @Test
+    public void shouldCorrectlyReturnScenarioOutline() {
+        featureDoc featureDoc = new featureDoc(this.featureBody);
+        Map<String, Map> featureRules = featureDoc.getFeatureRules();
+        Map<String, String> scenarios = featureRules.get("Specifying Request Data");
+        String scenarioDocString = scenarios.get("With scenarios outlines in examples table");
+        Assert.assertTrue(scenarioDocString.contains("Example"));
     }
 
     @Test

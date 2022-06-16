@@ -38,6 +38,15 @@ Feature: test feature
       | {}          | ${file:UTF-8:src/test/resources/schemas/simple0.json} |
       | {"a": true} | ${file:UTF-8:src/test/resources/schemas/simple1.json} |
 
+  @ignore
+  Scenario: Replacements in a DocString
+    Given This is a DocString
+        """
+            Test1
+            Test2
+            Test3
+         """
+
   #comment
   @tag
   Rule: Verifying Response Data
