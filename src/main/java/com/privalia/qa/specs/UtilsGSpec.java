@@ -31,6 +31,7 @@ import org.hjson.JsonArray;
 import org.hjson.JsonValue;
 import org.testng.Assert;
 
+import javax.swing.*;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
@@ -649,5 +650,33 @@ public class UtilsGSpec extends BaseGSpec {
     @Given("this is a datatable:")
     public void thisIsADatatable(DataTable table) {
         System.out.println(table.toString());
+    }
+
+    /**
+     * Temporally stop the execution of the feature
+     * <p>
+     * This step shows a dialog in the center of the screen and interrupts the execution of the rest
+     * of the steps in the feature until the "Ok" button in the dialog is pressed. This comes handy when
+     * debugging and the user needs to execute some manual actions before continuing
+     * <pre>{@code
+     * Example:
+     *
+     * Scenario: Temporally stop the execution of the feature
+     *     Given I go to 'http://demoqa.com/automation-practice-form'
+     *     Then I pause
+     *     Then I type 'Jose' on the element with 'id:firstName'
+     * }</pre>
+     *
+     * @see UtilsGSpec#idleWait(Integer)
+     */
+    @Then("^I pause$")
+    public void SeleniumPause() {
+        this.commonspec.getLogger().info("Pausing feature execution until button in dialog is pressed...");
+
+        JFrame jf = new JFrame();
+        JOptionPane.showMessageDialog(jf, "Feature execution is paused and will resume when you click OK.",
+                "Cucumber paused", JOptionPane.INFORMATION_MESSAGE);
+        jf.toFront();
+        jf.repaint();
     }
 }

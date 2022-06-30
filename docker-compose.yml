@@ -54,9 +54,9 @@ services:
     ports:
       - "3000:3000"
   demo-site:
-    image: 'privaliatech/privalia-front-image:0.1.0'
+    image: 'josefd8/selenium-testpages-image:1.0'
     ports:
-      - "80:80"
+      - "80:4567"
   selenium-grid:
     image: 'selenium/hub:3.141.59-20210311'
     ports:

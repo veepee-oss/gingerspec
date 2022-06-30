@@ -1,5 +1,5 @@
 @sql
-Feature: SQL Database Steps
+Feature: Steps for testing relational databases
 
   Steps related to working with SQL relational databases (currently supports postgresql and mysql). In Scenarios that create connections
   to a database, you can also use the @sql tag to automatically close any open sql connection after the Scenario completes, so is not necessary to

@@ -28,9 +28,10 @@ import io.cucumber.java.en.When;
 import org.assertj.core.api.Assertions;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
-import javax.swing.*;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -159,10 +160,12 @@ public class SeleniumGSpec extends BaseGSpec {
      * <pre>{@code
      * Example:
      *
-     * Scenario: Wait until the element is clickable
-     *      Given I go to 'http://mydummysite.com/login'
-     *      Then I check every '1' seconds for at least '10' seconds until '1' elements exists with 'id:loginbutton' and is 'clickable'
-     *      And I click on the element on index '0'
+     * Scenario: Wait for element to be present/visible/hidden/clickable (longer method)
+     *       Given I go to 'http://localhost/styled/javascript-redirect-test.html'
+     *       And I click on the element with 'id:delaygotobasic'
+     *       Then I check every '1' seconds for at least '10' seconds until '1' elements exists with 'id:goback' and is 'clickable'
+     *       And I click on the element with 'id:goback'
+     *       And we are in page 'http://localhost/styled/javascript-redirect-test.html'
      * }</pre>
      *
      * @see #seleniumBrowse(String, String)
@@ -239,7 +242,7 @@ public class SeleniumGSpec extends BaseGSpec {
     }
 
     /**
-     * Checks if an alert message is open in the current page. The function implements a pooling interval to check if the condition is true
+     * Checks if an alert message is open in the current page.
      * <p>
      * This step stores the reference to the alert to be used in other steps such as {@link #iAcceptTheAlert()} or
      * by {@link #iDismissTheAlert()}
@@ -247,43 +250,49 @@ public class SeleniumGSpec extends BaseGSpec {
      * <pre>{@code
      * Example:
      *
-     * Scenario: Wait for an alert
-     *      Given I go to 'http://mydummysite.com/login'
-     *      And I check every '1' seconds for at least '5' seconds until an alert appears
+     *  Scenario: Wait for an alert to appear
+     *       Given I go to 'https://demoqa.com/alerts'
+     *       When I click on the element with 'id:alertButton'
+     *       And I wait '5' seconds until an alert appears
      * }</pre>
      *
      * @see #iAcceptTheAlert()
      * @see #iDismissTheAlert()
-     * @param poolingInterval Time between consecutive condition evaluations
      * @param poolMaxTime     Maximum time to wait for the condition to be true
      */
-    @Then("^I check every '(\\d+)' seconds for at least '(\\d+)' seconds until an alert appears$")
-    public void waitAlertWithPooling(int poolingInterval, int poolMaxTime) {
-        Alert alert = commonspec.waitAlertWithPooling(poolingInterval, poolMaxTime);
+    @Then("^I wait '(\\d+)' seconds until an alert appears$")
+    public void waitAlert(int poolMaxTime) {
+        Alert alert = commonspec.waitAlertWithPooling(1, poolMaxTime);
         commonspec.setSeleniumAlert(alert);
     }
 
     /**
      * Accepts an alert message previously found.
+     * <p>
+     * This step will automatically wait for 5 seconds until the alert is present. If that is not enough, you
+     * can directly use {@link #waitAlert(int)}
      * <pre>{@code
      * Example:
      *
      * Scenario: Wait for an alert and dismiss it
      *      Given I go to 'http://mydummysite.com/login'
-     *      And I check every '1' seconds for at least '5' seconds until an alert appears
      *      And I dismiss the alert
      * }</pre>
      *
-     * @see #waitAlertWithPooling(int, int)
+     * @see #waitAlert(int)
      * @see #iAcceptTheAlert()
      */
     @Then("^I dismiss the alert$")
     public void iAcceptTheAlert() {
+        this.waitAlert(5);
         commonspec.dismissSeleniumAlert();
     }
 
     /**
      * Dismiss an alert message previously found.
+     * <p>
+     * This step will automatically wait 5 seconds for the alert to be present. If thats not enough, you
+     * can use {@link #waitAlert(int)}
      * <pre>{@code
      * Example:
      *
@@ -293,37 +302,43 @@ public class SeleniumGSpec extends BaseGSpec {
      *      And I accept the alert
      * }
      * </pre>
-     * @see #waitAlertWithPooling(int, int)
+     * @see #waitAlert(int)
      * @see #iDismissTheAlert()
      */
     @Then("^I accept the alert$")
     public void iDismissTheAlert() {
+        this.waitAlert(5);
         commonspec.acceptSeleniumAlert();
     }
 
     /**
-     * Assigns the given file (relative to schemas/) to the web elements in the given index.
+     * Assigns the given file (relative to schemas/) to the referenced web element.
      * <p>
      * This step is suitable for file selectors/file pickers (an input type=file), where the user must specify a
-     * file in the local computer as an input in a form. This step requires a previous operation for finding elements
-     * to have been executed, such as: <br>
-     * {@link SeleniumGSpec#assertSeleniumNElementExists(String, Integer, String, String)} <br>
-     * {@link SeleniumGSpec#assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)} <br>
-     * {@link SeleniumGSpec#waitWebElementWithPooling(int, int, int, String, String, String)}
+     * file in the local computer as an input in a form.
      * <pre>{@code
      * Example:
      *
      * Scenario: Uploading a new profile picture
-     *      Given I go to 'http://mydummysite.com/myprofile'
-     *      When '1' elements exists with 'id:profile_pic_10'
-     *      Then I assign the file in 'schemas/empty.json' to the element on index '0'
+     *       Given I go to 'http://localhost/styled/file-upload-test.html'
+     *       And '1' elements exists with 'id:fileinput'
+     *       When I assign the file in 'schemas/empty.json' to the element with 'id:fileinput'
+     *       Then I click on the element with 'name:upload'
+     *       And the element with 'id:uploadedfilename' has 'empty.json' as text
      * }</pre>
      *
      * @param fileName Name of the file relative to schemas folder (schemas/myFile.txt)
+     * @param method        method to locate the elements (id, name, class, css, xpath, linkText, partialLinkText and tagName)
+     * @param element       the relative reference to the element
      * @param index    Index of the web element (file input)
      */
-    @Then("^I assign the file in '(.*)' to the element on index '(\\d+)'$")
-    public void iSetTheFileInSchemasEmptyJsonToTheElementOnIndex(String fileName, int index) {
+    @Then("^I assign the file in '(.*)' to the element with '(" + LOCATORS + "):(.*?)'( index '(\\d+)')?$")
+    public void iSetTheFileInSchemasEmptyJsonToTheElementOnIndex(String fileName, String method, String element, Integer index) {
+
+        this.assertSeleniumNElementExists("at least", 1, method, element);
+        if (index == null) {
+            index = 0;
+        }
 
         //Get file absolute path
         String filePath = getClass().getClassLoader().getResource(fileName).getPath();
@@ -355,7 +370,6 @@ public class SeleniumGSpec extends BaseGSpec {
      * <p>
      * This step requires a previous operation for finding elements to have been executed, such as: <br>
      * {@link SeleniumGSpec#assertSeleniumNElementExists(String, Integer, String, String)} <br>
-     * {@link SeleniumGSpec#assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)} <br>
      * {@link SeleniumGSpec#waitWebElementWithPooling(int, int, int, String, String, String)}
      * <pre>{@code
      * Example:
@@ -368,7 +382,9 @@ public class SeleniumGSpec extends BaseGSpec {
      *
      * @see #seleniumIdFrame(String, String)
      * @param index the index
+     * @deprecated use {@link #seleniumIdFrame(String, String)} instead
      */
+    @Deprecated
     @Given("^I switch to the iframe on index '(\\d+)'$")
     public void seleniumSwitchFrame(Integer index) {
 
@@ -396,14 +412,8 @@ public class SeleniumGSpec extends BaseGSpec {
      */
     @Given("^I switch to iframe with '(" + LOCATORS + "):(.*)'$")
     public void seleniumIdFrame(String method, String idframe) {
-        assertThat(commonspec.locateElement(method, idframe, 1));
-
-        if (!method.toLowerCase().matches("id") && !method.toLowerCase().matches("name")) {
-            Assertions.fail("Can not use '%s' to switch iframe. Use 'id' or 'name'", method);
-        }
-
-        commonspec.getDriver().switchTo().frame(idframe);
-
+        this.assertSeleniumNElementExists("at least", 1, method, idframe);
+        commonspec.getDriver().switchTo().frame(this.commonspec.getPreviousWebElements().getPreviousWebElements().get(0));
     }
 
 
@@ -419,31 +429,10 @@ public class SeleniumGSpec extends BaseGSpec {
      *
      * @see #seleniumIdFrame(String, String)
      * @see #seleniumSwitchFrame(Integer)
-     * @see #seleniumSwitchParentFrame()
-     *
      */
     @Given("^I switch to a parent frame$")
     public void seleniumSwitchAParentFrame() {
         commonspec.getDriver().switchTo().parentFrame();
-    }
-
-
-    /**
-     * Switches to the frames main container.
-     * <pre>{@code
-     * Example:
-     *
-     * Scenario: switch to the main frame container
-     *      Then I switch to the main frame container
-     * }</pre>
-     *
-     * @see #seleniumSwitchAParentFrame()
-     * @see #seleniumSwitchFrame(Integer)
-     * @see #seleniumIdFrame(String, String)
-     */
-    @Given("^I switch to the main frame container$")
-    public void seleniumSwitchParentFrame() {
-        commonspec.getDriver().switchTo().frame(commonspec.getParentWindow());
     }
 
 
@@ -466,36 +455,41 @@ public class SeleniumGSpec extends BaseGSpec {
     @Given("^a new window is opened$")
     public void seleniumGetwindows() {
         Set<String> wel = commonspec.getDriver().getWindowHandles();
-        assertThat(wel).as("No new windows opened. Driver only returned %s window handles", wel.size()).hasSize(2);
+        assertThat(wel).as("No new windows opened. Driver only returned %s window handles", wel.size()).hasSizeGreaterThanOrEqualTo(2);
     }
 
 
     /**
      * Verifies that a webelement previously found has the given text
-     * <p>
-     * This step requires a previous operation for finding elements to have been executed, such as: <br>
-     * {@link SeleniumGSpec#assertSeleniumNElementExists(String, Integer, String, String)} <br>
-     * {@link SeleniumGSpec#assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)} <br>
-     * {@link SeleniumGSpec#waitWebElementWithPooling(int, int, int, String, String, String)}
-     *
      * <pre>{@code
      * Example:
      *
      * Scenario: Verify text of element
-     *      Given I go to 'http:mydummysite/index.html'
-     *      When '1' elements exists with 'xpath://*[@id="pie_register"]/li[6]/div/label'
-     *      And the element on index '0' has 'Phone Number' as text
+     *      Given I go to 'https://demoqa.com/text-box'
+     *      And the element with 'id:userName-label' has 'Full Name' as text
+     *      And the element with 'class:form-label' index '1' has 'Email' as text
      * }</pre>
      *
-     * @param index the index of the webelement
-     * @param text  the text to verify
+     * @param method    Method to use to locate the web element (id, name, class, etc)
+     * @param element   The relative reference to the element
+     * @param index     Index of the element, in case one or more elements with the given locator are found (first element starts with index 0)
+     * @param text      Text to locate
      */
-    @Then("^the element on index '(\\d+)' has '(.*)' as text$")
-    public void assertSeleniumTextOnElementPresent(Integer index, String text) {
+    @Then("^the element with '(" + LOCATORS + "):(.*?)'( index '(\\d+)')? has '(.*)' as text$")
+    public void assertSeleniumTextOnElementByLocatorPresent(String method, String element, Integer index, String text) {
+
+        this.assertSeleniumNElementExists("at least", 1, method, element);
+        if (index == null) {
+            index = 0;
+        }
+
         Assertions.assertThat(commonspec.getPreviousWebElements().getPreviousWebElements().size()).as("Could not get webelement with index %s. Less elements were found. Allowed index: 0 to %s", index, commonspec.getPreviousWebElements().getPreviousWebElements().size() - 1)
                 .isGreaterThanOrEqualTo(index + 1);
+
         Assertions.assertThat(commonspec.getPreviousWebElements().getPreviousWebElements().get(index).getText()).contains(text);
     }
+
+
 
 
     /**
@@ -515,7 +509,27 @@ public class SeleniumGSpec extends BaseGSpec {
      */
     @Then("^this text exists:$")
     public void assertSeleniumTextInSource(String text) {
-        Assertions.assertThat(commonspec.getDriver().getPageSource()).as("Expected text not found at page").contains(text);
+        Assertions.assertThat(commonspec.getDriver().getPageSource().contains(text)).as("The expected text was not found in the page").isTrue();
+    }
+
+    /**
+     * Checks if a text does not exist in the source of an already loaded URL.
+     * <pre>{@code
+     * Example:
+     *
+     * Scenario: Verify text exists in page source
+     *      Given I go to 'http:mydummysite/index.html'
+     *      Then this text does not exist:
+     *      """
+     *      <h1 class="entry-title">Not present text</h1>
+     *      """
+     * }</pre>
+     *
+     * @param text the text to verify
+     */
+    @Then("^this text does not exist:$")
+    public void assertSeleniumTextNotPresentInSource(String text) {
+        Assertions.assertThat(commonspec.getDriver().getPageSource().contains(text)).as("The provided text was found in the page").isFalse();
     }
 
 
@@ -526,22 +540,12 @@ public class SeleniumGSpec extends BaseGSpec {
      * <pre>{@code
      * Examples:
      *
-     * Scenario: Locating element by id
-     *      Given I go to 'http:mydummysite/index.html'
-     *      When '1' elements exists with 'id:profile_pic_10'
-     *
-     * Scenario: Locating element by class
-     *      Given I go to 'http:mydummysite/index.html'
-     *      When '7' elements exists with 'class:legend_txt'
-     *
-     * Scenario: verify that the amount of elements is bigger or equal
-     *      Given I go to 'http:mydummysite/index.html'
-     *      Then at least '1' elements exists with 'class:detail-entry'
-     *
-     * Scenario: Elements are stored to be used in subsequent steps:
-     *      Given I go to 'http:mydummysite/index.html'
-     *      Given '1' elements exists with 'xpath://*[@id="myBtn"]'
-     *      Then I click on the element on index '0'
+     * Scenario: Verify element exists on the page
+     *       Given I go to 'http://localhost/styled/find-by-playground-test.html'
+     *       Then '1' elements exists with 'id:p1'
+     *       Then '2' elements exists with 'name:pName2'
+     *       Then '118' elements exists with 'class:normal'
+     *       Then at least '1' elements exists with 'class:explanation'
      * }
      * </pre>
      *
@@ -571,87 +575,36 @@ public class SeleniumGSpec extends BaseGSpec {
 
 
     /**
-     * Checks that the expected count of webelements are present in the page, within a timeout and with a location.
-     * <p>
-     * Each negative lookup is followed by a wait of wait seconds. Selenium times are not accounted for the mentioned timeout.
-     * This method is similar to {@link SeleniumGSpec#waitWebElementWithPooling(int, int, int, String, String, String)}
-     * but uses static wait instead of {@link org.openqa.selenium.support.ui.FluentWait} and does not assert the expected
-     * condition of the elements (if elements are visible|hidden|present|clickable)
-     * <pre>{@code
-     * Example:
-     *
-     * Scenario: Wait for element to be present
-     *      Given I go to 'http:mydummysite/index.html'
-     *      Then in less than '20' seconds, checking each '2' seconds, '1' elements exists with 'id:name_3_firstname'
-     *      And I click on the element on index '0'
-     * }</pre>
-     *
-     * @deprecated use {@link #waitWebElementWithPooling(int, int, int, String, String, String)} instead.
-     * @see #waitWebElementWithPooling(int, int, int, String, String, String)
-     * @see #assertSeleniumNElementExists(String, Integer, String, String)
-     * @see #seleniumClick(Integer)
-     * @param timeout                   The max time to wait for the condition to be true
-     * @param wait                      Interval between verification
-     * @param expectedCount             The expected count of elements
-     * @param method                    The method
-     * @param element                   The web element element
-     * @throws InterruptedException     The interrupted exception
-     */
-    @Deprecated
-    @Then("^in less than '(\\d+)' seconds, checking each '(\\d+)' seconds, '(\\d+)' elements exists with '(" + LOCATORS + "):(.*)'$")
-    public void assertSeleniumNElementExistsOnTimeOut(Integer timeout, Integer wait, Integer expectedCount,
-                                                      String method, String element) throws InterruptedException {
-        List<WebElement> wel = null;
-        for (int i = 0; i < timeout; i += wait) {
-            wel = commonspec.locateElement(method, element, -1);
-            if (wel.size() == expectedCount) {
-                break;
-            } else {
-                Thread.sleep(wait * 1000);
-            }
-        }
-
-        PreviousWebElements pwel = new PreviousWebElements(wel);
-        Assertions.assertThat(pwel.getPreviousWebElements().size()).as("Could not find the expected amount of element(s) (%s), with the given %s. Checked for %s secs, %s secs interval,", expectedCount, method, timeout, wait).isEqualTo(expectedCount);
-        commonspec.setPreviousWebElements(pwel);
-
-    }
-
-
-    /**
-     * Verifies if a webelement previously found is displayed or not
-     * <p>
-     * This step requires a previous operation for finding elements to have been executed, such as: <br>
-     * {@link SeleniumGSpec#assertSeleniumNElementExists(String, Integer, String, String)} <br>
-     * {@link SeleniumGSpec#assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)} <br>
-     * {@link SeleniumGSpec#waitWebElementWithPooling(int, int, int, String, String, String)}
+     * Verifies if a webelement referenced by locator is displayed or not
      *
      * <pre>{@code
      * Example:
      *
-     * Scenario: Checking if the element previously found is displayed
-     *      Given I go to 'http:mydummysite/index.html'
-     *      When '1' elements exists with 'id:myDIV'
-     *      And the element on index '0' IS displayed
-     *
-     * Scenario: Checking if the element previously found is not displayed
-     *      Given I go to 'http:mydummysite/index.html'
-     *      When '1' elements exists with 'id:myDIV'
-     *      And the element on index '0' IS NOT displayed
+     * Scenario: Verify element is displayed
+     *       Given I go to 'https://demoqa.com/accordian'
+     *       And the element with 'id:section1Content' IS displayed
+     *       And the element with 'id:section2Content' index '0' IS NOT displayed
      * }</pre>
      *
      * @see #assertSeleniumNElementExists(String, Integer, String, String)
-     * @see #assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)
      * @see #waitWebElementWithPooling(int, int, int, String, String, String)
-     * @param index  the index of the element
-     * @param option the option (is selected or not)
+     * @param method    Method to use to locate the web element (id, name, class, etc)
+     * @param element   The relative reference to the element
+     * @param index     Index of the element, in case one or more elements with the given locator are found (first element starts with index 0)
+     * @param option    Whether the element IS or IS NOT displayed
      */
-    @Then("^the element on index '(\\d+?)' (IS|IS NOT) displayed$")
-    public void assertSeleniumIsDisplayed(Integer index, String option) {
+    @Then("^the element with '(" + LOCATORS + "):(.*?)'( index '(\\d+)')? (IS|IS NOT) displayed$")
+    public void assertSeleniumIsDisplayedByLocator(String method, String element, Integer index, String option) {
+
         Boolean isDisplayed = false;
 
         if (option.matches("IS")) {
             isDisplayed = true;
+        }
+
+        this.assertSeleniumNElementExists("at least", 1, method, element);
+        if (index == null) {
+            index = 0;
         }
 
         Assertions.assertThat(commonspec.getPreviousWebElements().getPreviousWebElements().size()).as("Could not get webelement with index %s. Less elements were found. Allowed index: 0 to %s", index, commonspec.getPreviousWebElements().getPreviousWebElements().size() - 1)
@@ -662,36 +615,33 @@ public class SeleniumGSpec extends BaseGSpec {
 
 
     /**
-     * Verifies if a webelement previously found is enabled or not
-     * <p>
-     * This step requires a previous operation for finding elements to have been executed, such as: <br>
-     * {@link SeleniumGSpec#assertSeleniumNElementExists(String, Integer, String, String)} <br>
-     * {@link SeleniumGSpec#assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)} <br>
-     * {@link SeleniumGSpec#waitWebElementWithPooling(int, int, int, String, String, String)}
+     * Verifies if a webelement referenced by locator is enabled or not
      *
      * <pre>{@code
      * Example:
      *
-     * Scenario: Checking if the element previously found is enabled
-     *      Given I go to 'http:mydummysite/index.html'
-     *      When '1' elements exists with 'xpath://*[@id="myBtn"]'
-     *      And the element on index '0' IS enabled
-     *
-     * Scenario: Checking if the element previously found is not enabled
-     *      Given I go to 'http:mydummysite/index.html'
-     *      When '1' elements exists with 'xpath://*[@id="myBtn"]'
-     *      And the element on index '0' IS NOT enabled
+     *  Scenario: Verify if element is enabled
+     *       Given I go to 'https://demoqa.com/radio-button'
+     *       And the element with 'id:yesRadio' IS enabled
+     *       And the element with 'id:noRadio' index '0' IS NOT enabled
      * }</pre>
      *
-     * @param index  the index of the web element in the list
-     * @param option the option (is enabled or not)
+     * @param method    Method to use to locate the web element (id, name, class, etc)
+     * @param element   The relative reference to the element
+     * @param index     Index of the element, in case one or more elements with the given locator are found (first element starts with index 0)
+     * @param option    Whether the element is enabled or not
      */
-    @Then("^the element on index '(\\d+?)' (IS|IS NOT) enabled$")
-    public void assertSeleniumIsEnabled(Integer index, String option) {
+    @Then("^the element with '(" + LOCATORS + "):(.*?)'( index '(\\d+)')? (IS|IS NOT) enabled$")
+    public void assertSeleniumIsEnabledByLocator(String method, String element, Integer index, String option) {
         Boolean isEnabled = false;
 
         if (option.matches("IS")) {
             isEnabled = true;
+        }
+
+        this.assertSeleniumNElementExists("at least", 1, method, element);
+        if (index == null) {
+            index = 0;
         }
 
         Assertions.assertThat(commonspec.getPreviousWebElements().getPreviousWebElements().size()).as("Could not get webelement with index %s. Less elements were found. Allowed index: 0 to %s", index, commonspec.getPreviousWebElements().getPreviousWebElements().size() - 1)
@@ -700,37 +650,35 @@ public class SeleniumGSpec extends BaseGSpec {
                 .as("Unexpected element enabled property").isEqualTo(isEnabled);
     }
 
-
     /**
-     * Verifies if a webelement previously found is selected or not
-     * <p>
-     * This step requires a previous operation for finding elements to have been executed, such as: <br>
-     * {@link SeleniumGSpec#assertSeleniumNElementExists(String, Integer, String, String)} <br>
-     * {@link SeleniumGSpec#assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)} <br>
-     * {@link SeleniumGSpec#waitWebElementWithPooling(int, int, int, String, String, String)}
+     * Verifies if a webelement referenced by locator is selected or not
+     *
      * <pre>{@code
      * Example:
      *
-     * Scenario: Checking if the element previously found is not selected
-     *      Given I go to 'http:mydummysite/index.html'
-     *      When '3' elements exists with 'name:radio_4[]'
-     *      And the element on index '0' IS NOT selected
-     *
-     * Scenario: Checking if the element previously found is selected
-     *      Given I go to 'http:mydummysite/index.html'
-     *      When '3' elements exists with 'name:radio_4[]'
-     *      And the element on index '1' IS selected
+     *  Scenario: Verify if an element is selected
+     *       Given I go to 'https://demoqa.com/automation-practice-form'
+     *       And the element with 'id:hobbies-checkbox-1' IS NOT selected
+     *       When I click on the element with 'id:hobbies-checkbox-1' index '0'
+     *       And the element with 'id:hobbies-checkbox-1' index '0' IS selected
      * }</pre>
      *
-     * @param index  the index of the web element in the list
+     * @param method    Method to use to locate the web element (id, name, class, etc)
+     * @param element   The relative reference to the element
+     * @param index     Index of the element, in case one or more elements with the given locator are found (first element starts with index 0)
      * @param option the option (if it is enabled or not)
      */
-    @Then("^the element on index '(\\d+?)' (IS|IS NOT) selected$")
-    public void assertSeleniumIsSelected(Integer index, String option) {
+    @Then("^the element with '(" + LOCATORS + "):(.*?)'( index '(\\d+)')? (IS|IS NOT) selected$")
+    public void assertSeleniumIsSelectedByLocator(String method, String element, Integer index, String option) {
         Boolean isSelected = false;
 
         if (option.matches("IS")) {
             isSelected = true;
+        }
+
+        this.assertSeleniumNElementExists("at least", 1, method, element);
+        if (index == null) {
+            index = 0;
         }
 
         Assertions.assertThat(commonspec.getPreviousWebElements().getPreviousWebElements().size()).as("Could not get webelement with index %s. Less elements were found. Allowed index: 0 to %s", index, commonspec.getPreviousWebElements().getPreviousWebElements().size() - 1)
@@ -741,28 +689,31 @@ public class SeleniumGSpec extends BaseGSpec {
 
 
     /**
-     * Verifies that a webelement previously found has attribute with value (as a regexp)
-     * <p>
-     * This step requires a previous operation for finding elements to have been executed, such as: <br>
-     * {@link SeleniumGSpec#assertSeleniumNElementExists(String, Integer, String, String)} <br>
-     * {@link SeleniumGSpec#assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)} <br>
-     * {@link SeleniumGSpec#waitWebElementWithPooling(int, int, int, String, String, String)}
+     * Verifies that a webelement referenced by locator has attribute with value (as a regexp)
      *
      * <pre>{@code
      * Example:
      *
-     * Scenario: Checking the value of attribute
-     *      Given I go to 'http:mydummysite/index.html'
-     *      When '1' elements exists with 'id:loginButton'
-     *      Then the element on index '0' has 'type' as 'submit'
+     * Scenario: Verify the value of element's attribute
+     *       Given I go to 'https://demoqa.com/text-box'
+     *       Then the element with 'id:userName' has 'placeholder' as 'Full Name'
+     *       Then the element with 'id:submit' index '0' has 'type' as 'button'
      * }</pre>
      *
-     * @param index     the index of the web element
+     * @param method    Method to use to locate the web element (id, name, class, etc)
+     * @param element   The relative reference to the element
+     * @param index     Index of the element, in case one or more elements with the given locator are found (first element starts with index 0)
      * @param attribute the attribute to verify
      * @param value     the value of the attribute
      */
-    @Then("^the element on index '(\\d)' has '(.*?)' as '(.*)'$")
-    public void assertSeleniumHasAttributeValue(Integer index, String attribute, String value) {
+    @Then("^the element with '(" + LOCATORS + "):(.*?)'( index '(\\d+)')? has '(.*?)' as '(.*)'$")
+    public void assertSeleniumHasAttributeValueByLocator(String method, String element, Integer index, String attribute, String value) {
+
+        this.assertSeleniumNElementExists("at least", 1, method, element);
+        if (index == null) {
+            index = 0;
+        }
+
         Assertions.assertThat(commonspec.getPreviousWebElements().getPreviousWebElements().size()).as("Could not get webelement with index %s. Less elements were found. Allowed index: 0 to %s", index, commonspec.getPreviousWebElements().getPreviousWebElements().size() - 1)
                 .isGreaterThanOrEqualTo(index + 1);
         String val = commonspec.getPreviousWebElements().getPreviousWebElements().get(index).getAttribute(attribute);
@@ -804,7 +755,7 @@ public class SeleniumGSpec extends BaseGSpec {
      */
     @Then("^we are in page '(.*)'$")
     public void checkURL(String url) {
-        Assertions.assertThat(commonspec.getDriver().getCurrentUrl()).as("We are not in the expected url").isEqualTo(url);
+        Assertions.assertThat(commonspec.getDriver().getCurrentUrl()).as("We are not in the expected url").matches(url);
     }
 
 
@@ -839,70 +790,35 @@ public class SeleniumGSpec extends BaseGSpec {
 
     /**
      * Takes the content of a webElement and stores it in the thread environment variable passed as parameter
-     * <p>
-     * This step requires a previous operation for finding elements to have been executed, such as: <br>
-     * {@link SeleniumGSpec#assertSeleniumNElementExists(String, Integer, String, String)} <br>
-     * {@link SeleniumGSpec#assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)} <br>
-     * {@link SeleniumGSpec#waitWebElementWithPooling(int, int, int, String, String, String)}
      *
      * <pre>{@code
      * Example:
      *
      * Scenario: Saving the content of element
-     *      Given I go to 'http:mydummysite/index.html'
-     *      When '1' elements exists with 'id:my_text_field'
-     *      I save content of element in index '0' in environment variable 'mytext'
+     *       Given I go to 'https://demoqa.com/text-box'
+     *       When I save content of element with 'id:userName-label' in environment variable 'mytext'
+     *       Then '${mytext}' matches 'Full Name'
      * }</pre>
      *
      * @see #assertSeleniumNElementExists(String, Integer, String, String)
-     * @see #assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)
      * @see #waitWebElementWithPooling(int, int, int, String, String, String)
-     * @param index  position of the element in the array of webElements found
+     * @param method    Method to use to locate the web element (id, name, class, etc)
+     * @param element   The relative reference to the element
+     * @param index     Index of the element, in case one or more elements with the given locator are found (first element starts with index 0)
      * @param envVar name of the thread environment variable where to store the text
      */
-    @Then("^I save content of element in index '(\\d+)' in environment variable '(.*)'$")
-    public void saveContentWebElementInEnvVar(Integer index, String envVar) {
+    @Then("^I save content of element with '(" + LOCATORS + "):(.*?)'( index '(\\d+)')? in environment variable '(.*)'$")
+    public void saveContentWebElementByLocatorInEnvVar(String method, String element, Integer index, String envVar) {
+
+        this.assertSeleniumNElementExists("at least", 1, method, element);
+        if (index == null) {
+            index = 0;
+        }
+
         Assertions.assertThat(commonspec.getPreviousWebElements().getPreviousWebElements().size()).as("Could not get webelement with index %s. Less elements were found. Allowed index: 0 to %s", index, commonspec.getPreviousWebElements().getPreviousWebElements().size() - 1)
                 .isGreaterThanOrEqualTo(index + 1);
         String text = commonspec.getPreviousWebElements().getPreviousWebElements().get(index).getText();
         ThreadProperty.set(envVar, text);
-    }
-
-
-    /**
-     * Verifies if the value of a property of the webelement referenced by index matches the given value
-     * <p>
-     * This step requires a previous operation for finding elements to have been executed, such as: <br>
-     * {@link SeleniumGSpec#assertSeleniumNElementExists(String, Integer, String, String)} <br>
-     * {@link SeleniumGSpec#assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)} <br>
-     * {@link SeleniumGSpec#waitWebElementWithPooling(int, int, int, String, String, String)}
-     *
-     * <pre>{@code
-     * Example:
-     *
-     * Scenario: Verify property of element
-     *      Given I go to 'http:mydummysite/index.html'
-     *      And '3' elements exists with 'css:input[name='radio_4[]']'
-     *      Then the element in index '1' has 'radio_4[]' in property 'name'
-     * }</pre>
-     *
-     * @see #assertSeleniumNElementExists(String, Integer, String, String)
-     * @see #assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)
-     * @see #waitWebElementWithPooling(int, int, int, String, String, String)
-     * @param index          Position of the element in the array of webElements
-     * @param textValue      Value expected in the property
-     * @param customProperty Property of webElement to verify
-     */
-    @Then("^the element in index '(.*)' has '(.*)' in property '(.*)'$")
-    public void theElementOnIndexHasTextInCustomPropertyName(int index, String textValue, String customProperty) {
-
-        List<WebElement> wel = commonspec.getPreviousWebElements().getPreviousWebElements();
-        assertThat(wel.size()).as("The last step did not find elements").isNotZero();
-
-        String value = wel.get(index).getAttribute(customProperty);
-        assertThat(value).as("The element doesn't have the property '%s'", customProperty).isNotEmpty().isNotNull();
-        assertThat(value).as("The property '%s' doesn't have the text '%s'", customProperty, textValue).isEqualToIgnoringCase(textValue);
-
     }
 
 
@@ -930,7 +846,6 @@ public class SeleniumGSpec extends BaseGSpec {
      * <p>
      * This step requires a previous operation for finding elements to have been executed, such as: <br>
      * {@link SeleniumGSpec#assertSeleniumNElementExists(String, Integer, String, String)} <br>
-     * {@link SeleniumGSpec#assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)} <br>
      * {@link SeleniumGSpec#waitWebElementWithPooling(int, int, int, String, String, String)}<br>.
      * You can also perform click action on an element using {@link #seleniumClickByLocator(String, String, Integer)}
      *
@@ -945,7 +860,6 @@ public class SeleniumGSpec extends BaseGSpec {
      *
      * @deprecated This method is deprecated, use {@link #seleniumClickByLocator(String, String, Integer)} instead
      * @see #assertSeleniumNElementExists(String, Integer, String, String)
-     * @see #assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)
      * @see #waitWebElementWithPooling(int, int, int, String, String, String)
      * @see #seleniumClickByLocator(String, String, Integer)
      * @param index Index of the webelement in the list
@@ -957,7 +871,14 @@ public class SeleniumGSpec extends BaseGSpec {
         Assertions.assertThat(commonspec.getPreviousWebElements().getPreviousWebElements().size()).as("Could not get webelement with index %s. Less elements were found. Allowed index: 0 to %s", index, commonspec.getPreviousWebElements().getPreviousWebElements().size() - 1)
                 .isGreaterThanOrEqualTo(index + 1);
 
-        commonspec.getPreviousWebElements().getPreviousWebElements().get(index).click();
+        try {
+            WebDriverWait wait = new WebDriverWait(commonspec.getDriver(), 5);
+            WebElement element = wait.until(ExpectedConditions.elementToBeClickable(commonspec.getPreviousWebElements().getPreviousWebElements().get(index)));
+            element.click();
+        } catch (Exception e) {
+            Actions actions = new Actions(commonspec.getDriver());
+            actions.moveToElement(commonspec.getPreviousWebElements().getPreviousWebElements().get(index)).click().build().perform();
+        }
 
     }
 
@@ -966,7 +887,6 @@ public class SeleniumGSpec extends BaseGSpec {
      * <p>
      * This step requires a previous operation for finding elements to have been executed, such as: <br>
      * {@link SeleniumGSpec#assertSeleniumNElementExists(String, Integer, String, String)} <br>
-     * {@link SeleniumGSpec#assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)} <br>
      * {@link SeleniumGSpec#waitWebElementWithPooling(int, int, int, String, String, String)}<br>.
      * <pre>{@code
      * Example:
@@ -980,7 +900,6 @@ public class SeleniumGSpec extends BaseGSpec {
      * @deprecated This method is deprecated, use {@link #seleniumDoubleClickByLocator(String, String, Integer)} instead
      * @see #seleniumDoubleClickByLocator(String, String, Integer)
      * @see #assertSeleniumNElementExists(String, Integer, String, String)
-     * @see #assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)
      * @see #waitWebElementWithPooling(int, int, int, String, String, String)
      * @param index Index of the webelement in the list
      */
@@ -1000,7 +919,6 @@ public class SeleniumGSpec extends BaseGSpec {
      * <p>
      * This step requires a previous operation for finding elements to have been executed, such as: <br>
      * {@link SeleniumGSpec#assertSeleniumNElementExists(String, Integer, String, String)} <br>
-     * {@link SeleniumGSpec#assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)} <br>
      * {@link SeleniumGSpec#waitWebElementWithPooling(int, int, int, String, String, String)}<br>.
      * <pre>{@code
      * Example:
@@ -1014,7 +932,6 @@ public class SeleniumGSpec extends BaseGSpec {
      * @deprecated This method is deprecated, use {@link #seleniumRightClickByLocator(String, String, Integer)} instead
      * @see #seleniumRightClickByLocator(String, String, Integer)
      * @see #assertSeleniumNElementExists(String, Integer, String, String)
-     * @see #assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)
      * @see #waitWebElementWithPooling(int, int, int, String, String, String)
      * @param index Index of the webelement in the list
      */
@@ -1035,7 +952,6 @@ public class SeleniumGSpec extends BaseGSpec {
      * <p>
      * This step requires a previous operation for finding elements to have been executed, such as: <br>
      * {@link SeleniumGSpec#assertSeleniumNElementExists(String, Integer, String, String)} <br>
-     * {@link SeleniumGSpec#assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)} <br>
      * {@link SeleniumGSpec#waitWebElementWithPooling(int, int, int, String, String, String)}
      *
      * <pre>{@code
@@ -1048,11 +964,12 @@ public class SeleniumGSpec extends BaseGSpec {
      *      And I clear the content on text input at index '0'
      * }</pre>
      *
+     * @deprecated Better use {@link #seleniumClearByLocator(String, String, Integer)}
      * @see #assertSeleniumNElementExists(String, Integer, String, String)
-     * @see #assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)
      * @see #waitWebElementWithPooling(int, int, int, String, String, String)
      * @param index index of the web element
      */
+    @Deprecated
     @When("^I clear the content on text input at index '(\\d+)'$")
     public void seleniumClear(Integer index) {
         Assertions.assertThat(commonspec.getPreviousWebElements().getPreviousWebElements().size()).as("Could not get webelement with index %s. Less elements were found. Allowed index: 0 to %s", index, commonspec.getPreviousWebElements().getPreviousWebElements().size() - 1)
@@ -1063,13 +980,39 @@ public class SeleniumGSpec extends BaseGSpec {
         commonspec.getPreviousWebElements().getPreviousWebElements().get(index).clear();
     }
 
+    /**
+     * Clear the text on the element referenced by locator.
+     *
+     * <pre>{@code
+     * Example:
+     *
+     * Scenario: Clear the text on an element.
+     *       Given I go to 'http://localhost/styled/basic-html-form-test.html'
+     *       And I type 'John Smith' on the element with 'name:username'
+     *       And I clear the text of the element with 'name:username'
+     *       Then the element with 'name:username' has '' as text
+     * }</pre>
+     *
+     * @see #assertSeleniumNElementExists(String, Integer, String, String)
+     * @param index     index of the web element
+     * @param method    method to locate the elements (id, name, class, css, xpath, linkText, partialLinkText and tagName)
+     * @param element   locator of the element
+     */
+    @Then("^I clear the text of the element with '(" + LOCATORS + "):(.*?)'( index '(\\d+)')?$")
+    public void seleniumClearByLocator(String method, String element, Integer index) {
+        this.assertSeleniumNElementExists("at least", 1, method, element);
+        if (index == null) {
+            index = 0;
+        }
+        this.seleniumClear(index);
+    }
+
 
     /**
-     * Type a text on an numbered index previously found element.
+     * Type a text on a numbered index previously found element.
      * <p>
      * This step requires a previous operation for finding elements to have been executed, such as: <br>
      * {@link SeleniumGSpec#assertSeleniumNElementExists(String, Integer, String, String)} <br>
-     * {@link SeleniumGSpec#assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)} <br>
      * {@link SeleniumGSpec#waitWebElementWithPooling(int, int, int, String, String, String)}<br>
      * You can also use the step {@link #seleniumTypeByLocator(String, String, String, Integer)} to directly type the given
      * text in the element
@@ -1087,7 +1030,6 @@ public class SeleniumGSpec extends BaseGSpec {
      * @see #seleniumTypeByLocator(String, String, String, Integer)
      * @see #seleniumTypeLongTextByLocator(String, String, Integer, DocString)
      * @see #assertSeleniumNElementExists(String, Integer, String, String)
-     * @see #assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)
      * @see #waitWebElementWithPooling(int, int, int, String, String, String)
      * @param input Text to write on the element
      * @param index Index of the webelement in the list
@@ -1127,7 +1069,6 @@ public class SeleniumGSpec extends BaseGSpec {
      * <p>
      * This step requires a previous operation for finding elements to have been executed, such as: <br>
      * {@link SeleniumGSpec#assertSeleniumNElementExists(String, Integer, String, String)} <br>
-     * {@link SeleniumGSpec#assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)} <br>
      * {@link SeleniumGSpec#waitWebElementWithPooling(int, int, int, String, String, String)}
      *
      * <pre>{@code
@@ -1140,13 +1081,14 @@ public class SeleniumGSpec extends BaseGSpec {
      *      Then I send 'ENTER' on the element on index '0'
      * }</pre>
      *
+     * @deprecated Please use {@link #seleniumKeys(String, Integer)}
      * @see #seleniumType(String, Integer)
      * @see #assertSeleniumNElementExists(String, Integer, String, String)
-     * @see #assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)
      * @see #waitWebElementWithPooling(int, int, int, String, String, String)
      * @param text  key stroke to send
      * @param index index of the web element in the list
      */
+    @Deprecated
     @When("^I send '(.*)' on the element on index '(\\d+)'$")
     public void seleniumKeys(String text, Integer index) {
 
@@ -1181,26 +1123,63 @@ public class SeleniumGSpec extends BaseGSpec {
         }
     }
 
+    /**
+     * Send a strokes to an element referenced by locator.
+     * <p>
+     * Strokes examples are "HOME, END" or "END, SHIFT + HOME, DELETE". Each element in the stroke list has to be an element from
+     * {@link org.openqa.selenium.Keys} (NULL, CANCEL, HELP, BACK_SPACE, TAB, CLEAR, RETURN, ENTER, SHIFT, LEFT_SHIFT,
+     * CONTROL, LEFT_CONTROL, ALT, LEFT_ALT, PAUSE, ESCAPE, SPACE, PAGE_UP, PAGE_DOWN, END, HOME, LEFT, ARROW_LEFT, UP,
+     * ARROW_UP, RIGHT, ARROW_RIGHT, DOWN, ARROW_DOWN, INSERT, DELETE, SEMICOLON, EQUALS, NUMPAD0, NUMPAD1, NUMPAD2,
+     * NUMPAD3, NUMPAD4, NUMPAD5, NUMPAD6, NUMPAD7, NUMPAD8, NUMPAD9, MULTIPLY, ADD, SEPARATOR, SUBTRACT, DECIMAL,
+     * DIVIDE, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, META, COMMAND, ZENKAKU_HANKAKU) , a plus sign (+), a
+     * comma (,) or spaces ( ) <br>
+     *
+     * <pre>{@code
+     * Example:
+     *
+     * Scenario: Press enter on the given element
+     *      Given I go to 'http:mydummysite/index.html'
+     *      And I type 'testUser' on the element with 'id:name_3_firstname'
+     *      Then I send 'ENTER' on the element with 'id:name_3_firstname'
+     * }</pre>
+     *
+     * @see #seleniumType(String, Integer)
+     * @see #assertSeleniumNElementExists(String, Integer, String, String)
+     * @see #waitWebElementWithPooling(int, int, int, String, String, String)
+     * @param input  key stroke to send
+     * @param method    method to locate the elements (id, name, class, css, xpath, linkText, partialLinkText and tagName)
+     * @param element   the relative reference to the element
+     * @param index     Index of the element, in case one or more elements with the given locator are found (first element starts with index 0)
+     */
+    @When("^I send '(.*)' on the element with '(" + LOCATORS + "):(.*?)'( index '(\\d+)')?$")
+    public void seleniumKeysByLocator(String input, String method, String element, Integer index) {
+        this.assertSeleniumNElementExists("at least", 1, method, element);
+        if (index == null) {
+            index = 0;
+        }
+        this.seleniumKeys(input, index);
+    }
+
 
     /**
      * Choose an option from a select webelement found previously
      * <p>
-     * This step requires a previous operation for finding elements to have been executed, such as: <br>
-     * {@link SeleniumGSpec#assertSeleniumNElementExists(String, Integer, String, String)} <br>
-     * {@link SeleniumGSpec#assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)} <br>
-     * {@link SeleniumGSpec#waitWebElementWithPooling(int, int, int, String, String, String)}
-     *
      * @see #assertSeleniumNElementExists(String, Integer, String, String)
-     * @see #assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)
      * @see #waitWebElementWithPooling(int, int, int, String, String, String)
      * @param option option in the select element
+     * @param method    method to locate the elements (id, name, class, css, xpath, linkText, partialLinkText and tagName)
+     * @param element   the relative reference to the element
      * @param index  index of the web element in the list
      */
-    @When("^I select '(.*)' on the element on index '(\\d+)'$")
-    public void elementSelect(String option, Integer index) {
-        Select sel = null;
-        sel = new Select(commonspec.getPreviousWebElements().getPreviousWebElements().get(index));
+    @When("^I select '(.*)' on the element with '(" + LOCATORS + "):(.*?)'( index '(\\d+)')?$")
+    public void elementSelect(String option, String method, String element, Integer index) {
 
+        this.assertSeleniumNElementExists("at least", 1, method, element);
+        if (index == null) {
+            index = 0;
+        }
+
+        Select sel = new Select(commonspec.getPreviousWebElements().getPreviousWebElements().get(index));
         sel.selectByVisibleText(option);
     }
 
@@ -1208,17 +1187,19 @@ public class SeleniumGSpec extends BaseGSpec {
     /**
      * Choose no option from a select webelement found previously
      * <p>
-     * This step requires a previous operation for finding elements to have been executed, such as: <br>
-     * {@link SeleniumGSpec#assertSeleniumNElementExists(String, Integer, String, String)} <br>
-     * {@link SeleniumGSpec#assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)} <br>
-     * {@link SeleniumGSpec#waitWebElementWithPooling(int, int, int, String, String, String)}
-     *
      * @param index index of the web element in the list
+     * @param method    method to locate the elements (id, name, class, css, xpath, linkText, partialLinkText and tagName)
+     * @param element   the relative reference to the element
      */
-    @When("^I de-select every item on the element on index '(\\d+)'$")
-    public void elementDeSelect(Integer index) {
-        Select sel = null;
-        sel = new Select(commonspec.getPreviousWebElements().getPreviousWebElements().get(index));
+    @When("^I de-select every item on the element with '(" + LOCATORS + "):(.*?)'( index '(\\d+)')?$")
+    public void elementDeSelect(String method, String element, Integer index) {
+
+        this.assertSeleniumNElementExists("at least", 1, method, element);
+        if (index == null) {
+            index = 0;
+        }
+
+        Select sel = new Select(commonspec.getPreviousWebElements().getPreviousWebElements().get(index));
 
         if (sel.isMultiple()) {
             sel.deselectAll();
@@ -1257,31 +1238,33 @@ public class SeleniumGSpec extends BaseGSpec {
     }
 
     /**
-     * Saves the given property of the specified webelement (referenced by its index) in the specified variable.
-     * <p>
-     * This step requires a previous operation for finding elements to have been executed, such as: <br>
-     * {@link SeleniumGSpec#assertSeleniumNElementExists(String, Integer, String, String)} <br>
-     * {@link SeleniumGSpec#assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)} <br>
-     * {@link SeleniumGSpec#waitWebElementWithPooling(int, int, int, String, String, String)}
+     * Saves the given property of the specified webelement (referenced by its locator) in the specified variable.
      *
      * <pre>{@code
      * Example:
      *
-     * Scenario: Saving the value of class in local variable for future use
-     *      Given I go to 'http:mydummysite/index.html'
-     *      Then '1' elements exists with 'id:menu-item-146'
-     *      Then I save the value of the property 'class' of the element in index '0' in variable 'VAR2'
+     * Scenario: Saving the value an attribute
+     *       Given I go to 'https://demoqa.com/text-box'
+     *       Then I save the value of the property 'type' of the element with 'id:submit' in variable 'TYPE'
+     *       Then '${TYPE}' matches 'button'
      * }</pre>
      *
      * @see #assertSeleniumNElementExists(String, Integer, String, String)
-     * @see #assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)
      * @see #waitWebElementWithPooling(int, int, int, String, String, String)
-     * @param propertyName Name of the property
-     * @param index        Index of the webelement in the list
+     * @param propertyName  Name of the property of the HTML tag
+     * @param method        Method to use to locate the web element (id, name, class, etc)
+     * @param element       The relative reference to the element
+     * @param index         Index of the element, in case one or more elements with the given locator are found (first element starts with index 0)
      * @param variable     Variable where to save the result
      */
-    @Then("^I save the value of the property '(.*)' of the element in index '(.*)' in variable '(.*)'$")
-    public void iSaveTheValueOfThePropertyHrefOfTheElementInIndexInVariableVAR(String propertyName, int index, String variable) {
+    @Then("^I save the value of the property '(.*)' of the element with '(" + LOCATORS + "):(.*?)'( index '(\\d+)')? in variable '(.*)'$")
+    public void saveTheValueOfElementPropertyByLocator(String propertyName, String method, String element, Integer index, String variable) {
+
+        this.assertSeleniumNElementExists("at least", 1, method, element);
+        if (index == null) {
+            index = 0;
+        }
+
         List<WebElement> wel = commonspec.getPreviousWebElements().getPreviousWebElements();
         String value = wel.get(index).getAttribute(propertyName);
         assertThat(value).as("The web element doesn't have the property '" + propertyName + "'").isNotNull();
@@ -1290,46 +1273,76 @@ public class SeleniumGSpec extends BaseGSpec {
 
 
     /**
-     * Executes a JavaScript function in the current driver. This could be useful for getting specific information on the
-     * web page or forcing specific actions, like clicking on an element that is being blocked by a popup
-     * <p>
-     * This step requires a previous operation for finding elements to have been executed, such as: <br>
-     * {@link SeleniumGSpec#assertSeleniumNElementExists(String, Integer, String, String)} <br>
-     * {@link SeleniumGSpec#assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)} <br>
-     * {@link SeleniumGSpec#waitWebElementWithPooling(int, int, int, String, String, String)}
+     * Executes a JavaScript function in the current driver.
      *
      * <pre>{@code
      * Example:
      *
-     * Scenario: Executes a JavaScript function
-     *      Given I go to 'http:mydummysite/index.html'
-     *      And I execute 'alert("This is an alert!")' as javascript
+     *  Scenario: Execute JavaScript functions
+     *       Given I go to 'http:mydummysite/index.html'
+     *       And I execute 'alert("This is an alert!")' as javascript
+     *       And I check every '1' seconds for at least '5' seconds until an alert appears
+     *       And I accept the alert
+     *       And I execute 'return document.URL;' as javascript and save the result in the environment variable 'PAGE'
+     *       And '${PAGE}' contains 'index.html'
      *
-     * Scenario: Javascript functions can be executed on previous found elements
-     *      Given I go to 'http:mydummysite/index.html'
-     *      And '1' elements exists with 'xpath://*[@id="menu-item-158"]/a'
-     *      And I execute 'arguments[0].click();' as javascript on the element on index '0'
      * }</pre>
      *
      * @see #assertSeleniumNElementExists(String, Integer, String, String)
-     * @see #assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)
      * @see #waitWebElementWithPooling(int, int, int, String, String, String)
+     * @see #executeJavascript(String, String)
      * @param script Script to execute (i.e alert("This is an alert message"))
-     * @param index  If used, the index of the previously found web element on which to execute the function
      * @param enVar  If used, variable where to store the result of the execution of the script
      */
-    @Then("^I execute '(.*)' as javascript( on the element on index '(.*)')?( and save the result in the environment variable '(.*)')?$")
-    public void iExecuteTheScriptScriptOnTheElmentOnIndex(String script, String index, String enVar) {
+    @Then("^I execute '(.*)' as javascript( and save the result in the environment variable '(.*)')?$")
+    public void executeJavascript(String script, String enVar) {
 
         JavascriptExecutor executor = (JavascriptExecutor) this.commonspec.getDriver();
         Object output;
 
-        if (index != null) {
-            List<WebElement> wel = commonspec.getPreviousWebElements().getPreviousWebElements();
-            output = executor.executeScript(script, wel.get(Integer.parseInt(index)));
-        } else {
-            output = executor.executeScript(script);
+        output = executor.executeScript(script);
+
+        if (enVar != null) {
+            assertThat(output).as("The script did not return any value!").isNotNull();
+            ThreadProperty.set(enVar, output.toString());
         }
+    }
+
+    /**
+     * Executes a JavaScript function in the given element referenced by locator
+     *
+     * <pre>{@code
+     * Example:
+     *
+     *  Scenario: Execute JavaScript functions
+     *       Given I go to 'http:mydummysite/index.html'
+     *       And I execute 'arguments[0].click();' as javascript on the element with 'xpath://*[@id="menu-item-158"]/a'
+     *       And I execute 'alert("This is an alert!")' as javascript
+     *
+     * }</pre>
+     *
+     * @see #assertSeleniumNElementExists(String, Integer, String, String)
+     * @see #waitWebElementWithPooling(int, int, int, String, String, String)
+     * @see #executeJavascript(String, String)
+     * @param script Script to execute (i.e alert("This is an alert message"))
+     * @param method    Method to use to locate the web element (id, name, class, etc)
+     * @param element   The relative reference to the element
+     * @param index  If used, the index of the previously found web element on which to execute the function
+     * @param enVar  If used, variable where to store the result of the execution of the script
+     */
+    @Then("^I execute '(.*)' as javascript on the element with '(" + LOCATORS + "):(.*?)'( index '(\\d+)')?( and save the result in the environment variable '(.*)')?$")
+    public void executeJavascriptOnElement(String script, String method, String element, Integer index, String enVar) {
+
+        JavascriptExecutor executor = (JavascriptExecutor) this.commonspec.getDriver();
+        Object output;
+
+        this.assertSeleniumNElementExists("at least", 1, method, element);
+        if (index == null) {
+            index = 0;
+        }
+
+        List<WebElement> wel = commonspec.getPreviousWebElements().getPreviousWebElements();
+        output = executor.executeScript(script, wel.get(index));
 
         if (enVar != null) {
             assertThat(output).as("The script did not return any value!").isNotNull();
@@ -1371,11 +1384,18 @@ public class SeleniumGSpec extends BaseGSpec {
     }
 
     /**
+     * Closes the current window
+     */
+    @Given("^I close the current window$")
+    public void closeWindow() {
+        commonspec.getDriver().close();
+    }
+
+    /**
      * Directly clicks the given element referenced by locator
      * <p>
      * This step performs a click action on the element. This step is similar to {@link #seleniumClick(Integer)}
      * but, it does not require a previous operation for finding elements, such as {@link #assertSeleniumNElementExists(String, Integer, String, String)}
-     * or {@link #assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)}. If the page contains
      * several web elements with the given locator, the click action will be performed to the first element found by default,
      * unless an index is specified (first element has index 0)
      * <pre>{@code
@@ -1387,12 +1407,11 @@ public class SeleniumGSpec extends BaseGSpec {
      *
      * Scenario: Using index in case more than one element is found (first element has index 0)
      *      Given I go to 'http:mydummysite/index.html'
-     *      When I click on the element with 'tagName:button' index 1
+     *      When I click on the element with 'tagName:button' index '1'
      * }</pre>
      *
      * @see #seleniumClick(Integer)
      * @see #assertSeleniumNElementExists(String, Integer, String, String)
-     * @see #assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)
      * @param method        method to locate the elements (id, name, class, css, xpath, linkText, partialLinkText and tagName)
      * @param element       the relative reference to the element
      * @param index         Index of the element, in case one or more elements with the given locator are found (first element starts with index 0)
@@ -1410,9 +1429,8 @@ public class SeleniumGSpec extends BaseGSpec {
      * Directly types the given text in the element referenced by locator.
      * <p>
      * This steps types the given text on the given web element. This step is similar to {@link #seleniumType(String, Integer)}
-     * but, it does not require a previous operation for finding elements, such as {@link #assertSeleniumNElementExists(String, Integer, String, String)}
-     * or {@link #assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)}. If the page contains
-     * several web elements with the given locator, the click action will be performed to the first element found by default,
+     * but, it does not require a previous operation for finding elements, such as {@link #assertSeleniumNElementExists(String, Integer, String, String)}.
+     * If the page contains several web elements with the given locator, the click action will be performed to the first element found by default,
      * unless an index is specified (first element has index 0)
      * <pre>{@code
      * Examples:
@@ -1423,7 +1441,7 @@ public class SeleniumGSpec extends BaseGSpec {
      *
      * Scenario: Using index in case more than one element is found (first element has index 0)
      *      Given I go to 'http:mydummysite/index.html'
-     *      And I type '555-555' on the element with 'class:text-field' index 1
+     *      And I type '555-555' on the element with 'class:text-field' index '1'
      * }
      * </pre>
      *
@@ -1503,30 +1521,32 @@ public class SeleniumGSpec extends BaseGSpec {
     }
 
     /**
-     * Scrolls the page up or down until the element referenced by index is visible
+     * Directly scrolls the page up or down until the element is visible
      * <p>
-     * This step executes a javascript function to automatically scroll the element into view. The web element is referenced
-     * by its index, to  it does require a previous operation for finding elements, such as {@link #assertSeleniumNElementExists(String, Integer, String, String)}
-     * or {@link #assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)} to be executed first.
+     * This step executes a javascript function to automatically scroll the element into view.
      * <pre>{@code
      * Example:
      *
-     * Scenario: Scroll until the submit button is visible, then, click on it
+     * Scenario: Scroll up and down the page until the referenced element is visible
      *      Given I go to 'http:mydummysite/index.html'
-     *      And at least '1' elements exists with 'id:submit'
-     *      Then I scroll down until the element on index '0' is visible
-     *      Then I click on the element on index '0'
+     *      Then I scroll up until the element with 'id:userName' is visible
+     *      Then I scroll down until the element with 'id:submit' is visible
+     *      Then I click on the element with 'id:submit'
      * }</pre>
      *
-     * @see #scrollUntilElementVisibleByLocator(String, String, String, Integer)
-     * @see #assertSeleniumNElementExists(String, Integer, String, String)
-     * @see #assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)
-     * @param direction             Indicates if the scroll is upwards or downwards
-     * @param index                 Index of the web element
-     * @throws InterruptedException InterruptedException
+     * @param direction                 Indicates if the scroll is upwards or downwards
+     * @param method                    method to locate the elements (id, name, class, css, xpath, linkText, partialLinkText and tagName)
+     * @param element                   The relative reference to the element
+     * @param index                     Index of the element, in case one or more elements with the given locator are found (first element starts with index 0)
+     * @throws InterruptedException     InterruptedException
      */
-    @Then("^I scroll (up|down) until the element on index '(\\d+)' is visible$")
-    public void scrollUntilElementVisible(String direction, int index) throws InterruptedException {
+    @Then("^I scroll (up|down) until the element with '(" + LOCATORS +  "):(.*?)'( index '(\\d+)')? is visible$")
+    public void scrollUntilElementVisibleByLocator(String direction, String method, String element, Integer index) throws InterruptedException {
+        this.assertSeleniumNElementExists("at least", 1, method, element);
+        if (index == null) {
+            index = 0;
+        }
+
         Assertions.assertThat(commonspec.getPreviousWebElements().getPreviousWebElements().size()).as("Could not get webelement with index %s. Less elements were found. Allowed index: 0 to %s", index, commonspec.getPreviousWebElements().getPreviousWebElements().size() - 1)
                 .isGreaterThanOrEqualTo(index + 1);
 
@@ -1543,42 +1563,10 @@ public class SeleniumGSpec extends BaseGSpec {
     }
 
     /**
-     * Directly scrolls the page up or down until the element is visible
-     * <p>
-     * This step executes a javascript function to automatically scroll the element into view. This step is similar to {@link #scrollUntilElementVisible(String, int)}
-     * but it does not require a previous operation for finding elements to be executed, since the element is directly referenced as a locator
-     * <pre>{@code
-     * Example:
-     *
-     * Scenario: Scroll up and down the page until the referenced element is visible
-     *      Given I go to 'http:mydummysite/index.html'
-     *      Then I scroll up until the element with 'id:userName' is visible
-     *      Then I scroll down until the element with 'id:submit' is visible
-     *      Then I click on the element with 'id:submit'
-     * }</pre>
-     *
-     * @see #scrollUntilElementVisible(String, int)
-     * @param direction                 Indicates if the scroll is upwards or downwards
-     * @param method                    method to locate the elements (id, name, class, css, xpath, linkText, partialLinkText and tagName)
-     * @param element                   The relative reference to the element
-     * @param index                     Index of the element, in case one or more elements with the given locator are found (first element starts with index 0)
-     * @throws InterruptedException     InterruptedException
-     */
-    @Then("^I scroll (up|down) until the element with '(" + LOCATORS +  "):(.*?)'( index '(\\d+)')? is visible$")
-    public void scrollUntilElementVisibleByLocator(String direction, String method, String element, Integer index) throws InterruptedException {
-        this.assertSeleniumNElementExists("at least", 1, method, element);
-        if (index == null) {
-            index = 0;
-        }
-        this.scrollUntilElementVisible(direction, index);
-    }
-
-    /**
      * Directly double clicks the given element referenced by locator
      * <p>
      * This step performs a double click action on the element. This step is similar to {@link #seleniumDoubleClick(Integer)}
      * but, it does not require a previous operation for finding elements, such as {@link #assertSeleniumNElementExists(String, Integer, String, String)}
-     * or {@link #assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)}. If the page contains
      * several web elements with the given locator, the double click action will be performed to the first element found by default,
      * unless an index is specified (first element has index 0)
      * <pre>{@code
@@ -1590,12 +1578,11 @@ public class SeleniumGSpec extends BaseGSpec {
      *
      * Scenario: Using index in case more than one element is found (first element has index 0)
      *      Given I go to 'http:mydummysite/index.html'
-     *      When I double click on the element with 'tagName:button' index 1
+     *      When I double click on the element with 'tagName:button' index '1'
      * }</pre>
      *
      * @see #seleniumDoubleClick(Integer)
      * @see #assertSeleniumNElementExists(String, Integer, String, String)
-     * @see #assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)
      * @param method        method to locate the elements (id, name, class, css, xpath, linkText, partialLinkText and tagName)
      * @param element       the relative reference to the element
      * @param index         Index of the element, in case one or more elements with the given locator are found (first element starts with index 0)
@@ -1615,7 +1602,6 @@ public class SeleniumGSpec extends BaseGSpec {
      * <p>
      * This step performs a right click action on the element. This step is similar to {@link #seleniumRightClick(Integer)}
      * but, it does not require a previous operation for finding elements, such as {@link #assertSeleniumNElementExists(String, Integer, String, String)}
-     * or {@link #assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)}. If the page contains
      * several web elements with the given locator, the right click action will be performed to the first element found by default,
      * unless an index is specified (first element has index 0)
      * <pre>{@code
@@ -1632,7 +1618,6 @@ public class SeleniumGSpec extends BaseGSpec {
      * </pre>
      * @see #seleniumRightClick(Integer)
      * @see #assertSeleniumNElementExists(String, Integer, String, String)
-     * @see #assertSeleniumNElementExistsOnTimeOut(Integer, Integer, Integer, String, String)
      * @param method        method to locate the elements (id, name, class, css, xpath, linkText, partialLinkText and tagName)
      * @param element       the relative reference to the element
      * @param index         Index of the element, in case one or more elements with the given locator are found (first element starts with index 0)
@@ -1677,37 +1662,6 @@ public class SeleniumGSpec extends BaseGSpec {
         }
         Actions action = new Actions(this.commonspec.getDriver());
         action.moveToElement(this.commonspec.getPreviousWebElements().getPreviousWebElements().get(index)).perform();
-    }
-
-
-    /**
-     * Temporally stop the execution of the feature
-     * <p>
-     * This step shows a dialog in the center of the screen and interrupts the execution of the rest
-     * of the steps in the feature until the "Ok" button in the dialog is pressed. This comes handy when
-     * debugging and the user needs to execute some manual actions before continuing
-     * <pre>{@code
-     * Example:
-     *
-     * Scenario: Step the execution
-     *     Given I go to 'http://demoqa.com/automation-practice-form'
-     *     Then I pause
-     *     Then I type 'Jose' on the element with 'id:firstName'
-     * }</pre>
-     *
-     * @see UtilsGSpec#idleWait(Integer)
-     * @see #waitWebElementWithPooling(int, int, int, String, String, String)
-     * @see #waitAlertWithPooling(int, int)
-     */
-    @Then("^I pause$")
-    public void SeleniumPause() {
-        this.commonspec.getLogger().info("Pausing feature execution until button in dialog is pressed...");
-
-        JFrame jf = new JFrame();
-        JOptionPane.showMessageDialog(jf, "Feature execution is paused and will resume when you click OK.",
-                    "Cucumber paused", JOptionPane.INFORMATION_MESSAGE);
-        jf.toFront();
-        jf.repaint();
     }
 
 }

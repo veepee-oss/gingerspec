@@ -12,14 +12,16 @@
  * OF USE, DATA  OR PROFITS, WHETHER IN AN ACTION OF  CONTRACT, NEGLIGENCE OR OTHER
  * TORTIOUS ACTION, ARISING OUT OF OR  IN CONNECTION WITH THE USE OR PERFORMANCE OF
  * THIS SOFTWARE.
-*/
+ */
 
 package com.privalia.qa.specs;
 
 import com.privalia.qa.utils.BaseGTest;
 import io.cucumber.testng.CucumberOptions;
 
-@CucumberOptions(
+@CucumberOptions(plugin = {
+        "com.privalia.qa.cucumber.reporter.gingerHtmlFormatter:target/documentation",
+},
         features = {"src/test/resources/features/selenium.feature"},
         glue = "com.privalia.qa.specs"
 )

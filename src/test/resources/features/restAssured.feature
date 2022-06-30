@@ -1,5 +1,5 @@
 @rest
-Feature: Rest Assured Feature
+Feature: Steps for testing REST APIs
 
   This feature provides examples on how to use the steps for testing REST APIs. All feature files that make use of
   the steps for testing REST APIs (such as this one) must include the "@rest" annotation at the beginning of the file.
