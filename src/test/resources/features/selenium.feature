@@ -192,6 +192,7 @@ Feature: Steps for testing web pages
       And I click on the element with 'id:delaygotobasic'
       Then I check every '1' seconds for at least '10' seconds until '1' elements exists with 'id:goback' and is 'clickable'
       And I click on the element with 'id:goback'
+      Then I check every '1' seconds for at least '10' seconds until '1' elements exists with 'id:delaygotobasic' and is 'clickable'
       And we are in page 'http://${DEMO_SITE_HOST}/styled/javascript-redirect-test.html'
 
   Rule: Managing alerts
