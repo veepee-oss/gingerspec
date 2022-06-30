@@ -19,9 +19,10 @@ package com.privalia.qa.specs;
 import com.privalia.qa.utils.BaseGTest;
 import io.cucumber.testng.CucumberOptions;
 
-@CucumberOptions(plugin = {
+@CucumberOptions(
+        plugin = {
         "com.privalia.qa.cucumber.reporter.gingerHtmlFormatter:target/documentation",
-},
+        },
         features = {"src/test/resources/features/selenium.feature"},
         glue = "com.privalia.qa.specs"
 )
