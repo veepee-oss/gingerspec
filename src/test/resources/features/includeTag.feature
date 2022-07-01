@@ -15,5 +15,6 @@ Feature: Testing the @include tag
   @web
   @include(feature:scenarioIncluded.feature,scenario:Dummy_scenario)
   Scenario: Testing include from another feature file
-    When '7' elements exists with 'class:legend_txt'
-    And I wait '2' seconds
+    Then '2' elements exists with 'name:pName2'
+    Then '118' elements exists with 'class:normal'
+    Then at least '1' elements exists with 'class:explanation'
