@@ -262,7 +262,9 @@ public class SeleniumGSpec extends BaseGSpec {
      */
     @Then("^I wait '(\\d+)' seconds until an alert appears$")
     public void waitAlert(int poolMaxTime) {
+        this.getCommonSpec().getLogger().debug("Waiting {} seconds for an alert to appear...", poolMaxTime);
         Alert alert = commonspec.waitAlertWithPooling(1, poolMaxTime);
+        assertThat(alert).as("Alert was not found on the page").isNotNull();
         commonspec.setSeleniumAlert(alert);
     }
 
@@ -285,6 +287,7 @@ public class SeleniumGSpec extends BaseGSpec {
     @Then("^I dismiss the alert$")
     public void iAcceptTheAlert() {
         this.waitAlert(5);
+        this.getCommonSpec().getLogger().debug("Dismissing alert...");
         commonspec.dismissSeleniumAlert();
     }
 
@@ -308,6 +311,7 @@ public class SeleniumGSpec extends BaseGSpec {
     @Then("^I accept the alert$")
     public void iDismissTheAlert() {
         this.waitAlert(5);
+        this.getCommonSpec().getLogger().debug("Accepting alert...");
         commonspec.acceptSeleniumAlert();
     }
 
@@ -337,15 +341,19 @@ public class SeleniumGSpec extends BaseGSpec {
 
         this.assertSeleniumNElementExists("at least", 1, method, element);
         if (index == null) {
+            this.getCommonSpec().getLogger().debug("No index specified for element. Defaulting to index 0");
             index = 0;
         }
 
         //Get file absolute path
         String filePath = getClass().getClassLoader().getResource(fileName).getPath();
+        this.getCommonSpec().getLogger().debug("Getting file from path '{}'", filePath);
 
         //Assign the file absolute path to the file picker element previously set
         File f = new File(filePath);
         Assertions.assertThat(f.exists()).as("The file located in " + filePath + " does not exists or is not accessible").isEqualTo(true);
+
+        this.getCommonSpec().getLogger().debug("Assigning file to element with '{}' as '{}' and index '{}'", element, method, index);
         commonspec.getPreviousWebElements().getPreviousWebElements().get(index).sendKeys(filePath);
     }
 
@@ -455,6 +463,7 @@ public class SeleniumGSpec extends BaseGSpec {
     @Given("^a new window is opened$")
     public void seleniumGetwindows() {
         Set<String> wel = commonspec.getDriver().getWindowHandles();
+        this.getCommonSpec().getLogger().debug("{} windows/tabs detected", wel.size());
         assertThat(wel).as("No new windows opened. Driver only returned %s window handles", wel.size()).hasSizeGreaterThanOrEqualTo(2);
     }
 
@@ -480,12 +489,14 @@ public class SeleniumGSpec extends BaseGSpec {
 
         this.assertSeleniumNElementExists("at least", 1, method, element);
         if (index == null) {
+            this.getCommonSpec().getLogger().debug("No index specified for element. Defaulting to index 0");
             index = 0;
         }
 
         Assertions.assertThat(commonspec.getPreviousWebElements().getPreviousWebElements().size()).as("Could not get webelement with index %s. Less elements were found. Allowed index: 0 to %s", index, commonspec.getPreviousWebElements().getPreviousWebElements().size() - 1)
                 .isGreaterThanOrEqualTo(index + 1);
 
+        this.getCommonSpec().getLogger().debug("Checking if text on element with '{}' as '{}' index '{}' has '{}' as text", element, method, index, text);
         Assertions.assertThat(commonspec.getPreviousWebElements().getPreviousWebElements().get(index).getText()).contains(text);
     }
 
@@ -509,7 +520,7 @@ public class SeleniumGSpec extends BaseGSpec {
      */
     @Then("^this text exists:$")
     public void assertSeleniumTextInSource(String text) {
-        Assertions.assertThat(commonspec.getDriver().getPageSource().contains(text)).as("The expected text was not found in the page").isTrue();
+        Assertions.assertThat(commonspec.getDriver().getPageSource().contains(text)).as("The expected text was not found in the page source").isTrue();
     }
 
     /**
@@ -529,7 +540,7 @@ public class SeleniumGSpec extends BaseGSpec {
      */
     @Then("^this text does not exist:$")
     public void assertSeleniumTextNotPresentInSource(String text) {
-        Assertions.assertThat(commonspec.getDriver().getPageSource().contains(text)).as("The provided text was found in the page").isFalse();
+        Assertions.assertThat(commonspec.getDriver().getPageSource().contains(text)).as("The provided text was found in the page source").isFalse();
     }
 
 
@@ -562,13 +573,16 @@ public class SeleniumGSpec extends BaseGSpec {
         List<WebElement> wel;
 
         if (atLeast != null) {
+            this.getCommonSpec().getLogger().debug("Locating 'at least' '{}' element with '{}' as '{}'", expectedCount, element, method);
             wel = commonspec.locateElement(method, element, -1);
             PreviousWebElements pwel = new PreviousWebElements(wel);
             Assertions.assertThat(pwel.getPreviousWebElements().size()).as("Couldn't find the expected amount of elements (at least %s) with the given %s", expectedCount, method).isGreaterThanOrEqualTo(expectedCount);
         } else {
+            this.getCommonSpec().getLogger().debug("Locating 'exactly' '{}' element with '{}' as '{}'", expectedCount, element, method);
             wel = commonspec.locateElement(method, element, expectedCount);
         }
 
+        this.getCommonSpec().getLogger().debug("'{}' elements found with '{}' as '{}'. Saving...", expectedCount, element, method);
         PreviousWebElements pwel = new PreviousWebElements(wel);
         commonspec.setPreviousWebElements(pwel);
     }
@@ -604,6 +618,7 @@ public class SeleniumGSpec extends BaseGSpec {
 
         this.assertSeleniumNElementExists("at least", 1, method, element);
         if (index == null) {
+            this.getCommonSpec().getLogger().debug("No index specified for element. Defaulting to index 0");
             index = 0;
         }
 
@@ -641,6 +656,7 @@ public class SeleniumGSpec extends BaseGSpec {
 
         this.assertSeleniumNElementExists("at least", 1, method, element);
         if (index == null) {
+            this.getCommonSpec().getLogger().debug("No index specified for element. Defaulting to index 0");
             index = 0;
         }
 
@@ -678,6 +694,7 @@ public class SeleniumGSpec extends BaseGSpec {
 
         this.assertSeleniumNElementExists("at least", 1, method, element);
         if (index == null) {
+            this.getCommonSpec().getLogger().debug("No index specified for element. Defaulting to index 0");
             index = 0;
         }
 
@@ -711,11 +728,14 @@ public class SeleniumGSpec extends BaseGSpec {
 
         this.assertSeleniumNElementExists("at least", 1, method, element);
         if (index == null) {
+            this.getCommonSpec().getLogger().debug("No index specified for element. Defaulting to index 0");
             index = 0;
         }
 
         Assertions.assertThat(commonspec.getPreviousWebElements().getPreviousWebElements().size()).as("Could not get webelement with index %s. Less elements were found. Allowed index: 0 to %s", index, commonspec.getPreviousWebElements().getPreviousWebElements().size() - 1)
                 .isGreaterThanOrEqualTo(index + 1);
+
+        this.getCommonSpec().getLogger().debug("Getting value of attribute '{}' of element with '{}' as '{}' index '{}'", attribute, element, method, index);
         String val = commonspec.getPreviousWebElements().getPreviousWebElements().get(index).getAttribute(attribute);
         Assertions.assertThat(val).as("Attribute not found").isNotNull();
         Assertions.assertThat(val).as("Unexpected value for specified attribute").matches(value);
@@ -736,6 +756,7 @@ public class SeleniumGSpec extends BaseGSpec {
      */
     @Then("^I take a snapshot$")
     public void seleniumSnapshot() {
+        this.getCommonSpec().getLogger().debug("Taking snapshot...");
         commonspec.captureEvidence(commonspec.getDriver(), "screenCapture");
     }
 
@@ -812,12 +833,15 @@ public class SeleniumGSpec extends BaseGSpec {
 
         this.assertSeleniumNElementExists("at least", 1, method, element);
         if (index == null) {
+            this.getCommonSpec().getLogger().debug("No index specified for element. Defaulting to index 0");
             index = 0;
         }
 
         Assertions.assertThat(commonspec.getPreviousWebElements().getPreviousWebElements().size()).as("Could not get webelement with index %s. Less elements were found. Allowed index: 0 to %s", index, commonspec.getPreviousWebElements().getPreviousWebElements().size() - 1)
                 .isGreaterThanOrEqualTo(index + 1);
+        this.getCommonSpec().getLogger().debug("Getting text on element with '{}' as '{}' index '{}'", element, method, index);
         String text = commonspec.getPreviousWebElements().getPreviousWebElements().get(index).getText();
+        this.getCommonSpec().getLogger().debug("Saving '{}' in variable '{}'", text, envVar);
         ThreadProperty.set(envVar, text);
     }
 
@@ -872,10 +896,13 @@ public class SeleniumGSpec extends BaseGSpec {
                 .isGreaterThanOrEqualTo(index + 1);
 
         try {
+            this.getCommonSpec().getLogger().debug("Waiting for element on index '{}' to become clickable", index);
             WebDriverWait wait = new WebDriverWait(commonspec.getDriver(), 5);
             WebElement element = wait.until(ExpectedConditions.elementToBeClickable(commonspec.getPreviousWebElements().getPreviousWebElements().get(index)));
+            this.getCommonSpec().getLogger().debug("Performing click on element with index '{}'", index);
             element.click();
         } catch (Exception e) {
+            this.getCommonSpec().getLogger().warn("Click on element on index '{}' failed. Attempting to move mouse to element and perform click", index);
             Actions actions = new Actions(commonspec.getDriver());
             actions.moveToElement(commonspec.getPreviousWebElements().getPreviousWebElements().get(index)).click().build().perform();
         }
@@ -909,6 +936,8 @@ public class SeleniumGSpec extends BaseGSpec {
 
         Assertions.assertThat(commonspec.getPreviousWebElements().getPreviousWebElements().size()).as("Could not get webelement with index %s. Less elements were found. Allowed index: 0 to %s", index, commonspec.getPreviousWebElements().getPreviousWebElements().size() - 1)
                 .isGreaterThanOrEqualTo(index + 1);
+
+        this.getCommonSpec().getLogger().debug("Performing double click on element with index '{}'",index);
         Actions actions = new Actions(this.commonspec.getDriver());
         actions.doubleClick(commonspec.getPreviousWebElements().getPreviousWebElements().get(index)).perform();
 
@@ -941,6 +970,8 @@ public class SeleniumGSpec extends BaseGSpec {
 
         Assertions.assertThat(commonspec.getPreviousWebElements().getPreviousWebElements().size()).as("Could not get webelement with index %s. Less elements were found. Allowed index: 0 to %s", index, commonspec.getPreviousWebElements().getPreviousWebElements().size() - 1)
                 .isGreaterThanOrEqualTo(index + 1);
+
+        this.getCommonSpec().getLogger().debug("Performing right click on element with index '{}'", index);
         Actions actions = new Actions(this.commonspec.getDriver());
         actions.contextClick(commonspec.getPreviousWebElements().getPreviousWebElements().get(index)).perform();
 
@@ -1002,6 +1033,7 @@ public class SeleniumGSpec extends BaseGSpec {
     public void seleniumClearByLocator(String method, String element, Integer index) {
         this.assertSeleniumNElementExists("at least", 1, method, element);
         if (index == null) {
+            this.getCommonSpec().getLogger().debug("No index specified for element. Defaulting to index 0");
             index = 0;
         }
         this.seleniumClear(index);
@@ -1043,6 +1075,7 @@ public class SeleniumGSpec extends BaseGSpec {
 
         Assertions.assertThat(commonspec.getPreviousWebElements().getPreviousWebElements().size()).as("Could not get webelement with index %s. Less elements were found. Allowed index: 0 to %s", index, commonspec.getPreviousWebElements().getPreviousWebElements().size() - 1)
                 .isGreaterThanOrEqualTo(index + 1);
+
         while (text.length() > 0) {
             if (-1 == text.indexOf("\\n")) {
                 commonspec.getPreviousWebElements().getPreviousWebElements().get(index).sendKeys(text);
@@ -1155,6 +1188,7 @@ public class SeleniumGSpec extends BaseGSpec {
     public void seleniumKeysByLocator(String input, String method, String element, Integer index) {
         this.assertSeleniumNElementExists("at least", 1, method, element);
         if (index == null) {
+            this.getCommonSpec().getLogger().debug("No index specified for element. Defaulting to index 0");
             index = 0;
         }
         this.seleniumKeys(input, index);
@@ -1176,10 +1210,15 @@ public class SeleniumGSpec extends BaseGSpec {
 
         this.assertSeleniumNElementExists("at least", 1, method, element);
         if (index == null) {
+            this.getCommonSpec().getLogger().debug("No index specified for element. Defaulting to index 0");
             index = 0;
         }
 
+
         Select sel = new Select(commonspec.getPreviousWebElements().getPreviousWebElements().get(index));
+        assertThat(sel).as("No select found with %s as %s in index %s", element, method, index).isNotNull();
+
+        this.getCommonSpec().getLogger().debug("Selecting options that display the matching argument '{}'", option);
         sel.selectByVisibleText(option);
     }
 
@@ -1228,9 +1267,11 @@ public class SeleniumGSpec extends BaseGSpec {
     public void seleniumChangeWindow() {
         String originalWindowHandle = commonspec.getDriver().getWindowHandle();
         Set<String> windowHandles = commonspec.getDriver().getWindowHandles();
+        this.getCommonSpec().getLogger().debug("Current window is '{}'. {} windows/tabs total detected", originalWindowHandle, windowHandles.size());
 
         for (String window : windowHandles) {
             if (!window.equals(originalWindowHandle)) {
+                this.getCommonSpec().getLogger().debug("Switching window to '{}'", window);
                 commonspec.getDriver().switchTo().window(window);
             }
         }
@@ -1262,12 +1303,19 @@ public class SeleniumGSpec extends BaseGSpec {
 
         this.assertSeleniumNElementExists("at least", 1, method, element);
         if (index == null) {
+            this.getCommonSpec().getLogger().debug("No index specified for element. Defaulting to index 0");
             index = 0;
         }
 
         List<WebElement> wel = commonspec.getPreviousWebElements().getPreviousWebElements();
+
+        this.getCommonSpec().getLogger().debug("Getting value of property '{}' of element with '{}' as '{}' index '{}'", propertyName, element, method, index);
         String value = wel.get(index).getAttribute(propertyName);
+
+        this.getCommonSpec().getLogger().debug("property '{}' has '{}' as value", propertyName, value);
         assertThat(value).as("The web element doesn't have the property '" + propertyName + "'").isNotNull();
+
+        this.getCommonSpec().getLogger().debug("Saving '{}' as variable '{}'", value, variable);
         ThreadProperty.set(variable, value);
     }
 
@@ -1338,6 +1386,7 @@ public class SeleniumGSpec extends BaseGSpec {
 
         this.assertSeleniumNElementExists("at least", 1, method, element);
         if (index == null) {
+            this.getCommonSpec().getLogger().debug("No index specified for element. Defaulting to index 0");
             index = 0;
         }
 
@@ -1379,6 +1428,7 @@ public class SeleniumGSpec extends BaseGSpec {
             Assertions.fail("Could not infer hypertext transfer protocol. Include 'http://' or 'https://'");
         }
 
+        this.getCommonSpec().getLogger().debug("Loading '{}' in the current browser window", url);
         commonspec.getDriver().get(url);
         commonspec.setParentWindow(commonspec.getDriver().getWindowHandle());
     }
@@ -1420,6 +1470,7 @@ public class SeleniumGSpec extends BaseGSpec {
     public void seleniumClickByLocator(String method, String element, Integer index) {
         this.assertSeleniumNElementExists("at least", 1, method, element);
         if (index == null) {
+            this.getCommonSpec().getLogger().debug("No index specified to perform click. Defaulting to index 0");
             index = 0;
         }
         this.seleniumClick(index);
@@ -1456,6 +1507,7 @@ public class SeleniumGSpec extends BaseGSpec {
     public void seleniumTypeByLocator(String input, String method, String element, Integer index) {
         this.assertSeleniumNElementExists("at least", 1, method, element);
         if (index == null) {
+            this.getCommonSpec().getLogger().debug("No index specified for element. Defaulting to index 0");
             index = 0;
         }
         this.seleniumType(input, index);
@@ -1501,6 +1553,7 @@ public class SeleniumGSpec extends BaseGSpec {
     public void seleniumTypeLongTextByLocator(String method, String element, Integer index, DocString input) {
         this.assertSeleniumNElementExists("at least", 1, method, element);
         if (index == null) {
+            this.getCommonSpec().getLogger().debug("No index specified for element. Defaulting to index 0");
             index = 0;
         }
         this.seleniumType(input.getContent(), index);
@@ -1544,6 +1597,7 @@ public class SeleniumGSpec extends BaseGSpec {
     public void scrollUntilElementVisibleByLocator(String direction, String method, String element, Integer index) throws InterruptedException {
         this.assertSeleniumNElementExists("at least", 1, method, element);
         if (index == null) {
+            this.getCommonSpec().getLogger().debug("No index specified for element. Defaulting to index 0");
             index = 0;
         }
 
@@ -1558,6 +1612,7 @@ public class SeleniumGSpec extends BaseGSpec {
             script = "arguments[0].scrollIntoView(true);";
         }
 
+        this.getCommonSpec().getLogger().debug("Scrolling element with '{}' as '{}' index '{}' into view", element, method, index);
         ((JavascriptExecutor) this.commonspec.getDriver()).executeScript(script, this.commonspec.getPreviousWebElements().getPreviousWebElements().get(index));
         Thread.sleep(500);
     }
@@ -1591,6 +1646,7 @@ public class SeleniumGSpec extends BaseGSpec {
     public void seleniumDoubleClickByLocator(String method, String element, Integer index) {
         this.assertSeleniumNElementExists("at least", 1, method, element);
         if (index == null) {
+            this.getCommonSpec().getLogger().debug("No index specified for element. Defaulting to index 0");
             index = 0;
         }
         this.seleniumDoubleClick(index);
@@ -1626,6 +1682,7 @@ public class SeleniumGSpec extends BaseGSpec {
     public void seleniumRightClickByLocator(String method, String element, Integer index) {
         this.assertSeleniumNElementExists("at least", 1, method, element);
         if (index == null) {
+            this.getCommonSpec().getLogger().debug("No index specified for element. Defaulting to index 0");
             index = 0;
         }
         this.seleniumRightClick(index);
@@ -1658,8 +1715,11 @@ public class SeleniumGSpec extends BaseGSpec {
     public void seleniumHoverByLocator(String method, String element, Integer index) {
         this.assertSeleniumNElementExists("at least", 1, method, element);
         if (index == null) {
+            this.getCommonSpec().getLogger().debug("No index specified for element. Defaulting to index 0");
             index = 0;
         }
+
+        this.getCommonSpec().getLogger().debug("Hovering on element with '{}' as '{}' index '{}'", element, method, index);
         Actions action = new Actions(this.commonspec.getDriver());
         action.moveToElement(this.commonspec.getPreviousWebElements().getPreviousWebElements().get(index)).perform();
     }
