@@ -937,7 +937,7 @@ public class SeleniumGSpec extends BaseGSpec {
         Assertions.assertThat(commonspec.getPreviousWebElements().getPreviousWebElements().size()).as("Could not get webelement with index %s. Less elements were found. Allowed index: 0 to %s", index, commonspec.getPreviousWebElements().getPreviousWebElements().size() - 1)
                 .isGreaterThanOrEqualTo(index + 1);
 
-        this.getCommonSpec().getLogger().debug("Performing double click on element with index '{}'",index);
+        this.getCommonSpec().getLogger().debug("Performing double click on element with index '{}'", index);
         Actions actions = new Actions(this.commonspec.getDriver());
         actions.doubleClick(commonspec.getPreviousWebElements().getPreviousWebElements().get(index)).perform();
 

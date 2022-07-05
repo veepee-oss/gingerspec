@@ -621,7 +621,7 @@ public class CommonG {
                 .ignoring(TimeoutException.class)
                 .ignoring(WebDriverException.class);
 
-        logger.debug("Waiting {} seconds for {} elements by xpath to be {}",poolMaxTime, expectedCount, type);
+        logger.debug("Waiting {} seconds for {} elements by xpath to be {}", poolMaxTime, expectedCount, type);
 
         try {
 
