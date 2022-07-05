@@ -1,4 +1,3 @@
-@rest
 Feature: Steps for testing REST APIs
 
   This feature provides examples on how to use the steps for testing REST APIs. All feature files that make use of

@@ -113,6 +113,7 @@ public class HookGSpec extends BaseGSpec {
      */
     @Before(order = 0)
     public void globalSetup(Scenario scenario) {
+
         /*Removes unnecessary logging messages that are produced by dependencies that make use of java.util.logging.Logger*/
         Logger rootLogger = LogManager.getLogManager().getLogger("");
         rootLogger.setLevel(Level.WARNING);
@@ -467,10 +468,9 @@ public class HookGSpec extends BaseGSpec {
      * If the feature has the @web or @mobile annotation, closes selenium web driver after each scenario is completed.
      *
      * @param scenario Instance of the scenario just executed
-     * @throws IOException The IOException
      */
     @After(order = 20, value = "@web or @mobile")
-    public void seleniumTeardown(Scenario scenario) throws IOException {
+    public void seleniumTeardown(Scenario scenario) {
 
         if (scenario.getStatus().name().toLowerCase().matches("skipped")) {
             throw new SkipException("@web/@mobile tag ignored since scenario was skipped");
@@ -510,44 +510,9 @@ public class HookGSpec extends BaseGSpec {
 
 
     /**
-     * If the feature has the @rest annotation, creates a new REST client before each scenario
-     *
-     * @param scenario  Scenario
-     */
-    @Before(order = 10, value = "@rest")
-    public void restClientSetup(Scenario scenario) {
-
-        if (scenario.getStatus().name().toLowerCase().matches("skipped")) {
-            throw new SkipException("@rest tag ignored since scenario was skipped");
-        }
-
-        if (scenario.getStatus().toString().matches("skipped")) {
-            return;
-        }
-
-        commonspec.getLogger().debug("Starting a REST client");
-
-        commonspec.setRestRequest(given().contentType(ContentType.JSON));
-
-    }
-
-    /**
-     * If the feature has the @rest annotation, closes the REST client after each scenario is completed
-     * @param scenario  Scenario
-     */
-    @After(order = 10, value = "@rest")
-    public void restClientTeardown(Scenario scenario) {
-
-        if (scenario.getStatus().name().toLowerCase().matches("skipped")) {
-            throw new SkipException("@rest tag ignored since scenario was skipped");
-        }
-    }
-
-
-    /**
      * Checks if the scenario contains any reference to a Jira ticket and will try to update
      * its status based on the result of the scenario execution.
-     * Checks if theres any reference to an slack channel and sends a notification to that channel
+     * Checks if there's any reference to a Slack channel and sends a notification to that channel
      * if the scenario failed
      * Closes any remaining SSH connection
      * @param scenario  Scenario
@@ -597,6 +562,7 @@ public class HookGSpec extends BaseGSpec {
             commonspec.getLogger().debug("Closing SSH remote connection");
             commonspec.getRemoteSSHConnection().getSession().disconnect();
         }
+
     }
 
     /**

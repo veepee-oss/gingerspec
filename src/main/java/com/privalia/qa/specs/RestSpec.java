@@ -89,6 +89,10 @@ public class RestSpec extends BaseGSpec {
      */
     @Given("^I( securely)? send requests to '(.*)'$")
     public void setupApp(String isSecured, String restHost) {
+
+        RequestSpecification spec = new RequestSpecBuilder().setContentType(ContentType.JSON).setRelaxedHTTPSValidation().build();
+        commonspec.setRestRequest(given().header("Content-Type", "application/json").spec(spec));
+
         String restProtocol = "http://";
         String restPort = null;
 
@@ -99,7 +103,6 @@ public class RestSpec extends BaseGSpec {
 
         Assertions.assertThat(restHost).isNotNull();
         Assertions.assertThat(restHost).as("Malformed url. No need to use http(s):// prefix").doesNotContain("http://").doesNotContain("https://");
-        Assertions.assertThat(commonspec.getRestRequest()).as("No rest client initialized. Did you forget to use @rest annotation in your feature?").isNotNull();
 
         String[] restAddress = restHost.split(":");
 
