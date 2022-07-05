@@ -1,4 +1,3 @@
-@sql
 Feature: Steps for testing relational databases
 
   Steps related to working with SQL relational databases (currently supports postgresql and mysql). In Scenarios that create connections

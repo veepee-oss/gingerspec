@@ -58,6 +58,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -518,9 +519,10 @@ public class HookGSpec extends BaseGSpec {
      * @param scenario  Scenario
      * @throws SlackApiException    SlackApiException
      * @throws IOException          IOException
+     * @throws SQLException         SQLException
      */
     @After(order = 10)
-    public void teardown(Scenario scenario) throws SlackApiException, IOException {
+    public void teardown(Scenario scenario) throws SlackApiException, IOException, SQLException {
 
         if (scenario.isFailed()) {
 
@@ -563,19 +565,11 @@ public class HookGSpec extends BaseGSpec {
             commonspec.getRemoteSSHConnection().getSession().disconnect();
         }
 
-    }
-
-    /**
-     * If the feature has the @sql annotation, closes any open connection to a database after each scenario is completed
-     *
-     * @throws Exception Exception
-     */
-    @After(value = "@sql")
-    public void sqlConnectionClose() throws Exception {
         if ((commonspec.getSqlClient() != null) && (commonspec.getSqlClient().connectionStatus())) {
             commonspec.getLogger().debug("Closing SQL remote connection");
             commonspec.getSqlClient().disconnect();
         }
+
     }
 
     /**
