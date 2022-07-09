@@ -1,5 +1,23 @@
 # Changelog
 
+## 2.2.13
+
+* Created a new formatter capable of transforming the feature files into a html document. This is for auto-generating the documentation that will be published in GitHub pages (https://veepee-oss.github.io/gingerspec/index.html)
+
+* Some unnecessary features and runner classes were removed, general code-cleanup
+
+* Completely rewrite the Selenium, Rest and SQL features, so they can be displayed with nice sections in the final html page. The Selenium feature was rewritten using examples from https://testpages.herokuapp.com
+
+* Many Selenium steps were rewritten to avoid using a previous step for storing webelements
+
+* Test page used during the pipeline execution for testing the selenium steps was removed and is no longer using demoqa.com, but a static page from https://testpages.herokuapp.com
+
+* Improved debug messages for selenium steps
+
+* @rest annotation was removed. Rest steps will now automatically bootstrap a new instance of rest-assured client if it doesn't exists
+
+* @sql annotation was removed. Now GingerSpec will automatically close any open database connection at the end of the scenario
+
 ## 2.2.12
 
 * Updated step so Rest client from rest assured is not initialized using a port if the user does not specify one
