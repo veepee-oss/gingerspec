@@ -1,8 +1,7 @@
 Feature: Steps for testing REST APIs
 
-  This feature provides examples on how to use the steps for testing REST APIs. All feature files that make use of
-  the steps for testing REST APIs (such as this one) must include the "@rest" annotation at the beginning of the file.
-  This is necessary, since it signals the library that it should bootstrap some necessary components for testing REST APIs
+  This feature provides examples on how to use the steps for testing REST APIs. All steps make use of the
+  library rest-assured in the background
 
 
   Rule: Set up initial base URI for future requests

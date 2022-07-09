@@ -9,7 +9,7 @@ Feature: Jira Integration
 
   Rule: Basic usage
 
-    @jira[QMS-990] @rest
+    @jira[QMS-990]
     Scenario: Execute scenario based on status of jira ticket
       Given I save 'a' in variable 'x'
       And I save 'b' in variable 'y'
