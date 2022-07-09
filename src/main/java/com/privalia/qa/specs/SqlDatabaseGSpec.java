@@ -54,8 +54,7 @@ public class SqlDatabaseGSpec extends BaseGSpec {
      * <p>
      * The DriverManager attempts to select an appropriate driver from the set of registered JDBC drivers.
      * All subsequent steps that interact with the database will be performed on this connection. You can also use the
-     * step {@link #disconnectDatabase()} to close this connection at the end of your scenarios, however, it is recommended
-     * to include the @sql tag in your scenarios to allow gingerspec to do this automatically. The current supported types of
+     * step {@link #disconnectDatabase()} to close this connection at the end of your scenarios. The current supported types of
      * databases are postgresql/mysql
      * <pre>{@code
      * Example:
@@ -104,8 +103,7 @@ public class SqlDatabaseGSpec extends BaseGSpec {
      * Close the Database connection
      * <p>
      * Closes the active database connection. To create a database connection use the step {@link #connectDatabase(String, String, String, String, String, String, String)}
-     * You can use this step to close the database connection at the end of your scenarios, however, it is recommended to include
-     * the @sql tag in your scenarios to allow gingerspec to do this automatically.
+     * You can use this step to close the database connection at the end of your scenarios.
      * <pre>{@code
      * Example:
      *

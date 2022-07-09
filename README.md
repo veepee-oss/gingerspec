@@ -177,6 +177,7 @@ _[Testing Rest services](https://veepee-oss.github.io/gingerspec/steps-for-testi
 
 _[Testing a web page](https://veepee-oss.github.io/gingerspec/steps-for-testing-web-pages.html)_
 ```
+  @web
   Scenario: Fill the form and click the submit button
     Given I go to 'http://demoqa.com/text-box'
     And I type 'John' on the element with 'id:userName'
@@ -189,7 +190,6 @@ _[Testing a web page](https://veepee-oss.github.io/gingerspec/steps-for-testing-
 
 _[Testing database](https://veepee-oss.github.io/gingerspec/steps-for-testing-relational-databases.html)_
 ```
-  @sql
   Scenario: Executing SELECT statements on a MySQL database
     Given I connect with JDBC to database 'mysql' type 'mysql' on host '${MYSQL_HOST}' and port '3306' with user 'root' and password 'mysql'
     Then I execute query 'CREATE TABLE IF NOT EXISTS weather1 (city varchar(80), temp_lo int, temp_hi int, prcp real, date date);'

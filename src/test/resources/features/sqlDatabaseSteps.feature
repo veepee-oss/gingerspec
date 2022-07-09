@@ -1,11 +1,9 @@
 Feature: Steps for testing relational databases
 
-  Steps related to working with SQL relational databases (currently supports postgresql and mysql). In Scenarios that create connections
-  to a database, you can also use the @sql tag to automatically close any open sql connection after the Scenario completes, so is not necessary to
-  use the step "Then I close database connection" at the end.
+  Steps related to working with SQL relational databases (currently supports postgresql and mysql). GingerSpec automatically
+  detects if a database connection was left open at the end of each scenario and automatically tries to close it, so is not
+  necessary to use the step "Then I close database connection" at the end.
 
-  For more information check out:
-  https://github.com/veepee-oss/gingerspec/wiki/Gherkin-tags#sql-tag
 
   Rule: Opening and closing a connection to a database
 
