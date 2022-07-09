@@ -48,6 +48,7 @@ GingerSpec provides common functionality that can be reused by different test pr
 
 ## Documentation
 * [Project wiki](https://github.com/veepee-oss/gingerspec/wiki)
+* [Steps documentation an examples](https://veepee-oss.github.io/gingerspec/)
 * [Javadoc](https://javadoc.io/doc/com.github.privaliatech/gingerspec/latest/index.html)  
 
 ### Requirements
@@ -151,7 +152,7 @@ And [many others more!](https://github.com/veepee-oss/gingerspec/wiki/Gherkin-ta
 GingerSpec contains tons of predefined Gherkin steps ready to use in your own features. The steps cover a wide range of functionality, from steps for testing Rest endpoints, perform front-end etsting using selenium, and even for testing kafka services!
 
 
-_Testing Rest services_
+_[Testing Rest services](https://veepee-oss.github.io/gingerspec/steps-for-testing-rEST-aPIs.html)_
 ```
   Scenario: A successful response with a valid body is returned
     Given I securely send requests to 'jsonplaceholder.typicode.com:443'
@@ -174,7 +175,7 @@ _Testing Rest services_
 ```
 
 
-_Testing a web page_
+_[Testing a web page](https://veepee-oss.github.io/gingerspec/steps-for-testing-web-pages.html)_
 ```
   Scenario: Fill the form and click the submit button
     Given I go to 'http://demoqa.com/text-box'
@@ -186,7 +187,7 @@ _Testing a web page_
     Then at least '1' elements exists with 'id:output'
 ```
 
-_Testing database_
+_[Testing database](https://veepee-oss.github.io/gingerspec/steps-for-testing-relational-databases.html)_
 ```
   @sql
   Scenario: Executing SELECT statements on a MySQL database
@@ -211,7 +212,7 @@ _Testing database_
 ```
   
 
-And many many more!  
+[And many many more!](https://veepee-oss.github.io/gingerspec/index.html)  
 
   
 ## Contributing Members to GingerSpec
