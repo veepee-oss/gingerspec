@@ -100,9 +100,11 @@ public class SqlUtils {
                 Class.forName("com.mysql.cj.jdbc.Driver");
                 break;
 
-            case "POSTGRESQL":
-                Class.forName("org.postgresql.Driver");
+            case "CLICKHOUSE":
+                Class.forName("com.clickhouse.jdbc.ClickHouseDriver");
                 break;
+
+            case "POSTGRESQL":
 
             default:
                 Class.forName("org.postgresql.Driver");
@@ -252,10 +254,20 @@ public class SqlUtils {
         boolean exists = false;
         String query;
 
-        if (this.dataBaseType.toLowerCase().matches("mysql")) {
-            query = "SELECT * FROM information_schema.tables WHERE table_schema = '" + this.sqlConnection.getCatalog() + "' AND table_name = '" + tableName + "' LIMIT 1;";
-        } else {
-            query = "SELECT * FROM pg_tables WHERE tablename = " + "\'" + tableName + "\'" + ";";
+        switch (this.dataBaseType.toUpperCase()) {
+            case "MYSQL":
+                query = "SELECT * FROM information_schema.tables WHERE table_schema = '" + this.sqlConnection.getCatalog() + "' AND table_name = '" + tableName + "' LIMIT 1;";
+                break;
+
+            case "CLICKHOUSE":
+                query = "SELECT * FROM system.tables WHERE name = " + "\'" + tableName + "\'" + ";";
+                break;
+
+            case "POSTGRESQL":
+
+            default:
+                query = "SELECT * FROM pg_tables WHERE tablename = " + "\'" + tableName + "\'" + ";";
+                break;
         }
 
         LOGGER.debug(String.format("Verifying if table %s exists. Executing %s", tableName, query));
