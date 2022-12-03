@@ -11,6 +11,7 @@
 #
 # * 3306 (mysql)
 # * 5432 (postgres)
+# * 8123 (clickhouse)
 # * 3000 (Rest API server)
 # * 80   (Demo site)
 # * 4444 (Selenium hub)
@@ -49,6 +50,10 @@ services:
       POSTGRES_PASSWORD: 'postgres'
     ports:
       - "5432:5432"
+  clickhouse:
+    image: 'dmamontov/gingerspec-clickhouse:1.0'
+    ports:
+      - "8123:8123"
   rest-server:
     image: 'privaliatech/privalia-rest-server:0.1.0'
     ports:

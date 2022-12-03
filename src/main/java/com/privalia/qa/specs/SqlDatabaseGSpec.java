@@ -31,6 +31,8 @@ import org.assertj.core.api.Assertions;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -278,12 +280,24 @@ public class SqlDatabaseGSpec extends BaseGSpec {
     @Then("^I check that result is:$")
     public void compareTable(DataTable dataTable) {
 
-        List<List<String>> previousResult = this.commonspec.getPreviousSqlResult();
+        List<List<String>> previousResult = new ArrayList(this.commonspec.getPreviousSqlResult());
         assertThat(previousResult).as("The last SQL query returned a null result").isNotNull();
         assertThat(previousResult.size()).as("The last SQL query did not returned any rows").isNotEqualTo(0);
 
         commonspec.getLogger().debug("comparing {} with given datatable", previousResult);
-        assertThat(dataTable.asLists()).as("The returned and the expected results do not match.").isEqualTo(previousResult);
+
+        List<List<String>> currentResult = new ArrayList(dataTable.asLists());
+
+        /*
+            With multiple INSERT in a row, clickhouse does not guarantee the correct INSERT order.
+            Without ORDER BY, clickhouse does not guarantee the correct order.
+        */
+        if (this.commonspec.getSqlClient().getDataBaseType().equals("CLICKHOUSE")) {
+            previousResult.sort(Comparator.comparing(l -> l.get(0)));
+            currentResult.sort(Comparator.comparing(l -> l.get(0)));
+        }
+
+        assertThat(currentResult).as("The returned and the expected results do not match.").isEqualTo(previousResult);
 
     }
 

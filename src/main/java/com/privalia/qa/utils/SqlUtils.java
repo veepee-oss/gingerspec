@@ -54,6 +54,10 @@ public class SqlUtils {
 
     private List<List<String>> previousSqlResult;
 
+    public String getDataBaseType() {
+        return dataBaseType.toUpperCase();
+    }
+
     public List<List<String>> getPreviousSqlResult() {
         return previousSqlResult;
     }
@@ -95,7 +99,7 @@ public class SqlUtils {
         this.dataBaseType = dataBaseType;
         this.dataBaseName = dataBaseName;
 
-        switch (dataBaseType.toUpperCase()) {
+        switch (this.getDataBaseType()) {
             case "MYSQL":
                 Class.forName("com.mysql.cj.jdbc.Driver");
                 break;
@@ -254,7 +258,7 @@ public class SqlUtils {
         boolean exists = false;
         String query;
 
-        switch (this.dataBaseType.toUpperCase()) {
+        switch (this.getDataBaseType()) {
             case "MYSQL":
                 query = "SELECT * FROM information_schema.tables WHERE table_schema = '" + this.sqlConnection.getCatalog() + "' AND table_name = '" + tableName + "' LIMIT 1;";
                 break;
