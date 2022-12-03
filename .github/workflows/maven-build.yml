@@ -66,7 +66,7 @@ jobs:
       run: mvn clean install -DVERSION=1.0 -DSLEEPTEST=3 -DAGENT_LIST=1,2 -DVARNAME=foo -DWAIT=1 -DPOSTGRES_HOST=localhost -DMYSQL_HOST=localhost -DCLICKHOUSE_HOST=localhost -DREST_SERVER_HOST=localhost -DDEMO_SITE_HOST=demo-site:4567 -DSELENIUM_GRID=http://localhost:4444/wd/hub -DZOOKEEPER_HOST=localhost -DSCHEMA_REGISTRY_HOST=localhost
 
     - name: Publish pages
-      uses: JamesIves/github-pages-deploy-action@v4.3.3
+      uses: JamesIves/github-pages-deploy-action@v4.4.1
       with:
         branch: gh-pages
         folder: target/documentation
