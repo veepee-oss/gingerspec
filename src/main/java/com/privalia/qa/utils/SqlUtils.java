@@ -29,7 +29,7 @@ import java.util.Properties;
 
 
 /**
- * Generic operations on SQL relational databases. Currently supports mysql/postgres
+ * Generic operations on SQL relational databases. Currently supports mysql/postgres/clickhouse
  * @author Jose Fernandez
  */
 public class SqlUtils {
@@ -85,7 +85,7 @@ public class SqlUtils {
      *
      * @param host         URL of remote host
      * @param port         Database port
-     * @param dataBaseType Database type (currently MYSQL/POSTGRESQL)
+     * @param dataBaseType Database type (currently MYSQL/POSTGRESQL/CLICKHOUSE)
      * @param dataBaseName Name of the remote database
      * @param security     True if secure connection
      * @param user         Database user

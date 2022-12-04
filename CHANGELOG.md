@@ -1,5 +1,25 @@
 # Changelog
 
+## 2.2.14
+
+* Added support for clickhouse DB
+
+* Bump commons-text from 1.9 to 1.10.0
+
+* Bump postgresql from 42.3.3 to 42.3.8
+
+* Bump commons-configuration2 from 2.7 to 2.8.0
+
+* Bump jsch from 0.1.53 to 0.1.54
+
+* Bump soa-model-core from 1.6.0 to 1.6.4
+
+* Bump log4j-api from 2.16.0 to 2.17.1
+
+* Bump log4j-core from 2.14.1 to 2.17.1
+
+* Bump commons-text from 1.9 to 1.10.0
+
 ## 2.2.13
 
 * Created a new formatter capable of transforming the feature files into a html document. This is for auto-generating the documentation that will be published in GitHub pages (https://veepee-oss.github.io/gingerspec/index.html)

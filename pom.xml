@@ -4,7 +4,7 @@
 
     <groupId>com.github.privaliatech</groupId>
     <artifactId>gingerspec</artifactId>
-    <version>2.2.13</version>
+    <version>2.2.14</version>
 
     <name>Privalia GingerSpec framework</name>
     <description>Acceptance Test library. General purpose automation framework.</description>

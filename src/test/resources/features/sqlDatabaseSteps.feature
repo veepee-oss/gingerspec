@@ -1,6 +1,6 @@
 Feature: Steps for testing relational databases
 
-  Steps related to working with SQL relational databases (currently supports postgresql and mysql). GingerSpec automatically
+  Steps related to working with SQL relational databases (currently supports postgresql, mysql and clickhouse). GingerSpec automatically
   detects if a database connection was left open at the end of each scenario and automatically tries to close it, so is not
   necessary to use the step "Then I close database connection" at the end.
 
