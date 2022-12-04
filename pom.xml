@@ -122,7 +122,7 @@
         <avro.version>1.8.0</avro.version>
         <mysql-connector-java.version>8.0.28</mysql-connector-java.version>
         <clickhouse.version>0.3.2-patch11</clickhouse.version>
-        <postgresql.version>42.3.3</postgresql.version>
+        <postgresql.version>42.3.8</postgresql.version>
         <rest-assured.version>4.5.1</rest-assured.version>
         <webdrivermanager.version>5.1.0</webdrivermanager.version>
         <appium.version>7.3.0</appium.version>
