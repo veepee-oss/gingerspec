@@ -68,6 +68,11 @@
             <name>Jose Fernandez</name>
             <email>jfernandez at privalia.pin</email>
         </developer>
+        <developer>
+            <id>dmamontov</id>
+            <name>Dmitry Mamontov</name>
+            <email>d@mamontov.tech</email>
+        </developer>
     </developers>
 
     <scm>
@@ -116,6 +121,7 @@
         <kafka-avro-serializer.version>3.1.1</kafka-avro-serializer.version>
         <avro.version>1.8.0</avro.version>
         <mysql-connector-java.version>8.0.28</mysql-connector-java.version>
+        <clickhouse.version>0.3.2-patch11</clickhouse.version>
         <postgresql.version>42.3.3</postgresql.version>
         <rest-assured.version>4.5.1</rest-assured.version>
         <webdrivermanager.version>5.1.0</webdrivermanager.version>
@@ -410,6 +416,18 @@
             <groupId>org.freemarker</groupId>
             <artifactId>freemarker</artifactId>
             <version>2.3.31</version>
+        </dependency>
+        <dependency>
+            <groupId>com.clickhouse</groupId>
+            <artifactId>clickhouse-jdbc</artifactId>
+            <version>${clickhouse.version}</version>
+            <classifier>all</classifier>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 

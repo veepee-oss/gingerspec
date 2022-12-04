@@ -31,6 +31,8 @@ import org.assertj.core.api.Assertions;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -67,6 +69,9 @@ public class SqlDatabaseGSpec extends BaseGSpec {
      *
      * Scenario: Connecting to a postgresql database
      *      Given I connect with JDBC to database 'databaseName' type 'postgresql' on host '121.0.0.1' and port '5432' with user 'postgres' and password 'P@$$W0RD'
+     *
+     * Scenario: Connecting to a clickhouse database
+     *      Given I connect with JDBC to database 'databaseName' type 'clickhouse' on host '121.0.0.1' and port '8123' with user 'clickhouse' and password 'P@$$W0RD'
      * }</pre>
      *
      * @see #disconnectDatabase()
@@ -78,7 +83,7 @@ public class SqlDatabaseGSpec extends BaseGSpec {
      * @param user          Database user
      * @param password      Database password
      */
-    @Given("^I( securely)? connect with JDBC to database '(.+?)' type '(mysql|postgresql)' on host '(.+?)' and port '(.+?)' with user '(.+?)'( and password '(.+?)')?$")
+    @Given("^I( securely)? connect with JDBC to database '(.+?)' type '(mysql|postgresql|clickhouse)' on host '(.+?)' and port '(.+?)' with user '(.+?)'( and password '(.+?)')?$")
     public void connectDatabase(String isSecured, String database, String dataBaseType, String host, String port, String user, String password) {
 
         commonspec.getLogger().debug("opening database connection to {} database {} at {}:{} with user {} and password {}", dataBaseType, database, host, port, user, password);
@@ -275,12 +280,24 @@ public class SqlDatabaseGSpec extends BaseGSpec {
     @Then("^I check that result is:$")
     public void compareTable(DataTable dataTable) {
 
-        List<List<String>> previousResult = this.commonspec.getPreviousSqlResult();
+        List<List<String>> previousResult = new ArrayList(this.commonspec.getPreviousSqlResult());
         assertThat(previousResult).as("The last SQL query returned a null result").isNotNull();
         assertThat(previousResult.size()).as("The last SQL query did not returned any rows").isNotEqualTo(0);
 
         commonspec.getLogger().debug("comparing {} with given datatable", previousResult);
-        assertThat(dataTable.asLists()).as("The returned and the expected results do not match.").isEqualTo(previousResult);
+
+        List<List<String>> currentResult = new ArrayList(dataTable.asLists());
+
+        /*
+            With multiple INSERT in a row, clickhouse does not guarantee the correct INSERT order.
+            Without ORDER BY, clickhouse does not guarantee the correct order.
+        */
+        if (this.commonspec.getSqlClient().getDataBaseType().equals("CLICKHOUSE")) {
+            previousResult.sort(Comparator.comparing(l -> l.get(0)));
+            currentResult.sort(Comparator.comparing(l -> l.get(0)));
+        }
+
+        assertThat(currentResult).as("The returned and the expected results do not match.").isEqualTo(previousResult);
 
     }
 
