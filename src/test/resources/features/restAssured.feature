@@ -43,10 +43,28 @@ Feature: Steps for testing REST APIs
       Given I send requests to '${REST_SERVER_HOST}:3000'
       When I send a 'POST' request to '/posts' based on 'schemas/mytestdata.json' as 'json'
 
+    Scenario: Adding graphql request body from a file
+      Given I send requests to '${GRAPHQL_SERVER_HOST}:3001'
+      When I send a 'POST' request to '/' based on 'schemas/mytestdata.graphql' as 'graphql'
+
+    Scenario: Adding graphql request body from a file with variables
+      Given I send requests to '${GRAPHQL_SERVER_HOST}:3001'
+      When I send a 'POST' request to '/' based on 'schemas/mytestdatawithvars.graphql' as 'graphql' with variables '{"perPage": 10}'
+
     Scenario: Adding request body from a file but modifying elements of the json before sending
       Given I send requests to '${REST_SERVER_HOST}:3000'
       When I send a 'POST' request to '/posts' based on 'schemas/mytestdata.json' as 'json' with:
         | $.title | UPDATE | This is a test 2 |
+
+    Scenario: Adding request body from a file but modifying elements of the graphql before sending
+      Given I send requests to '${GRAPHQL_SERVER_HOST}:3001'
+      When I send a 'POST' request to '/' based on 'schemas/mytestdata.graphql' as 'graphql' with:
+        | id | UPDATE | name |
+
+    Scenario: Adding request body from a file and variables but modifying elements of the graphql before sending
+      Given I send requests to '${GRAPHQL_SERVER_HOST}:3001'
+      When I send a 'POST' request to '/' based on 'schemas/mytestdatawithvars.graphql' as 'graphql' with variables '{"perPage": 10}' and:
+        | id | UPDATE | name |
 
     Scenario: Adding request body directly in the gherkin step
       Given I send requests to '${REST_SERVER_HOST}:3000'
@@ -56,6 +74,41 @@ Feature: Steps for testing REST APIs
                 "userId": 1,
                 "title": "This is a test",
                 "body": "This is a test"
+              }
+          """
+
+    Scenario: Adding request body directly in the gherkin step as json
+      Given I send requests to '${REST_SERVER_HOST}:3000'
+      When I send a 'POST' request to '/posts' as 'json' with body
+           """
+              {
+                "userId": 1,
+                "title": "This is a test",
+                "body": "This is a test"
+              }
+          """
+
+    Scenario: Adding graphql request body directly in the gherkin step
+      Given I send requests to '${GRAPHQL_SERVER_HOST}:3001'
+      When I send a 'POST' request to '/' as 'graphql' with body
+           """
+              {
+                  allUsers(perPage: 10) {
+                      id
+                      name
+                  }
+              }
+          """
+
+    Scenario: Adding graphql request body and variables directly in the gherkin step
+      Given I send requests to '${GRAPHQL_SERVER_HOST}:3001'
+      When I send a 'POST' request to '/' as 'graphql' with variables '{"perPage": 10}' and body
+           """
+              query ($perPage: Int = 1) {
+                  allUsers(perPage: $perPage) {
+                      id
+                      name
+                  }
               }
           """
 

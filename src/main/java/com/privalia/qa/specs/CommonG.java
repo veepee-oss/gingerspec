@@ -1017,7 +1017,7 @@ public class CommonG {
      * Returns the information contained in file passed as parameter
      *
      * @param baseData path to file to be read
-     * @param type     type of information, it can be: json|string
+     * @param type     type of information, it can be: json|string|graphql
      * @param charset  charset to use when reading the file
      * @return String string
      * @throws NonReplaceableException the non replaceable exception
@@ -1059,11 +1059,16 @@ public class CommonG {
         ReplacementAspect replacementAspect = new ReplacementAspect();
         std = replacementAspect.replacePlaceholders(std, true);
 
-        if ("json".equals(type)) {
-            result = JsonValue.readHjson(std).asObject().toString();
-        } else {
-            result = std;
+        switch (type) {
+            case "json":
+                result = JsonValue.readHjson(std).asObject().toString();
+                break;
+
+            default:
+                result = std;
+                break;
         }
+
         return result;
     }
 
@@ -1789,6 +1794,13 @@ public class CommonG {
 
     public String updateMarathonJson(String json) {
         return removeJSONPathElement(removeJSONPathElement(removeJSONPathElement(json, ".versionInfo"), ".version"), ".uris.*");
+    }
+
+    public String buildGraphql(String content, String variables) {
+        return new JSONObject()
+                .put("query", content)
+                .put("variables", variables == null ? null : JsonValue.readHjson(variables).asObject())
+                .toString();
     }
 
     public void runCommandLoggerAndEnvVar(int exitStatus, String envVar, Boolean local) {

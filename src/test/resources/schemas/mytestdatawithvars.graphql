@@ -1,0 +1,6 @@
+query ($perPage: Int = 1) {
+    allUsers(perPage: $perPage) {
+        id
+        name
+    }
+}
