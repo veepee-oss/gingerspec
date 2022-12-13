@@ -1,6 +1,6 @@
-Feature: Steps for testing REST APIs
+Feature: Steps for testing APIs
 
-  This feature provides examples on how to use the steps for testing REST APIs. All steps make use of the
+  This feature provides examples on how to use the steps for testing REST or GRAPHQL APIs. All steps make use of the
   library rest-assured in the background
 
 
@@ -39,32 +39,17 @@ Feature: Steps for testing REST APIs
         | headerName | value1 |
       When I send a 'GET' request to '/posts'
 
+
+  Rule: REST APIs Specifying Request Data
+
     Scenario: Adding request body from a file
       Given I send requests to '${REST_SERVER_HOST}:3000'
       When I send a 'POST' request to '/posts' based on 'schemas/mytestdata.json' as 'json'
-
-    Scenario: Adding graphql request body from a file
-      Given I send requests to '${GRAPHQL_SERVER_HOST}:3001'
-      When I send a 'POST' request to '/' based on 'schemas/mytestdata.graphql' as 'graphql'
-
-    Scenario: Adding graphql request body from a file with variables
-      Given I send requests to '${GRAPHQL_SERVER_HOST}:3001'
-      When I send a 'POST' request to '/' based on 'schemas/mytestdatawithvars.graphql' as 'graphql' with variables '{"perPage": 10}'
 
     Scenario: Adding request body from a file but modifying elements of the json before sending
       Given I send requests to '${REST_SERVER_HOST}:3000'
       When I send a 'POST' request to '/posts' based on 'schemas/mytestdata.json' as 'json' with:
         | $.title | UPDATE | This is a test 2 |
-
-    Scenario: Adding request body from a file but modifying elements of the graphql before sending
-      Given I send requests to '${GRAPHQL_SERVER_HOST}:3001'
-      When I send a 'POST' request to '/' based on 'schemas/mytestdata.graphql' as 'graphql' with:
-        | id | UPDATE | name |
-
-    Scenario: Adding request body from a file and variables but modifying elements of the graphql before sending
-      Given I send requests to '${GRAPHQL_SERVER_HOST}:3001'
-      When I send a 'POST' request to '/' based on 'schemas/mytestdatawithvars.graphql' as 'graphql' with variables '{"perPage": 10}' and:
-        | id | UPDATE | name |
 
     Scenario: Adding request body directly in the gherkin step
       Given I send requests to '${REST_SERVER_HOST}:3000'
@@ -87,6 +72,36 @@ Feature: Steps for testing REST APIs
                 "body": "This is a test"
               }
           """
+
+    @ignore
+    Scenario: Sending a file
+      Given I send requests to '${REST_SERVER_HOST}:3000'
+      And I set headers:
+        | Content-Type | multipart/form-data |
+      And I add the file in 'schemas/mytestdata.json' to the request
+      When I send a 'POST' request to '/posts'
+      Then the service response status must be '201'
+
+
+  Rule: GRAPHQL APIs Specifying Request Data
+
+    Scenario: Adding graphql request body from a file
+      Given I send requests to '${GRAPHQL_SERVER_HOST}:3001'
+      When I send a 'POST' request to '/' based on 'schemas/mytestdata.graphql' as 'graphql'
+
+    Scenario: Adding graphql request body from a file with variables
+      Given I send requests to '${GRAPHQL_SERVER_HOST}:3001'
+      When I send a 'POST' request to '/' based on 'schemas/mytestdatawithvars.graphql' as 'graphql' with variables '{"perPage": 10}'
+
+    Scenario: Adding request body from a file but modifying elements of the graphql before sending
+      Given I send requests to '${GRAPHQL_SERVER_HOST}:3001'
+      When I send a 'POST' request to '/' based on 'schemas/mytestdata.graphql' as 'graphql' with:
+        | id | UPDATE | name |
+
+    Scenario: Adding request body from a file and variables but modifying elements of the graphql before sending
+      Given I send requests to '${GRAPHQL_SERVER_HOST}:3001'
+      When I send a 'POST' request to '/' based on 'schemas/mytestdatawithvars.graphql' as 'graphql' with variables '{"perPage": 10}' and:
+        | id | UPDATE | name |
 
     Scenario: Adding graphql request body directly in the gherkin step
       Given I send requests to '${GRAPHQL_SERVER_HOST}:3001'
@@ -111,16 +126,6 @@ Feature: Steps for testing REST APIs
                   }
               }
           """
-
-    @ignore
-    Scenario: Sending a file
-      Given I send requests to '${REST_SERVER_HOST}:3000'
-      And I set headers:
-        | Content-Type | multipart/form-data |
-      And I add the file in 'schemas/mytestdata.json' to the request
-      When I send a 'POST' request to '/posts'
-      Then the service response status must be '201'
-
 
   Rule: Verifying Response Data
 

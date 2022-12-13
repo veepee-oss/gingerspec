@@ -22,7 +22,7 @@ import io.cucumber.testng.CucumberOptions;
 @CucumberOptions(plugin = {
         "com.privalia.qa.cucumber.reporter.gingerHtmlFormatter:target/documentation",
         },
-        features = {"src/test/resources/features/restAssured.feature"},
+        features = {"src/test/resources/features/apiAssured.feature"},
         glue = "com.privalia.qa.specs")
 public class RestAssuredStepsIT extends BaseGTest {
 
