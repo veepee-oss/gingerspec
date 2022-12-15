@@ -525,7 +525,27 @@ public class SeleniumGSpec extends BaseGSpec {
      */
     @Then("^this text exists:$")
     public void assertSeleniumTextInSource(String text) {
-        Assertions.assertThat(commonspec.getDriver().getPageSource().contains(text)).as("The expected text was not found in the page source").isTrue();
+            Assertions.assertThat(commonspec.getDriver().getPageSource()).as("The expected text was not found in the page source").contains(text);
+    }
+
+    /**
+     * Checks if a text exists in the source of an already loaded URL ignoring case.
+     * <pre>{@code
+     * Example:
+     *
+     * Scenario: Verify text exists in page source
+     *      Given I go to 'http:mydummysite/index.html'
+     *      Then this text exists:
+     *      """
+     *      <h1 class="entry-title">Home</h1>
+     *      """
+     * }</pre>
+     *
+     * @param text the text to verify
+     */
+    @Then("^this text exists ignoring case:$")
+    public void assertSeleniumTextInSourceIgnoreCase(String text) {
+        Assertions.assertThat(commonspec.getDriver().getPageSource()).as("The expected text was not found in the page source").containsIgnoringCase(text);
     }
 
     /**

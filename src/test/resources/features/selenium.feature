@@ -71,10 +71,14 @@ Feature: Steps for testing web pages
 
     # Will look for the given text anywhere on the page DOM
     Scenario: Verify text exists in page source
-      Given I go to 'http://${DEMO_SITE_HOST}/styled/index.html'
+      Given I go to 'https://testpages.herokuapp.com/styled/index.html'
       Then this text exists:
             """
            Test Pages For Automating
+           """
+      Then this text exists ignoring case:
+            """
+           TeSt PaGeS FoR AuToMaTiNg
            """
       Then this text does not exist:
             """
