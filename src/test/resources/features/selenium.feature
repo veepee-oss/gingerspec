@@ -59,6 +59,11 @@ Feature: Steps for testing web pages
       And the element with 'id:p1' has 'This is a paragraph text' as text
       And the element with 'name:pName2' index '0' has 'This is b paragraph text' as text
 
+    Scenario: Verify text of an element ignoring case
+      Given I go to 'http://${DEMO_SITE_HOST}/styled/find-by-playground-test.html'
+      And the element with 'id:p1' has 'ThIs Is A pArAgRaPh TeXt' as text ignoring case
+      And the element with 'name:pName2' index '0' has 'ThIs Is B pArAgRaPh TeXt' as text ignoring case
+
     Scenario: Saving the text of an element
       Given I go to 'http://${DEMO_SITE_HOST}/styled/find-by-playground-test.html'
       When I save content of element with 'id:p1' in environment variable 'mytext'

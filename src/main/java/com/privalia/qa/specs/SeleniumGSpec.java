@@ -484,8 +484,8 @@ public class SeleniumGSpec extends BaseGSpec {
      * @param index     Index of the element, in case one or more elements with the given locator are found (first element starts with index 0)
      * @param text      Text to locate
      */
-    @Then("^the element with '(" + LOCATORS + "):(.*?)'( index '(\\d+)')? has '(.*)' as text$")
-    public void assertSeleniumTextOnElementByLocatorPresent(String method, String element, Integer index, String text) {
+    @Then("^the element with '(" + LOCATORS + "):(.*?)'( index '(\\d+)')? has '(.*)' as text( ignoring case)?$")
+    public void assertSeleniumTextOnElementByLocatorPresent(String method, String element, Integer index, String text, String ignoreCase) {
 
         this.assertSeleniumNElementExists("at least", 1, method, element);
         if (index == null) {
@@ -496,8 +496,13 @@ public class SeleniumGSpec extends BaseGSpec {
         Assertions.assertThat(commonspec.getPreviousWebElements().getPreviousWebElements().size()).as("Could not get webelement with index %s. Less elements were found. Allowed index: 0 to %s", index, commonspec.getPreviousWebElements().getPreviousWebElements().size() - 1)
                 .isGreaterThanOrEqualTo(index + 1);
 
-        this.getCommonSpec().getLogger().debug("Checking if text on element with '{}' as '{}' index '{}' has '{}' as text", element, method, index, text);
-        Assertions.assertThat(commonspec.getPreviousWebElements().getPreviousWebElements().get(index).getText()).contains(text);
+        if (ignoreCase == null) {
+            this.getCommonSpec().getLogger().debug("Checking if text on element with '{}' as '{}' index '{}' has '{}' as text", element, method, index, text);
+            Assertions.assertThat(commonspec.getPreviousWebElements().getPreviousWebElements().get(index).getText()).contains(text);
+        } else {
+            this.getCommonSpec().getLogger().debug("Checking if text on element with '{}' as '{}' index '{}' has '{}' as text ignoring case", element, method, index, text);
+            Assertions.assertThat(commonspec.getPreviousWebElements().getPreviousWebElements().get(index).getText()).containsIgnoringCase(text);
+        }
     }
 
 
