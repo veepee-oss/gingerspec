@@ -6,7 +6,7 @@
 		<em>Back to <a href="index.html">Index</a>.</em>
 	</header>
 
-	<title>Steps for testing REST APIs</title>
+	<title>Steps for testing APIs</title>
 
 	<style type="text/css">
 		body {
@@ -145,10 +145,10 @@ pre code {
 </head>
 <body>
 
-	<h1>Steps for testing REST APIs</h1>
+	<h1>Steps for testing APIs</h1>
 
 	<p>
-  This feature provides examples on how to use the steps for testing REST APIs. All steps make use of the
+  This feature provides examples on how to use the steps for testing REST or GRAPHQL APIs. All steps make use of the
   library rest-assured in the background
 
 
@@ -234,6 +234,10 @@ pre code {
 			</code></pre>
 			</div>
 			</ul>
+
+			<hr>
+
+			<li><h2>REST APIs Specifying Request Data</h2></li>
 			<ul>
 			<li><h3>Adding request body from a file</h3></li>
 			<div class="highlight">
@@ -273,6 +277,23 @@ pre code {
 			</div>
 			</ul>
 			<ul>
+			<li><h3>Adding request body directly in the gherkin step as json</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+    Scenario: Adding request body directly in the gherkin step as json
+      Given I send requests to '${REST_SERVER_HOST}:3000'
+      When I send a 'POST' request to '/posts' as 'json' with body
+           """
+              {
+                "userId": 1,
+                "title": "This is a test",
+                "body": "This is a test"
+              }
+          """
+			</code></pre>
+			</div>
+			</ul>
+			<ul>
 			<li><h3>Sending a file</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
@@ -284,6 +305,88 @@ pre code {
       And I add the file in 'schemas/mytestdata.json' to the request
       When I send a 'POST' request to '/posts'
       Then the service response status must be '201'
+			</code></pre>
+			</div>
+			</ul>
+
+			<hr>
+
+			<li><h2>GRAPHQL APIs Specifying Request Data</h2></li>
+			<ul>
+			<li><h3>Adding graphql request body from a file</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+    Scenario: Adding graphql request body from a file
+      Given I send requests to '${GRAPHQL_SERVER_HOST}:3001'
+      When I send a 'POST' request to '/' based on 'schemas/mytestdata.graphql' as 'graphql'
+			</code></pre>
+			</div>
+			</ul>
+			<ul>
+			<li><h3>Adding graphql request body from a file with variables</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+    Scenario: Adding graphql request body from a file with variables
+      Given I send requests to '${GRAPHQL_SERVER_HOST}:3001'
+      When I send a 'POST' request to '/' based on 'schemas/mytestdatawithvars.graphql' as 'graphql' with variables '{"perPage": 10}'
+			</code></pre>
+			</div>
+			</ul>
+			<ul>
+			<li><h3>Adding request body from a file but modifying elements of the graphql before sending</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+    Scenario: Adding request body from a file but modifying elements of the graphql before sending
+      Given I send requests to '${GRAPHQL_SERVER_HOST}:3001'
+      When I send a 'POST' request to '/' based on 'schemas/mytestdata.graphql' as 'graphql' with:
+        | id | UPDATE | name |
+			</code></pre>
+			</div>
+			</ul>
+			<ul>
+			<li><h3>Adding request body from a file and variables but modifying elements of the graphql before sending</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+    Scenario: Adding request body from a file and variables but modifying elements of the graphql before sending
+      Given I send requests to '${GRAPHQL_SERVER_HOST}:3001'
+      When I send a 'POST' request to '/' based on 'schemas/mytestdatawithvars.graphql' as 'graphql' with variables '{"perPage": 10}' and:
+        | id | UPDATE | name |
+			</code></pre>
+			</div>
+			</ul>
+			<ul>
+			<li><h3>Adding graphql request body directly in the gherkin step</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+    Scenario: Adding graphql request body directly in the gherkin step
+      Given I send requests to '${GRAPHQL_SERVER_HOST}:3001'
+      When I send a 'POST' request to '/' as 'graphql' with body
+           """
+              {
+                  allUsers(perPage: 10) {
+                      id
+                      name
+                  }
+              }
+          """
+			</code></pre>
+			</div>
+			</ul>
+			<ul>
+			<li><h3>Adding graphql request body and variables directly in the gherkin step</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+    Scenario: Adding graphql request body and variables directly in the gherkin step
+      Given I send requests to '${GRAPHQL_SERVER_HOST}:3001'
+      When I send a 'POST' request to '/' as 'graphql' with variables '{"perPage": 10}' and body
+           """
+              query ($perPage: Int = 1) {
+                  allUsers(perPage: $perPage) {
+                      id
+                      name
+                  }
+              }
+          """
 			</code></pre>
 			</div>
 			</ul>
