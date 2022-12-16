@@ -273,6 +273,17 @@ pre code {
 			</div>
 			</ul>
 			<ul>
+			<li><h3>Verify text of an element ignoring case</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+    Scenario: Verify text of an element ignoring case
+      Given I go to 'http://${DEMO_SITE_HOST}/styled/find-by-playground-test.html'
+      And the element with 'id:p1' has 'ThIs Is A pArAgRaPh TeXt' as text ignoring case
+      And the element with 'name:pName2' index '0' has 'ThIs Is B pArAgRaPh TeXt' as text ignoring case
+			</code></pre>
+			</div>
+			</ul>
+			<ul>
 			<li><h3>Saving the text of an element</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
@@ -293,6 +304,10 @@ pre code {
       Then this text exists:
             """
            Test Pages For Automating
+           """
+      Then this text exists ignoring case:
+            """
+           TeSt PaGeS FoR AuToMaTiNg
            """
       Then this text does not exist:
             """
