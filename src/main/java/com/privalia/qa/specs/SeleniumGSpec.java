@@ -479,10 +479,11 @@ public class SeleniumGSpec extends BaseGSpec {
      *      And the element with 'class:form-label' index '1' has 'Email' as text
      * }</pre>
      *
-     * @param method    Method to use to locate the web element (id, name, class, etc)
-     * @param element   The relative reference to the element
-     * @param index     Index of the element, in case one or more elements with the given locator are found (first element starts with index 0)
-     * @param text      Text to locate
+     * @param method        Method to use to locate the web element (id, name, class, etc)
+     * @param element       The relative reference to the element
+     * @param index         Index of the element, in case one or more elements with the given locator are found (first element starts with index 0)
+     * @param text          Text to locate
+     * @param ignoreCase    Whether to ignore case or not when checking the text
      */
     @Then("^the element with '(" + LOCATORS + "):(.*?)'( index '(\\d+)')? has '(.*)' as text( ignoring case)?$")
     public void assertSeleniumTextOnElementByLocatorPresent(String method, String element, Integer index, String text, String ignoreCase) {
@@ -525,7 +526,7 @@ public class SeleniumGSpec extends BaseGSpec {
      */
     @Then("^this text exists:$")
     public void assertSeleniumTextInSource(String text) {
-            Assertions.assertThat(commonspec.getDriver().getPageSource()).as("The expected text was not found in the page source").contains(text);
+        Assertions.assertThat(commonspec.getDriver().getPageSource()).as("The expected text was not found in the page source").contains(text);
     }
 
     /**
