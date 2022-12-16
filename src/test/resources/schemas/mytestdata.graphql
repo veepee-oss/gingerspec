@@ -1,0 +1,5 @@
+{
+    allUsers(perPage: 10) {
+        id
+    }
+}

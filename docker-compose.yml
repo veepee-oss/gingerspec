@@ -13,6 +13,7 @@
 # * 5432 (postgres)
 # * 8123 (clickhouse)
 # * 3000 (Rest API server)
+# * 3001 (GraphQL server)
 # * 80   (Demo site)
 # * 4444 (Selenium hub)
 # * 5900 (Selenium node)
@@ -58,6 +59,10 @@ services:
     image: 'privaliatech/privalia-rest-server:0.1.0'
     ports:
       - "3000:3000"
+  graphql-server:
+    image: 'dmamontov/gingerspec-graphql:1.0'
+    ports:
+      - "3001:3000"
   demo-site:
     image: 'josefd8/selenium-testpages-image:1.0'
     ports:
