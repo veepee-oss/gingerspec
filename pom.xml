@@ -468,7 +468,12 @@
                 <version>3.0.0-M3</version>
                 <configuration>
                     <argLine>
-                         -javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/${aspectjweaver.version}/aspectjweaver-${aspectjweaver.version}.jar
+                        -javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/${aspectjweaver.version}/aspectjweaver-${aspectjweaver.version}.jar
+<!--                        Uncomment if using AdoptOpenJDK-->
+<!--                        &#45;&#45;add-opens java.base/java.lang=ALL-UNNAMED-->
+<!--                        &#45;&#45;add-opens java.base/java.io=ALL-UNNAMED-->
+<!--                        &#45;&#45;add-opens java.base/java.util=ALL-UNNAMED-->
+<!--                        &#45;&#45;add-opens java.base/java.base=ALL-UNNAMED-->
                     </argLine>
                     <reportsDirectory>${project.build.directory}/failsafe-reports</reportsDirectory>
                 </configuration>

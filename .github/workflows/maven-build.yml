@@ -35,6 +35,10 @@ jobs:
         image: privaliatech/privalia-rest-server:0.1.0
         ports:
         - 3000:3000
+      graphql-server:
+        image: dmamontov/gingerspec-graphql:1.0
+        ports:
+        - 3001:3000
       demo-site:
         image: josefd8/selenium-testpages-image:1.0
         ports:
@@ -63,7 +67,7 @@ jobs:
         restore-keys: |
             ${{ runner.os }}-maven-
     - name: Building with Maven
-      run: mvn clean install -DVERSION=1.0 -DSLEEPTEST=3 -DAGENT_LIST=1,2 -DVARNAME=foo -DWAIT=1 -DPOSTGRES_HOST=localhost -DMYSQL_HOST=localhost -DCLICKHOUSE_HOST=localhost -DREST_SERVER_HOST=localhost -DDEMO_SITE_HOST=demo-site:4567 -DSELENIUM_GRID=http://localhost:4444/wd/hub -DZOOKEEPER_HOST=localhost -DSCHEMA_REGISTRY_HOST=localhost
+      run: mvn clean install -DVERSION=1.0 -DSLEEPTEST=3 -DAGENT_LIST=1,2 -DVARNAME=foo -DWAIT=1 -DPOSTGRES_HOST=localhost -DMYSQL_HOST=localhost -DCLICKHOUSE_HOST=localhost -DREST_SERVER_HOST=localhost -DGRAPHQL_SERVER_HOST=localhost -DDEMO_SITE_HOST=demo-site:4567 -DSELENIUM_GRID=http://localhost:4444/wd/hub -DZOOKEEPER_HOST=localhost -DSCHEMA_REGISTRY_HOST=localhost
 
     - name: Publish pages
       uses: JamesIves/github-pages-deploy-action@v4.4.1
