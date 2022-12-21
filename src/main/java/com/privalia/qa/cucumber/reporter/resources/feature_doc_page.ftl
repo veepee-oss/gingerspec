@@ -33,7 +33,18 @@
 			<ul>
 			<li><h3>${k1}</h3></li>
 			<div class="highlight">
-			<pre><code class="language-gherkin">${v1}
+			<pre><code class="language-gherkin">
+			${v1
+			?replace("Scenario: ", "<span class=\"gherkin-keyword\">Scenario: </span>")
+			?replace("Scenario Outline: ", "<span class=\"gherkin-keyword\">Scenario Outline: </span>")
+			?replace("Given ", "<span class=\"gherkin-keyword\">Given </span>")
+			?replace("When ", "<span class=\"gherkin-keyword\">When </span>")
+			?replace("Then ", "<span class=\"gherkin-keyword\">Then </span>")
+			?replace("And ", "<span class=\"gherkin-keyword\">And </span>")
+			?replace("But ", "<span class=\"gherkin-keyword\">But </span>")
+			?replace("Examples:", "<span class=\"gherkin-keyword\">Examples:</span>")
+			?replace("|", "<span class=\"gherkin-keyword\">|</span>")
+			}
 			</code></pre>
 			</div>
 			</ul>

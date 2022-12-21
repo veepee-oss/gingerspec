@@ -35,16 +35,29 @@ h3 {
 }
 
 pre code {
-    background-color: #eee;
+    background-color: #2b2b2b;
+    color: #9ba8b6;
     display: block;
     padding: 16px;
     overflow: auto;
     border-radius: 6px;
     font-family: ui-monospace,SFMono-Regular,SF Mono,Menlo,Consolas,Liberation Mono,monospace;
-    font-size: 85%;
+    font-size: 90%;
     border-style: solid;
     border-width: 1px;
     border-color: darkgray;
+}
+
+.gherkin-keyword {
+    color: #c47432;
+}
+
+gherkin-tag {
+    color: #aca729;
+}
+
+.highlight-wrapper {
+    display: block;
 }
 
 .highlight-wrapper {
