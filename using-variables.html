@@ -46,16 +46,29 @@ h3 {
 }
 
 pre code {
-    background-color: #eee;
+    background-color: #2b2b2b;
+    color: #9ba8b6;
     display: block;
     padding: 16px;
     overflow: auto;
     border-radius: 6px;
     font-family: ui-monospace,SFMono-Regular,SF Mono,Menlo,Consolas,Liberation Mono,monospace;
-    font-size: 85%;
+    font-size: 90%;
     border-style: solid;
     border-width: 1px;
     border-color: darkgray;
+}
+
+.gherkin-keyword {
+    color: #c47432;
+}
+
+gherkin-tag {
+    color: #aca729;
+}
+
+.highlight-wrapper {
+    display: block;
 }
 
 .highlight-wrapper {
@@ -173,9 +186,10 @@ pre code {
 			<li><h3>Replacements scenario title and log comments. 1.0</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Replacements scenario title and log comments. 1.0
+			
+    <span class="gherkin-keyword">Scenario: </span>Replacements scenario title and log comments. 1.0
       #log The value of VERSION in the title should be ${VERSION}
-      And I wait '1' seconds
+      <span class="gherkin-keyword">And </span>I wait '1' seconds
 			</code></pre>
 			</div>
 			</ul>
@@ -183,8 +197,9 @@ pre code {
 			<li><h3>Simplest read {} on scenario name</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Simplest read {} on scenario name
-      Given I run 'ls' locally
+			
+    <span class="gherkin-keyword">Scenario: </span>Simplest read {} on scenario name
+      <span class="gherkin-keyword">Given </span>I run 'ls' locally
 			</code></pre>
 			</div>
 			</ul>
@@ -192,11 +207,12 @@ pre code {
 			<li><h3>Replacements in datatables</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Replacements in datatables
-      Given this is a datatable:
-        | $.title  | contains  | ${faker:number.number_between '1','10'}    |
-        | $.body   | contains  | This is a test: ${envProperties:wait.time} |
-        | $.userId | not equal | ${VERSION}                                 |
+			
+    <span class="gherkin-keyword">Scenario: </span>Replacements in datatables
+      <span class="gherkin-keyword">Given </span>this is a datatable:
+        <span class="gherkin-keyword">|</span> $.title  <span class="gherkin-keyword">|</span> contains  <span class="gherkin-keyword">|</span> ${faker:number.number_between '1','10'}    <span class="gherkin-keyword">|</span>
+        <span class="gherkin-keyword">|</span> $.body   <span class="gherkin-keyword">|</span> contains  <span class="gherkin-keyword">|</span> This is a test: ${envProperties:wait.time} <span class="gherkin-keyword">|</span>
+        <span class="gherkin-keyword">|</span> $.userId <span class="gherkin-keyword">|</span> not equal <span class="gherkin-keyword">|</span> ${VERSION}                                 <span class="gherkin-keyword">|</span>
 			</code></pre>
 			</div>
 			</ul>
@@ -204,8 +220,9 @@ pre code {
 			<li><h3>Replacements in a DocString</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Replacements in a DocString
-      Given This is a DocString
+			
+    <span class="gherkin-keyword">Scenario: </span>Replacements in a DocString
+      <span class="gherkin-keyword">Given </span>This is a DocString
         """
             {
               "userId": ${faker:number.number_between '1','10'},
@@ -225,10 +242,11 @@ pre code {
 			<li><h3>Saving and replacing local variables</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Saving and replacing local variables
-      Given I save '2' in variable 'MY_LOCAL_VAR'
-      Then '${MY_LOCAL_VAR}' is '2'
-      And I wait '${MY_LOCAL_VAR}' seconds
+			
+    <span class="gherkin-keyword">Scenario: </span>Saving and replacing local variables
+      <span class="gherkin-keyword">Given </span>I save '2' in variable 'MY_LOCAL_VAR'
+      <span class="gherkin-keyword">Then </span>'${MY_LOCAL_VAR}' is '2'
+      <span class="gherkin-keyword">And </span>I wait '${MY_LOCAL_VAR}' seconds
 			</code></pre>
 			</div>
 			</ul>
@@ -236,18 +254,19 @@ pre code {
 			<li><h3>Replacements in an scenario outline</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario Outline: Replacements in an scenario outline
-      Given I save '2' in variable 'SO_ENV_VAR'
-      And I wait '${SO_ENV_VAR}' seconds
-      And I wait '${SO_ENV_VAR}' seconds
-      And I wait '<other>' seconds
-      And I wait '${envProperties:wait.time}' seconds
-      And I wait '${envProperties:wait.time}' seconds
+			
+    <span class="gherkin-keyword">Scenario Outline: </span>Replacements in an scenario outline
+      <span class="gherkin-keyword">Given </span>I save '2' in variable 'SO_ENV_VAR'
+      <span class="gherkin-keyword">And </span>I wait '${SO_ENV_VAR}' seconds
+      <span class="gherkin-keyword">And </span>I wait '${SO_ENV_VAR}' seconds
+      <span class="gherkin-keyword">And </span>I wait '<other>' seconds
+      <span class="gherkin-keyword">And </span>I wait '${envProperties:wait.time}' seconds
+      <span class="gherkin-keyword">And </span>I wait '${envProperties:wait.time}' seconds
 
-      Examples:
-        | other                      |
-        | 1                          |
-        | ${envProperties:wait.time} |
+      <span class="gherkin-keyword">Examples:</span>
+        <span class="gherkin-keyword">|</span> other                      <span class="gherkin-keyword">|</span>
+        <span class="gherkin-keyword">|</span> 1                          <span class="gherkin-keyword">|</span>
+        <span class="gherkin-keyword">|</span> ${envProperties:wait.time} <span class="gherkin-keyword">|</span>
 			</code></pre>
 			</div>
 			</ul>
@@ -259,8 +278,9 @@ pre code {
 			<li><h3>Passing a variable via CLI using -DVERSION=1.0</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Passing a variable via CLI using -DVERSION=1.0
-      Then '${VERSION}' is '1.0'
+			
+    <span class="gherkin-keyword">Scenario: </span>Passing a variable via CLI using -DVERSION=1.0
+      <span class="gherkin-keyword">Then </span>'${VERSION}' is '1.0'
 			</code></pre>
 			</div>
 			</ul>
@@ -272,8 +292,9 @@ pre code {
 			<li><h3>Using a default value when the variable is not found</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Using a default value when the variable is not found
-      Then '${INVALID:-bb}' matches 'bb'
+			
+    <span class="gherkin-keyword">Scenario: </span>Using a default value when the variable is not found
+      <span class="gherkin-keyword">Then </span>'${INVALID:-bb}' matches 'bb'
 			</code></pre>
 			</div>
 			</ul>
@@ -285,11 +306,12 @@ pre code {
 			<li><h3>Using default interpolators (this is just a short sample, there are many more)</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Using default interpolators (this is just a short sample, there are many more)
-      Then '${base64Encoder:HelloWorld!}' matches 'SGVsbG9Xb3JsZCE='
-      Then '${const:java.awt.event.KeyEvent.VK_ESCAPE}' matches '27'
-      Then '${date:yyyy-MM-dd}' contains '-'
-      Then '${properties:src/test/resources/configuration/common.properties::wait.time}' matches '1'
+			
+    <span class="gherkin-keyword">Scenario: </span>Using default interpolators (this is just a short sample, there are many more)
+      <span class="gherkin-keyword">Then </span>'${base64Encoder:HelloWorld!}' matches 'SGVsbG9Xb3JsZCE='
+      <span class="gherkin-keyword">Then </span>'${const:java.awt.event.KeyEvent.VK_ESCAPE}' matches '27'
+      <span class="gherkin-keyword">Then </span>'${date:yyyy-MM-dd}' contains '-'
+      <span class="gherkin-keyword">Then </span>'${properties:src/test/resources/configuration/common.properties::wait.time}' matches '1'
 			</code></pre>
 			</div>
 			</ul>
@@ -297,9 +319,10 @@ pre code {
 			<li><h3>Changing variables value to upper or lower case</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Changing variables value to upper or lower case
-      Then '${toUpperCase:${VARNAME}}' matches 'FOO'
-      Then '${toLowerCase:${VARNAME}}' matches 'foo'
+			
+    <span class="gherkin-keyword">Scenario: </span>Changing variables value to upper or lower case
+      <span class="gherkin-keyword">Then </span>'${toUpperCase:${VARNAME}}' matches 'FOO'
+      <span class="gherkin-keyword">Then </span>'${toLowerCase:${VARNAME}}' matches 'foo'
 			</code></pre>
 			</div>
 			</ul>
@@ -311,10 +334,11 @@ pre code {
 			<li><h3>use a variable inside an interpolator</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: use a variable inside an interpolator
-      Given I save 'Foo' in variable 'VARNAME'
-      Then '${toUpperCase:${VARNAME}}' matches 'FOO'
-      Then '${toLowerCase:${VARNAME}}' matches 'foo'
+			
+    <span class="gherkin-keyword">Scenario: </span>use a variable inside an interpolator
+      <span class="gherkin-keyword">Given </span>I save 'Foo' in variable 'VARNAME'
+      <span class="gherkin-keyword">Then </span>'${toUpperCase:${VARNAME}}' matches 'FOO'
+      <span class="gherkin-keyword">Then </span>'${toLowerCase:${VARNAME}}' matches 'foo'
 			</code></pre>
 			</div>
 			</ul>
@@ -326,10 +350,11 @@ pre code {
 			<li><h3>Using variables from one properties file or another</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Using variables from one properties file or another
-      Then '${envProperties:wait.time}' matches '1'
-      Given I save 'pre' in variable 'env'
-      Then '${envProperties:wait.time}' matches '2'
+			
+    <span class="gherkin-keyword">Scenario: </span>Using variables from one properties file or another
+      <span class="gherkin-keyword">Then </span>'${envProperties:wait.time}' matches '1'
+      <span class="gherkin-keyword">Given </span>I save 'pre' in variable 'env'
+      <span class="gherkin-keyword">Then </span>'${envProperties:wait.time}' matches '2'
 			</code></pre>
 			</div>
 			</ul>
@@ -341,13 +366,14 @@ pre code {
 			<li><h3>Using the faker library</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Using the faker library
-      Given I save '${faker:number.number_between '1','10'}' in variable 'RANDOM_NUMBER'
-      Then '${RANDOM_NUMBER}' is higher than '0'
-      And '${RANDOM_NUMBER}' is lower than '11'
-      Given I save '${faker:Internet.emailAddress}' in variable 'RANDOM_EMAIL'
-      Then '${RANDOM_EMAIL}' contains '@'
-      Given I save '${faker:Name.first_name}' in variable 'RANDOM_NAME'
+			
+    <span class="gherkin-keyword">Scenario: </span>Using the faker library
+      <span class="gherkin-keyword">Given </span>I save '${faker:number.number_between '1','10'}' in variable 'RANDOM_NUMBER'
+      <span class="gherkin-keyword">Then </span>'${RANDOM_NUMBER}' is higher than '0'
+      <span class="gherkin-keyword">And </span>'${RANDOM_NUMBER}' is lower than '11'
+      <span class="gherkin-keyword">Given </span>I save '${faker:Internet.emailAddress}' in variable 'RANDOM_EMAIL'
+      <span class="gherkin-keyword">Then </span>'${RANDOM_EMAIL}' contains '@'
+      <span class="gherkin-keyword">Given </span>I save '${faker:Name.first_name}' in variable 'RANDOM_NAME'
 			</code></pre>
 			</div>
 			</ul>
@@ -359,10 +385,11 @@ pre code {
 			<li><h3>Doing a simple calculation</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Doing a simple calculation
-      Given I save '2' in variable 'X'
-      Given I save '2' in variable 'Y'
-      Given '${math:${X} + ${Y}}' is '4.0'
+			
+    <span class="gherkin-keyword">Scenario: </span>Doing a simple calculation
+      <span class="gherkin-keyword">Given </span>I save '2' in variable 'X'
+      <span class="gherkin-keyword">Given </span>I save '2' in variable 'Y'
+      <span class="gherkin-keyword">Given </span>'${math:${X} + ${Y}}' is '4.0'
 			</code></pre>
 			</div>
 			</ul>
@@ -370,8 +397,9 @@ pre code {
 			<li><h3>Doing an advanced calculation</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Doing an advanced calculation
-      Given '${math:3 * sin(90) - 2 / (5 - 2)}' is '2.015323324135007'
+			
+    <span class="gherkin-keyword">Scenario: </span>Doing an advanced calculation
+      <span class="gherkin-keyword">Given </span>'${math:3 * sin(90) - 2 / (5 - 2)}' is '2.015323324135007'
 			</code></pre>
 			</div>
 			</ul>
@@ -383,14 +411,15 @@ pre code {
 			<li><h3>With scenarios outlines in examples table</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario Outline: With scenarios outlines in examples table
-      Given I save '<file>' in variable 'VAR'
-      Then I run '[ "${VAR}" = "<content>" ]' locally
+			
+    <span class="gherkin-keyword">Scenario Outline: </span>With scenarios outlines in examples table
+      <span class="gherkin-keyword">Given </span>I save '<file>' in variable 'VAR'
+      <span class="gherkin-keyword">Then </span>I run '[ "${VAR}" = "<content>" ]' locally
 
-      Examples:
-        | content     | file                                                  |
-        | {}          | ${file:UTF-8:src/test/resources/schemas/simple0.json} |
-        | {"a": true} | ${file:UTF-8:src/test/resources/schemas/simple1.json} |
+      <span class="gherkin-keyword">Examples:</span>
+        <span class="gherkin-keyword">|</span> content     <span class="gherkin-keyword">|</span> file                                                  <span class="gherkin-keyword">|</span>
+        <span class="gherkin-keyword">|</span> {}          <span class="gherkin-keyword">|</span> ${file:UTF-8:src/test/resources/schemas/simple0.json} <span class="gherkin-keyword">|</span>
+        <span class="gherkin-keyword">|</span> {"a": true} <span class="gherkin-keyword">|</span> ${file:UTF-8:src/test/resources/schemas/simple1.json} <span class="gherkin-keyword">|</span>
 			</code></pre>
 			</div>
 			</ul>
@@ -398,15 +427,16 @@ pre code {
 			<li><h3>With scenarios outlines and datatables</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario Outline: With scenarios outlines and datatables
-      Given I create file 'testSOATtag.json' based on 'schemas/simple1.json' as 'json' with:
-        | $.a | REPLACE | <file> | object |
-      Given I save '${file:UTF-8:target/test-classes/testSOATtag.json}' in variable 'VAR'
-      Then I run '[ "${VAR}" = "<content>" ]' locally
+			
+    <span class="gherkin-keyword">Scenario Outline: </span>With scenarios outlines and datatables
+      <span class="gherkin-keyword">Given </span>I create file 'testSOATtag.json' based on 'schemas/simple1.json' as 'json' with:
+        <span class="gherkin-keyword">|</span> $.a <span class="gherkin-keyword">|</span> REPLACE <span class="gherkin-keyword">|</span> <file> <span class="gherkin-keyword">|</span> object <span class="gherkin-keyword">|</span>
+      <span class="gherkin-keyword">Given </span>I save '${file:UTF-8:target/test-classes/testSOATtag.json}' in variable 'VAR'
+      <span class="gherkin-keyword">Then </span>I run '[ "${VAR}" = "<content>" ]' locally
 
-      Examples:
-        | content  | file                                                |
-        | {"a":{}} | ${file:UTF-8:src/test/resources/schemas/empty.json} |
+      <span class="gherkin-keyword">Examples:</span>
+        <span class="gherkin-keyword">|</span> content  <span class="gherkin-keyword">|</span> file                                                <span class="gherkin-keyword">|</span>
+        <span class="gherkin-keyword">|</span> {"a":{}} <span class="gherkin-keyword">|</span> ${file:UTF-8:src/test/resources/schemas/empty.json} <span class="gherkin-keyword">|</span>
 			</code></pre>
 			</div>
 			</ul>
@@ -414,19 +444,20 @@ pre code {
 			<li><h3>With scenarios outlines and datatables2</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario Outline: With scenarios outlines and datatables2
-      Given I run 'ls' locally
-      Given I create file 'testSOATtag.json' based on 'schemas/simple1.json' as 'json' with:
-        | $.a     | REPLACE | ${file:UTF-8:src/test/resources/schemas/<file>.json} | object |
-        | b       | ADD     | ${WAIT}                                              | N/A    |
-        | ${WAIT} | ADD     | ${file:UTF-8:src/test/resources/schemas/<file>.json} | object |
-      Given I save '${file:UTF-8:target/test-classes/testSOATtag.json}' in variable 'VAR'
-      Then I run '[ "${VAR}" = "<content>" ]' locally
+			
+    <span class="gherkin-keyword">Scenario Outline: </span>With scenarios outlines and datatables2
+      <span class="gherkin-keyword">Given </span>I run 'ls' locally
+      <span class="gherkin-keyword">Given </span>I create file 'testSOATtag.json' based on 'schemas/simple1.json' as 'json' with:
+        <span class="gherkin-keyword">|</span> $.a     <span class="gherkin-keyword">|</span> REPLACE <span class="gherkin-keyword">|</span> ${file:UTF-8:src/test/resources/schemas/<file>.json} <span class="gherkin-keyword">|</span> object <span class="gherkin-keyword">|</span>
+        <span class="gherkin-keyword">|</span> b       <span class="gherkin-keyword">|</span> ADD     <span class="gherkin-keyword">|</span> ${WAIT}                                              <span class="gherkin-keyword">|</span> N/A    <span class="gherkin-keyword">|</span>
+        <span class="gherkin-keyword">|</span> ${WAIT} <span class="gherkin-keyword">|</span> ADD     <span class="gherkin-keyword">|</span> ${file:UTF-8:src/test/resources/schemas/<file>.json} <span class="gherkin-keyword">|</span> object <span class="gherkin-keyword">|</span>
+      <span class="gherkin-keyword">Given </span>I save '${file:UTF-8:target/test-classes/testSOATtag.json}' in variable 'VAR'
+      <span class="gherkin-keyword">Then </span>I run '[ "${VAR}" = "<content>" ]' locally
 
-      Examples:
-        | content                 | file    |
-        | {"a":{},"1":{},"b":"1"} | empty   |
-        | {"a":{},"1":{},"b":"1"} | simple0 |
+      <span class="gherkin-keyword">Examples:</span>
+        <span class="gherkin-keyword">|</span> content                 <span class="gherkin-keyword">|</span> file    <span class="gherkin-keyword">|</span>
+        <span class="gherkin-keyword">|</span> {"a":{},"1":{},"b":"1"} <span class="gherkin-keyword">|</span> empty   <span class="gherkin-keyword">|</span>
+        <span class="gherkin-keyword">|</span> {"a":{},"1":{},"b":"1"} <span class="gherkin-keyword">|</span> simple0 <span class="gherkin-keyword">|</span>
 			</code></pre>
 			</div>
 			</ul>
@@ -434,12 +465,13 @@ pre code {
 			<li><h3>Reading a file and saving it in a variable</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Reading a file and saving it in a variable
-      Given I save '${file:UTF-8:src/test/resources/schemas/empty.json}' in variable 'VAR'
-      Then I run '[ "${VAR}" = "{}" ]' locally
+			
+    <span class="gherkin-keyword">Scenario: </span>Reading a file and saving it in a variable
+      <span class="gherkin-keyword">Given </span>I save '${file:UTF-8:src/test/resources/schemas/empty.json}' in variable 'VAR'
+      <span class="gherkin-keyword">Then </span>I run '[ "${VAR}" = "{}" ]' locally
       #log The same operation can be done with $variables
-      Given I save '${file:UTF-8:src/test/resources/schemas/empty.json}' in variable 'VAR'
-      Then I run '[ "${VAR}" = "{}" ]' locally
+      <span class="gherkin-keyword">Given </span>I save '${file:UTF-8:src/test/resources/schemas/empty.json}' in variable 'VAR'
+      <span class="gherkin-keyword">Then </span>I run '[ "${VAR}" = "{}" ]' locally
 			</code></pre>
 			</div>
 			</ul>

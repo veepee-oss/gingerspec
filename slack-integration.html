@@ -46,16 +46,29 @@ h3 {
 }
 
 pre code {
-    background-color: #eee;
+    background-color: #2b2b2b;
+    color: #9ba8b6;
     display: block;
     padding: 16px;
     overflow: auto;
     border-radius: 6px;
     font-family: ui-monospace,SFMono-Regular,SF Mono,Menlo,Consolas,Liberation Mono,monospace;
-    font-size: 85%;
+    font-size: 90%;
     border-style: solid;
     border-width: 1px;
     border-color: darkgray;
+}
+
+.gherkin-keyword {
+    color: #c47432;
+}
+
+gherkin-tag {
+    color: #aca729;
+}
+
+.highlight-wrapper {
+    display: block;
 }
 
 .highlight-wrapper {
@@ -170,10 +183,11 @@ pre code {
 			<li><h3>Using the slack tag with one channel</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
+			
     # This will send a notification message to qms-notifications channel if the scenario fails
     @slack[#qms-notifications]
-    Scenario: Using the slack tag with one channel
-      Then 'a' matches 'b'
+    <span class="gherkin-keyword">Scenario: </span>Using the slack tag with one channel
+      <span class="gherkin-keyword">Then </span>'a' matches 'b'
 			</code></pre>
 			</div>
 			</ul>
@@ -181,10 +195,11 @@ pre code {
 			<li><h3>Using the slack tag with more than one channel</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
+			
       # This will send a notification message to qms-notifications and o1-e2e-test-report channel if the scenario fails
     @slack[#qms-notifications,#o1-e2e-test-report]
-    Scenario: Using the slack tag with more than one channel
-      Then 'a' matches 'b'
+    <span class="gherkin-keyword">Scenario: </span>Using the slack tag with more than one channel
+      <span class="gherkin-keyword">Then </span>'a' matches 'b'
 			</code></pre>
 			</div>
 			</ul>
@@ -196,9 +211,10 @@ pre code {
 			<li><h3>Sending message to a slack channel</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Sending message to a slack channel
-      Given I save 'GingerSpec' in variable 'FRAMEWORK'
-      Given I send a message to the slack channel '#qms-notifications' with text
+			
+    <span class="gherkin-keyword">Scenario: </span>Sending message to a slack channel
+      <span class="gherkin-keyword">Given </span>I save 'GingerSpec' in variable 'FRAMEWORK'
+      <span class="gherkin-keyword">Given </span>I send a message to the slack channel '#qms-notifications' with text
       """
       :wave: Hello! You can send any type of text to a given slack channel.
       You can even send variables created during your steps

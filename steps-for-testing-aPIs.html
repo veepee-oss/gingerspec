@@ -46,16 +46,29 @@ h3 {
 }
 
 pre code {
-    background-color: #eee;
+    background-color: #2b2b2b;
+    color: #9ba8b6;
     display: block;
     padding: 16px;
     overflow: auto;
     border-radius: 6px;
     font-family: ui-monospace,SFMono-Regular,SF Mono,Menlo,Consolas,Liberation Mono,monospace;
-    font-size: 85%;
+    font-size: 90%;
     border-style: solid;
     border-width: 1px;
     border-color: darkgray;
+}
+
+.gherkin-keyword {
+    color: #c47432;
+}
+
+gherkin-tag {
+    color: #aca729;
+}
+
+.highlight-wrapper {
+    display: block;
 }
 
 .highlight-wrapper {
@@ -168,8 +181,9 @@ pre code {
 			<li><h3>Setting up base URI for future requests using http</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Setting up base URI for future requests using http
-      Given I send requests to '${REST_SERVER_HOST}:3000'
+			
+    <span class="gherkin-keyword">Scenario: </span>Setting up base URI for future requests using http
+      <span class="gherkin-keyword">Given </span>I send requests to '${REST_SERVER_HOST}:3000'
 			</code></pre>
 			</div>
 			</ul>
@@ -177,8 +191,9 @@ pre code {
 			<li><h3>Setting up base URI for future requests using https</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Setting up base URI for future requests using https
-      Given I securely send requests to '${REST_SERVER_HOST}:3000'
+			
+    <span class="gherkin-keyword">Scenario: </span>Setting up base URI for future requests using https
+      <span class="gherkin-keyword">Given </span>I securely send requests to '${REST_SERVER_HOST}:3000'
 			</code></pre>
 			</div>
 			</ul>
@@ -190,9 +205,10 @@ pre code {
 			<li><h3>Invoking HTTP resources (GET, POST, DELETE, PATCH, UPDATE)</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Invoking HTTP resources (GET, POST, DELETE, PATCH, UPDATE)
-      Given I send requests to '${REST_SERVER_HOST}:3000'
-      When I send a 'GET' request to '/posts'
+			
+    <span class="gherkin-keyword">Scenario: </span>Invoking HTTP resources (GET, POST, DELETE, PATCH, UPDATE)
+      <span class="gherkin-keyword">Given </span>I send requests to '${REST_SERVER_HOST}:3000'
+      <span class="gherkin-keyword">When </span>I send a 'GET' request to '/posts'
 			</code></pre>
 			</div>
 			</ul>
@@ -200,11 +216,12 @@ pre code {
 			<li><h3>Adding URL parameters (i.e /posts?userId=3)</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Adding URL parameters (i.e /posts?userId=3)
-      Given I send requests to '${REST_SERVER_HOST}:3000'
-      Given I set url parameters:
-        | userId | 3 |
-      When I send a 'GET' request to '/posts'
+			
+    <span class="gherkin-keyword">Scenario: </span>Adding URL parameters (i.e /posts?userId=3)
+      <span class="gherkin-keyword">Given </span>I send requests to '${REST_SERVER_HOST}:3000'
+      <span class="gherkin-keyword">Given </span>I set url parameters:
+        <span class="gherkin-keyword">|</span> userId <span class="gherkin-keyword">|</span> 3 <span class="gherkin-keyword">|</span>
+      <span class="gherkin-keyword">When </span>I send a 'GET' request to '/posts'
 			</code></pre>
 			</div>
 			</ul>
@@ -212,12 +229,13 @@ pre code {
 			<li><h3>Adding cookies</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
+			
     @ignore
-    Scenario: Adding cookies
-      Given I send requests to '${REST_SERVER_HOST}:3000'
-      Given I set cookies:
-        | cookieName | value1 |
-      When I send a 'GET' request to '/posts'
+    <span class="gherkin-keyword">Scenario: </span>Adding cookies
+      <span class="gherkin-keyword">Given </span>I send requests to '${REST_SERVER_HOST}:3000'
+      <span class="gherkin-keyword">Given </span>I set cookies:
+        <span class="gherkin-keyword">|</span> cookieName <span class="gherkin-keyword">|</span> value1 <span class="gherkin-keyword">|</span>
+      <span class="gherkin-keyword">When </span>I send a 'GET' request to '/posts'
 			</code></pre>
 			</div>
 			</ul>
@@ -225,12 +243,13 @@ pre code {
 			<li><h3>Adding headers</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
+			
     @ignore
-    Scenario: Adding headers
-      Given I send requests to '${REST_SERVER_HOST}:3000'
-      Given I set headers:
-        | headerName | value1 |
-      When I send a 'GET' request to '/posts'
+    <span class="gherkin-keyword">Scenario: </span>Adding headers
+      <span class="gherkin-keyword">Given </span>I send requests to '${REST_SERVER_HOST}:3000'
+      <span class="gherkin-keyword">Given </span>I set headers:
+        <span class="gherkin-keyword">|</span> headerName <span class="gherkin-keyword">|</span> value1 <span class="gherkin-keyword">|</span>
+      <span class="gherkin-keyword">When </span>I send a 'GET' request to '/posts'
 			</code></pre>
 			</div>
 			</ul>
@@ -242,9 +261,10 @@ pre code {
 			<li><h3>Adding request body from a file</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Adding request body from a file
-      Given I send requests to '${REST_SERVER_HOST}:3000'
-      When I send a 'POST' request to '/posts' based on 'schemas/mytestdata.json' as 'json'
+			
+    <span class="gherkin-keyword">Scenario: </span>Adding request body from a file
+      <span class="gherkin-keyword">Given </span>I send requests to '${REST_SERVER_HOST}:3000'
+      <span class="gherkin-keyword">When </span>I send a 'POST' request to '/posts' based on 'schemas/mytestdata.json' as 'json'
 			</code></pre>
 			</div>
 			</ul>
@@ -252,10 +272,11 @@ pre code {
 			<li><h3>Adding request body from a file but modifying elements of the json before sending</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Adding request body from a file but modifying elements of the json before sending
-      Given I send requests to '${REST_SERVER_HOST}:3000'
-      When I send a 'POST' request to '/posts' based on 'schemas/mytestdata.json' as 'json' with:
-        | $.title | UPDATE | This is a test 2 |
+			
+    <span class="gherkin-keyword">Scenario: </span>Adding request body from a file but modifying elements of the json before sending
+      <span class="gherkin-keyword">Given </span>I send requests to '${REST_SERVER_HOST}:3000'
+      <span class="gherkin-keyword">When </span>I send a 'POST' request to '/posts' based on 'schemas/mytestdata.json' as 'json' with:
+        <span class="gherkin-keyword">|</span> $.title <span class="gherkin-keyword">|</span> UPDATE <span class="gherkin-keyword">|</span> This is a test 2 <span class="gherkin-keyword">|</span>
 			</code></pre>
 			</div>
 			</ul>
@@ -263,9 +284,10 @@ pre code {
 			<li><h3>Adding request body directly in the gherkin step</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Adding request body directly in the gherkin step
-      Given I send requests to '${REST_SERVER_HOST}:3000'
-      When I send a 'POST' request to '/posts' with body
+			
+    <span class="gherkin-keyword">Scenario: </span>Adding request body directly in the gherkin step
+      <span class="gherkin-keyword">Given </span>I send requests to '${REST_SERVER_HOST}:3000'
+      <span class="gherkin-keyword">When </span>I send a 'POST' request to '/posts' with body
            """
               {
                 "userId": 1,
@@ -280,9 +302,10 @@ pre code {
 			<li><h3>Adding request body directly in the gherkin step as json</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Adding request body directly in the gherkin step as json
-      Given I send requests to '${REST_SERVER_HOST}:3000'
-      When I send a 'POST' request to '/posts' as 'json' with body
+			
+    <span class="gherkin-keyword">Scenario: </span>Adding request body directly in the gherkin step as json
+      <span class="gherkin-keyword">Given </span>I send requests to '${REST_SERVER_HOST}:3000'
+      <span class="gherkin-keyword">When </span>I send a 'POST' request to '/posts' as 'json' with body
            """
               {
                 "userId": 1,
@@ -297,14 +320,15 @@ pre code {
 			<li><h3>Sending a file</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
+			
     @ignore
-    Scenario: Sending a file
-      Given I send requests to '${REST_SERVER_HOST}:3000'
-      And I set headers:
-        | Content-Type | multipart/form-data |
-      And I add the file in 'schemas/mytestdata.json' to the request
-      When I send a 'POST' request to '/posts'
-      Then the service response status must be '201'
+    <span class="gherkin-keyword">Scenario: </span>Sending a file
+      <span class="gherkin-keyword">Given </span>I send requests to '${REST_SERVER_HOST}:3000'
+      <span class="gherkin-keyword">And </span>I set headers:
+        <span class="gherkin-keyword">|</span> Content-Type <span class="gherkin-keyword">|</span> multipart/form-data <span class="gherkin-keyword">|</span>
+      <span class="gherkin-keyword">And </span>I add the file in 'schemas/mytestdata.json' to the request
+      <span class="gherkin-keyword">When </span>I send a 'POST' request to '/posts'
+      <span class="gherkin-keyword">Then </span>the service response status must be '201'
 			</code></pre>
 			</div>
 			</ul>
@@ -316,9 +340,10 @@ pre code {
 			<li><h3>Adding graphql request body from a file</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Adding graphql request body from a file
-      Given I send requests to '${GRAPHQL_SERVER_HOST}:3001'
-      When I send a 'POST' request to '/' based on 'schemas/mytestdata.graphql' as 'graphql'
+			
+    <span class="gherkin-keyword">Scenario: </span>Adding graphql request body from a file
+      <span class="gherkin-keyword">Given </span>I send requests to '${GRAPHQL_SERVER_HOST}:3001'
+      <span class="gherkin-keyword">When </span>I send a 'POST' request to '/' based on 'schemas/mytestdata.graphql' as 'graphql'
 			</code></pre>
 			</div>
 			</ul>
@@ -326,9 +351,10 @@ pre code {
 			<li><h3>Adding graphql request body from a file with variables</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Adding graphql request body from a file with variables
-      Given I send requests to '${GRAPHQL_SERVER_HOST}:3001'
-      When I send a 'POST' request to '/' based on 'schemas/mytestdatawithvars.graphql' as 'graphql' with variables '{"perPage": 10}'
+			
+    <span class="gherkin-keyword">Scenario: </span>Adding graphql request body from a file with variables
+      <span class="gherkin-keyword">Given </span>I send requests to '${GRAPHQL_SERVER_HOST}:3001'
+      <span class="gherkin-keyword">When </span>I send a 'POST' request to '/' based on 'schemas/mytestdatawithvars.graphql' as 'graphql' with variables '{"perPage": 10}'
 			</code></pre>
 			</div>
 			</ul>
@@ -336,10 +362,11 @@ pre code {
 			<li><h3>Adding request body from a file but modifying elements of the graphql before sending</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Adding request body from a file but modifying elements of the graphql before sending
-      Given I send requests to '${GRAPHQL_SERVER_HOST}:3001'
-      When I send a 'POST' request to '/' based on 'schemas/mytestdata.graphql' as 'graphql' with:
-        | id | UPDATE | name |
+			
+    <span class="gherkin-keyword">Scenario: </span>Adding request body from a file but modifying elements of the graphql before sending
+      <span class="gherkin-keyword">Given </span>I send requests to '${GRAPHQL_SERVER_HOST}:3001'
+      <span class="gherkin-keyword">When </span>I send a 'POST' request to '/' based on 'schemas/mytestdata.graphql' as 'graphql' with:
+        <span class="gherkin-keyword">|</span> id <span class="gherkin-keyword">|</span> UPDATE <span class="gherkin-keyword">|</span> name <span class="gherkin-keyword">|</span>
 			</code></pre>
 			</div>
 			</ul>
@@ -347,10 +374,11 @@ pre code {
 			<li><h3>Adding request body from a file and variables but modifying elements of the graphql before sending</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Adding request body from a file and variables but modifying elements of the graphql before sending
-      Given I send requests to '${GRAPHQL_SERVER_HOST}:3001'
-      When I send a 'POST' request to '/' based on 'schemas/mytestdatawithvars.graphql' as 'graphql' with variables '{"perPage": 10}' and:
-        | id | UPDATE | name |
+			
+    <span class="gherkin-keyword">Scenario: </span>Adding request body from a file and variables but modifying elements of the graphql before sending
+      <span class="gherkin-keyword">Given </span>I send requests to '${GRAPHQL_SERVER_HOST}:3001'
+      <span class="gherkin-keyword">When </span>I send a 'POST' request to '/' based on 'schemas/mytestdatawithvars.graphql' as 'graphql' with variables '{"perPage": 10}' and:
+        <span class="gherkin-keyword">|</span> id <span class="gherkin-keyword">|</span> UPDATE <span class="gherkin-keyword">|</span> name <span class="gherkin-keyword">|</span>
 			</code></pre>
 			</div>
 			</ul>
@@ -358,9 +386,10 @@ pre code {
 			<li><h3>Adding graphql request body directly in the gherkin step</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Adding graphql request body directly in the gherkin step
-      Given I send requests to '${GRAPHQL_SERVER_HOST}:3001'
-      When I send a 'POST' request to '/' as 'graphql' with body
+			
+    <span class="gherkin-keyword">Scenario: </span>Adding graphql request body directly in the gherkin step
+      <span class="gherkin-keyword">Given </span>I send requests to '${GRAPHQL_SERVER_HOST}:3001'
+      <span class="gherkin-keyword">When </span>I send a 'POST' request to '/' as 'graphql' with body
            """
               {
                   allUsers(perPage: 10) {
@@ -376,9 +405,10 @@ pre code {
 			<li><h3>Adding graphql request body and variables directly in the gherkin step</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Adding graphql request body and variables directly in the gherkin step
-      Given I send requests to '${GRAPHQL_SERVER_HOST}:3001'
-      When I send a 'POST' request to '/' as 'graphql' with variables '{"perPage": 10}' and body
+			
+    <span class="gherkin-keyword">Scenario: </span>Adding graphql request body and variables directly in the gherkin step
+      <span class="gherkin-keyword">Given </span>I send requests to '${GRAPHQL_SERVER_HOST}:3001'
+      <span class="gherkin-keyword">When </span>I send a 'POST' request to '/' as 'graphql' with variables '{"perPage": 10}' and body
            """
               query ($perPage: Int = 1) {
                   allUsers(perPage: $perPage) {
@@ -398,10 +428,11 @@ pre code {
 			<li><h3>Verify response status code</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Verify response status code
-      Given I send requests to '${REST_SERVER_HOST}:3000'
-      When I send a 'GET' request to '/posts'
-      Then the service response status must be '200'
+			
+    <span class="gherkin-keyword">Scenario: </span>Verify response status code
+      <span class="gherkin-keyword">Given </span>I send requests to '${REST_SERVER_HOST}:3000'
+      <span class="gherkin-keyword">When </span>I send a 'GET' request to '/posts'
+      <span class="gherkin-keyword">Then </span>the service response status must be '200'
 			</code></pre>
 			</div>
 			</ul>
@@ -409,10 +440,11 @@ pre code {
 			<li><h3>Verify the response body contains specific text</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Verify the response body contains specific text
-      Given I send requests to '${REST_SERVER_HOST}:3000'
-      When I send a 'GET' request to '/posts'
-      And the service response must contain the text 'body'
+			
+    <span class="gherkin-keyword">Scenario: </span>Verify the response body contains specific text
+      <span class="gherkin-keyword">Given </span>I send requests to '${REST_SERVER_HOST}:3000'
+      <span class="gherkin-keyword">When </span>I send a 'GET' request to '/posts'
+      <span class="gherkin-keyword">And </span>the service response must contain the text 'body'
 			</code></pre>
 			</div>
 			</ul>
@@ -420,10 +452,11 @@ pre code {
 			<li><h3>Verify the response body is the specified length</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Verify the response body is the specified length
-      Given I send requests to '${REST_SERVER_HOST}:3000'
-      When I send a 'GET' request to '/posts/1'
-      When the service response length must be '292'
+			
+    <span class="gherkin-keyword">Scenario: </span>Verify the response body is the specified length
+      <span class="gherkin-keyword">Given </span>I send requests to '${REST_SERVER_HOST}:3000'
+      <span class="gherkin-keyword">When </span>I send a 'GET' request to '/posts/1'
+      <span class="gherkin-keyword">When </span>the service response length must be '292'
 			</code></pre>
 			</div>
 			</ul>
@@ -431,10 +464,11 @@ pre code {
 			<li><h3>Validating the response body matches a predefined json schema</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Validating the response body matches a predefined json schema
-      Given I send requests to '${REST_SERVER_HOST}:3000'
-      When I send a 'GET' request to '/posts'
-      And the service response matches the schema in 'schemas/responseSchema.json'
+			
+    <span class="gherkin-keyword">Scenario: </span>Validating the response body matches a predefined json schema
+      <span class="gherkin-keyword">Given </span>I send requests to '${REST_SERVER_HOST}:3000'
+      <span class="gherkin-keyword">When </span>I send a 'GET' request to '/posts'
+      <span class="gherkin-keyword">And </span>the service response matches the schema in 'schemas/responseSchema.json'
 			</code></pre>
 			</div>
 			</ul>
@@ -442,12 +476,13 @@ pre code {
 			<li><h3>Saving an element from the response body in a variable for future use using jsonpath</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Saving an element from the response body in a variable for future use using jsonpath
-      Given I send requests to '${REST_SERVER_HOST}:3000'
-      When I send a 'GET' request to '/posts'
-      Then the service response status must be '200'
-      And I save element '$.[0].id' in environment variable 'ID'
-      Then '${ID}' matches '1'
+			
+    <span class="gherkin-keyword">Scenario: </span>Saving an element from the response body in a variable for future use using jsonpath
+      <span class="gherkin-keyword">Given </span>I send requests to '${REST_SERVER_HOST}:3000'
+      <span class="gherkin-keyword">When </span>I send a 'GET' request to '/posts'
+      <span class="gherkin-keyword">Then </span>the service response status must be '200'
+      <span class="gherkin-keyword">And </span>I save element '$.[0].id' in environment variable 'ID'
+      <span class="gherkin-keyword">Then </span>'${ID}' matches '1'
 			</code></pre>
 			</div>
 			</ul>
@@ -455,18 +490,19 @@ pre code {
 			<li><h3>Saving the whole response body and evaluating several elements at the same time</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Saving the whole response body and evaluating several elements at the same time
-      Given I send requests to '${REST_SERVER_HOST}:3000'
-      When I send a 'GET' request to '/comments/1'
-      Then the service response status must be '200'
-      And I save element '$' in environment variable 'response'
-      And 'response' matches the following cases:
-        | $.postId    | equal            | 1      |
-        | $.id        | not equal        | 2      |
-        | $.email     | contains         | Eliseo |
-        | $.email     | does not contain | foobar |
-        | $.body      | exists           |        |
-        | $.fakefield | does not exists  |        |
+			
+    <span class="gherkin-keyword">Scenario: </span>Saving the whole response body and evaluating several elements at the same time
+      <span class="gherkin-keyword">Given </span>I send requests to '${REST_SERVER_HOST}:3000'
+      <span class="gherkin-keyword">When </span>I send a 'GET' request to '/comments/1'
+      <span class="gherkin-keyword">Then </span>the service response status must be '200'
+      <span class="gherkin-keyword">And </span>I save element '$' in environment variable 'response'
+      <span class="gherkin-keyword">And </span>'response' matches the following cases:
+        <span class="gherkin-keyword">|</span> $.postId    <span class="gherkin-keyword">|</span> equal            <span class="gherkin-keyword">|</span> 1      <span class="gherkin-keyword">|</span>
+        <span class="gherkin-keyword">|</span> $.id        <span class="gherkin-keyword">|</span> not equal        <span class="gherkin-keyword">|</span> 2      <span class="gherkin-keyword">|</span>
+        <span class="gherkin-keyword">|</span> $.email     <span class="gherkin-keyword">|</span> contains         <span class="gherkin-keyword">|</span> Eliseo <span class="gherkin-keyword">|</span>
+        <span class="gherkin-keyword">|</span> $.email     <span class="gherkin-keyword">|</span> does not contain <span class="gherkin-keyword">|</span> foobar <span class="gherkin-keyword">|</span>
+        <span class="gherkin-keyword">|</span> $.body      <span class="gherkin-keyword">|</span> exists           <span class="gherkin-keyword">|</span>        <span class="gherkin-keyword">|</span>
+        <span class="gherkin-keyword">|</span> $.fakefield <span class="gherkin-keyword">|</span> does not exists  <span class="gherkin-keyword">|</span>        <span class="gherkin-keyword">|</span>
 			</code></pre>
 			</div>
 			</ul>
@@ -474,11 +510,12 @@ pre code {
 			<li><h3>Saving the value of a response header in a variable for future use</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Saving the value of a response header in a variable for future use
-      Given I send requests to '${REST_SERVER_HOST}:3000'
-      When I send a 'GET' request to '/posts'
-      And I save the response header 'Content-Type' in environment variable 'CONTENT-TYPE'
-      Then '${CONTENT-TYPE}' matches 'application/json; charset=utf-8'
+			
+    <span class="gherkin-keyword">Scenario: </span>Saving the value of a response header in a variable for future use
+      <span class="gherkin-keyword">Given </span>I send requests to '${REST_SERVER_HOST}:3000'
+      <span class="gherkin-keyword">When </span>I send a 'GET' request to '/posts'
+      <span class="gherkin-keyword">And </span>I save the response header 'Content-Type' in environment variable 'CONTENT-TYPE'
+      <span class="gherkin-keyword">Then </span>'${CONTENT-TYPE}' matches 'application/json; charset=utf-8'
 			</code></pre>
 			</div>
 			</ul>
@@ -486,13 +523,14 @@ pre code {
 			<li><h3>Verifying several headers using a datatable</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Verifying several headers using a datatable
-      Given I send requests to '${REST_SERVER_HOST}:3000'
-      When I send a 'GET' request to '/posts'
-      And the service response headers match the following cases:
-        | Content-Type | equal  | application/json; charset=utf-8 |
-        | Expires      | equal  | -1                              |
-        | Expires      | exists |                                 |
+			
+    <span class="gherkin-keyword">Scenario: </span>Verifying several headers using a datatable
+      <span class="gherkin-keyword">Given </span>I send requests to '${REST_SERVER_HOST}:3000'
+      <span class="gherkin-keyword">When </span>I send a 'GET' request to '/posts'
+      <span class="gherkin-keyword">And </span>the service response headers match the following cases:
+        <span class="gherkin-keyword">|</span> Content-Type <span class="gherkin-keyword">|</span> equal  <span class="gherkin-keyword">|</span> application/json; charset=utf-8 <span class="gherkin-keyword">|</span>
+        <span class="gherkin-keyword">|</span> Expires      <span class="gherkin-keyword">|</span> equal  <span class="gherkin-keyword">|</span> -1                              <span class="gherkin-keyword">|</span>
+        <span class="gherkin-keyword">|</span> Expires      <span class="gherkin-keyword">|</span> exists <span class="gherkin-keyword">|</span>                                 <span class="gherkin-keyword">|</span>
 			</code></pre>
 			</div>
 			</ul>
@@ -500,12 +538,13 @@ pre code {
 			<li><h3>Saving the value of a response cookie in a variable for future use</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
+			
     @ignore
-    Scenario: Saving the value of a response cookie in a variable for future use
-      Given I send requests to '${REST_SERVER_HOST}:3000'
-      When I send a 'GET' request to '/posts'
-      And I save the response cookie 'cookieName' in environment variable 'COOKIE'
-      Then '${COOKIE}' matches 'value'
+    <span class="gherkin-keyword">Scenario: </span>Saving the value of a response cookie in a variable for future use
+      <span class="gherkin-keyword">Given </span>I send requests to '${REST_SERVER_HOST}:3000'
+      <span class="gherkin-keyword">When </span>I send a 'GET' request to '/posts'
+      <span class="gherkin-keyword">And </span>I save the response cookie 'cookieName' in environment variable 'COOKIE'
+      <span class="gherkin-keyword">Then </span>'${COOKIE}' matches 'value'
 			</code></pre>
 			</div>
 			</ul>
@@ -513,14 +552,15 @@ pre code {
 			<li><h3>Verifying several cookies using a datatable</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
+			
     @ignore
-    Scenario: Verifying several cookies using a datatable
-      Given I send requests to '${REST_SERVER_HOST}:3000'
-      When I send a 'GET' request to '/posts'
-      And the service response cookies match the following cases:
-        | cookieName1 | equal  | value1 |
-        | cookieName2 | equal  | value2 |
-        | cookieName3 | exists |        |
+    <span class="gherkin-keyword">Scenario: </span>Verifying several cookies using a datatable
+      <span class="gherkin-keyword">Given </span>I send requests to '${REST_SERVER_HOST}:3000'
+      <span class="gherkin-keyword">When </span>I send a 'GET' request to '/posts'
+      <span class="gherkin-keyword">And </span>the service response cookies match the following cases:
+        <span class="gherkin-keyword">|</span> cookieName1 <span class="gherkin-keyword">|</span> equal  <span class="gherkin-keyword">|</span> value1 <span class="gherkin-keyword">|</span>
+        <span class="gherkin-keyword">|</span> cookieName2 <span class="gherkin-keyword">|</span> equal  <span class="gherkin-keyword">|</span> value2 <span class="gherkin-keyword">|</span>
+        <span class="gherkin-keyword">|</span> cookieName3 <span class="gherkin-keyword">|</span> exists <span class="gherkin-keyword">|</span>        <span class="gherkin-keyword">|</span>
 			</code></pre>
 			</div>
 			</ul>
@@ -528,10 +568,11 @@ pre code {
 			<li><h3>Measuring Response Time</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Measuring Response Time
-      Given I send requests to '${REST_SERVER_HOST}:3000'
-      When I send a 'GET' request to '/posts'
-      And the service response time is lower than '1000' milliseconds
+			
+    <span class="gherkin-keyword">Scenario: </span>Measuring Response Time
+      <span class="gherkin-keyword">Given </span>I send requests to '${REST_SERVER_HOST}:3000'
+      <span class="gherkin-keyword">When </span>I send a 'GET' request to '/posts'
+      <span class="gherkin-keyword">And </span>the service response time is lower than '1000' milliseconds
 			</code></pre>
 			</div>
 			</ul>
@@ -543,9 +584,10 @@ pre code {
 			<li><h3>Generating a request using basic authentication</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Generating a request using basic authentication
-      Given I send requests to '${REST_SERVER_HOST}:3000'
-      When I send a 'GET' request to '/posts' with user and password 'user:password'
+			
+    <span class="gherkin-keyword">Scenario: </span>Generating a request using basic authentication
+      <span class="gherkin-keyword">Given </span>I send requests to '${REST_SERVER_HOST}:3000'
+      <span class="gherkin-keyword">When </span>I send a 'GET' request to '/posts' with user and password 'user:password'
 			</code></pre>
 			</div>
 			</ul>
@@ -553,9 +595,10 @@ pre code {
 			<li><h3>Generating a request using basic authentication (POST example)</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Generating a request using basic authentication (POST example)
-      Given I send requests to '${REST_SERVER_HOST}:3000'
-      When I send a 'POST' request to '/posts' with user and password 'user:password' based on 'schemas/mytestdata.json' as 'json'
+			
+    <span class="gherkin-keyword">Scenario: </span>Generating a request using basic authentication (POST example)
+      <span class="gherkin-keyword">Given </span>I send requests to '${REST_SERVER_HOST}:3000'
+      <span class="gherkin-keyword">When </span>I send a 'POST' request to '/posts' with user and password 'user:password' based on 'schemas/mytestdata.json' as 'json'
 			</code></pre>
 			</div>
 			</ul>
@@ -567,10 +610,11 @@ pre code {
 			<li><h3>Setting a proxy</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
+			
     @ignore
-    Scenario: Setting a proxy
-      Given I send requests to '${REST_SERVER_HOST}:3000'
-      And I set the proxy to 'http://localhost:80'
+    <span class="gherkin-keyword">Scenario: </span>Setting a proxy
+      <span class="gherkin-keyword">Given </span>I send requests to '${REST_SERVER_HOST}:3000'
+      <span class="gherkin-keyword">And </span>I set the proxy to 'http://localhost:80'
 			</code></pre>
 			</div>
 			</ul>
@@ -578,10 +622,11 @@ pre code {
 			<li><h3>Setting a proxy with credentials</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
+			
     @ignore
-    Scenario: Setting a proxy with credentials
-      Given I send requests to '${REST_SERVER_HOST}:3000'
-      And I set the proxy to 'http://localhost:80' with username 'myusername' and password 'mypassword'
+    <span class="gherkin-keyword">Scenario: </span>Setting a proxy with credentials
+      <span class="gherkin-keyword">Given </span>I send requests to '${REST_SERVER_HOST}:3000'
+      <span class="gherkin-keyword">And </span>I set the proxy to 'http://localhost:80' with username 'myusername' and password 'mypassword'
 			</code></pre>
 			</div>
 			</ul>
@@ -593,20 +638,21 @@ pre code {
 			<li><h3>Operations that can be done on a json response (using a sample json file as seed json)</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Operations that can be done on a json response (using a sample json file as seed json)
-      And I save '${file:UTF-8:src/test/resources/schemas/sampleJsonResponse.json}' in variable 'SAMPLE_JSON'
-      And 'SAMPLE_JSON' matches the following cases:
-        | $.firstName             | equal            | John    |
-        | $.firstName             | not equal        | Smith   |
-        | $.lastName              | contains         | d       |
-        | $.lastName              | does not contain | foo     |
-        | $.age                   | length           | 2       |
-        | $.phoneNumbers[0].type  | equal            | iPhone  |
-        | $.phoneNumbers[0].local | equal            | false   |
-        | $.address               | exists           |         |
-        | $.fakefield             | does not exists  |         |
-        | $.phoneNumbers          | size             | 2       |
-        | $.hobbies               | contains         | netflix |
+			
+    <span class="gherkin-keyword">Scenario: </span>Operations that can be done on a json response (using a sample json file as seed json)
+      <span class="gherkin-keyword">And </span>I save '${file:UTF-8:src/test/resources/schemas/sampleJsonResponse.json}' in variable 'SAMPLE_JSON'
+      <span class="gherkin-keyword">And </span>'SAMPLE_JSON' matches the following cases:
+        <span class="gherkin-keyword">|</span> $.firstName             <span class="gherkin-keyword">|</span> equal            <span class="gherkin-keyword">|</span> John    <span class="gherkin-keyword">|</span>
+        <span class="gherkin-keyword">|</span> $.firstName             <span class="gherkin-keyword">|</span> not equal        <span class="gherkin-keyword">|</span> Smith   <span class="gherkin-keyword">|</span>
+        <span class="gherkin-keyword">|</span> $.lastName              <span class="gherkin-keyword">|</span> contains         <span class="gherkin-keyword">|</span> d       <span class="gherkin-keyword">|</span>
+        <span class="gherkin-keyword">|</span> $.lastName              <span class="gherkin-keyword">|</span> does not contain <span class="gherkin-keyword">|</span> foo     <span class="gherkin-keyword">|</span>
+        <span class="gherkin-keyword">|</span> $.age                   <span class="gherkin-keyword">|</span> length           <span class="gherkin-keyword">|</span> 2       <span class="gherkin-keyword">|</span>
+        <span class="gherkin-keyword">|</span> $.phoneNumbers[0].type  <span class="gherkin-keyword">|</span> equal            <span class="gherkin-keyword">|</span> iPhone  <span class="gherkin-keyword">|</span>
+        <span class="gherkin-keyword">|</span> $.phoneNumbers[0].local <span class="gherkin-keyword">|</span> equal            <span class="gherkin-keyword">|</span> false   <span class="gherkin-keyword">|</span>
+        <span class="gherkin-keyword">|</span> $.address               <span class="gherkin-keyword">|</span> exists           <span class="gherkin-keyword">|</span>         <span class="gherkin-keyword">|</span>
+        <span class="gherkin-keyword">|</span> $.fakefield             <span class="gherkin-keyword">|</span> does not exists  <span class="gherkin-keyword">|</span>         <span class="gherkin-keyword">|</span>
+        <span class="gherkin-keyword">|</span> $.phoneNumbers          <span class="gherkin-keyword">|</span> size             <span class="gherkin-keyword">|</span> 2       <span class="gherkin-keyword">|</span>
+        <span class="gherkin-keyword">|</span> $.hobbies               <span class="gherkin-keyword">|</span> contains         <span class="gherkin-keyword">|</span> netflix <span class="gherkin-keyword">|</span>
 			</code></pre>
 			</div>
 			</ul>

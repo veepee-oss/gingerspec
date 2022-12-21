@@ -46,16 +46,29 @@ h3 {
 }
 
 pre code {
-    background-color: #eee;
+    background-color: #2b2b2b;
+    color: #9ba8b6;
     display: block;
     padding: 16px;
     overflow: auto;
     border-radius: 6px;
     font-family: ui-monospace,SFMono-Regular,SF Mono,Menlo,Consolas,Liberation Mono,monospace;
-    font-size: 85%;
+    font-size: 90%;
     border-style: solid;
     border-width: 1px;
     border-color: darkgray;
+}
+
+.gherkin-keyword {
+    color: #c47432;
+}
+
+gherkin-tag {
+    color: #aca729;
+}
+
+.highlight-wrapper {
+    display: block;
 }
 
 .highlight-wrapper {
@@ -175,8 +188,9 @@ pre code {
 			<li><h3>Open the browser and go to page</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Open the browser and go to page
-      Given I go to 'http://${DEMO_SITE_HOST}'
+			
+    <span class="gherkin-keyword">Scenario: </span>Open the browser and go to page
+      <span class="gherkin-keyword">Given </span>I go to 'http://${DEMO_SITE_HOST}'
 			</code></pre>
 			</div>
 			</ul>
@@ -184,9 +198,10 @@ pre code {
 			<li><h3>Maximize the browser</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Maximize the browser
-      Given I go to 'http://${DEMO_SITE_HOST}'
-      Then I maximize the browser
+			
+    <span class="gherkin-keyword">Scenario: </span>Maximize the browser
+      <span class="gherkin-keyword">Given </span>I go to 'http://${DEMO_SITE_HOST}'
+      <span class="gherkin-keyword">Then </span>I maximize the browser
 			</code></pre>
 			</div>
 			</ul>
@@ -194,10 +209,11 @@ pre code {
 			<li><h3>Check that a new window opened</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Check that a new window opened
-      Given I go to 'http://${DEMO_SITE_HOST}/styled/windows-test.html'
-      Then I click on the element with 'id:gobasicajax'
-      Then a new window is opened
+			
+    <span class="gherkin-keyword">Scenario: </span>Check that a new window opened
+      <span class="gherkin-keyword">Given </span>I go to 'http://${DEMO_SITE_HOST}/styled/windows-test.html'
+      <span class="gherkin-keyword">Then </span>I click on the element with 'id:gobasicajax'
+      <span class="gherkin-keyword">Then </span>a new window is opened
 			</code></pre>
 			</div>
 			</ul>
@@ -205,11 +221,12 @@ pre code {
 			<li><h3>Change focus to another opened window.</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Change focus to another opened window.
-      Given I go to 'http://${DEMO_SITE_HOST}/styled/windows-test.html'
-      Then I click on the element with 'id:gobasicajax'
-      Then a new window is opened
-      Then I change active window
+			
+    <span class="gherkin-keyword">Scenario: </span>Change focus to another opened window.
+      <span class="gherkin-keyword">Given </span>I go to 'http://${DEMO_SITE_HOST}/styled/windows-test.html'
+      <span class="gherkin-keyword">Then </span>I click on the element with 'id:gobasicajax'
+      <span class="gherkin-keyword">Then </span>a new window is opened
+      <span class="gherkin-keyword">Then </span>I change active window
 			</code></pre>
 			</div>
 			</ul>
@@ -217,9 +234,10 @@ pre code {
 			<li><h3>Check the current url</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Check the current url
-      Given I go to 'http://${DEMO_SITE_HOST}/styled/index.html'
-      Then we are in page 'http://${DEMO_SITE_HOST}/styled/index.html'
+			
+    <span class="gherkin-keyword">Scenario: </span>Check the current url
+      <span class="gherkin-keyword">Given </span>I go to 'http://${DEMO_SITE_HOST}/styled/index.html'
+      <span class="gherkin-keyword">Then </span>we are in page 'http://${DEMO_SITE_HOST}/styled/index.html'
 			</code></pre>
 			</div>
 			</ul>
@@ -227,9 +245,10 @@ pre code {
 			<li><h3>Check if current URL contains text</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Check if current URL contains text
-      Given I go to 'http://${DEMO_SITE_HOST}/styled/index.html'
-      Then the current url contains the text 'styled'
+			
+    <span class="gherkin-keyword">Scenario: </span>Check if current URL contains text
+      <span class="gherkin-keyword">Given </span>I go to 'http://${DEMO_SITE_HOST}/styled/index.html'
+      <span class="gherkin-keyword">Then </span>the current url contains the text 'styled'
 			</code></pre>
 			</div>
 			</ul>
@@ -237,9 +256,10 @@ pre code {
 			<li><h3>Close the active window</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Close the active window
-      Given I go to 'http://${DEMO_SITE_HOST}/styled/index.html'
-      And I close the current window
+			
+    <span class="gherkin-keyword">Scenario: </span>Close the active window
+      <span class="gherkin-keyword">Given </span>I go to 'http://${DEMO_SITE_HOST}/styled/index.html'
+      <span class="gherkin-keyword">And </span>I close the current window
 			</code></pre>
 			</div>
 			</ul>
@@ -251,13 +271,14 @@ pre code {
 			<li><h3>Verify element exists on the page</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
+			
     # Besides class, you can use id, name, css, xpath, linkText, partialLinkText or tagName
-    Scenario: Verify element exists on the page
-      Given I go to 'http://${DEMO_SITE_HOST}/styled/find-by-playground-test.html'
-      Then '1' elements exists with 'id:p1'
-      Then '2' elements exists with 'name:pName2'
-      Then '118' elements exists with 'class:normal'
-      Then at least '1' elements exists with 'class:explanation'
+    <span class="gherkin-keyword">Scenario: </span>Verify element exists on the page
+      <span class="gherkin-keyword">Given </span>I go to 'http://${DEMO_SITE_HOST}/styled/find-by-playground-test.html'
+      <span class="gherkin-keyword">Then </span>'1' elements exists with 'id:p1'
+      <span class="gherkin-keyword">Then </span>'2' elements exists with 'name:pName2'
+      <span class="gherkin-keyword">Then </span>'118' elements exists with 'class:normal'
+      <span class="gherkin-keyword">Then </span>at least '1' elements exists with 'class:explanation'
 			</code></pre>
 			</div>
 			</ul>
@@ -265,10 +286,11 @@ pre code {
 			<li><h3>Verify text of an element</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Verify text of an element
-      Given I go to 'http://${DEMO_SITE_HOST}/styled/find-by-playground-test.html'
-      And the element with 'id:p1' has 'This is a paragraph text' as text
-      And the element with 'name:pName2' index '0' has 'This is b paragraph text' as text
+			
+    <span class="gherkin-keyword">Scenario: </span>Verify text of an element
+      <span class="gherkin-keyword">Given </span>I go to 'http://${DEMO_SITE_HOST}/styled/find-by-playground-test.html'
+      <span class="gherkin-keyword">And </span>the element with 'id:p1' has 'This is a paragraph text' as text
+      <span class="gherkin-keyword">And </span>the element with 'name:pName2' index '0' has 'This is b paragraph text' as text
 			</code></pre>
 			</div>
 			</ul>
@@ -276,10 +298,11 @@ pre code {
 			<li><h3>Verify text of an element ignoring case</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Verify text of an element ignoring case
-      Given I go to 'http://${DEMO_SITE_HOST}/styled/find-by-playground-test.html'
-      And the element with 'id:p1' has 'ThIs Is A pArAgRaPh TeXt' as text ignoring case
-      And the element with 'name:pName2' index '0' has 'ThIs Is B pArAgRaPh TeXt' as text ignoring case
+			
+    <span class="gherkin-keyword">Scenario: </span>Verify text of an element ignoring case
+      <span class="gherkin-keyword">Given </span>I go to 'http://${DEMO_SITE_HOST}/styled/find-by-playground-test.html'
+      <span class="gherkin-keyword">And </span>the element with 'id:p1' has 'ThIs Is A pArAgRaPh TeXt' as text ignoring case
+      <span class="gherkin-keyword">And </span>the element with 'name:pName2' index '0' has 'ThIs Is B pArAgRaPh TeXt' as text ignoring case
 			</code></pre>
 			</div>
 			</ul>
@@ -287,10 +310,11 @@ pre code {
 			<li><h3>Saving the text of an element</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Saving the text of an element
-      Given I go to 'http://${DEMO_SITE_HOST}/styled/find-by-playground-test.html'
-      When I save content of element with 'id:p1' in environment variable 'mytext'
-      Then '${mytext}' matches 'This is a paragraph text'
+			
+    <span class="gherkin-keyword">Scenario: </span>Saving the text of an element
+      <span class="gherkin-keyword">Given </span>I go to 'http://${DEMO_SITE_HOST}/styled/find-by-playground-test.html'
+      <span class="gherkin-keyword">When </span>I save content of element with 'id:p1' in environment variable 'mytext'
+      <span class="gherkin-keyword">Then </span>'${mytext}' matches 'This is a paragraph text'
 			</code></pre>
 			</div>
 			</ul>
@@ -298,18 +322,19 @@ pre code {
 			<li><h3>Verify text exists in page source</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
+			
     # Will look for the given text anywhere on the page DOM
-    Scenario: Verify text exists in page source
-      Given I go to 'http://${DEMO_SITE_HOST}/styled/index.html'
-      Then this text exists:
+    <span class="gherkin-keyword">Scenario: </span>Verify text exists in page source
+      <span class="gherkin-keyword">Given </span>I go to 'http://${DEMO_SITE_HOST}/styled/index.html'
+      <span class="gherkin-keyword">Then </span>this text exists:
             """
            Test Pages For Automating
            """
-      Then this text exists ignoring case:
+      <span class="gherkin-keyword">Then </span>this text exists ignoring case:
             """
            TeSt PaGeS FoR AuToMaTiNg
            """
-      Then this text does not exist:
+      <span class="gherkin-keyword">Then </span>this text does not exist:
             """
            This text is not present in the source
            """
@@ -320,12 +345,13 @@ pre code {
 			<li><h3>Verify if element is displayed</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Verify if element is displayed
-      Given I go to 'http://${DEMO_SITE_HOST}/styled/tag/dynamic-table.html'
-      And the element with 'id:dynamictable' IS displayed
-      And the element with 'id:jsondata' index '0' IS NOT displayed
-      Then I click on the element with 'css:summary'
-      When the element with 'id:jsondata' index '0' IS displayed
+			
+    <span class="gherkin-keyword">Scenario: </span>Verify if element is displayed
+      <span class="gherkin-keyword">Given </span>I go to 'http://${DEMO_SITE_HOST}/styled/tag/dynamic-table.html'
+      <span class="gherkin-keyword">And </span>the element with 'id:dynamictable' IS displayed
+      <span class="gherkin-keyword">And </span>the element with 'id:jsondata' index '0' IS NOT displayed
+      <span class="gherkin-keyword">Then </span>I click on the element with 'css:summary'
+      <span class="gherkin-keyword">When </span>the element with 'id:jsondata' index '0' IS displayed
 			</code></pre>
 			</div>
 			</ul>
@@ -333,10 +359,11 @@ pre code {
 			<li><h3>Verify if element is enabled</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Verify if element is enabled
-      Given I go to 'http://${DEMO_SITE_HOST}/styled/dynamic-buttons-disabled.html'
-      And the element with 'id:button00' IS enabled
-      And the element with 'id:button01' index '0' IS NOT enabled
+			
+    <span class="gherkin-keyword">Scenario: </span>Verify if element is enabled
+      <span class="gherkin-keyword">Given </span>I go to 'http://${DEMO_SITE_HOST}/styled/dynamic-buttons-disabled.html'
+      <span class="gherkin-keyword">And </span>the element with 'id:button00' IS enabled
+      <span class="gherkin-keyword">And </span>the element with 'id:button01' index '0' IS NOT enabled
 			</code></pre>
 			</div>
 			</ul>
@@ -344,11 +371,12 @@ pre code {
 			<li><h3>Verify if an element is selected</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Verify if an element is selected
-      Given I go to 'http://${DEMO_SITE_HOST}/styled/basic-html-form-test.html'
-      And the element with 'name:checkboxes[]' index '0' IS NOT selected
-      When I click on the element with 'name:checkboxes[]' index '0'
-      And the element with 'name:checkboxes[]' index '0' IS selected
+			
+    <span class="gherkin-keyword">Scenario: </span>Verify if an element is selected
+      <span class="gherkin-keyword">Given </span>I go to 'http://${DEMO_SITE_HOST}/styled/basic-html-form-test.html'
+      <span class="gherkin-keyword">And </span>the element with 'name:checkboxes[]' index '0' IS NOT selected
+      <span class="gherkin-keyword">When </span>I click on the element with 'name:checkboxes[]' index '0'
+      <span class="gherkin-keyword">And </span>the element with 'name:checkboxes[]' index '0' IS selected
 			</code></pre>
 			</div>
 			</ul>
@@ -356,10 +384,11 @@ pre code {
 			<li><h3>Verify the value of element's attribute</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Verify the value of element's attribute
-      Given I go to 'http://${DEMO_SITE_HOST}/styled/basic-html-form-test.html'
-      Then the element with 'name:password' has 'type' as 'password'
-      Then the element with 'name:submitbutton' index '0' has 'type' as 'reset'
+			
+    <span class="gherkin-keyword">Scenario: </span>Verify the value of element's attribute
+      <span class="gherkin-keyword">Given </span>I go to 'http://${DEMO_SITE_HOST}/styled/basic-html-form-test.html'
+      <span class="gherkin-keyword">Then </span>the element with 'name:password' has 'type' as 'password'
+      <span class="gherkin-keyword">Then </span>the element with 'name:submitbutton' index '0' has 'type' as 'reset'
 			</code></pre>
 			</div>
 			</ul>
@@ -367,10 +396,11 @@ pre code {
 			<li><h3>Saving the value of an element's attribute</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Saving the value of an element's attribute
-      Given I go to 'http://${DEMO_SITE_HOST}/styled/basic-html-form-test.html'
-      Then I save the value of the property 'type' of the element with 'name:password' in variable 'TYPE'
-      Then '${TYPE}' matches 'password'
+			
+    <span class="gherkin-keyword">Scenario: </span>Saving the value of an element's attribute
+      <span class="gherkin-keyword">Given </span>I go to 'http://${DEMO_SITE_HOST}/styled/basic-html-form-test.html'
+      <span class="gherkin-keyword">Then </span>I save the value of the property 'type' of the element with 'name:password' in variable 'TYPE'
+      <span class="gherkin-keyword">Then </span>'${TYPE}' matches 'password'
 			</code></pre>
 			</div>
 			</ul>
@@ -378,12 +408,13 @@ pre code {
 			<li><h3>Scrolling up or down to element</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Scrolling up or down to element
-      Given I go to 'http://${DEMO_SITE_HOST}/styled/basic-html-form-test.html'
-      And at least '1' elements exists with 'name:username'
-      Then I scroll up until the element with 'name:username' is visible
-      Then I scroll down until the element with 'name:password' is visible
-      Then I click on the element with 'name:password'
+			
+    <span class="gherkin-keyword">Scenario: </span>Scrolling up or down to element
+      <span class="gherkin-keyword">Given </span>I go to 'http://${DEMO_SITE_HOST}/styled/basic-html-form-test.html'
+      <span class="gherkin-keyword">And </span>at least '1' elements exists with 'name:username'
+      <span class="gherkin-keyword">Then </span>I scroll up until the element with 'name:username' is visible
+      <span class="gherkin-keyword">Then </span>I scroll down until the element with 'name:password' is visible
+      <span class="gherkin-keyword">Then </span>I click on the element with 'name:password'
 			</code></pre>
 			</div>
 			</ul>
@@ -395,11 +426,12 @@ pre code {
 			<li><h3>Perform click on the an element</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Perform click on the an element
-      Given I go to 'http://${DEMO_SITE_HOST}/styled/events/javascript-events.html'
-      When I click on the element with 'id:onclick'
-      When I click on the element with 'id:onclick' index '0'
-      Then the element with 'id:onclickstatus' has 'Event Triggered' as text
+			
+    <span class="gherkin-keyword">Scenario: </span>Perform click on the an element
+      <span class="gherkin-keyword">Given </span>I go to 'http://${DEMO_SITE_HOST}/styled/events/javascript-events.html'
+      <span class="gherkin-keyword">When </span>I click on the element with 'id:onclick'
+      <span class="gherkin-keyword">When </span>I click on the element with 'id:onclick' index '0'
+      <span class="gherkin-keyword">Then </span>the element with 'id:onclickstatus' has 'Event Triggered' as text
 			</code></pre>
 			</div>
 			</ul>
@@ -407,11 +439,12 @@ pre code {
 			<li><h3>Perform double click on an element</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Perform double click on an element
-      Given I go to 'http://${DEMO_SITE_HOST}/styled/events/javascript-events.html'
-      When I double click on the element with 'id:ondoubleclick'
-      When I double click on the element with 'id:ondoubleclick' index '0'
-      Then the element with 'id:ondoubleclickstatus' has 'Event Triggered' as text
+			
+    <span class="gherkin-keyword">Scenario: </span>Perform double click on an element
+      <span class="gherkin-keyword">Given </span>I go to 'http://${DEMO_SITE_HOST}/styled/events/javascript-events.html'
+      <span class="gherkin-keyword">When </span>I double click on the element with 'id:ondoubleclick'
+      <span class="gherkin-keyword">When </span>I double click on the element with 'id:ondoubleclick' index '0'
+      <span class="gherkin-keyword">Then </span>the element with 'id:ondoubleclickstatus' has 'Event Triggered' as text
 			</code></pre>
 			</div>
 			</ul>
@@ -419,11 +452,12 @@ pre code {
 			<li><h3>Perform right click on an element</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Perform right click on an element
-      Given I go to 'http://${DEMO_SITE_HOST}/styled/events/javascript-events.html'
-      When I right click on the element with 'id:oncontextmenu'
-      When I right click on the element with 'id:oncontextmenu' index '0'
-      Then the element with 'id:oncontextmenustatus' has 'Event Triggered' as text
+			
+    <span class="gherkin-keyword">Scenario: </span>Perform right click on an element
+      <span class="gherkin-keyword">Given </span>I go to 'http://${DEMO_SITE_HOST}/styled/events/javascript-events.html'
+      <span class="gherkin-keyword">When </span>I right click on the element with 'id:oncontextmenu'
+      <span class="gherkin-keyword">When </span>I right click on the element with 'id:oncontextmenu' index '0'
+      <span class="gherkin-keyword">Then </span>the element with 'id:oncontextmenustatus' has 'Event Triggered' as text
 			</code></pre>
 			</div>
 			</ul>
@@ -431,11 +465,12 @@ pre code {
 			<li><h3>Hover mouse on an element</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Hover mouse on an element
-      Given I go to 'http://${DEMO_SITE_HOST}/styled/events/javascript-events.html'
-      Given I hover on the element with 'id:onmouseover'
-      Given I hover on the element with 'id:onmouseover' index '0'
-      Then the element with 'id:onmouseoverstatus' has 'Event Triggered' as text
+			
+    <span class="gherkin-keyword">Scenario: </span>Hover mouse on an element
+      <span class="gherkin-keyword">Given </span>I go to 'http://${DEMO_SITE_HOST}/styled/events/javascript-events.html'
+      <span class="gherkin-keyword">Given </span>I hover on the element with 'id:onmouseover'
+      <span class="gherkin-keyword">Given </span>I hover on the element with 'id:onmouseover' index '0'
+      <span class="gherkin-keyword">Then </span>the element with 'id:onmouseoverstatus' has 'Event Triggered' as text
 			</code></pre>
 			</div>
 			</ul>
@@ -443,11 +478,12 @@ pre code {
 			<li><h3>Typing text on an element</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Typing text on an element
-      Given I go to 'http://${DEMO_SITE_HOST}/styled/basic-html-form-test.html'
-      And I type 'John Smith' on the element with 'name:username'
-      And I type '12345678' on the element with 'name:password'
-      And I type on the element with 'name:comments' the text:
+			
+    <span class="gherkin-keyword">Scenario: </span>Typing text on an element
+      <span class="gherkin-keyword">Given </span>I go to 'http://${DEMO_SITE_HOST}/styled/basic-html-form-test.html'
+      <span class="gherkin-keyword">And </span>I type 'John Smith' on the element with 'name:username'
+      <span class="gherkin-keyword">And </span>I type '12345678' on the element with 'name:password'
+      <span class="gherkin-keyword">And </span>I type on the element with 'name:comments' the text:
       """
         (510) 794-7942
         4274 Deep Creek Rd
@@ -460,11 +496,12 @@ pre code {
 			<li><h3>Clear the text on an element.</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Clear the text on an element.
-      Given I go to 'http://${DEMO_SITE_HOST}/styled/basic-html-form-test.html'
-      And I type 'John Smith' on the element with 'name:username'
-      And I clear the text of the element with 'name:username'
-      Then the element with 'name:username' has '' as text
+			
+    <span class="gherkin-keyword">Scenario: </span>Clear the text on an element.
+      <span class="gherkin-keyword">Given </span>I go to 'http://${DEMO_SITE_HOST}/styled/basic-html-form-test.html'
+      <span class="gherkin-keyword">And </span>I type 'John Smith' on the element with 'name:username'
+      <span class="gherkin-keyword">And </span>I clear the text of the element with 'name:username'
+      <span class="gherkin-keyword">Then </span>the element with 'name:username' has '' as text
 			</code></pre>
 			</div>
 			</ul>
@@ -472,11 +509,12 @@ pre code {
 			<li><h3>Press a key on an element</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Press a key on an element
-      Given I go to 'http://${DEMO_SITE_HOST}/styled/events/javascript-events.html'
-      And I click on the element with 'id:onkeypress'
-      Then I send 'ENTER' on the element with 'id:onkeypress'
-      And the element with 'id:onkeypressstatus' has 'Event Triggered' as text
+			
+    <span class="gherkin-keyword">Scenario: </span>Press a key on an element
+      <span class="gherkin-keyword">Given </span>I go to 'http://${DEMO_SITE_HOST}/styled/events/javascript-events.html'
+      <span class="gherkin-keyword">And </span>I click on the element with 'id:onkeypress'
+      <span class="gherkin-keyword">Then </span>I send 'ENTER' on the element with 'id:onkeypress'
+      <span class="gherkin-keyword">And </span>the element with 'id:onkeypressstatus' has 'Event Triggered' as text
 			</code></pre>
 			</div>
 			</ul>
@@ -484,14 +522,15 @@ pre code {
 			<li><h3>Select an option from a dropdown</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Select an option from a dropdown
-      Given I go to 'http://${DEMO_SITE_HOST}/styled/basic-html-form-test.html'
-      When I select 'Drop Down Item 1' on the element with 'name:dropdown'
-      When I de-select every item on the element with 'name:multipleselect[]'
-      When I select 'Selection Item 1' on the element with 'name:multipleselect[]'
-      And I click on the element with 'name:submitbutton' index '1'
-      And the element with 'id:_valuedropdown' has 'dd1' as text
-      And the element with 'id:_valuemultipleselect0' has 'ms1' as text
+			
+    <span class="gherkin-keyword">Scenario: </span>Select an option from a dropdown
+      <span class="gherkin-keyword">Given </span>I go to 'http://${DEMO_SITE_HOST}/styled/basic-html-form-test.html'
+      <span class="gherkin-keyword">When </span>I select 'Drop Down Item 1' on the element with 'name:dropdown'
+      <span class="gherkin-keyword">When </span>I de-select every item on the element with 'name:multipleselect[]'
+      <span class="gherkin-keyword">When </span>I select 'Selection Item 1' on the element with 'name:multipleselect[]'
+      <span class="gherkin-keyword">And </span>I click on the element with 'name:submitbutton' index '1'
+      <span class="gherkin-keyword">And </span>the element with 'id:_valuedropdown' has 'dd1' as text
+      <span class="gherkin-keyword">And </span>the element with 'id:_valuemultipleselect0' has 'ms1' as text
 			</code></pre>
 			</div>
 			</ul>
@@ -503,11 +542,12 @@ pre code {
 			<li><h3>Wait until the element is present</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Wait until the element is present
-      Given I go to 'http://${DEMO_SITE_HOST}/styled/dynamic-buttons-simple.html'
-      And I click on the element with 'id:button00'
-      And I wait until element with 'id:button01' is present
-      And I click on the element with 'id:button01'
+			
+    <span class="gherkin-keyword">Scenario: </span>Wait until the element is present
+      <span class="gherkin-keyword">Given </span>I go to 'http://${DEMO_SITE_HOST}/styled/dynamic-buttons-simple.html'
+      <span class="gherkin-keyword">And </span>I click on the element with 'id:button00'
+      <span class="gherkin-keyword">And </span>I wait until element with 'id:button01' is present
+      <span class="gherkin-keyword">And </span>I click on the element with 'id:button01'
 			</code></pre>
 			</div>
 			</ul>
@@ -515,15 +555,16 @@ pre code {
 			<li><h3>Wait an specific time until the element is present</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Wait an specific time until the element is present
-      Given I go to 'http://${DEMO_SITE_HOST}/styled/dynamic-buttons-simple.html'
-      And I click on the element with 'id:button00'
-      And I click on the element with 'id:button01'
-      Then I wait '5' seconds until element with 'id:button02' is present
-      And I click on the element with 'id:button02'
-      Then I wait '10' seconds until element with 'id:button03' is present
-      And I click on the element with 'id:button03'
-      And the element with 'id:buttonmessage' has 'All Buttons Clicked' as text
+			
+    <span class="gherkin-keyword">Scenario: </span>Wait an specific time until the element is present
+      <span class="gherkin-keyword">Given </span>I go to 'http://${DEMO_SITE_HOST}/styled/dynamic-buttons-simple.html'
+      <span class="gherkin-keyword">And </span>I click on the element with 'id:button00'
+      <span class="gherkin-keyword">And </span>I click on the element with 'id:button01'
+      <span class="gherkin-keyword">Then </span>I wait '5' seconds until element with 'id:button02' is present
+      <span class="gherkin-keyword">And </span>I click on the element with 'id:button02'
+      <span class="gherkin-keyword">Then </span>I wait '10' seconds until element with 'id:button03' is present
+      <span class="gherkin-keyword">And </span>I click on the element with 'id:button03'
+      <span class="gherkin-keyword">And </span>the element with 'id:buttonmessage' has 'All Buttons Clicked' as text
 			</code></pre>
 			</div>
 			</ul>
@@ -531,11 +572,12 @@ pre code {
 			<li><h3>Wait for element to be present/visible/hidden/clickable (longer method)</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Wait for element to be present/visible/hidden/clickable (longer method)
-      Given I go to 'http://${DEMO_SITE_HOST}/styled/javascript-redirect-test.html'
-      And I click on the element with 'id:delaygotobasic'
-      Then I check every '1' seconds for at least '10' seconds until '1' elements exists with 'id:goback' and is 'clickable'
-      And I click on the element with 'id:goback'
+			
+    <span class="gherkin-keyword">Scenario: </span>Wait for element to be present/visible/hidden/clickable (longer method)
+      <span class="gherkin-keyword">Given </span>I go to 'http://${DEMO_SITE_HOST}/styled/javascript-redirect-test.html'
+      <span class="gherkin-keyword">And </span>I click on the element with 'id:delaygotobasic'
+      <span class="gherkin-keyword">Then </span>I check every '1' seconds for at least '10' seconds until '1' elements exists with 'id:goback' and is 'clickable'
+      <span class="gherkin-keyword">And </span>I click on the element with 'id:goback'
 			</code></pre>
 			</div>
 			</ul>
@@ -547,11 +589,12 @@ pre code {
 			<li><h3>Dismiss an alert</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Dismiss an alert
-      Given I go to 'http://${DEMO_SITE_HOST}/styled/alerts/alert-test.html'
-      And I click on the element with 'id:confirmexample'
-      When I dismiss the alert
-      Then the element with 'id:confirmreturn' has 'false' as text
+			
+    <span class="gherkin-keyword">Scenario: </span>Dismiss an alert
+      <span class="gherkin-keyword">Given </span>I go to 'http://${DEMO_SITE_HOST}/styled/alerts/alert-test.html'
+      <span class="gherkin-keyword">And </span>I click on the element with 'id:confirmexample'
+      <span class="gherkin-keyword">When </span>I dismiss the alert
+      <span class="gherkin-keyword">Then </span>the element with 'id:confirmreturn' has 'false' as text
 			</code></pre>
 			</div>
 			</ul>
@@ -559,11 +602,12 @@ pre code {
 			<li><h3>Accept an alert</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Accept an alert
-      Given I go to 'http://${DEMO_SITE_HOST}/styled/alerts/alert-test.html'
-      And I click on the element with 'id:confirmexample'
-      And I accept the alert
-      Then the element with 'id:confirmreturn' has 'true' as text
+			
+    <span class="gherkin-keyword">Scenario: </span>Accept an alert
+      <span class="gherkin-keyword">Given </span>I go to 'http://${DEMO_SITE_HOST}/styled/alerts/alert-test.html'
+      <span class="gherkin-keyword">And </span>I click on the element with 'id:confirmexample'
+      <span class="gherkin-keyword">And </span>I accept the alert
+      <span class="gherkin-keyword">Then </span>the element with 'id:confirmreturn' has 'true' as text
 			</code></pre>
 			</div>
 			</ul>
@@ -571,10 +615,11 @@ pre code {
 			<li><h3>Wait for an alert to appear</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Wait for an alert to appear
-      Given I go to 'http://${DEMO_SITE_HOST}/styled/alerts/alert-test.html'
-      When I click on the element with 'id:confirmexample'
-      And I wait '5' seconds until an alert appears
+			
+    <span class="gherkin-keyword">Scenario: </span>Wait for an alert to appear
+      <span class="gherkin-keyword">Given </span>I go to 'http://${DEMO_SITE_HOST}/styled/alerts/alert-test.html'
+      <span class="gherkin-keyword">When </span>I click on the element with 'id:confirmexample'
+      <span class="gherkin-keyword">And </span>I wait '5' seconds until an alert appears
 			</code></pre>
 			</div>
 			</ul>
@@ -586,15 +631,16 @@ pre code {
 			<li><h3>Uploading a new profile picture</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
+			
     # Ignored since could fail while using selenium grid
     # The file must be reachable by the local browser
     @ignore
-    Scenario: Uploading a new profile picture
-      Given I go to 'http://${DEMO_SITE_HOST}/styled/file-upload-test.html'
-      And '1' elements exists with 'id:fileinput'
-      When I assign the file in 'schemas/empty.json' to the element with 'id:fileinput'
-      Then I click on the element with 'name:upload'
-      And the element with 'id:uploadedfilename' has 'empty.json' as text
+    <span class="gherkin-keyword">Scenario: </span>Uploading a new profile picture
+      <span class="gherkin-keyword">Given </span>I go to 'http://${DEMO_SITE_HOST}/styled/file-upload-test.html'
+      <span class="gherkin-keyword">And </span>'1' elements exists with 'id:fileinput'
+      <span class="gherkin-keyword">When </span>I assign the file in 'schemas/empty.json' to the element with 'id:fileinput'
+      <span class="gherkin-keyword">Then </span>I click on the element with 'name:upload'
+      <span class="gherkin-keyword">And </span>the element with 'id:uploadedfilename' has 'empty.json' as text
 			</code></pre>
 			</div>
 			</ul>
@@ -606,10 +652,11 @@ pre code {
 			<li><h3>Switch to iframe by locator</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Switch to iframe by locator
-      Given I go to 'http://${DEMO_SITE_HOST}/styled/iframes-test.html'
-      When I switch to iframe with 'id:thedynamichtml'
-      Then the element with 'id:iframe0' has 'iFrame List Item 0' as text
+			
+    <span class="gherkin-keyword">Scenario: </span>Switch to iframe by locator
+      <span class="gherkin-keyword">Given </span>I go to 'http://${DEMO_SITE_HOST}/styled/iframes-test.html'
+      <span class="gherkin-keyword">When </span>I switch to iframe with 'id:thedynamichtml'
+      <span class="gherkin-keyword">Then </span>the element with 'id:iframe0' has 'iFrame List Item 0' as text
 			</code></pre>
 			</div>
 			</ul>
@@ -617,12 +664,13 @@ pre code {
 			<li><h3>Switch to a parent frame</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Switch to a parent frame
-      Given I go to 'http://${DEMO_SITE_HOST}/styled/iframes-test.html'
-      When I switch to iframe with 'id:thedynamichtml'
-      Then the element with 'id:iframe0' has 'iFrame List Item 0' as text
-      Then I switch to a parent frame
-      And the element with 'css:h1' has 'iFrames Example' as text
+			
+    <span class="gherkin-keyword">Scenario: </span>Switch to a parent frame
+      <span class="gherkin-keyword">Given </span>I go to 'http://${DEMO_SITE_HOST}/styled/iframes-test.html'
+      <span class="gherkin-keyword">When </span>I switch to iframe with 'id:thedynamichtml'
+      <span class="gherkin-keyword">Then </span>the element with 'id:iframe0' has 'iFrame List Item 0' as text
+      <span class="gherkin-keyword">Then </span>I switch to a parent frame
+      <span class="gherkin-keyword">And </span>the element with 'css:h1' has 'iFrames Example' as text
 			</code></pre>
 			</div>
 			</ul>
@@ -634,10 +682,11 @@ pre code {
 			<li><h3>Taking a snapshot</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
+			
     # Snapshots are saved under target/executions
-    Scenario: Taking a snapshot
-      Given I go to 'http://${DEMO_SITE_HOST}'
-      Then I take a snapshot
+    <span class="gherkin-keyword">Scenario: </span>Taking a snapshot
+      <span class="gherkin-keyword">Given </span>I go to 'http://${DEMO_SITE_HOST}'
+      <span class="gherkin-keyword">Then </span>I take a snapshot
 			</code></pre>
 			</div>
 			</ul>
@@ -645,13 +694,14 @@ pre code {
 			<li><h3>Execute JavaScript functions</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
-    Scenario: Execute JavaScript functions
-      Given I go to 'http://${DEMO_SITE_HOST}/styled/basic-html-form-test.html'
-      And I execute 'arguments[0].click();' as javascript on the element with 'name:submitbutton'
-      And I execute 'alert("This is an alert!")' as javascript
-      And I accept the alert
-      And I execute 'return document.URL;' as javascript and save the result in the environment variable 'PAGE'
-      And '${PAGE}' contains 'basic-html-form-test'
+			
+    <span class="gherkin-keyword">Scenario: </span>Execute JavaScript functions
+      <span class="gherkin-keyword">Given </span>I go to 'http://${DEMO_SITE_HOST}/styled/basic-html-form-test.html'
+      <span class="gherkin-keyword">And </span>I execute 'arguments[0].click();' as javascript on the element with 'name:submitbutton'
+      <span class="gherkin-keyword">And </span>I execute 'alert("This is an alert!")' as javascript
+      <span class="gherkin-keyword">And </span>I accept the alert
+      <span class="gherkin-keyword">And </span>I execute 'return document.URL;' as javascript and save the result in the environment variable 'PAGE'
+      <span class="gherkin-keyword">And </span>'${PAGE}' contains 'basic-html-form-test'
 			</code></pre>
 			</div>
 			</ul>
