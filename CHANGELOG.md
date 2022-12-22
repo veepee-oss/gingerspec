@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.2.15
+
+* Added small change to add some style to html documentation
+
+* Edited Java SDKs for pipelines testing and execution
+
+* Added Support for graphql
+
+* Minor improve for some selenium steps: Added posibility of ignoring case when checking text of page source and element string contains
+
 ## 2.2.14
 
 * Added support for clickhouse DB
