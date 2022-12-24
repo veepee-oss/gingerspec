@@ -458,6 +458,15 @@ public class CommonG {
     }
 
     /**
+     * Get the Rest Spec utils.
+     *
+     * @return RestSpecUtils
+     */
+    public SwaggerUtils getSwagger() {
+        return SwaggerUtil.INSTANCE.getSwaggerUtils();
+    }
+
+    /**
      * Get the SOAP Services utils.
      *
      * @return SoapServiceUtils

@@ -63,6 +63,7 @@ GingerSpec provides common functionality that can be reused by different test pr
 * AssertJ
 * SQL (PostgreSQL & MySQL)
 * rest-assured (Rest API testing)
+* Swagger (2.x, 3.x)
 * SSH support
 * Files manipulation
 * WebServices (SOAP)

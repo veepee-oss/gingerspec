@@ -14,6 +14,8 @@
 # * 8123 (clickhouse)
 # * 3000 (Rest API server)
 # * 3001 (GraphQL server)
+# * 3002 (OAS2.x server)
+# * 3003 (OAS3.x server)
 # * 80   (Demo site)
 # * 4444 (Selenium hub)
 # * 5900 (Selenium node)
@@ -63,6 +65,14 @@ services:
     image: 'dmamontov/gingerspec-graphql:1.0'
     ports:
       - "3001:3000"
+  oas2-server:
+    image: 'dmamontov/gingerspec-oas:2'
+    ports:
+      - "3002:4010"
+  oas3-server:
+    image: 'dmamontov/gingerspec-oas:3'
+    ports:
+      - "3003:4010"
   demo-site:
     image: 'josefd8/selenium-testpages-image:1.0'
     ports:

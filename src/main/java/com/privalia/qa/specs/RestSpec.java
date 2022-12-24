@@ -18,6 +18,7 @@ package com.privalia.qa.specs;
 
 import com.jayway.jsonpath.PathNotFoundException;
 import com.privalia.qa.exceptions.NonReplaceableException;
+import com.privalia.qa.utils.SwaggerMethod;
 import com.privalia.qa.utils.ThreadProperty;
 import io.cucumber.datatable.DataTable;
 import io.cucumber.docstring.DocString;
@@ -124,6 +125,43 @@ public class RestSpec extends BaseGSpec {
         commonspec.setRestPort(restPort);
         commonspec.setRestProtocol(restProtocol);
 
+    }
+
+    /**
+     * Set app swagger spec for Rest requests.
+     * <p>
+     * This is a swagger spec initialization step. This is used as the first step in rest features to configure
+     * swagger spec.
+     * This parameters will be used for all future requests in the same scenario. The rest request is build within
+     * the {@link HookGSpec} class, so, don't forget to use the {@literal @}rest annotation at the beginning of your
+     * feature for a proper initialization.
+     * <pre>
+     * {@code
+     * Examples
+     *
+     * Scenario: Setting up the swagger from file.
+     *      Given I getting the swagger spec from 'swagger/oas3.yaml'
+     *
+     * Scenario: Setting up the swagger from file.
+     *      Given I getting the swagger spec from 'swagger/oas3.yaml' and choose server with index 1
+     *
+     * Scenario: Setting up the swagger from url.
+     *      Given I getting the swagger spec from 'http://petstore.swagger.io/v2/swagger.json'
+     * }
+     * </pre>
+     *
+     * @param path   File path to swagger spec or URI to swagger spec
+     * @param server Server index to which requests will be sent (default: 0)
+     */
+    @Given("^I getting the swagger spec from '(.*)'( and choose server with index (\\d+))?$")
+    public void setupSwaggerSpec(String path, Integer server) throws MalformedURLException {
+
+        commonspec.getSwagger().initialize(path, server);
+
+        this.setupApp(
+            commonspec.getSwagger().isSecured() ? "securely" : null,
+            commonspec.getSwagger().getHost()
+        );
     }
 
     /**
@@ -240,6 +278,60 @@ public class RestSpec extends BaseGSpec {
     }
 
     /**
+     * Generates a REST request from swagger operation
+     * <p>
+     * If needed, you can also specify the body of the request (for POST, PUT and DELETE requests) from a local file.
+     * If you need to alter the content of the json document before sending you could use
+     * {@link #sendRequestDataTable(String, String, String, String, String, String, DataTable)}.
+     * As soon as the request is completed, the request object is re-initialized with the same swagger spec as
+     * configured in {@link #setupSwaggerSpec(String, Integer)}. This is to avoid future requests from re-using the same
+     * cookies/headers/url parameters that the user may have configured.
+     * <pre>{@code
+     * Examples:
+     *
+     * Scenario: Executing a simple GET request
+     *      Given I getting the swagger spec from 'schemas/oas2.yaml'
+     *      When I send request to swagger by operation id 'pet'
+     *
+     * Scenario: Using basic authentication
+     *      Given I getting the swagger spec from 'schemas/oas2.yaml'
+     *      When I send request to swagger by operation id 'pet' with user and password 'user:password'
+     *
+     * Scenario: Sending a POST request with content of file swagger.testdata.json as body
+     *      Given I getting the swagger spec from 'schemas/oas2.yaml'
+     *      When I send request to swagger by operation id 'pet' based on 'schemas/swagger.testdata.json' as 'json'
+     * }</pre>
+     *
+     * @see #setupSwaggerSpec(String, Integer)
+     * @see #sendSwaggerRequestDataTable(String, String, String, String, DataTable)
+     * @see #sendSwaggerRequestInlineBody(String, String, DocString)
+     * @param operationId   Operation ID from swagger spec
+     * @param loginInfo     User and password to use if the endpoints requires basic authentication (user:password)
+     * @param baseData      If specified, the content of the file will be loaded in the body of the request (POST, PUT, PATCH operations)
+     * @param type          If the content of the file should be read as string or json or graphql
+     * @throws Exception    Exception
+     */
+    @When("^I send request to swagger by operation id '(.+?)'( with user and password '(.+:.+?)')?( based on '([^:]+?)')?( as '(json|string)')?$")
+    public void sendSwaggerRequestNoDataTable(String operationId, String loginInfo, String baseData, String type) throws Exception {
+
+        SwaggerMethod method = commonspec.getSwagger().getMethod(operationId);
+
+        Assertions.assertThat(method).as("Incorrect Operation ID from swagger").isNotNull();
+
+        commonspec.getRestRequest().given().filter(commonspec.getSwagger().getValidator());
+
+        this.sendRequestNoDataTable(
+            method.getMethod().name(),
+            method.getPath(),
+            loginInfo,
+            baseData,
+            type,
+            null
+        );
+
+    }
+
+    /**
      * Generates a REST request of the type specified to the indicated endpoint
      * <p>
      * This function works in the same way as {@link #sendRequestNoDataTable(String, String, String, String, String, String)}
@@ -320,6 +412,77 @@ public class RestSpec extends BaseGSpec {
         commonspec.generateRestRequest(requestType, endPoint);
         commonspec.getLogger().debug("Saving response");
         this.initializeRestClient();
+
+    }
+
+    /**
+     * Generates a REST request from swagger operation
+     * <p>
+     * This function works in the same way as {@link #sendSwaggerRequestNoDataTable(String, String, String, String)}
+     * the difference is that this one accepts a datatable with a list of modification to be applied to the json
+     * body before the request is executed. As soon as the request, is completed, the request object is re-initialized
+     * with the same base URI and port as configured in {@link #setupSwaggerSpec(String, Integer)}. This is to avoid future requests
+     * from re-using the same cookies/headers/url parameters that the user may have configured.
+     *
+     * <pre>{@code
+     * Example
+     *
+     * Scenario: Sending a POST request with content of file swagger.testdata.json as body
+     *      Given I getting the swagger spec from 'schemas/oas2.yaml'
+     *      When I send request to swagger by operation id 'pet' based on 'schemas/swagger.testdata.json' as 'json' with:
+     *          | $.title | UPDATE | This is a test 2 |
+     *
+     *
+     * About the modifications datatable: The datatable will typically have the following
+     * structure:
+     *
+     *      | <key path> | <type of modification> | <new value> | <object type> (optional) |
+     *
+     * <key path>: jsonPath to the key to be modified.
+     * <type of modification>: DELETE|ADD|UPDATE|APPEND|PREPEND|REPLACE|ADDTO
+     * <new value>: In case of UPDATE or ADD, new value to be used.
+     *
+     *              If the element read is: {"key1": "value1", "key2": {"key3": "value3"}}
+     *              And the modifications datatable is: | key2.key3 | UPDATE | "new value3" |
+     *              The result will be: {"key1": "value1", "key2": {"key3": "new value3"}}
+     *
+     *              (The new value will always by added as a string, that is, will contain double
+     *              quotes "". If you want to override this behaviour, use REPLACE and specify the <object type> column)
+     *
+     * <object type>: In case of REPLACE and ADDTO, specifies the object type the value should be transformed to.
+     *                Accepted values are: array|object|string|number|array|boolean|null. Use null if you want that
+     *                value in the json to be null.
+     *
+     * }</pre>
+     * @see #setupSwaggerSpec(String, Integer)
+     * @see #sendSwaggerRequestNoDataTable(String, String, String, String)
+     * @see #sendSwaggerRequestInlineBody(String, String, DocString)
+     * @param operationId   Operation ID from swagger spec
+     * @param baseData      Path to file containing the schema to be used
+     * @param type          Element to read from file (element should contain a json)
+     * @param loginInfo     Credentials for basic auth (if required)
+     * @param modifications DataTable containing the modifications to be done to the
+     *                      base schema element.
+     * @throws Exception    Exception
+     */
+    @When("^I send request to swagger by operation id '(.+?)'( with user and password '(.+:.+?)')? based on '([^:]+?)'( as '(json|string)')? with:$")
+    public void sendSwaggerRequestDataTable(String operationId, String loginInfo, String baseData, String type, DataTable modifications) throws Exception {
+
+        SwaggerMethod method = commonspec.getSwagger().getMethod(operationId);
+
+        Assertions.assertThat(method).as("Incorrect Operation ID from swagger").isNotNull();
+
+        commonspec.getRestRequest().given().filter(commonspec.getSwagger().getValidator());
+
+        this.sendRequestDataTable(
+            method.getMethod().name(),
+            method.getPath(),
+            loginInfo,
+            baseData,
+            type,
+            null,
+            modifications
+        );
 
     }
 
@@ -825,6 +988,54 @@ public class RestSpec extends BaseGSpec {
     }
 
     /**
+     * Specify a custom map of url path parameters to be added to future request
+     * <pre>{@code
+     * Example:
+     *
+     * Scenario: Add userId=3 to the url path parameters
+     *      Given I securely send requests to 'jsonplaceholder.typicode.com:443'
+     *      Given I set url path parameters:
+     *           | userId | 3 |
+     *      When I send a 'GET' request to '/posts/{userId}'
+     * }</pre>
+     * @see #setupApp(String, String)
+     * @see #sendRequestDataTable(String, String, String, String, String, String, DataTable)
+     * @see #sendRequestNoDataTable(String, String, String, String, String, String)
+     * @param modifications DataTable containing the custom set of url path parameters to be
+     *                      added to the requests. Syntax will be:
+     *                      {@code
+     *                      | <key> | <value> |
+     *                      }
+     *                      where:
+     *                      key: parameters name
+     *                      value: parameters value
+     *                      for example:
+     *                      if we want to add the parameter "id" with value "1", to the request url
+     *                      the modification will be:
+     *
+     *                      Given I set url parameters
+     *                          |  id  |  1  |
+     *                      When I send a 'GET' request to '/posts/{id}'
+     *
+     *                      This will produce the request '/posts/1'
+     */
+    @Given("^I set url path parameters:$")
+    public void iSetPathParameters(DataTable modifications) {
+
+        Map<String, String> pathParams = new HashMap<>();
+
+        for (List<String> row: modifications.asLists()) {
+            String key = row.get(0);
+            String value = row.get(1);
+            pathParams.put(key, value);
+            this.getCommonSpec().getLogger().debug("Setting path parameter '{}' to '{}'", key, value);
+        }
+
+        commonspec.getRestRequest().pathParams(pathParams);
+
+    }
+
+    /**
      * Specify a custom map of url query parameters to be added to future request
      * <pre>{@code
      * Example:
@@ -1035,6 +1246,53 @@ public class RestSpec extends BaseGSpec {
         commonspec.getRestRequest().given().body(content);
         commonspec.generateRestRequest(requestType, endPoint);
         commonspec.getLogger().debug("Saving response");
+    }
+
+    /**
+     * Generates a REST request from swagger operation
+     * <p>
+     * This step works in the same way as {@link #sendSwaggerRequestDataTable(String, String, String, String, DataTable)} or to
+     * {@link #sendSwaggerRequestNoDataTable(String, String, String, String)}, but in this case, you can pass directly the body to
+     * send as parameter. This could be useful if you want to give visibility of the data you are sending, although, if the body
+     * you want to send is too large, it might be better to store it in a file and use any of the other two steps.
+     * <pre>{@code
+     * Example:
+     *
+     * Scenario: Add the body to be sent directly
+     *      Given I getting the swagger spec from 'schemas/oas2.yaml'
+     *      When I send request to swagger by operation id 'pet' with body
+     *         """
+     *           {
+     *               "name": "doggie",
+     *               "tags": "dog"
+     *           }
+     *         """
+     * }
+     * </pre>
+     *
+     * @see #sendSwaggerRequestNoDataTable(String, String, String, String)
+     * @see #sendSwaggerRequestDataTable(String, String, String, String, DataTable)
+     * @param operationId   Operation ID from swagger spec
+     * @param type          If the content as string or json
+     * @param body          Inline body
+     */
+    @When("^I send request to swagger by operation id '(.+?)'( as '(json|string)')? with body")
+    public void sendSwaggerRequestInlineBody(String operationId, String type, DocString body) {
+
+        SwaggerMethod method = commonspec.getSwagger().getMethod(operationId);
+
+        Assertions.assertThat(method).as("Incorrect Operation ID from swagger").isNotNull();
+
+        commonspec.getRestRequest().given().filter(commonspec.getSwagger().getValidator());
+
+        this.sendRequestInlineBody(
+            method.getMethod().name(),
+            method.getPath(),
+            type,
+            null,
+            body
+        );
+
     }
 
     /**
