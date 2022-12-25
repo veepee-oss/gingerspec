@@ -16,12 +16,20 @@
 
 package com.privalia.qa.utils;
 
+import graphql.language.Document;
+import graphql.parser.Parser;
+import graphql.schema.GraphQLSchema;
+import graphql.schema.idl.SchemaParser;
+import graphql.schema.idl.UnExecutableSchemaGenerator;
+import graphql.validation.ValidationError;
+import graphql.validation.Validator;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.assertj.core.api.Assertions;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Additional operations with rest api spec (graphql).
@@ -30,6 +38,20 @@ public class GraphQlUtils {
     private static final Logger LOGGER = LoggerFactory.getLogger(GraphQlUtils.class);
 
     private JSONObject variables = new JSONObject();
+
+    private GraphQLSchema schema;
+
+    private Map<String, GraphQLSchema> cache = new HashMap<>();
+
+    /**
+     * Reset GraphQl data.
+     */
+    public void reset() {
+
+        this.variables = new JSONObject();
+        this.schema = null;
+
+    }
 
     /**
      * Set GraphQl variables.
@@ -75,9 +97,40 @@ public class GraphQlUtils {
      * @return String
      */
     public String build(String query) {
+
+        if (this.schema != null) {
+            List<ValidationError> errors = (new Validator()).validateDocument(
+                this.schema,
+                (new Parser()).parseDocument(query),
+                Locale.ROOT
+            );
+
+            Assertions
+                .assertThat(errors)
+                .as("Incorrect graphql query: " + errors.toString())
+                .isEmpty();
+        }
+
         return new JSONObject()
                 .put("query", query)
                 .put("variables", this.variables)
                 .toString();
+
+    }
+
+    /**
+     * Initialize GraphQl schema
+     *
+     * @param path File path to graphql schema
+     * @param data Content graphql schema
+     */
+    public void initialize(String path, String data) {
+
+        if (!this.cache.containsKey(path)) {
+            this.schema = UnExecutableSchemaGenerator.makeUnExecutableSchema(((new SchemaParser()).parse(data)));
+        } else {
+            this.schema = this.cache.get(path);
+        }
+
     }
 }

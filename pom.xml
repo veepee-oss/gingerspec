@@ -127,6 +127,7 @@
         <appium.version>7.3.0</appium.version>
         <swagger.parser.version>2.1.9</swagger.parser.version>
         <swagger.validator.version>2.31.0</swagger.validator.version>
+        <graphql.version>20.0</graphql.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -449,6 +450,11 @@
             <groupId>com.atlassian.oai</groupId>
             <artifactId>swagger-request-validator-restassured</artifactId>
             <version>${swagger.validator.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.graphql-java</groupId>
+            <artifactId>graphql-java</artifactId>
+            <version>${graphql.version}</version>
         </dependency>
     </dependencies>
 

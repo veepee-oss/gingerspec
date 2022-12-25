@@ -1,0 +1,18 @@
+type Query {
+  allUsers(page: Int, perPage: Int, sortField: String, sortOrder: String, filter: UserFilter): [User]
+}
+
+type User {
+  id: ID!
+  name: String!
+}
+
+input UserFilter {
+  q: String
+  ids: [ID]
+  id: ID
+  name: String
+  id_neq: ID
+  name_neq: String
+}
+

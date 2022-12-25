@@ -166,6 +166,41 @@ public class RestSpec extends BaseGSpec {
     }
 
     /**
+     * Set app graphql schema for Rest requests.
+     * <p>
+     * This is a graphql schema initialization step. This is used as the second step in rest features to configure
+     * graphql schema.
+     * This parameters will be used for all future requests in the same scenario. The rest request is build within
+     * the {@link HookGSpec} class, so, don't forget to use the {@literal @}rest annotation at the beginning of your
+     * feature for a proper initialization.
+     * <pre>
+     * {@code
+     * Examples
+     *
+     * Scenario: Setting up the host.
+     *      Given I send requests to 'jsonplaceholder.typicode.com'
+     *      Given I getting the graphql schema from 'schemas/schema.graphql'
+     *
+     * Scenario: Setting up host and specific port
+     *      Given I send requests to 'jsonplaceholder.typicode.com:8080'
+     *      Given I getting the graphql schema from 'schemas/schema.graphql'
+     *
+     * Scenario: using the keyword 'securely' to use https.
+     *      Given I securely send requests to 'jsonplaceholder.typicode.com'
+     *      Given I getting the graphql schema from 'schemas/schema.graphql'
+     * }
+     * </pre>
+     *
+     * @param path   File path to GraphQl schema
+     */
+    @Given("^I getting the graphql schema from '(.*)'$")
+    public void setupGraphQlSchema(String path) throws Exception {
+
+        commonspec.getGraphQl().initialize(path, commonspec.retrieveData(path, "string"));
+
+    }
+
+    /**
      * Verifies the structure of a json document against a set of test cases defined in a datatable
      * <p>
      * This step is typically used to verify the response body of a request. The json to verify
@@ -1352,7 +1387,7 @@ public class RestSpec extends BaseGSpec {
         RequestSpecification spec = new RequestSpecBuilder().setContentType(ContentType.JSON).setRelaxedHTTPSValidation().build();
         commonspec.setRestRequest(given().header("Content-Type", "application/json").spec(spec));
 
-        commonspec.getGraphQl().setVariables(new JSONObject());
+        commonspec.getGraphQl().reset();
 
         String baseUrl;
         if (commonspec.getRestPort() != null) {

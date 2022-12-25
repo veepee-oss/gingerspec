@@ -13,6 +13,13 @@ Feature: Steps for testing APIs
       Given I securely send requests to '${REST_SERVER_HOST}:3000'
 
 
+  Rule: Set up initial base URI for future requests
+
+    Scenario: Setting up base URI for future requests using graphql schema
+      Given I send requests to '${GRAPHQL_SERVER_HOST}:3001'
+      Given I getting the graphql schema from 'schemas/schema.graphql'
+
+
   Rule: Set up initial swagger spec for future requests
 
     @ignore
@@ -170,26 +177,31 @@ Feature: Steps for testing APIs
 
     Scenario: Adding graphql request body from a file
       Given I send requests to '${GRAPHQL_SERVER_HOST}:3001'
+      Given I getting the graphql schema from 'schemas/schema.graphql'
       When I send a 'POST' request to '/' based on 'schemas/mytestdata.graphql' as 'graphql'
 
     Scenario: Adding graphql request body from a file with variables
       Given I send requests to '${GRAPHQL_SERVER_HOST}:3001'
+      Given I getting the graphql schema from 'schemas/schema.graphql'
       Given I set graphql variables:
         | perPage | 10 |
       When I send a 'POST' request to '/' based on 'schemas/mytestdatawithvars.graphql' as 'graphql'
 
     Scenario: Adding graphql request body from a file with variables from file
       Given I send requests to '${GRAPHQL_SERVER_HOST}:3001'
+      Given I getting the graphql schema from 'schemas/schema.graphql'
       Given I set graphql variables based on 'schemas/graphql.variables.json'
       When I send a 'POST' request to '/' based on 'schemas/mytestdatawithvars.graphql' as 'graphql'
 
     Scenario: Adding request body from a file but modifying elements of the graphql before sending
       Given I send requests to '${GRAPHQL_SERVER_HOST}:3001'
+      Given I getting the graphql schema from 'schemas/schema.graphql'
       When I send a 'POST' request to '/' based on 'schemas/mytestdata.graphql' as 'graphql' with:
         | id | UPDATE | name |
 
     Scenario: Adding request body from a file and variables but modifying elements of the graphql before sending
       Given I send requests to '${GRAPHQL_SERVER_HOST}:3001'
+      Given I getting the graphql schema from 'schemas/schema.graphql'
       Given I set graphql variables:
         | perPage | 10 |
       When I send a 'POST' request to '/' based on 'schemas/mytestdatawithvars.graphql' as 'graphql' with:
@@ -197,6 +209,7 @@ Feature: Steps for testing APIs
 
     Scenario: Adding graphql request body directly in the gherkin step
       Given I send requests to '${GRAPHQL_SERVER_HOST}:3001'
+      Given I getting the graphql schema from 'schemas/schema.graphql'
       When I send a 'POST' request to '/' as 'graphql' with body
            """
               {
@@ -209,6 +222,7 @@ Feature: Steps for testing APIs
 
     Scenario: Adding graphql request body and variables directly in the gherkin step
       Given I send requests to '${GRAPHQL_SERVER_HOST}:3001'
+      Given I getting the graphql schema from 'schemas/schema.graphql'
       Given I set graphql variables:
         | perPage | 10 |
       When I send a 'POST' request to '/' as 'graphql' with body

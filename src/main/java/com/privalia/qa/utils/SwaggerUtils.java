@@ -46,13 +46,6 @@ public class SwaggerUtils {
     private Map<String, OpenAPI> cache = new HashMap<>();
 
     /**
-     * Reset swagger spec.
-     */
-    public void reset() {
-        this.spec = null;
-    }
-
-    /**
      * Get swagger spec.
      *
      * @return OpenAPI
