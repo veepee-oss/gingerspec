@@ -174,7 +174,14 @@ Feature: Steps for testing APIs
 
     Scenario: Adding graphql request body from a file with variables
       Given I send requests to '${GRAPHQL_SERVER_HOST}:3001'
-      When I send a 'POST' request to '/' based on 'schemas/mytestdatawithvars.graphql' as 'graphql' with variables '{"perPage": 10}'
+      Given I set graphql variables:
+        | perPage | 10 |
+      When I send a 'POST' request to '/' based on 'schemas/mytestdatawithvars.graphql' as 'graphql'
+
+    Scenario: Adding graphql request body from a file with variables from file
+      Given I send requests to '${GRAPHQL_SERVER_HOST}:3001'
+      Given I set graphql variables based on 'schemas/graphql.variables.json'
+      When I send a 'POST' request to '/' based on 'schemas/mytestdatawithvars.graphql' as 'graphql'
 
     Scenario: Adding request body from a file but modifying elements of the graphql before sending
       Given I send requests to '${GRAPHQL_SERVER_HOST}:3001'
@@ -183,7 +190,9 @@ Feature: Steps for testing APIs
 
     Scenario: Adding request body from a file and variables but modifying elements of the graphql before sending
       Given I send requests to '${GRAPHQL_SERVER_HOST}:3001'
-      When I send a 'POST' request to '/' based on 'schemas/mytestdatawithvars.graphql' as 'graphql' with variables '{"perPage": 10}' and:
+      Given I set graphql variables:
+        | perPage | 10 |
+      When I send a 'POST' request to '/' based on 'schemas/mytestdatawithvars.graphql' as 'graphql' with:
         | id | UPDATE | name |
 
     Scenario: Adding graphql request body directly in the gherkin step
@@ -200,7 +209,9 @@ Feature: Steps for testing APIs
 
     Scenario: Adding graphql request body and variables directly in the gherkin step
       Given I send requests to '${GRAPHQL_SERVER_HOST}:3001'
-      When I send a 'POST' request to '/' as 'graphql' with variables '{"perPage": 10}' and body
+      Given I set graphql variables:
+        | perPage | 10 |
+      When I send a 'POST' request to '/' as 'graphql' with body
            """
               query ($perPage: Int = 1) {
                   allUsers(perPage: $perPage) {
