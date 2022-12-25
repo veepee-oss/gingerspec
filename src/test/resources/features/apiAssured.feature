@@ -13,9 +13,12 @@ Feature: Steps for testing APIs
       Given I securely send requests to '${REST_SERVER_HOST}:3000'
 
 
-  Rule: Set up initial base URI for future requests
+  Rule: Set up initial base URI for future graphql requests
 
-    Scenario: Setting up base URI for future requests using graphql schema
+    Scenario: Setting up base URI for future requests without graphql schema
+      Given I send requests to '${GRAPHQL_SERVER_HOST}:3001'
+
+    Scenario: Setting up base URI for future requests with graphql schema
       Given I send requests to '${GRAPHQL_SERVER_HOST}:3001'
       Given I getting the graphql schema from 'schemas/schema.graphql'
 
