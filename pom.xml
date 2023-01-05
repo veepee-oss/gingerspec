@@ -99,7 +99,7 @@
     <properties>
         <cucumber-java.version>6.9.0</cucumber-java.version>
         <assertj-core.version>3.16.0</assertj-core.version>
-        <slf4j-api.version>1.7.30</slf4j-api.version>
+        <slf4j.version>2.0.5</slf4j.version>
         <reflections.version>0.9.9-RC1</reflections.version>
         <org.jacoco.core.version>0.7.5.201505241946</org.jacoco.core.version>
         <aspectjweaver.version>1.9.5</aspectjweaver.version>
@@ -114,8 +114,7 @@
         <hjson.version>1.1.4</hjson.version>
         <json-path.version>2.4.0</json-path.version>
         <elasticsearch.version>2.2.0</elasticsearch.version>
-        <jackson-core.version>2.11.0</jackson-core.version>
-        <jackson-databind.version>2.10.5.1</jackson-databind.version>
+        <jackson.version>2.14.0</jackson.version>
         <json-schema-validator.version>2.9.0</json-schema-validator.version>
         <kafka-clients.version>1.1.0</kafka-clients.version>
         <kafka-avro-serializer.version>3.1.1</kafka-avro-serializer.version>
@@ -126,6 +125,9 @@
         <rest-assured.version>4.5.1</rest-assured.version>
         <webdrivermanager.version>5.1.0</webdrivermanager.version>
         <appium.version>7.3.0</appium.version>
+        <swagger.parser.version>2.1.9</swagger.parser.version>
+        <swagger.validator.version>2.31.0</swagger.validator.version>
+        <graphql.version>20.0</graphql.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -140,7 +142,12 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>${slf4j-api.version}</version>
+            <version>${slf4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>${slf4j.version}</version>
         </dependency>
         <dependency>
             <groupId>org.reflections</groupId>
@@ -261,14 +268,24 @@
             <version>${elasticsearch.version}</version>
         </dependency>
         <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-yaml</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
-            <version>${jackson-core.version}</version>
+            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>${jackson-databind.version}</version>
+            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.kafka</groupId>
@@ -428,6 +445,21 @@
                     <artifactId>*</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>io.swagger.parser.v3</groupId>
+            <artifactId>swagger-parser</artifactId>
+            <version>${swagger.parser.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.atlassian.oai</groupId>
+            <artifactId>swagger-request-validator-restassured</artifactId>
+            <version>${swagger.validator.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.graphql-java</groupId>
+            <artifactId>graphql-java</artifactId>
+            <version>${graphql.version}</version>
         </dependency>
     </dependencies>
 

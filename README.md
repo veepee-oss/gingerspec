@@ -61,8 +61,10 @@ GingerSpec provides common functionality that can be reused by different test pr
 * Selenium
 * Appium     
 * AssertJ
-* SQL (PostgreSQL & MySQL)
+* SQL (PostgreSQL, MySQL, Clickhouse)
 * rest-assured (Rest API testing)
+* GraphQl
+* Swagger (2.x, 3.x)
 * SSH support
 * Files manipulation
 * WebServices (SOAP)

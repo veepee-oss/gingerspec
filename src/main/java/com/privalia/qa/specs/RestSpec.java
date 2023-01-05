@@ -18,6 +18,7 @@ package com.privalia.qa.specs;
 
 import com.jayway.jsonpath.PathNotFoundException;
 import com.privalia.qa.exceptions.NonReplaceableException;
+import com.privalia.qa.utils.SwaggerMethod;
 import com.privalia.qa.utils.ThreadProperty;
 import io.cucumber.datatable.DataTable;
 import io.cucumber.docstring.DocString;
@@ -33,6 +34,7 @@ import io.restassured.specification.RequestSpecification;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.assertj.core.api.Assertions;
 import org.hjson.JsonValue;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -127,6 +129,78 @@ public class RestSpec extends BaseGSpec {
     }
 
     /**
+     * Set app swagger spec for Rest requests.
+     * <p>
+     * This is a swagger spec initialization step. This is used as the first step in rest features to configure
+     * swagger spec.
+     * This parameters will be used for all future requests in the same scenario. The rest request is build within
+     * the {@link HookGSpec} class, so, don't forget to use the {@literal @}rest annotation at the beginning of your
+     * feature for a proper initialization.
+     * <pre>
+     * {@code
+     * Examples
+     *
+     * Scenario: Setting up the swagger from file.
+     *      Given I getting the swagger spec from 'swagger/oas3.yaml'
+     *
+     * Scenario: Setting up the swagger from file.
+     *      Given I getting the swagger spec from 'swagger/oas3.yaml' and choose server with index 1
+     *
+     * Scenario: Setting up the swagger from url.
+     *      Given I getting the swagger spec from 'http://petstore.swagger.io/v2/swagger.json'
+     * }
+     * </pre>
+     *
+     * @param path   File path to swagger spec or URI to swagger spec
+     * @param server Server index to which requests will be sent (default: 0)
+     */
+    @Given("^I getting the swagger spec from '(.*)'( and choose server with index (\\d+))?$")
+    public void setupSwaggerSpec(String path, Integer server) throws MalformedURLException {
+
+        commonspec.getSwagger().initialize(path, server);
+
+        this.setupApp(
+            commonspec.getSwagger().isSecured() ? "securely" : null,
+            commonspec.getSwagger().getHost()
+        );
+    }
+
+    /**
+     * Set app graphql schema for Rest requests.
+     * <p>
+     * This is a graphql schema initialization step. This is used as the second step in rest features to configure
+     * graphql schema.
+     * This parameters will be used for all future requests in the same scenario. The rest request is build within
+     * the {@link HookGSpec} class, so, don't forget to use the {@literal @}rest annotation at the beginning of your
+     * feature for a proper initialization.
+     * <pre>
+     * {@code
+     * Examples
+     *
+     * Scenario: Setting up the host.
+     *      Given I send requests to 'jsonplaceholder.typicode.com'
+     *      Given I getting the graphql schema from 'schemas/schema.graphql'
+     *
+     * Scenario: Setting up host and specific port
+     *      Given I send requests to 'jsonplaceholder.typicode.com:8080'
+     *      Given I getting the graphql schema from 'schemas/schema.graphql'
+     *
+     * Scenario: using the keyword 'securely' to use https.
+     *      Given I securely send requests to 'jsonplaceholder.typicode.com'
+     *      Given I getting the graphql schema from 'schemas/schema.graphql'
+     * }
+     * </pre>
+     *
+     * @param path   File path to GraphQl schema
+     */
+    @Given("^I getting the graphql schema from '(.*)'$")
+    public void setupGraphQlSchema(String path) throws Exception {
+
+        commonspec.getGraphQl().initialize(path, commonspec.retrieveData(path, "string"));
+
+    }
+
+    /**
      * Verifies the structure of a json document against a set of test cases defined in a datatable
      * <p>
      * This step is typically used to verify the response body of a request. The json to verify
@@ -171,7 +245,7 @@ public class RestSpec extends BaseGSpec {
      * <p>
      * The endpoint must be relative to the base path previously defined with {@link #setupApp(String, String)}. If needed, you can also specify
      * the body of the request (for POST, PUT and DELETE requests) from a local file. If you need to alter the content of the json document before
-     * sending you could use {@link #sendRequestDataTable(String, String, String, String, String, String, DataTable)}. As soon as the request is completed, the
+     * sending you could use {@link #sendRequestDataTable(String, String, String, String, String, DataTable)}. As soon as the request is completed, the
      * request object is re-initialized with the same base URI and port as configured in {@link #setupApp(String, String)}. This is to avoid future requests
      * from re-using the same cookies/headers/url parameters that the user may have configured.
      * <pre>{@code
@@ -192,25 +266,20 @@ public class RestSpec extends BaseGSpec {
      * Scenario: Sending a POST request with content of file mytestdata.graphql as body
      *      Given I securely send requests to 'jsonplaceholder.typicode.com:443'
      *      When I send a 'POST' request to '/' based on 'schemas/mytestdata.graphql' as 'graphql'
-     *
-     * Scenario: Sending a POST request with content of file mytestdata.graphql with variables as body
-     *      Given I securely send requests to 'jsonplaceholder.typicode.com:443'
-     *      When I send a 'POST' request to '/' based on 'schemas/mytestdata.graphql' as 'graphql' with variables '{"perPage": 10}' and
      * }</pre>
      *
      * @see #setupApp(String, String)
-     * @see #sendRequestDataTable(String, String, String, String, String, String, DataTable)
-     * @see #sendRequestInlineBody(String, String, String, String, DocString)
+     * @see #sendRequestDataTable(String, String, String, String, String, DataTable)
+     * @see #sendRequestInlineBody(String, String, String, DocString)
      * @param requestType   HTTP verb (type of request): POST, GET, PUT, PATCH, DELETE
      * @param endPoint      Endpoint (i.e /user/1). The base path used is the one indicated in a previous step
      * @param loginInfo     User and password to use if the endpoints requires basic authentication (user:password)
      * @param baseData      If specified, the content of the file will be loaded in the body of the request (POST, PUT, PATCH operations)
      * @param type          If the content of the file should be read as string or json or graphql
-     * @param variables     If the content as graphql
      * @throws Exception    Exception
      */
-    @When("^I send a '(.+?)' request to '(.+?)'( with user and password '(.+:.+?)')?( based on '([^:]+?)')?( as '(json|string|graphql)')?( with variables '(.+?)')?$")
-    public void sendRequestNoDataTable(String requestType, String endPoint, String loginInfo, String baseData, String type, String variables) throws Exception {
+    @When("^I send a '(.+?)' request to '(.+?)'( with user and password '(.+:.+?)')?( based on '([^:]+?)')?( as '(json|string|graphql)')?$")
+    public void sendRequestNoDataTable(String requestType, String endPoint, String loginInfo, String baseData, String type) throws Exception {
 
         String retrievedData;
         String user = null;
@@ -226,7 +295,7 @@ public class RestSpec extends BaseGSpec {
             retrievedData = commonspec.retrieveData(baseData, type);
 
             if (type.equals("graphql")) {
-                retrievedData = this.commonspec.buildGraphql(retrievedData, variables);
+                retrievedData = this.commonspec.getGraphQl().build(retrievedData);
             }
 
             commonspec.getRestRequest().given().body(retrievedData);
@@ -240,9 +309,62 @@ public class RestSpec extends BaseGSpec {
     }
 
     /**
+     * Generates a REST request from swagger operation
+     * <p>
+     * If needed, you can also specify the body of the request (for POST, PUT and DELETE requests) from a local file.
+     * If you need to alter the content of the json document before sending you could use
+     * {@link #sendRequestDataTable(String, String, String, String, String, DataTable)}.
+     * As soon as the request is completed, the request object is re-initialized with the same swagger spec as
+     * configured in {@link #setupSwaggerSpec(String, Integer)}. This is to avoid future requests from re-using the same
+     * cookies/headers/url parameters that the user may have configured.
+     * <pre>{@code
+     * Examples:
+     *
+     * Scenario: Executing a simple GET request
+     *      Given I getting the swagger spec from 'schemas/oas2.yaml'
+     *      When I send request to swagger by operation id 'pet'
+     *
+     * Scenario: Using basic authentication
+     *      Given I getting the swagger spec from 'schemas/oas2.yaml'
+     *      When I send request to swagger by operation id 'pet' with user and password 'user:password'
+     *
+     * Scenario: Sending a POST request with content of file swagger.testdata.json as body
+     *      Given I getting the swagger spec from 'schemas/oas2.yaml'
+     *      When I send request to swagger by operation id 'pet' based on 'schemas/swagger.testdata.json' as 'json'
+     * }</pre>
+     *
+     * @see #setupSwaggerSpec(String, Integer)
+     * @see #sendSwaggerRequestDataTable(String, String, String, String, DataTable)
+     * @see #sendSwaggerRequestInlineBody(String, String, DocString)
+     * @param operationId   Operation ID from swagger spec
+     * @param loginInfo     User and password to use if the endpoints requires basic authentication (user:password)
+     * @param baseData      If specified, the content of the file will be loaded in the body of the request (POST, PUT, PATCH operations)
+     * @param type          If the content of the file should be read as string or json or graphql
+     * @throws Exception    Exception
+     */
+    @When("^I send request to swagger by operation id '(.+?)'( with user and password '(.+:.+?)')?( based on '([^:]+?)')?( as '(json|string)')?$")
+    public void sendSwaggerRequestNoDataTable(String operationId, String loginInfo, String baseData, String type) throws Exception {
+
+        SwaggerMethod method = commonspec.getSwagger().getMethod(operationId);
+
+        Assertions.assertThat(method).as("Incorrect Operation ID from swagger").isNotNull();
+
+        commonspec.getRestRequest().given().filter(commonspec.getSwagger().getValidator());
+
+        this.sendRequestNoDataTable(
+            method.getMethod().name(),
+            method.getPath(),
+            loginInfo,
+            baseData,
+            type
+        );
+
+    }
+
+    /**
      * Generates a REST request of the type specified to the indicated endpoint
      * <p>
-     * This function works in the same way as {@link #sendRequestNoDataTable(String, String, String, String, String, String)}
+     * This function works in the same way as {@link #sendRequestNoDataTable(String, String, String, String, String)}
      * the difference is that this one accepts a datatable with a list of modification to be applied to the json
      * body before the request is executed. As soon as the request, is completed, the request object is re-initialized
      * with the same base URI and port as configured in {@link #setupApp(String, String)}. This is to avoid future requests
@@ -279,20 +401,19 @@ public class RestSpec extends BaseGSpec {
      *
      * }</pre>
      * @see #setupApp(String, String)
-     * @see #sendRequestNoDataTable(String, String, String, String, String, String)
-     * @see #sendRequestInlineBody(String, String, String, String, DocString)
+     * @see #sendRequestNoDataTable(String, String, String, String, String)
+     * @see #sendRequestInlineBody(String, String, String, DocString)
      * @param requestType   Type of request to be sent. Possible values: GET|DELETE|POST|PUT|PATCH
      * @param endPoint      End point to be used (relative to the base path previously defined with {@link #setupApp(String, String)})
      * @param baseData      Path to file containing the schema to be used
      * @param type          Element to read from file (element should contain a json)
-     * @param variables     If the content as graphql
      * @param loginInfo     Credentials for basic auth (if required)
      * @param modifications DataTable containing the modifications to be done to the
      *                      base schema element.
      * @throws Exception    Exception
      */
-    @When("^I send a '(.+?)' request to '(.+?)'( with user and password '(.+:.+?)')? based on '([^:]+?)'( as '(json|string|graphql)')? with( variables '(.+?)' and)?:$")
-    public void sendRequestDataTable(String requestType, String endPoint, String loginInfo, String baseData, String type, String variables, DataTable modifications) throws Exception {
+    @When("^I send a '(.+?)' request to '(.+?)'( with user and password '(.+:.+?)')? based on '([^:]+?)'( as '(json|string|graphql)')? with:$")
+    public void sendRequestDataTable(String requestType, String endPoint, String loginInfo, String baseData, String type, DataTable modifications) throws Exception {
 
         String user;
         String password;
@@ -301,7 +422,7 @@ public class RestSpec extends BaseGSpec {
         String retrievedData = commonspec.retrieveData(baseData, type);
 
         if (type.equals("graphql")) {
-            retrievedData = this.commonspec.buildGraphql(retrievedData, variables);
+            retrievedData = this.commonspec.getGraphQl().build(retrievedData);
         }
 
         // Modify data
@@ -320,6 +441,76 @@ public class RestSpec extends BaseGSpec {
         commonspec.generateRestRequest(requestType, endPoint);
         commonspec.getLogger().debug("Saving response");
         this.initializeRestClient();
+
+    }
+
+    /**
+     * Generates a REST request from swagger operation
+     * <p>
+     * This function works in the same way as {@link #sendSwaggerRequestNoDataTable(String, String, String, String)}
+     * the difference is that this one accepts a datatable with a list of modification to be applied to the json
+     * body before the request is executed. As soon as the request, is completed, the request object is re-initialized
+     * with the same base URI and port as configured in {@link #setupSwaggerSpec(String, Integer)}. This is to avoid future requests
+     * from re-using the same cookies/headers/url parameters that the user may have configured.
+     *
+     * <pre>{@code
+     * Example
+     *
+     * Scenario: Sending a POST request with content of file swagger.testdata.json as body
+     *      Given I getting the swagger spec from 'schemas/oas2.yaml'
+     *      When I send request to swagger by operation id 'pet' based on 'schemas/swagger.testdata.json' as 'json' with:
+     *          | $.title | UPDATE | This is a test 2 |
+     *
+     *
+     * About the modifications datatable: The datatable will typically have the following
+     * structure:
+     *
+     *      | <key path> | <type of modification> | <new value> | <object type> (optional) |
+     *
+     * <key path>: jsonPath to the key to be modified.
+     * <type of modification>: DELETE|ADD|UPDATE|APPEND|PREPEND|REPLACE|ADDTO
+     * <new value>: In case of UPDATE or ADD, new value to be used.
+     *
+     *              If the element read is: {"key1": "value1", "key2": {"key3": "value3"}}
+     *              And the modifications datatable is: | key2.key3 | UPDATE | "new value3" |
+     *              The result will be: {"key1": "value1", "key2": {"key3": "new value3"}}
+     *
+     *              (The new value will always by added as a string, that is, will contain double
+     *              quotes "". If you want to override this behaviour, use REPLACE and specify the <object type> column)
+     *
+     * <object type>: In case of REPLACE and ADDTO, specifies the object type the value should be transformed to.
+     *                Accepted values are: array|object|string|number|array|boolean|null. Use null if you want that
+     *                value in the json to be null.
+     *
+     * }</pre>
+     * @see #setupSwaggerSpec(String, Integer)
+     * @see #sendSwaggerRequestNoDataTable(String, String, String, String)
+     * @see #sendSwaggerRequestInlineBody(String, String, DocString)
+     * @param operationId   Operation ID from swagger spec
+     * @param baseData      Path to file containing the schema to be used
+     * @param type          Element to read from file (element should contain a json)
+     * @param loginInfo     Credentials for basic auth (if required)
+     * @param modifications DataTable containing the modifications to be done to the
+     *                      base schema element.
+     * @throws Exception    Exception
+     */
+    @When("^I send request to swagger by operation id '(.+?)'( with user and password '(.+:.+?)')? based on '([^:]+?)'( as '(json|string)')? with:$")
+    public void sendSwaggerRequestDataTable(String operationId, String loginInfo, String baseData, String type, DataTable modifications) throws Exception {
+
+        SwaggerMethod method = commonspec.getSwagger().getMethod(operationId);
+
+        Assertions.assertThat(method).as("Incorrect Operation ID from swagger").isNotNull();
+
+        commonspec.getRestRequest().given().filter(commonspec.getSwagger().getValidator());
+
+        this.sendRequestDataTable(
+            method.getMethod().name(),
+            method.getPath(),
+            loginInfo,
+            baseData,
+            type,
+            modifications
+        );
 
     }
 
@@ -371,8 +562,8 @@ public class RestSpec extends BaseGSpec {
     /**
      * Verifies the response body matches a json schema.
      * <p>
-     * For this step to work, a previous request must have been executed such as {@link #sendRequestNoDataTable(String, String, String, String, String, String)}
-     * or {@link #sendRequestDataTable(String, String, String, String, String, String, DataTable)}. The given file must contain a valid json schema (http://json-schema.org/)
+     * For this step to work, a previous request must have been executed such as {@link #sendRequestNoDataTable(String, String, String, String, String)}
+     * or {@link #sendRequestDataTable(String, String, String, String, String, DataTable)}. The given file must contain a valid json schema (http://json-schema.org/)
      * <pre>{@code
      * Example:
      *
@@ -387,8 +578,8 @@ public class RestSpec extends BaseGSpec {
      * @throws ConfigurationException  the configuration exception
      * @throws FileNotFoundException   the file not found exception
      * @throws URISyntaxException      the uri syntax exception
-     * @see #sendRequestNoDataTable(String, String, String, String, String, String) #sendRequestNoDataTable(String, String, String, String, String, String)
-     * @see #sendRequestDataTable(String, String, String, String, String, String, DataTable) #sendRequestDataTable(String, String, String, String, String, String, DataTable)
+     * @see #sendRequestNoDataTable(String, String, String, String, String)
+     * @see #sendRequestDataTable(String, String, String, String, String, DataTable)
      * @see <a href="http://json-schema.org/">http://json-schema.org/</a>
      */
     @Then("^the service response matches the schema in '(.*?)'$")
@@ -400,8 +591,8 @@ public class RestSpec extends BaseGSpec {
     /**
      * Verifies the length of the response body.
      * <p>
-     * For this step to work, a previous request must have been executed such as {@link #sendRequestNoDataTable(String, String, String, String, String, String)}
-     * or {@link #sendRequestDataTable(String, String, String, String, String, String, DataTable)}
+     * For this step to work, a previous request must have been executed such as {@link #sendRequestNoDataTable(String, String, String, String, String)}
+     * or {@link #sendRequestDataTable(String, String, String, String, String, DataTable)}
      * <pre>{@code
      * Example:
      *
@@ -410,8 +601,8 @@ public class RestSpec extends BaseGSpec {
      *     When I send a 'GET' request to '/comments/1'
      *     Then the service response length must be '268'
      * }</pre>
-     * @see #sendRequestNoDataTable(String, String, String, String, String, String)
-     * @see #sendRequestDataTable(String, String, String, String, String, String, DataTable)
+     * @see #sendRequestNoDataTable(String, String, String, String, String)
+     * @see #sendRequestDataTable(String, String, String, String, String, DataTable)
      * @see <a href="http://json-schema.org/">http://json-schema.org/</a>
      * @param expextedLength        Expected response body length
      */
@@ -423,8 +614,8 @@ public class RestSpec extends BaseGSpec {
     /**
      * Verifies the status response (HTTP response code) of a rest request.
      * <p>
-     * For this step to work, a previous request must have been executed such as {@link #sendRequestNoDataTable(String, String, String, String, String, String)}
-     * or {@link #sendRequestDataTable(String, String, String, String, String, String, DataTable)}
+     * For this step to work, a previous request must have been executed such as {@link #sendRequestNoDataTable(String, String, String, String, String)}
+     * or {@link #sendRequestDataTable(String, String, String, String, String, DataTable)}
      * <pre>{@code
      * Example:
      *
@@ -433,8 +624,8 @@ public class RestSpec extends BaseGSpec {
      *      When I send a 'GET' request to '/posts'
      *      Then the service response status must be '200'
      * }</pre>
-     * @see #sendRequestNoDataTable(String, String, String, String, String, String)
-     * @see #sendRequestDataTable(String, String, String, String, String, String, DataTable)
+     * @see #sendRequestNoDataTable(String, String, String, String, String)
+     * @see #sendRequestDataTable(String, String, String, String, String, DataTable)
      * @see <a href="http://json-schema.org/">http://json-schema.org/</a>
      * @param expectedStatus        Expected HTTP status code
      */
@@ -446,8 +637,8 @@ public class RestSpec extends BaseGSpec {
     /**
      * Verifies if the response body contains an specific string
      * <p>
-     * For this step to work, a previous request must have been executed such as {@link #sendRequestNoDataTable(String, String, String, String, String, String)}
-     * or {@link #sendRequestDataTable(String, String, String, String, String, String, DataTable)}
+     * For this step to work, a previous request must have been executed such as {@link #sendRequestNoDataTable(String, String, String, String, String)}
+     * or {@link #sendRequestDataTable(String, String, String, String, String, DataTable)}
      * <pre>{@code
      * Example:
      *
@@ -457,8 +648,8 @@ public class RestSpec extends BaseGSpec {
      *     And the service response must contain the text 'body'
      * }
      * </pre>
-     * @see #sendRequestDataTable(String, String, String, String, String, String, DataTable)
-     * @see #sendRequestNoDataTable(String, String, String, String, String, String)
+     * @see #sendRequestDataTable(String, String, String, String, String, DataTable)
+     * @see #sendRequestNoDataTable(String, String, String, String, String)
      * @see #assertResponseStatusLength(Integer, String)
      * @param expectedText  String to find in the response body
      */
@@ -475,8 +666,8 @@ public class RestSpec extends BaseGSpec {
      * <p>
      * This step is typically used to save the body response of a HTTP request (either the full body
      * response or just an specific element). If this is the case, a previous HTTP request operation
-     * must have been performed (with {@link #sendRequestDataTable(String, String, String, String, String, String, DataTable)} or with
-     * {@link #sendRequestNoDataTable(String, String, String, String, String, String)})
+     * must have been performed (with {@link #sendRequestDataTable(String, String, String, String, String, DataTable)} or with
+     * {@link #sendRequestNoDataTable(String, String, String, String, String)})
      * <pre>{@code
      * Example: If element is a jsonpath expression (i.e. $.fragments[0].id), it will be applied over the last httpResponse.
      *
@@ -503,8 +694,8 @@ public class RestSpec extends BaseGSpec {
      *      And I save element '${first_user}.$.username' in environment variable 'username'
      *      Then '${username}' matches 'Bret'
      * }</pre>
-     * @see #sendRequestNoDataTable(String, String, String, String, String, String)
-     * @see #sendRequestDataTable(String, String, String, String, String, String, DataTable)
+     * @see #sendRequestNoDataTable(String, String, String, String, String)
+     * @see #sendRequestDataTable(String, String, String, String, String, DataTable)
      * @see <a href="http://json-schema.org/">http://json-schema.org/</a>
      * @param position position from a search result
      * @param element  key in the json response to be saved
@@ -698,8 +889,8 @@ public class RestSpec extends BaseGSpec {
     /**
      * Checks if the headers in the response matches the specified values
      * <p>
-     * A previous HTTP request operation must have been executed, such as {@link #sendRequestNoDataTable(String, String, String, String, String, String)}
-     * or {@link #sendRequestDataTable(String, String, String, String, String, String, DataTable)}
+     * A previous HTTP request operation must have been executed, such as {@link #sendRequestNoDataTable(String, String, String, String, String)}
+     * or {@link #sendRequestDataTable(String, String, String, String, String, DataTable)}
      * <pre>{@code
      * Example:
      *
@@ -712,8 +903,8 @@ public class RestSpec extends BaseGSpec {
      *       | Content-Encoding | equal           | gzip  |
      * }</pre>
      *
-     * @see #sendRequestDataTable(String, String, String, String, String, String, DataTable)
-     * @see #sendRequestNoDataTable(String, String, String, String, String, String)
+     * @see #sendRequestDataTable(String, String, String, String, String, DataTable)
+     * @see #sendRequestNoDataTable(String, String, String, String, String)
      * @param table DataTable containing the custom set of headers to be
      *                      added to the requests. Syntax will be:
      *                      {@code
@@ -748,10 +939,10 @@ public class RestSpec extends BaseGSpec {
      * Checks if the cookies in the response matches the specified values
      * <p>
      * Works in a similar way that {@link #checkHeaders(DataTable)}. A previous HTTP request operation must have been executed
-     * such as {@link #sendRequestNoDataTable(String, String, String, String, String, String)} or {@link #sendRequestDataTable(String, String, String, String, String, String, DataTable)}
+     * such as {@link #sendRequestNoDataTable(String, String, String, String, String)} or {@link #sendRequestDataTable(String, String, String, String, String, DataTable)}
      * @see #checkHeaders(DataTable)
-     * @see #sendRequestDataTable(String, String, String, String, String, String, DataTable)
-     * @see #sendRequestNoDataTable(String, String, String, String, String, String)
+     * @see #sendRequestDataTable(String, String, String, String, String, DataTable)
+     * @see #sendRequestNoDataTable(String, String, String, String, String)
      * @param table DataTable containing the custom set of cookies to be
      *                      added to the requests. Syntax will be:
      *                      {@code
@@ -793,8 +984,8 @@ public class RestSpec extends BaseGSpec {
      *      And I save the response header 'Content-Type' in environment variable 'content-type'
      *      Then '${content-type}' matches 'application/json; charset=utf-8'
      * }</pre>
-     * @see #sendRequestDataTable(String, String, String, String, String, String, DataTable)
-     * @see #sendRequestNoDataTable(String, String, String, String, String, String)
+     * @see #sendRequestDataTable(String, String, String, String, String, DataTable)
+     * @see #sendRequestNoDataTable(String, String, String, String, String)
      * @param headerName    Header name
      * @param varName       Name of the environmental variable
      */
@@ -825,6 +1016,54 @@ public class RestSpec extends BaseGSpec {
     }
 
     /**
+     * Specify a custom map of url path parameters to be added to future request
+     * <pre>{@code
+     * Example:
+     *
+     * Scenario: Add userId=3 to the url path parameters
+     *      Given I securely send requests to 'jsonplaceholder.typicode.com:443'
+     *      Given I set url path parameters:
+     *           | userId | 3 |
+     *      When I send a 'GET' request to '/posts/{userId}'
+     * }</pre>
+     * @see #setupApp(String, String)
+     * @see #sendRequestDataTable(String, String, String, String, String, DataTable)
+     * @see #sendRequestNoDataTable(String, String, String, String, String)
+     * @param modifications DataTable containing the custom set of url path parameters to be
+     *                      added to the requests. Syntax will be:
+     *                      {@code
+     *                      | <key> | <value> |
+     *                      }
+     *                      where:
+     *                      key: parameters name
+     *                      value: parameters value
+     *                      for example:
+     *                      if we want to add the parameter "id" with value "1", to the request url
+     *                      the modification will be:
+     *
+     *                      Given I set url parameters
+     *                          |  id  |  1  |
+     *                      When I send a 'GET' request to '/posts/{id}'
+     *
+     *                      This will produce the request '/posts/1'
+     */
+    @Given("^I set url path parameters:$")
+    public void iSetPathParameters(DataTable modifications) {
+
+        Map<String, String> pathParams = new HashMap<>();
+
+        for (List<String> row: modifications.asLists()) {
+            String key = row.get(0);
+            String value = row.get(1);
+            pathParams.put(key, value);
+            this.getCommonSpec().getLogger().debug("Setting path parameter '{}' to '{}'", key, value);
+        }
+
+        commonspec.getRestRequest().pathParams(pathParams);
+
+    }
+
+    /**
      * Specify a custom map of url query parameters to be added to future request
      * <pre>{@code
      * Example:
@@ -836,8 +1075,8 @@ public class RestSpec extends BaseGSpec {
      *      When I send a 'GET' request to '/posts'
      * }</pre>
      * @see #setupApp(String, String)
-     * @see #sendRequestDataTable(String, String, String, String, String, String, DataTable)
-     * @see #sendRequestNoDataTable(String, String, String, String, String, String)
+     * @see #sendRequestDataTable(String, String, String, String, String, DataTable)
+     * @see #sendRequestNoDataTable(String, String, String, String, String)
      * @param modifications DataTable containing the custom set of url query parameters to be
      *                      added to the requests. Syntax will be:
      *                      {@code
@@ -868,6 +1107,72 @@ public class RestSpec extends BaseGSpec {
             this.getCommonSpec().getLogger().debug("Setting url parameter '{}' to '{}'", key, value);
             commonspec.getRestRequest().queryParam(key, value);
         }
+    }
+
+    /**
+     * Specify a custom map of graphql variables to be added to future request
+     * <pre>{@code
+     * Example:
+     *
+     * Scenario: Add {"userId": 3} to the graphql variables
+     *      Given I securely send requests to 'jsonplaceholder.typicode.com:443'
+     *      Given I set graphql variables:
+     *           | userId | 3 |
+     *      When I send a 'POST' request to '/'
+     * }</pre>
+     * @see #setupApp(String, String)
+     * @see #sendRequestDataTable(String, String, String, String, String, DataTable)
+     * @see #sendRequestNoDataTable(String, String, String, String, String)
+     * @param modifications DataTable containing the custom set of url query parameters to be
+     *                      added to the requests. Syntax will be:
+     *                      {@code
+     *                      | <key> | <value> |
+     *                      }
+     *                      where:
+     *                      key: parameters name
+     *                      value: parameters value
+     *                      for example:
+     *                      if we want to add the variable "id" with value "1", to the request url
+     *                      the modification will be:
+     *
+     *                      Given I set graphql variables:
+     *                          |  id  |  1  |
+     *                      When I send a 'POST' request to '/'
+     */
+    @Given("^I set graphql variables:$")
+    public void iSetGraphqlVariables(DataTable modifications) {
+        for (List<String> row: modifications.asLists()) {
+            String key = row.get(0);
+            String value = row.get(1);
+
+            commonspec.getGraphQl().addVariable(key, value);
+
+            this.getCommonSpec().getLogger().debug("Setting graphql variables '{}' to '{}'", key, value);
+        }
+    }
+
+    /**
+     * Specify graphql variables from file
+     * <pre>{@code
+     * Example:
+     *
+     * Scenario: Add {"userId": 3} to the graphql variables
+     *      Given I securely send requests to 'jsonplaceholder.typicode.com:443'
+     *      Given I set graphql variables based on 'schemas/variables.json'
+     *      When I send a 'POST' request to '/'
+     * }</pre>
+     * @see #setupApp(String, String)
+     * @see #sendRequestDataTable(String, String, String, String, String, DataTable)
+     * @see #sendRequestNoDataTable(String, String, String, String, String)
+     * @param baseData Path to file containing the schema to be used
+     */
+    @Given("^I set graphql variables based on '([^:]+?)'$")
+    public void iSetGraphqlVariablesBasedOn(String baseData) throws Exception {
+        String retrievedData = commonspec.retrieveData(baseData, "json");
+
+        commonspec.getGraphQl().setVariables(
+            new JSONObject(JsonValue.readHjson(retrievedData).asObject())
+        );
     }
 
     /**
@@ -955,8 +1260,8 @@ public class RestSpec extends BaseGSpec {
     /**
      * Generates a REST request of the type specified to the indicated endpoint
      * <p>
-     * This step works in the same way as {@link #sendRequestDataTable(String, String, String, String, String, String, DataTable)} or to
-     * {@link #sendRequestNoDataTable(String, String, String, String, String, String)}, but in this case, you can pass directly the body to
+     * This step works in the same way as {@link #sendRequestDataTable(String, String, String, String, String, DataTable)} or to
+     * {@link #sendRequestNoDataTable(String, String, String, String, String)}, but in this case, you can pass directly the body to
      * send as parameter. This could be useful if you want to give visibility of the data you are sending, although, if the body
      * you want to send is too large, it might be better to store it in a file and use any of the other two steps.
      * <pre>{@code
@@ -986,32 +1291,18 @@ public class RestSpec extends BaseGSpec {
      *         }
      *     """
      *     Then the service response status must be '201'
-     *
-     * Scenario: Add the graphql body and variables to be sent directly
-     *     Given I securely send requests to 'jsonplaceholder.typicode.com:443'
-     *     When I send a 'POST' request to '/' as 'graphql' with variables '{"perPage": 10}' and body
-     *     """
-     *         query ($perPage: Int = 1) {
-     *             allUsers(perPage: $perPage) {
-     *                 id
-     *                 name
-     *             }
-     *         }
-     *     """
-     *     Then the service response status must be '201'
      * }
      * </pre>
      *
-     * @see #sendRequestNoDataTable(String, String, String, String, String, String)
-     * @see #sendRequestDataTable(String, String, String, String, String, String, DataTable)
+     * @see #sendRequestNoDataTable(String, String, String, String, String)
+     * @see #sendRequestDataTable(String, String, String, String, String, DataTable)
      * @param requestType   HTTP verb (type of request): POST, GET, PUT, PATCH, DELETE
      * @param endPoint      end point to be used
      * @param type          If the content as string or json or graphql
-     * @param variables     If the content as graphql
      * @param body          Inline body
      */
-    @When("^I send a '(.+?)' request to '(.+?)'( as '(json|string|graphql)')? with( variables '(.+?)' and)? body")
-    public void sendRequestInlineBody(String requestType, String endPoint, String type, String variables, DocString body) {
+    @When("^I send a '(.+?)' request to '(.+?)'( as '(json|string|graphql)')? with body")
+    public void sendRequestInlineBody(String requestType, String endPoint, String type, DocString body) {
         String content;
 
         if (type == null) {
@@ -1024,7 +1315,7 @@ public class RestSpec extends BaseGSpec {
                 break;
 
             case "graphql":
-                content = this.commonspec.buildGraphql(body.getContent(), variables);
+                content = this.commonspec.getGraphQl().build(body.getContent());
                 break;
 
             default:
@@ -1035,6 +1326,52 @@ public class RestSpec extends BaseGSpec {
         commonspec.getRestRequest().given().body(content);
         commonspec.generateRestRequest(requestType, endPoint);
         commonspec.getLogger().debug("Saving response");
+    }
+
+    /**
+     * Generates a REST request from swagger operation
+     * <p>
+     * This step works in the same way as {@link #sendSwaggerRequestDataTable(String, String, String, String, DataTable)} or to
+     * {@link #sendSwaggerRequestNoDataTable(String, String, String, String)}, but in this case, you can pass directly the body to
+     * send as parameter. This could be useful if you want to give visibility of the data you are sending, although, if the body
+     * you want to send is too large, it might be better to store it in a file and use any of the other two steps.
+     * <pre>{@code
+     * Example:
+     *
+     * Scenario: Add the body to be sent directly
+     *      Given I getting the swagger spec from 'schemas/oas2.yaml'
+     *      When I send request to swagger by operation id 'pet' with body
+     *         """
+     *           {
+     *               "name": "doggie",
+     *               "tags": "dog"
+     *           }
+     *         """
+     * }
+     * </pre>
+     *
+     * @see #sendSwaggerRequestNoDataTable(String, String, String, String)
+     * @see #sendSwaggerRequestDataTable(String, String, String, String, DataTable)
+     * @param operationId   Operation ID from swagger spec
+     * @param type          If the content as string or json
+     * @param body          Inline body
+     */
+    @When("^I send request to swagger by operation id '(.+?)'( as '(json|string)')? with body")
+    public void sendSwaggerRequestInlineBody(String operationId, String type, DocString body) {
+
+        SwaggerMethod method = commonspec.getSwagger().getMethod(operationId);
+
+        Assertions.assertThat(method).as("Incorrect Operation ID from swagger").isNotNull();
+
+        commonspec.getRestRequest().given().filter(commonspec.getSwagger().getValidator());
+
+        this.sendRequestInlineBody(
+            method.getMethod().name(),
+            method.getPath(),
+            type,
+            body
+        );
+
     }
 
     /**
@@ -1049,6 +1386,8 @@ public class RestSpec extends BaseGSpec {
 
         RequestSpecification spec = new RequestSpecBuilder().setContentType(ContentType.JSON).setRelaxedHTTPSValidation().build();
         commonspec.setRestRequest(given().header("Content-Type", "application/json").spec(spec));
+
+        commonspec.getGraphQl().reset();
 
         String baseUrl;
         if (commonspec.getRestPort() != null) {

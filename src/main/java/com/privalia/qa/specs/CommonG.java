@@ -458,6 +458,24 @@ public class CommonG {
     }
 
     /**
+     * Get the Swagger Spec utils.
+     *
+     * @return SwaggerUtils
+     */
+    public SwaggerUtils getSwagger() {
+        return SwaggerUtil.INSTANCE.getSwaggerUtils();
+    }
+
+    /**
+     * Get the GraphQl utils.
+     *
+     * @return GraphQlUtils
+     */
+    public GraphQlUtils getGraphQl() {
+        return GraphQlUtil.INSTANCE.getGraphQlUtils();
+    }
+
+    /**
      * Get the SOAP Services utils.
      *
      * @return SoapServiceUtils
@@ -1794,13 +1812,6 @@ public class CommonG {
 
     public String updateMarathonJson(String json) {
         return removeJSONPathElement(removeJSONPathElement(removeJSONPathElement(json, ".versionInfo"), ".version"), ".uris.*");
-    }
-
-    public String buildGraphql(String content, String variables) {
-        return new JSONObject()
-                .put("query", content)
-                .put("variables", variables == null ? null : JsonValue.readHjson(variables).asObject())
-                .toString();
     }
 
     public void runCommandLoggerAndEnvVar(int exitStatus, String envVar, Boolean local) {
