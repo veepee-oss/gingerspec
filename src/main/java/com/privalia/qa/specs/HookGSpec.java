@@ -31,7 +31,6 @@ import io.cucumber.java.After;
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
 import io.github.bonigarcia.wdm.WebDriverManager;
-import io.restassured.http.ContentType;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.core.config.Configurator;
 import org.openqa.selenium.*;
@@ -69,8 +68,6 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static io.restassured.RestAssured.given;
 
 
 /**

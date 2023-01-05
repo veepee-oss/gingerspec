@@ -16,7 +16,6 @@
 
 package com.privalia.qa.specs;
 
-import com.google.common.io.CharStreams;
 import com.privalia.qa.aspects.ReplacementAspect;
 import com.privalia.qa.utils.ThreadProperty;
 import io.cucumber.datatable.DataTable;
@@ -24,11 +23,11 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.apache.commons.text.io.StringSubstitutorReader;
-import org.apache.tools.ant.taskdefs.Replace;
-import org.assertj.core.api.Assert;
 import org.assertj.core.api.Assertions;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.ArrayList;

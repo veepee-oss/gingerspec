@@ -1,7 +1,5 @@
 package com.privalia.qa.cucumber.reporter;
 
-import io.cucumber.plugin.event.TestSourceRead;
-import net.bytebuddy.dynamic.scaffold.MethodGraph;
 import org.apache.commons.lang3.RegExUtils;
 
 import java.util.*;

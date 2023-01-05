@@ -16,7 +16,6 @@
 
 package com.privalia.qa.utils;
 
-import graphql.language.Document;
 import graphql.parser.Parser;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.idl.SchemaParser;
