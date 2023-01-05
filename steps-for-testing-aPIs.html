@@ -200,6 +200,97 @@ gherkin-tag {
 
 			<hr>
 
+			<li><h2>Set up initial base URI for future graphql requests</h2></li>
+			<ul>
+			<li><h3>Setting up base URI for future requests without graphql schema</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+			
+    <span class="gherkin-keyword">Scenario: </span>Setting up base URI for future requests without graphql schema
+      <span class="gherkin-keyword">Given </span>I send requests to '${GRAPHQL_SERVER_HOST}:3001'
+			</code></pre>
+			</div>
+			</ul>
+			<ul>
+			<li><h3>Setting up base URI for future requests with graphql schema</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+			
+    <span class="gherkin-keyword">Scenario: </span>Setting up base URI for future requests with graphql schema
+      <span class="gherkin-keyword">Given </span>I send requests to '${GRAPHQL_SERVER_HOST}:3001'
+      <span class="gherkin-keyword">Given </span>I getting the graphql schema from 'schemas/schema.graphql'
+			</code></pre>
+			</div>
+			</ul>
+
+			<hr>
+
+			<li><h2>Set up initial swagger spec for future requests</h2></li>
+			<ul>
+			<li><h3>Setting up swagger spec oas2 for future requests from URI</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+			
+    @ignore
+    <span class="gherkin-keyword">Scenario: </span>Setting up swagger spec oas2 for future requests from URI
+      <span class="gherkin-keyword">Given </span>I getting the swagger spec from 'https://petstore.swagger.io/v2/swagger.json'
+			</code></pre>
+			</div>
+			</ul>
+			<ul>
+			<li><h3>Setting up swagger spec oas2 for future requests from URI with server</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+			
+    @ignore
+    <span class="gherkin-keyword">Scenario: </span>Setting up swagger spec oas2 for future requests from URI with server
+      <span class="gherkin-keyword">Given </span>I getting the swagger spec from 'https://petstore.swagger.io/v2/swagger.json' and choose server with index 0
+			</code></pre>
+			</div>
+			</ul>
+			<ul>
+			<li><h3>Setting up swagger spec oas2 for future requests from file</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+			
+    <span class="gherkin-keyword">Scenario: </span>Setting up swagger spec oas2 for future requests from file
+      <span class="gherkin-keyword">Given </span>I getting the swagger spec from 'schemas/oas2.yaml'
+			</code></pre>
+			</div>
+			</ul>
+			<ul>
+			<li><h3>Setting up swagger spec oas2 for future requests from file with server</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+			
+    <span class="gherkin-keyword">Scenario: </span>Setting up swagger spec oas2 for future requests from file with server
+      <span class="gherkin-keyword">Given </span>I getting the swagger spec from 'schemas/oas2.yaml' and choose server with index 0
+			</code></pre>
+			</div>
+			</ul>
+			<ul>
+			<li><h3>Setting up swagger spec oas3 for future requests from file</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+			
+    <span class="gherkin-keyword">Scenario: </span>Setting up swagger spec oas3 for future requests from file
+      <span class="gherkin-keyword">Given </span>I getting the swagger spec from 'schemas/oas3.yaml'
+			</code></pre>
+			</div>
+			</ul>
+			<ul>
+			<li><h3>Setting up swagger spec oas3 for future requests from file with server</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+			
+    <span class="gherkin-keyword">Scenario: </span>Setting up swagger spec oas3 for future requests from file with server
+      <span class="gherkin-keyword">Given </span>I getting the swagger spec from 'schemas/oas3.yaml' and choose server with index 0
+			</code></pre>
+			</div>
+			</ul>
+
+			<hr>
+
 			<li><h2>Specifying Request Data</h2></li>
 			<ul>
 			<li><h3>Invoking HTTP resources (GET, POST, DELETE, PATCH, UPDATE)</h3></li>
@@ -253,6 +344,130 @@ gherkin-tag {
 			</code></pre>
 			</div>
 			</ul>
+			<ul>
+			<li><h3>Adding path parameters</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+			
+    @ignore
+    <span class="gherkin-keyword">Scenario: </span>Adding path parameters
+      <span class="gherkin-keyword">Given </span>I send requests to '${REST_SERVER_HOST}:3000'
+      <span class="gherkin-keyword">Given </span>I set url path parameters:
+        <span class="gherkin-keyword">|</span> id <span class="gherkin-keyword">|</span> 1 <span class="gherkin-keyword">|</span>
+      <span class="gherkin-keyword">When </span>I send a 'GET' request to '/posts/{id}'
+			</code></pre>
+			</div>
+			</ul>
+
+			<hr>
+
+			<li><h2>Swagger Spec Specifying Request Data</h2></li>
+			<ul>
+			<li><h3>Invoking requests to swagger operation from spec oas3</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+			
+    <span class="gherkin-keyword">Scenario: </span>Invoking requests to swagger operation from spec oas3
+      <span class="gherkin-keyword">Given </span>I getting the swagger spec from 'schemas/oas3.yaml'
+      <span class="gherkin-keyword">Given </span>I set url path parameters:
+        <span class="gherkin-keyword">|</span> id <span class="gherkin-keyword">|</span> 1 <span class="gherkin-keyword">|</span>
+      <span class="gherkin-keyword">When </span>I send request to swagger by operation id 'find pet by id'
+			</code></pre>
+			</div>
+			</ul>
+			<ul>
+			<li><h3>Invoking requests to swagger operation from spec oas2</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+			
+    <span class="gherkin-keyword">Scenario: </span>Invoking requests to swagger operation from spec oas2
+      <span class="gherkin-keyword">Given </span>I getting the swagger spec from 'schemas/oas2.yaml'
+      <span class="gherkin-keyword">Given </span>I set url path parameters:
+        <span class="gherkin-keyword">|</span> id <span class="gherkin-keyword">|</span> 1 <span class="gherkin-keyword">|</span>
+      <span class="gherkin-keyword">When </span>I send request to swagger by operation id 'findPetById'
+			</code></pre>
+			</div>
+			</ul>
+			<ul>
+			<li><h3>Adding request body from a file for spec oas3</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+			
+    <span class="gherkin-keyword">Scenario: </span>Adding request body from a file for spec oas3
+      <span class="gherkin-keyword">Given </span>I getting the swagger spec from 'schemas/oas3.yaml'
+      <span class="gherkin-keyword">When </span>I send request to swagger by operation id 'addPet' based on 'schemas/swagger.testdata.json' as 'json'
+			</code></pre>
+			</div>
+			</ul>
+			<ul>
+			<li><h3>Adding request body from a file for spec oas2</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+			
+    <span class="gherkin-keyword">Scenario: </span>Adding request body from a file for spec oas2
+      <span class="gherkin-keyword">Given </span>I getting the swagger spec from 'schemas/oas2.yaml'
+      <span class="gherkin-keyword">When </span>I send request to swagger by operation id 'addPet' based on 'schemas/swagger.testdata.json' as 'json'
+			</code></pre>
+			</div>
+			</ul>
+			<ul>
+			<li><h3>Adding request body from a file but modifying elements of the json before sending for spec oas3</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+			
+    <span class="gherkin-keyword">Scenario: </span>Adding request body from a file but modifying elements of the json before sending for spec oas3
+      <span class="gherkin-keyword">Given </span>I getting the swagger spec from 'schemas/oas3.yaml'
+      <span class="gherkin-keyword">When </span>I send request to swagger by operation id 'addPet' based on 'schemas/swagger.testdata.json' as 'json' with:
+        <span class="gherkin-keyword">|</span> $.tags <span class="gherkin-keyword">|</span> UPDATE <span class="gherkin-keyword">|</span> cat <span class="gherkin-keyword">|</span>
+			</code></pre>
+			</div>
+			</ul>
+			<ul>
+			<li><h3>Adding request body from a file but modifying elements of the json before sending for oas2</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+			
+    <span class="gherkin-keyword">Scenario: </span>Adding request body from a file but modifying elements of the json before sending for oas2
+      <span class="gherkin-keyword">Given </span>I getting the swagger spec from 'schemas/oas2.yaml'
+      <span class="gherkin-keyword">When </span>I send request to swagger by operation id 'addPet' based on 'schemas/swagger.testdata.json' as 'json' with:
+        <span class="gherkin-keyword">|</span> $.tags <span class="gherkin-keyword">|</span> UPDATE <span class="gherkin-keyword">|</span> cat <span class="gherkin-keyword">|</span>
+			</code></pre>
+			</div>
+			</ul>
+			<ul>
+			<li><h3>Adding request body directly in the gherkin step for spec oas3</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+			
+    <span class="gherkin-keyword">Scenario: </span>Adding request body directly in the gherkin step for spec oas3
+      <span class="gherkin-keyword">Given </span>I getting the swagger spec from 'schemas/oas3.yaml'
+      <span class="gherkin-keyword">When </span>I send request to swagger by operation id 'addPet' with body
+           """
+              {
+                "name": "doggie",
+                "tags": "dog"
+              }
+           """
+			</code></pre>
+			</div>
+			</ul>
+			<ul>
+			<li><h3>Adding request body directly in the gherkin step for oas2</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+			
+    <span class="gherkin-keyword">Scenario: </span>Adding request body directly in the gherkin step for oas2
+      <span class="gherkin-keyword">Given </span>I getting the swagger spec from 'schemas/oas2.yaml'
+      <span class="gherkin-keyword">When </span>I send request to swagger by operation id 'addPet' with body
+           """
+              {
+                "name": "doggie",
+                "tags": "dog"
+              }
+           """
+			</code></pre>
+			</div>
+			</ul>
 
 			<hr>
 
@@ -294,7 +509,7 @@ gherkin-tag {
                 "title": "This is a test",
                 "body": "This is a test"
               }
-          """
+           """
 			</code></pre>
 			</div>
 			</ul>
@@ -343,6 +558,7 @@ gherkin-tag {
 			
     <span class="gherkin-keyword">Scenario: </span>Adding graphql request body from a file
       <span class="gherkin-keyword">Given </span>I send requests to '${GRAPHQL_SERVER_HOST}:3001'
+      <span class="gherkin-keyword">Given </span>I getting the graphql schema from 'schemas/schema.graphql'
       <span class="gherkin-keyword">When </span>I send a 'POST' request to '/' based on 'schemas/mytestdata.graphql' as 'graphql'
 			</code></pre>
 			</div>
@@ -354,7 +570,23 @@ gherkin-tag {
 			
     <span class="gherkin-keyword">Scenario: </span>Adding graphql request body from a file with variables
       <span class="gherkin-keyword">Given </span>I send requests to '${GRAPHQL_SERVER_HOST}:3001'
-      <span class="gherkin-keyword">When </span>I send a 'POST' request to '/' based on 'schemas/mytestdatawithvars.graphql' as 'graphql' with variables '{"perPage": 10}'
+      <span class="gherkin-keyword">Given </span>I getting the graphql schema from 'schemas/schema.graphql'
+      <span class="gherkin-keyword">Given </span>I set graphql variables:
+        <span class="gherkin-keyword">|</span> perPage <span class="gherkin-keyword">|</span> 10 <span class="gherkin-keyword">|</span>
+      <span class="gherkin-keyword">When </span>I send a 'POST' request to '/' based on 'schemas/mytestdatawithvars.graphql' as 'graphql'
+			</code></pre>
+			</div>
+			</ul>
+			<ul>
+			<li><h3>Adding graphql request body from a file with variables from file</h3></li>
+			<div class="highlight">
+			<pre><code class="language-gherkin">
+			
+    <span class="gherkin-keyword">Scenario: </span>Adding graphql request body from a file with variables from file
+      <span class="gherkin-keyword">Given </span>I send requests to '${GRAPHQL_SERVER_HOST}:3001'
+      <span class="gherkin-keyword">Given </span>I getting the graphql schema from 'schemas/schema.graphql'
+      <span class="gherkin-keyword">Given </span>I set graphql variables based on 'schemas/graphql.variables.json'
+      <span class="gherkin-keyword">When </span>I send a 'POST' request to '/' based on 'schemas/mytestdatawithvars.graphql' as 'graphql'
 			</code></pre>
 			</div>
 			</ul>
@@ -365,6 +597,7 @@ gherkin-tag {
 			
     <span class="gherkin-keyword">Scenario: </span>Adding request body from a file but modifying elements of the graphql before sending
       <span class="gherkin-keyword">Given </span>I send requests to '${GRAPHQL_SERVER_HOST}:3001'
+      <span class="gherkin-keyword">Given </span>I getting the graphql schema from 'schemas/schema.graphql'
       <span class="gherkin-keyword">When </span>I send a 'POST' request to '/' based on 'schemas/mytestdata.graphql' as 'graphql' with:
         <span class="gherkin-keyword">|</span> id <span class="gherkin-keyword">|</span> UPDATE <span class="gherkin-keyword">|</span> name <span class="gherkin-keyword">|</span>
 			</code></pre>
@@ -377,7 +610,10 @@ gherkin-tag {
 			
     <span class="gherkin-keyword">Scenario: </span>Adding request body from a file and variables but modifying elements of the graphql before sending
       <span class="gherkin-keyword">Given </span>I send requests to '${GRAPHQL_SERVER_HOST}:3001'
-      <span class="gherkin-keyword">When </span>I send a 'POST' request to '/' based on 'schemas/mytestdatawithvars.graphql' as 'graphql' with variables '{"perPage": 10}' and:
+      <span class="gherkin-keyword">Given </span>I getting the graphql schema from 'schemas/schema.graphql'
+      <span class="gherkin-keyword">Given </span>I set graphql variables:
+        <span class="gherkin-keyword">|</span> perPage <span class="gherkin-keyword">|</span> 10 <span class="gherkin-keyword">|</span>
+      <span class="gherkin-keyword">When </span>I send a 'POST' request to '/' based on 'schemas/mytestdatawithvars.graphql' as 'graphql' with:
         <span class="gherkin-keyword">|</span> id <span class="gherkin-keyword">|</span> UPDATE <span class="gherkin-keyword">|</span> name <span class="gherkin-keyword">|</span>
 			</code></pre>
 			</div>
@@ -389,6 +625,7 @@ gherkin-tag {
 			
     <span class="gherkin-keyword">Scenario: </span>Adding graphql request body directly in the gherkin step
       <span class="gherkin-keyword">Given </span>I send requests to '${GRAPHQL_SERVER_HOST}:3001'
+      <span class="gherkin-keyword">Given </span>I getting the graphql schema from 'schemas/schema.graphql'
       <span class="gherkin-keyword">When </span>I send a 'POST' request to '/' as 'graphql' with body
            """
               {
@@ -408,7 +645,10 @@ gherkin-tag {
 			
     <span class="gherkin-keyword">Scenario: </span>Adding graphql request body and variables directly in the gherkin step
       <span class="gherkin-keyword">Given </span>I send requests to '${GRAPHQL_SERVER_HOST}:3001'
-      <span class="gherkin-keyword">When </span>I send a 'POST' request to '/' as 'graphql' with variables '{"perPage": 10}' and body
+      <span class="gherkin-keyword">Given </span>I getting the graphql schema from 'schemas/schema.graphql'
+      <span class="gherkin-keyword">Given </span>I set graphql variables:
+        <span class="gherkin-keyword">|</span> perPage <span class="gherkin-keyword">|</span> 10 <span class="gherkin-keyword">|</span>
+      <span class="gherkin-keyword">When </span>I send a 'POST' request to '/' as 'graphql' with body
            """
               query ($perPage: Int = 1) {
                   allUsers(perPage: $perPage) {
