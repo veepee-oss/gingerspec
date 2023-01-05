@@ -20,30 +20,30 @@ Feature: Steps for testing APIs
 
     Scenario: Setting up base URI for future requests with graphql schema
       Given I send requests to '${GRAPHQL_SERVER_HOST}:3001'
-      Given I getting the graphql schema from 'schemas/schema.graphql'
+      Given I get the graphql schema from 'schemas/schema.graphql'
 
 
   Rule: Set up initial swagger spec for future requests
 
     @ignore
     Scenario: Setting up swagger spec oas2 for future requests from URI
-      Given I getting the swagger spec from 'https://petstore.swagger.io/v2/swagger.json'
+      Given I get the swagger spec from 'https://petstore.swagger.io/v2/swagger.json'
 
     @ignore
     Scenario: Setting up swagger spec oas2 for future requests from URI with server
-      Given I getting the swagger spec from 'https://petstore.swagger.io/v2/swagger.json' and choose server with index 0
+      Given I get the swagger spec from 'https://petstore.swagger.io/v2/swagger.json' and choose server with index 0
 
     Scenario: Setting up swagger spec oas2 for future requests from file
-      Given I getting the swagger spec from 'schemas/oas2.yaml'
+      Given I get the swagger spec from 'schemas/oas2.yaml'
 
     Scenario: Setting up swagger spec oas2 for future requests from file with server
-      Given I getting the swagger spec from 'schemas/oas2.yaml' and choose server with index 0
+      Given I get the swagger spec from 'schemas/oas2.yaml' and choose server with index 0
 
     Scenario: Setting up swagger spec oas3 for future requests from file
-      Given I getting the swagger spec from 'schemas/oas3.yaml'
+      Given I get the swagger spec from 'schemas/oas3.yaml'
 
     Scenario: Setting up swagger spec oas3 for future requests from file with server
-      Given I getting the swagger spec from 'schemas/oas3.yaml' and choose server with index 0
+      Given I get the swagger spec from 'schemas/oas3.yaml' and choose server with index 0
 
 
   Rule: Specifying Request Data
@@ -83,37 +83,37 @@ Feature: Steps for testing APIs
   Rule: Swagger Spec Specifying Request Data
 
     Scenario: Invoking requests to swagger operation from spec oas3
-      Given I getting the swagger spec from 'schemas/oas3.yaml'
+      Given I get the swagger spec from 'schemas/oas3.yaml'
       Given I set url path parameters:
         | id | 1 |
       When I send request to swagger by operation id 'find pet by id'
 
     Scenario: Invoking requests to swagger operation from spec oas2
-      Given I getting the swagger spec from 'schemas/oas2.yaml'
+      Given I get the swagger spec from 'schemas/oas2.yaml'
       Given I set url path parameters:
         | id | 1 |
       When I send request to swagger by operation id 'findPetById'
 
     Scenario: Adding request body from a file for spec oas3
-      Given I getting the swagger spec from 'schemas/oas3.yaml'
+      Given I get the swagger spec from 'schemas/oas3.yaml'
       When I send request to swagger by operation id 'addPet' based on 'schemas/swagger.testdata.json' as 'json'
 
     Scenario: Adding request body from a file for spec oas2
-      Given I getting the swagger spec from 'schemas/oas2.yaml'
+      Given I get the swagger spec from 'schemas/oas2.yaml'
       When I send request to swagger by operation id 'addPet' based on 'schemas/swagger.testdata.json' as 'json'
 
     Scenario: Adding request body from a file but modifying elements of the json before sending for spec oas3
-      Given I getting the swagger spec from 'schemas/oas3.yaml'
+      Given I get the swagger spec from 'schemas/oas3.yaml'
       When I send request to swagger by operation id 'addPet' based on 'schemas/swagger.testdata.json' as 'json' with:
         | $.tags | UPDATE | cat |
 
     Scenario: Adding request body from a file but modifying elements of the json before sending for oas2
-      Given I getting the swagger spec from 'schemas/oas2.yaml'
+      Given I get the swagger spec from 'schemas/oas2.yaml'
       When I send request to swagger by operation id 'addPet' based on 'schemas/swagger.testdata.json' as 'json' with:
         | $.tags | UPDATE | cat |
 
     Scenario: Adding request body directly in the gherkin step for spec oas3
-      Given I getting the swagger spec from 'schemas/oas3.yaml'
+      Given I get the swagger spec from 'schemas/oas3.yaml'
       When I send request to swagger by operation id 'addPet' with body
            """
               {
@@ -123,7 +123,7 @@ Feature: Steps for testing APIs
            """
 
     Scenario: Adding request body directly in the gherkin step for oas2
-      Given I getting the swagger spec from 'schemas/oas2.yaml'
+      Given I get the swagger spec from 'schemas/oas2.yaml'
       When I send request to swagger by operation id 'addPet' with body
            """
               {
@@ -180,31 +180,31 @@ Feature: Steps for testing APIs
 
     Scenario: Adding graphql request body from a file
       Given I send requests to '${GRAPHQL_SERVER_HOST}:3001'
-      Given I getting the graphql schema from 'schemas/schema.graphql'
+      Given I get the graphql schema from 'schemas/schema.graphql'
       When I send a 'POST' request to '/' based on 'schemas/mytestdata.graphql' as 'graphql'
 
     Scenario: Adding graphql request body from a file with variables
       Given I send requests to '${GRAPHQL_SERVER_HOST}:3001'
-      Given I getting the graphql schema from 'schemas/schema.graphql'
+      Given I get the graphql schema from 'schemas/schema.graphql'
       Given I set graphql variables:
         | perPage | 10 |
       When I send a 'POST' request to '/' based on 'schemas/mytestdatawithvars.graphql' as 'graphql'
 
     Scenario: Adding graphql request body from a file with variables from file
       Given I send requests to '${GRAPHQL_SERVER_HOST}:3001'
-      Given I getting the graphql schema from 'schemas/schema.graphql'
+      Given I get the graphql schema from 'schemas/schema.graphql'
       Given I set graphql variables based on 'schemas/graphql.variables.json'
       When I send a 'POST' request to '/' based on 'schemas/mytestdatawithvars.graphql' as 'graphql'
 
     Scenario: Adding request body from a file but modifying elements of the graphql before sending
       Given I send requests to '${GRAPHQL_SERVER_HOST}:3001'
-      Given I getting the graphql schema from 'schemas/schema.graphql'
+      Given I get the graphql schema from 'schemas/schema.graphql'
       When I send a 'POST' request to '/' based on 'schemas/mytestdata.graphql' as 'graphql' with:
         | id | UPDATE | name |
 
     Scenario: Adding request body from a file and variables but modifying elements of the graphql before sending
       Given I send requests to '${GRAPHQL_SERVER_HOST}:3001'
-      Given I getting the graphql schema from 'schemas/schema.graphql'
+      Given I get the graphql schema from 'schemas/schema.graphql'
       Given I set graphql variables:
         | perPage | 10 |
       When I send a 'POST' request to '/' based on 'schemas/mytestdatawithvars.graphql' as 'graphql' with:
@@ -212,7 +212,7 @@ Feature: Steps for testing APIs
 
     Scenario: Adding graphql request body directly in the gherkin step
       Given I send requests to '${GRAPHQL_SERVER_HOST}:3001'
-      Given I getting the graphql schema from 'schemas/schema.graphql'
+      Given I get the graphql schema from 'schemas/schema.graphql'
       When I send a 'POST' request to '/' as 'graphql' with body
            """
               {
@@ -225,7 +225,7 @@ Feature: Steps for testing APIs
 
     Scenario: Adding graphql request body and variables directly in the gherkin step
       Given I send requests to '${GRAPHQL_SERVER_HOST}:3001'
-      Given I getting the graphql schema from 'schemas/schema.graphql'
+      Given I get the graphql schema from 'schemas/schema.graphql'
       Given I set graphql variables:
         | perPage | 10 |
       When I send a 'POST' request to '/' as 'graphql' with body

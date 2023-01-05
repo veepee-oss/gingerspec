@@ -141,20 +141,20 @@ public class RestSpec extends BaseGSpec {
      * Examples
      *
      * Scenario: Setting up the swagger from file.
-     *      Given I getting the swagger spec from 'swagger/oas3.yaml'
+     *      Given I get the swagger spec from 'swagger/oas3.yaml'
      *
      * Scenario: Setting up the swagger from file.
-     *      Given I getting the swagger spec from 'swagger/oas3.yaml' and choose server with index 1
+     *      Given I get the swagger spec from 'swagger/oas3.yaml' and choose server with index 1
      *
      * Scenario: Setting up the swagger from url.
-     *      Given I getting the swagger spec from 'http://petstore.swagger.io/v2/swagger.json'
+     *      Given I get the swagger spec from 'http://petstore.swagger.io/v2/swagger.json'
      * }
      * </pre>
      *
      * @param path   File path to swagger spec or URI to swagger spec
      * @param server Server index to which requests will be sent (default: 0)
      */
-    @Given("^I getting the swagger spec from '(.*)'( and choose server with index (\\d+))?$")
+    @Given("^I get the swagger spec from '(.*)'( and choose server with index (\\d+))?$")
     public void setupSwaggerSpec(String path, Integer server) throws MalformedURLException {
 
         commonspec.getSwagger().initialize(path, server);
@@ -179,21 +179,21 @@ public class RestSpec extends BaseGSpec {
      *
      * Scenario: Setting up the host.
      *      Given I send requests to 'jsonplaceholder.typicode.com'
-     *      Given I getting the graphql schema from 'schemas/schema.graphql'
+     *      Given I get the graphql schema from 'schemas/schema.graphql'
      *
      * Scenario: Setting up host and specific port
      *      Given I send requests to 'jsonplaceholder.typicode.com:8080'
-     *      Given I getting the graphql schema from 'schemas/schema.graphql'
+     *      Given I get the graphql schema from 'schemas/schema.graphql'
      *
      * Scenario: using the keyword 'securely' to use https.
      *      Given I securely send requests to 'jsonplaceholder.typicode.com'
-     *      Given I getting the graphql schema from 'schemas/schema.graphql'
+     *      Given I get the graphql schema from 'schemas/schema.graphql'
      * }
      * </pre>
      *
      * @param path   File path to GraphQl schema
      */
-    @Given("^I getting the graphql schema from '(.*)'$")
+    @Given("^I get the graphql schema from '(.*)'$")
     public void setupGraphQlSchema(String path) throws Exception {
 
         commonspec.getGraphQl().initialize(path, commonspec.retrieveData(path, "string"));
@@ -321,15 +321,15 @@ public class RestSpec extends BaseGSpec {
      * Examples:
      *
      * Scenario: Executing a simple GET request
-     *      Given I getting the swagger spec from 'schemas/oas2.yaml'
+     *      Given I get the swagger spec from 'schemas/oas2.yaml'
      *      When I send request to swagger by operation id 'pet'
      *
      * Scenario: Using basic authentication
-     *      Given I getting the swagger spec from 'schemas/oas2.yaml'
+     *      Given I get the swagger spec from 'schemas/oas2.yaml'
      *      When I send request to swagger by operation id 'pet' with user and password 'user:password'
      *
      * Scenario: Sending a POST request with content of file swagger.testdata.json as body
-     *      Given I getting the swagger spec from 'schemas/oas2.yaml'
+     *      Given I get the swagger spec from 'schemas/oas2.yaml'
      *      When I send request to swagger by operation id 'pet' based on 'schemas/swagger.testdata.json' as 'json'
      * }</pre>
      *
@@ -457,7 +457,7 @@ public class RestSpec extends BaseGSpec {
      * Example
      *
      * Scenario: Sending a POST request with content of file swagger.testdata.json as body
-     *      Given I getting the swagger spec from 'schemas/oas2.yaml'
+     *      Given I get the swagger spec from 'schemas/oas2.yaml'
      *      When I send request to swagger by operation id 'pet' based on 'schemas/swagger.testdata.json' as 'json' with:
      *          | $.title | UPDATE | This is a test 2 |
      *
@@ -1339,7 +1339,7 @@ public class RestSpec extends BaseGSpec {
      * Example:
      *
      * Scenario: Add the body to be sent directly
-     *      Given I getting the swagger spec from 'schemas/oas2.yaml'
+     *      Given I get the swagger spec from 'schemas/oas2.yaml'
      *      When I send request to swagger by operation id 'pet' with body
      *         """
      *           {
