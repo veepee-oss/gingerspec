@@ -48,3 +48,12 @@ jobs:
         MAVEN_USERNAME: jose.fernandez
         MAVEN_CENTRAL_TOKEN: ${{ secrets.MAVEN_CENTRAL_TOKEN }}
         MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
+
+    - name: Performing a dry-run to generate pages
+      run: mvn clean verify -Dcucumber.execution.dry-run=true
+
+    - name: Publish pages
+      uses: JamesIves/github-pages-deploy-action@v4.4.1
+      with:
+        branch: gh-pages
+        folder: target/documentation
