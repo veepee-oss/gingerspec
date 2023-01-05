@@ -90,6 +90,7 @@ public class SwaggerUtils {
      *
      * @param path   File path to swagger spec or URI to swagger spec
      * @param server Server index to which requests will be sent (default: 0)
+     * @throws MalformedURLException    MalformedURLException
      */
     public void initialize(String path, Integer server) throws MalformedURLException {
 

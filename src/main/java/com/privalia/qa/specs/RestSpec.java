@@ -153,6 +153,7 @@ public class RestSpec extends BaseGSpec {
      *
      * @param path   File path to swagger spec or URI to swagger spec
      * @param server Server index to which requests will be sent (default: 0)
+     * @throws MalformedURLException  MalformedURLException
      */
     @Given("^I get the swagger spec from '(.*)'( and choose server with index (\\d+))?$")
     public void setupSwaggerSpec(String path, Integer server) throws MalformedURLException {
@@ -192,6 +193,7 @@ public class RestSpec extends BaseGSpec {
      * </pre>
      *
      * @param path   File path to GraphQl schema
+     * @throws Exception    Exception
      */
     @Given("^I get the graphql schema from '(.*)'$")
     public void setupGraphQlSchema(String path) throws Exception {
@@ -1165,6 +1167,7 @@ public class RestSpec extends BaseGSpec {
      * @see #sendRequestDataTable(String, String, String, String, String, DataTable)
      * @see #sendRequestNoDataTable(String, String, String, String, String)
      * @param baseData Path to file containing the schema to be used
+     * @throws Exception Exception
      */
     @Given("^I set graphql variables based on '([^:]+?)'$")
     public void iSetGraphqlVariablesBasedOn(String baseData) throws Exception {
