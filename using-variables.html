@@ -183,11 +183,11 @@ gherkin-tag {
 		<ol>
 			<li><h2>Using variables in Scenario names, titles, log messages, datatables, docStrings</h2></li>
 			<ul>
-			<li><h3>Replacements scenario title and log comments. 1.0</h3></li>
+			<li><h3>Replacements scenario title and log comments. ${VERSION}</h3></li>
 			<div class="highlight">
 			<pre><code class="language-gherkin">
 			
-    <span class="gherkin-keyword">Scenario: </span>Replacements scenario title and log comments. 1.0
+    <span class="gherkin-keyword">Scenario: </span>Replacements scenario title and log comments. ${VERSION}
       #log The value of VERSION in the title should be ${VERSION}
       <span class="gherkin-keyword">And </span>I wait '1' seconds
 			</code></pre>
