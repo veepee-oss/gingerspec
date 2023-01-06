@@ -1,5 +1,17 @@
 # Changelog
 
+## 2.2.16
+
+* Add GraphQL request validator
+
+* Add support swagger and refactoring graphql
+
+* Generation of pages was moved to publish phase
+
+* Removed unnecessary imports in many classes
+
+* bump slf4j-api, slf4j-simple
+
 ## 2.2.15
 
 * Added small change to add some style to html documentation
