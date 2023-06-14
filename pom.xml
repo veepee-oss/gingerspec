@@ -104,7 +104,7 @@
         <org.jacoco.core.version>0.7.5.201505241946</org.jacoco.core.version>
         <aspectjweaver.version>1.9.5</aspectjweaver.version>
         <cassandra-driver-core.version>3.2.0</cassandra-driver-core.version>
-        <guava.version>30.0-jre</guava.version>
+        <guava.version>32.0.0-jre</guava.version>
         <lz4.version>1.2.0</lz4.version>
         <httpclient.version>4.5.13</httpclient.version>
         <mongo-java-driver.version>2.12.3</mongo-java-driver.version>
