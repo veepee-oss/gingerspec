@@ -4,7 +4,7 @@
 
     <groupId>com.github.privaliatech</groupId>
     <artifactId>gingerspec</artifactId>
-    <version>2.2.16</version>
+    <version>2.2.17</version>
 
     <name>Privalia GingerSpec framework</name>
     <description>Acceptance Test library. General purpose automation framework.</description>
@@ -123,7 +123,7 @@
         <clickhouse.version>0.3.2-patch11</clickhouse.version>
         <postgresql.version>42.3.8</postgresql.version>
         <rest-assured.version>4.5.1</rest-assured.version>
-        <webdrivermanager.version>5.1.0</webdrivermanager.version>
+        <webdrivermanager.version>5.6.2</webdrivermanager.version>
         <appium.version>7.3.0</appium.version>
         <swagger.parser.version>2.1.9</swagger.parser.version>
         <swagger.validator.version>2.31.0</swagger.validator.version>
